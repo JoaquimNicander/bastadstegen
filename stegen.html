@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS Stegen — Båstad Tennissällskap</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A1A0C;--surface:#0F2212;--card:#142816;--card2:#1A3320;
+  --border:#1F4025;--border2:#2A5530;
+  --green:#4CAF50;--green2:#2E7D32;--green-glow:rgba(76,175,80,0.15);
+  --yellow:#D4E157;--clay:#C17D4B;--clay2:#A0632F;
+  --white:#F0F5F0;--muted:rgba(240,245,240,0.45);--muted2:rgba(240,245,240,0.25);
+  --up:#4CAF50;--down:#EF5350;--same:#888;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:16px}
+
+/* ── HEADER ── */
+header{
+  background:linear-gradient(180deg,#071209 0%,var(--surface) 100%);
+  border-bottom:1px solid var(--border);
+  padding:0 48px;
+  position:sticky;top:0;z-index:100;
+}
+.header-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white)}
+.logo-sub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.round-badge{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;background:rgba(76,175,80,0.12);border:1px solid rgba(76,175,80,0.25);color:var(--green);padding:5px 14px;border-radius:100px}
+.header-right{display:flex;align-items:center;gap:10px}
+.player-login-btn{
+  text-decoration:none;background:var(--card2);border:1px solid var(--border2);
+  color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;
+  letter-spacing:1px;padding:6px 14px;transition:all 0.2s;
+}
+.player-login-btn:hover{color:var(--white);border-color:var(--muted)}
+
+/* ── NAV TABS ── */
+.nav-tabs{display:flex;gap:0;border-bottom:1px solid var(--border)}
+.tab-btn{background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.5px;padding:0 24px;height:52px;cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s;text-transform:uppercase;white-space:nowrap;display:inline-flex;align-items:center}
+.tab-btn.active{color:var(--white);border-bottom-color:var(--green)}
+.tab-btn:hover{color:var(--white)}
+
+/* ── MAIN ── */
+.main{max-width:1100px;margin:0 auto;padding:32px 48px 80px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── LADDER ── */
+.ladder-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+.ladder-header h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--white)}
+.ladder-legend{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase}
+.ladder-list{display:flex;flex-direction:column;gap:2px}
+.ladder-row{display:grid;grid-template-columns:48px 36px 1fr auto auto auto;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);padding:12px 20px;cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.15s}
+.ladder-row:hover{background:var(--card2);border-color:var(--border2);transform:translateX(3px)}
+.ladder-row.top3{border-left:3px solid var(--yellow)}
+.ladder-row.me{border-left:3px solid var(--green);background:#142416}
+.rank-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--muted2);line-height:1;text-align:right}
+.rank-num.top1{color:var(--yellow);font-size:32px}
+.rank-num.top3{color:rgba(212,225,87,0.6)}
+.player-avatar{width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);overflow:hidden;flex-shrink:0}
+.player-avatar img{width:100%;height:100%;object-fit:cover}
+.player-info{}
+.player-name{font-weight:600;font-size:16px;color:var(--white)}
+.player-meta{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px;margin-top:3px}
+.movement{display:flex;align-items:center;gap:4px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;min-width:40px;justify-content:flex-end}
+.movement.up{color:var(--up)}
+.movement.down{color:var(--down)}
+.movement.same{color:var(--same)}
+.player-record{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:right;min-width:50px}
+.player-sets-record{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);text-align:right;min-width:60px}
+
+/* ── TOP3 PODIUM ── */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:32px}
+.podium-card{background:var(--card);border:1px solid var(--border);padding:24px;text-align:center;position:relative;overflow:hidden}
+.podium-card.p1{border-color:var(--yellow);background:#141E06}
+.podium-card.p2{border-color:#9E9E9E}
+.podium-card.p3{border-color:#8D6748}
+.podium-pos{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;position:absolute;top:-8px;right:16px;opacity:0.08}
+.podium-card.p1 .podium-pos{color:var(--yellow);opacity:0.15}
+.podium-avatar{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;background:var(--card2);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--muted);overflow:hidden}
+.podium-card.p1 .podium-avatar{border-color:var(--yellow)}
+.podium-name{font-weight:700;font-size:15px;margin-bottom:4px}
+.podium-rank-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase}
+
+/* ── MATCHES TAB ── */
+.week-section{margin-bottom:40px}
+.week-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.matches-grid{display:flex;flex-direction:column;gap:3px}
+.match-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);padding:14px 20px}
+.match-player{display:flex;align-items:center;gap:10px}
+.match-player.right{flex-direction:row-reverse;text-align:right}
+.match-player-avatar{width:32px;height:32px;border-radius:50%;background:var(--card2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--muted);flex-shrink:0;overflow:hidden}
+.match-player-avatar img{width:100%;height:100%;object-fit:cover}
+.match-player-name{font-weight:500;font-size:15px}
+.match-player-rank{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+.match-center{text-align:center}
+.match-score{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--green);letter-spacing:1px;line-height:1.4}
+.match-vs{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px}
+.match-winner{font-weight:600;color:var(--white)}
+.match-loser{color:var(--muted)}
+.wo-badge{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted2);padding:2px 8px;border-radius:100px}
+
+/* ── PLAYERS TAB ── */
+.players-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+.player-card{
+  background:var(--card);border:1px solid var(--border);
+  padding:20px 16px 14px;text-align:center;cursor:pointer;
+  transition:border-color 0.2s,transform 0.2s,background 0.2s;
+  position:relative;overflow:hidden;
+}
+.player-card:hover{border-color:var(--green);transform:translateY(-3px);background:var(--card2)}
+.player-card.top3{border-top:2px solid var(--yellow)}
+
+.player-card-rank{
+  position:absolute;top:10px;left:12px;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2);line-height:1;
+}
+.player-card-rank.gold{color:var(--yellow)}
+
+.player-card-avatar{
+  width:72px;height:72px;border-radius:50%;margin:0 auto 10px;
+  background:var(--card2);border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;color:var(--muted);overflow:hidden;
+  transition:border-color 0.2s;
+}
+.player-card:hover .player-card-avatar{border-color:var(--green)}
+.player-card-avatar img{width:100%;height:100%;object-fit:cover}
+
+.player-card-name{font-weight:700;font-size:15px;margin-bottom:2px;line-height:1.2}
+.player-card-hand{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-bottom:8px}
+
+/* Main stats row */
+.player-card-stats-main{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:0;border:1px solid var(--border);margin-bottom:4px;
+}
+.pc-stat{
+  padding:6px 4px;text-align:center;border-right:1px solid var(--border);
+}
+.pc-stat:last-child{border-right:none}
+.pc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white);line-height:1}
+.pc-stat-lbl{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+
+/* Secondary stats row */
+.player-card-stats-sec{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;border:1px solid var(--border);border-top:none;margin-bottom:8px;
+}
+.pc-stat-sec{
+  padding:4px;text-align:center;border-right:1px solid var(--border);
+}
+.pc-stat-sec:last-child{border-right:none}
+.pc-stat-sec-val{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);font-weight:700;line-height:1}
+.pc-stat-sec-lbl{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+
+.player-card-phone{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px}
+.player-note{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--clay);margin-bottom:4px}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);width:100%;max-width:600px;max-height:92vh;overflow-y:auto;transform:translateY(20px);transition:transform 0.25s}
+.modal-overlay.open .modal{transform:translateY(0)}
+
+.modal-header{background:linear-gradient(135deg,#071209,#0F2212);padding:28px 28px 20px;position:relative;border-bottom:1px solid var(--border)}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{color:var(--white)}
+
+.modal-player-row{display:flex;align-items:flex-start;gap:20px}
+.modal-avatar{width:88px;height:88px;border-radius:50%;flex-shrink:0;background:var(--card2);border:3px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--muted);overflow:hidden;position:relative;cursor:pointer}
+.modal-avatar:hover .avatar-upload-hint{opacity:1}
+.avatar-upload-hint{position:absolute;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;opacity:0;transition:opacity 0.2s;border-radius:50%;text-align:center;line-height:1.3}
+.modal-avatar img{width:100%;height:100%;object-fit:cover}
+
+.modal-player-info{flex:1}
+.modal-rank{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--yellow);line-height:0.9;margin-bottom:4px}
+.modal-name{font-weight:700;font-size:22px;margin-bottom:3px}
+.modal-club{font-family:'Space Mono',monospace;font-size:9px;color:var(--green);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.modal-quick-info{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.modal-quick-chip{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:3px 8px;display:flex;align-items:center;gap:4px}
+
+.modal-body{padding:20px 28px 28px}
+
+/* ── MODAL STATS GRID ── */
+.modal-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.modal-stats-grid.secondary{margin-bottom:20px}
+.modal-stat{background:var(--card);border:1px solid var(--border);padding:12px;text-align:center}
+.modal-stat.highlight{border-color:rgba(76,175,80,0.3);background:#0F2212}
+.modal-stat-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white);line-height:1}
+.modal-stat-val.green{color:var(--green)}
+.modal-stat-val.yellow{color:var(--yellow)}
+.modal-stat-lbl{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+
+/* ── MODAL SECTIONS ── */
+.modal-section{margin-bottom:20px}
+.modal-section-title{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--green);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
+}
+.modal-section-edit-btn{
+  background:none;border:1px solid var(--border2);color:var(--muted2);
+  font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;
+  padding:3px 10px;cursor:pointer;text-transform:uppercase;
+  transition:all 0.2s;
+}
+.modal-section-edit-btn:hover{color:var(--white);border-color:var(--muted)}
+.modal-section-edit-btn.active{color:var(--yellow);border-color:var(--yellow)}
+
+.modal-info-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.modal-info-row:last-child{border-bottom:none}
+.modal-info-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:1px}
+.modal-info-val{font-size:15px;font-weight:500}
+
+/* ── PERSONAL INFO (ATP style 2-column) ── */
+.atp-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.atp-row{display:flex;flex-direction:column;padding:10px 12px;border:1px solid var(--border);border-top:none;border-right:none}
+.atp-row:nth-child(2n){border-right:1px solid var(--border)}
+.atp-row:nth-child(1),.atp-row:nth-child(2){border-top:1px solid var(--border)}
+.atp-row-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.atp-row-val{font-size:14px;font-weight:500;color:var(--white)}
+.atp-row-input{
+  background:var(--card2);border:1px solid var(--border2);color:var(--white);
+  font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;outline:none;width:100%;
+  transition:border-color 0.2s;
+}
+.atp-row-input:focus{border-color:var(--green)}
+.atp-row-select{
+  background:var(--card2);border:1px solid var(--border2);color:var(--white);
+  font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;outline:none;width:100%;cursor:pointer;
+}
+
+/* Fun fact / bio row (full width) */
+.atp-bio-row{padding:10px 12px;border:1px solid var(--border);border-top:none}
+.atp-bio-textarea{
+  background:var(--card2);border:1px solid var(--border2);color:var(--white);
+  font-family:'Inter',sans-serif;font-size:13px;padding:6px 8px;outline:none;
+  width:100%;resize:none;line-height:1.5;min-height:60px;
+  transition:border-color 0.2s;
+}
+.atp-bio-textarea:focus{border-color:var(--green)}
+
+.save-profile-btn{
+  background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;
+  font-size:12px;font-weight:700;padding:8px 20px;cursor:pointer;
+  letter-spacing:0.5px;margin-top:10px;transition:background 0.2s;
+}
+.save-profile-btn:hover{background:#43A047}
+
+/* ── RECENT MATCHES ── */
+.modal-match-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.modal-match-row:last-child{border-bottom:none}
+.modal-match-left{display:flex;align-items:center;gap:10px}
+.modal-match-week{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);min-width:28px}
+.modal-match-opp{color:var(--muted)}
+.modal-match-right{display:flex;align-items:center;gap:8px}
+.modal-match-score{font-family:'Space Mono',monospace;font-size:11px;font-weight:700}
+.modal-match-score.win{color:var(--up)}
+.modal-match-score.loss{color:var(--down)}
+.modal-match-badge{font-family:'Space Mono',monospace;font-size:8px;font-weight:700;padding:2px 6px;border-radius:2px}
+.modal-match-badge.win{background:rgba(76,175,80,0.15);color:var(--up);border:1px solid rgba(76,175,80,0.3)}
+.modal-match-badge.loss{background:rgba(239,83,80,0.1);color:var(--down);border:1px solid rgba(239,83,80,0.2)}
+
+/* ── WIN BAR ── */
+.win-bar-wrap{margin-bottom:20px}
+.win-bar-labels{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);margin-bottom:4px}
+.win-bar{background:var(--card2);border:1px solid var(--border);height:6px;position:relative;overflow:hidden}
+.win-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),#43A047);transition:width 0.5s ease}
+
+/* ── PHOTO INPUT ── */
+.photo-input{display:none}
+
+/* ── ANIMATIONS ── */
+@keyframes fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tab-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ladder-row,.player-card,.match-row{animation:fade-in 0.4s both}
+.tab-panel.active{animation:tab-in 0.22s ease both}
+
+/* ── SEASON CHIPS ── */
+.season-sel-chip{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;background:none;transition:all 0.2s;white-space:nowrap}
+.season-sel-chip:hover{border-color:var(--muted);color:var(--white)}
+.season-sel-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
+
+/* ── FOOTER ── */
+.site-footer{border-top:1px solid var(--border);padding:24px 48px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  header{padding:0 16px}
+  .main{padding:20px 16px 80px}
+  .podium{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .players-grid{grid-template-columns:1fr 1fr}
+  .ladder-row{grid-template-columns:44px 36px 1fr auto;gap:10px;padding:14px 16px}
+  .player-record,.player-sets-record{display:none}
+  .modal{max-height:96vh}
+}
+@media(max-width:600px){
+  header{padding:0 12px}
+  .header-inner{height:58px}
+  .logo-text{font-size:20px}
+  .logo-logo{width:34px;height:34px}
+  .main{padding:16px 12px 80px}
+  /* Ladder */
+  .ladder-row{grid-template-columns:40px 36px 1fr auto;gap:8px;padding:14px 12px;min-height:60px}
+  .rank-num{font-size:24px}
+  .player-name{font-size:17px}
+  .player-meta{font-size:10px}
+  /* Podium */
+  .podium{grid-template-columns:1fr}
+  .podium-card{padding:16px}
+  /* Player cards */
+  .players-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .player-card{padding:16px 10px 12px}
+  .player-card-avatar{width:60px;height:60px;font-size:18px}
+  .player-card-name{font-size:14px}
+  .player-card-hand{font-size:9px}
+  .pc-stat{padding:7px 4px}
+  .pc-stat-val{font-size:17px}
+  .pc-stat-lbl{font-size:8px}
+  /* Matches */
+  .match-row{grid-template-columns:1fr auto 1fr;padding:12px 10px;gap:6px}
+  .match-player-name{font-size:13px}
+  /* Nav */
+  .nav-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab-btn{font-size:13px;padding:0 16px;height:48px}
+  /* Modal */
+  .modal-header{padding:20px 16px 16px}
+  .modal-body{padding:16px 16px 24px}
+  .modal-rank{font-size:44px}
+  .modal-name{font-size:20px}
+  .modal-stat-val{font-size:24px}
+  .atp-grid{grid-template-columns:1fr}
+  .atp-row:nth-child(2n){border-right:none}
+  .atp-row:nth-child(2){border-top:none}
+  .modal-stats-grid{gap:4px}
+  /* Round badge */
+  .round-badge{font-size:8px;padding:4px 10px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <img src="bts-logo.svg" class="logo-logo" alt="BTS" style="width:40px;height:40px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none';this.nextElementSibling.querySelector('.logo-icon-fallback').style.display='flex'">
+      <div>
+        <div class="logo-text">BTS Stegen</div>
+        <div class="logo-sub">Båstad Tennissällskap</div>
+      </div>
+    </a>
+    <div id="season-round-badge" class="round-badge">VT 2026</div>
+    <div class="header-right">
+      <a href="rapportera.html" class="player-login-btn">Rapportera →</a>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:0;border-bottom:1px solid var(--border);overflow-x:auto">
+    <div class="nav-tabs" style="border-bottom:none;flex:1" id="nav-tabs-row">
+    <button class="tab-btn active" onclick="showTab('ladder',this)">Stege</button>
+    <button class="tab-btn" onclick="showTab('matches',this)">Matcher</button>
+    <button class="tab-btn" onclick="showTab('players',this)">Spelare</button>
+  </div>
+  <!-- SEASON SELECTOR (inline right side) -->
+  <div id="season-selector" style="display:flex;align-items:center;gap:4px;padding:0 16px;flex-shrink:0"></div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- ── LADDER TAB ── -->
+  <div id="tab-ladder" class="tab-panel active">
+    <div class="ladder-header">
+      <h2>Aktuell Stege</h2>
+      <div class="ladder-legend">▲ Upp &nbsp; ▼ Ned &nbsp; Klicka för profil</div>
+    </div>
+    <div class="podium" id="podium"></div>
+    <div class="ladder-list" id="ladder-list"></div>
+  </div>
+
+  <!-- ── MATCHES TAB ── -->
+  <div id="tab-matches" class="tab-panel">
+    <div class="week-section">
+      <div class="week-title">Omgång 16 — Resultat</div>
+      <div class="matches-grid" id="matches-w16"></div>
+    </div>
+    <div class="week-section">
+      <div class="week-title">Omgång 15 — Resultat</div>
+      <div class="matches-grid" id="matches-w15"></div>
+    </div>
+  </div>
+
+  <!-- ── PLAYERS TAB ── -->
+  <div id="tab-players" class="tab-panel">
+    <div style="margin-bottom:20px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase">Klicka på spelare för profil, foto och statistik</div>
+    </div>
+    <div class="players-grid" id="players-grid"></div>
+  </div>
+
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-player-row">
+        <div class="modal-avatar" id="modal-avatar" onclick="triggerPhotoUpload()">
+          <div class="avatar-upload-hint">Ladda<br>upp foto</div>
+        </div>
+        <div class="modal-player-info">
+          <div class="modal-rank" id="modal-rank"></div>
+          <div class="modal-name" id="modal-name"></div>
+          <div class="modal-club">Båstad Tennissällskap</div>
+          <div class="modal-quick-info" id="modal-quick-info"></div>
+        </div>
+      </div>
+      <input type="file" accept="image/*" class="photo-input" id="photo-input" onchange="handlePhotoUpload(event)">
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="site-footer">© 2026 Båstad Tennissällskap — Stegen VT 2026</footer>
+
+<script>
+// ── PLAYER DATA ────────────────────────────────────────────────────
+const players = [
+  {id:1,  name:"John Andersson",    rank:1,  prev:1,  phone:"0727333333", wins:10, losses:5},
+  {id:2,  name:"Andreas Almroth",   rank:2,  prev:3,  phone:"0768231313", wins:12, losses:4},
+  {id:3,  name:"Philip Pahlett",    rank:3,  prev:2,  phone:"0735223809", wins:9,  losses:7},
+  {id:4,  name:"Johan Olmarker",    rank:4,  prev:5,  phone:"0736540324", wins:11, losses:5},
+  {id:5,  name:"Andreas Gustafson", rank:5,  prev:4,  phone:"0704244341", wins:8,  losses:8},
+  {id:6,  name:"Johan Ludvigsson",  rank:6,  prev:7,  phone:"0705874471", wins:9,  losses:7},
+  {id:7,  name:"Mats Johansson",    rank:7,  prev:6,  phone:"0706425156", wins:8,  losses:8},
+  {id:8,  name:"Håkan Bergman",     rank:8,  prev:9,  phone:"0702172230", wins:10, losses:6},
+  {id:9,  name:"Mats Ljungström",   rank:9,  prev:8,  phone:"0708784133", wins:8,  losses:8},
+  {id:10, name:"Niklas Strömberg",  rank:10, prev:12, phone:"0705756786", wins:7,  losses:9},
+  {id:11, name:"Rasmus Winther",    rank:11, prev:10, phone:"0708670885", wins:9,  losses:7},
+  {id:12, name:"Joaquim Nicander",  rank:12, prev:13, phone:"0720787845", wins:7,  losses:9, me:true},
+  {id:13, name:"Stefan Munge",      rank:13, prev:11, phone:"0706402286", wins:8,  losses:8},
+  {id:14, name:"Oscar Hänsel",      rank:14, prev:16, phone:"0708750404", wins:7,  losses:9},
+  {id:15, name:"Johan Wastensson",  rank:15, prev:14, phone:"0733369718", wins:5,  losses:7, note:"Skadad"},
+  {id:16, name:"Anders Schillström",rank:16, prev:17, phone:"0707993028", wins:6,  losses:10},
+  {id:17, name:"Peter Widen",       rank:17, prev:15, phone:"0706636460", wins:7,  losses:9},
+  {id:18, name:"James Ljungström",  rank:18, prev:19, phone:"0709569308", wins:5,  losses:11},
+  {id:19, name:"Lars Paulsson",     rank:19, prev:18, phone:"0724433243", wins:6,  losses:10},
+  {id:20, name:"John Lundqvist",    rank:20, prev:22, phone:"0702990303", wins:5,  losses:11},
+  {id:21, name:"Jeff Bork",         rank:21, prev:20, phone:"0761000000", wins:5,  losses:11},
+  {id:22, name:"Johan Zetterberg",  rank:22, prev:24, phone:"0705598997", wins:5,  losses:11},
+  {id:23, name:"Matilda Svensson",  rank:23, prev:21, phone:"0703341469", wins:6,  losses:10},
+  {id:24, name:"Igor Mirkovic",     rank:24, prev:26, phone:"0725310210", wins:4,  losses:12},
+  {id:25, name:"Stefan Angvald",    rank:25, prev:23, phone:"0702451256", wins:5,  losses:11},
+  {id:26, name:"Fredrik Gradin",    rank:26, prev:27, phone:"0735446548", wins:3,  losses:13},
+  {id:27, name:"Jan Andresen",      rank:27, prev:28, phone:"0735073506", wins:4,  losses:12},
+  {id:28, name:"Roger Edmark",      rank:28, prev:29, phone:"0730790838", wins:3,  losses:13, note:"Bortrest maj"},
+  {id:29, name:"Karl Thorngren",    rank:29, prev:30, phone:"0702959477", wins:2,  losses:14},
+  {id:30, name:"Sam Lindgren",      rank:30, prev:25, phone:"0761424103", wins:4,  losses:12},
+];
+
+const matchesW16 = [
+  {a:"John Andersson",   b:"Andreas Almroth",   score:"6-4 6-2",      winner:"John Andersson",   wo:false, rankA:1,  rankB:2},
+  {a:"Philip Pahlett",   b:"Johan Olmarker",     score:"6-3 6-4",      winner:"Johan Olmarker",   wo:false, rankA:2,  rankB:3},
+  {a:"Andreas Gustafson",b:"Johan Ludvigsson",   score:"6-1 6-3",      winner:"Johan Ludvigsson", wo:false, rankA:4,  rankB:5},
+  {a:"Mats Johansson",   b:"Håkan Bergman",      score:"4-6 7-6 10-5", winner:"Håkan Bergman",    wo:false, rankA:6,  rankB:7},
+  {a:"Mats Ljungström",  b:"Niklas Strömberg",   score:"WO",           winner:"Niklas Strömberg", wo:true,  rankA:8,  rankB:9},
+  {a:"Rasmus Winther",   b:"Joaquim Nicander",   score:"6-4 6-2",      winner:"Rasmus Winther",   wo:false, rankA:10, rankB:11},
+  {a:"Stefan Munge",     b:"Oscar Hänsel",       score:"6-3 7-5",      winner:"Oscar Hänsel",     wo:false, rankA:11, rankB:12},
+  {a:"Johan Wastensson", b:"Anders Schillström", score:"WO",           winner:"Anders Schillström",wo:true, rankA:14, rankB:15},
+  {a:"Peter Widen",      b:"James Ljungström",   score:"3-6 6-4 10-7", winner:"James Ljungström", wo:false, rankA:15, rankB:16},
+  {a:"Lars Paulsson",    b:"John Lundqvist",     score:"6-7 3-6",      winner:"John Lundqvist",   wo:false, rankA:18, rankB:19},
+  {a:"Jeff Bork",        b:"Johan Zetterberg",   score:"4-6 6-7",      winner:"Johan Zetterberg", wo:false, rankA:20, rankB:21},
+  {a:"Matilda Svensson", b:"Igor Mirkovic",      score:"6-7 3-6",      winner:"Igor Mirkovic",    wo:false, rankA:21, rankB:22},
+  {a:"Stefan Angvald",   b:"Fredrik Gradin",     score:"WO",           winner:"Fredrik Gradin",   wo:true,  rankA:23, rankB:24},
+];
+
+const matchesW15 = [
+  {a:"John Andersson",   b:"Philip Pahlett",     score:"6-4 7-5",      winner:"John Andersson",   wo:false, rankA:1,  rankB:2},
+  {a:"Andreas Almroth",  b:"Andreas Gustafson",  score:"6-2 6-1",      winner:"Andreas Almroth",  wo:false, rankA:3,  rankB:4},
+  {a:"Johan Olmarker",   b:"Mats Johansson",     score:"7-5 6-3",      winner:"Johan Olmarker",   wo:false, rankA:5,  rankB:6},
+  {a:"Johan Ludvigsson", b:"Mats Ljungström",    score:"WO",           winner:"Johan Ludvigsson", wo:true,  rankA:7,  rankB:8},
+  {a:"Håkan Bergman",    b:"Rasmus Winther",     score:"6-1 6-2",      winner:"Håkan Bergman",    wo:false, rankA:9,  rankB:10},
+  {a:"Stefan Munge",     b:"Niklas Strömberg",   score:"3-6 7-5 10-8", winner:"Stefan Munge",     wo:false, rankA:11, rankB:12},
+  {a:"Joaquim Nicander", b:"Johan Wastensson",   score:"6-3 6-1",      winner:"Joaquim Nicander", wo:false, rankA:13, rankB:14},
+  {a:"Peter Widen",      b:"Oscar Hänsel",       score:"6-4 7-6",      winner:"Oscar Hänsel",     wo:false, rankA:15, rankB:16},
+  {a:"Anders Schillström",b:"James Ljungström",  score:"6-2 6-4",      winner:"Anders Schillström",wo:false,rankA:17, rankB:18},
+  {a:"Lars Paulsson",    b:"Jeff Bork",          score:"WO",           winner:"Lars Paulsson",    wo:true,  rankA:18, rankB:19},
+  {a:"John Lundqvist",   b:"Matilda Svensson",   score:"6-3 6-2",      winner:"John Lundqvist",   wo:false, rankA:22, rankB:21},
+  {a:"Johan Zetterberg", b:"Igor Mirkovic",      score:"7-5 6-4",      winner:"Johan Zetterberg", wo:false, rankA:24, rankB:23},
+  {a:"Stefan Angvald",   b:"Sam Lindgren",       score:"6-1 6-0",      winner:"Stefan Angvald",   wo:false, rankA:23, rankB:25},
+];
+
+// ── SEASONS ────────────────────────────────────────────────────────
+const DEFAULT_SEASONS=[
+  {id:'VT2026',name:'Vårtermin 2026',short:'VT 2026',start:'2026-01-01',end:'2026-06-20'},
+  {id:'ST2026',name:'Sommartermin 2026',short:'ST 2026',start:'2026-06-21',end:'2026-12-20'},
+];
+function getSeasons(){ try{return JSON.parse(localStorage.getItem('bts_seasons')||'null')||DEFAULT_SEASONS;}catch(e){return DEFAULT_SEASONS;} }
+function getActiveSeason(){
+  const override=localStorage.getItem('bts_active_season');
+  if(override)return override;
+  const today=new Date().toISOString().slice(0,10);
+  for(const s of getSeasons()){if(today>=s.start&&today<=s.end)return s.id;}
+  return getSeasons().slice(-1)[0].id;
+}
+
+let currentSeason=getActiveSeason();
+function sk(key){ return key+'_'+currentSeason; }
+
+function renderSeasonSelector(){
+  const seasons=getSeasons();
+  const sel=document.getElementById('season-selector');
+  if(!sel)return;
+  sel.innerHTML=seasons.map(s=>`<button class="season-sel-chip${s.id===currentSeason?' active':''}" onclick="switchSeason('${s.id}')">${s.short}</button>`).join('');
+  // Update round badge
+  const badge=document.getElementById('season-round-badge');
+  if(badge){ const s=seasons.find(x=>x.id===currentSeason); badge.textContent=s?s.short:currentSeason; }
+}
+
+function switchSeason(id){
+  currentSeason=id;
+  loadPlayerStats();
+  renderSeasonSelector();
+  renderLadder();
+  renderMatches();
+  renderPlayers();
+}
+
+// ── LOAD STATS FROM ADMIN ──────────────────────────────────────────
+function loadPlayerStats(){
+  // Reset stats first
+  players.forEach(p=>{delete p.setsWon;delete p.setsLost;delete p.gamesWon;delete p.gamesLost;});
+  try{
+    const raw=localStorage.getItem(sk('bts_stats'));
+    if(!raw)return;
+    const stats=JSON.parse(raw);
+    players.forEach(p=>{
+      const s=stats[p.id];
+      if(s){
+        p.setsWon=s.setsWon||0; p.setsLost=s.setsLost||0;
+        p.gamesWon=s.gamesWon||0; p.gamesLost=s.gamesLost||0;
+      }
+    });
+  }catch(e){}
+}
+
+// ── LOAD PLAYER PROFILES (personal info) ──────────────────────────
+function getProfile(name){
+  try{ return JSON.parse(localStorage.getItem('bts_profile_'+name)||'{}'); }
+  catch(e){ return {}; }
+}
+function saveProfileData(name, data){
+  try{ localStorage.setItem('bts_profile_'+name, JSON.stringify(data)); }
+  catch(e){}
+}
+
+// ── PHOTO STORAGE ──────────────────────────────────────────────────
+function getPhoto(name){
+  try{ return localStorage.getItem('bts_photo_'+name)||null }catch(e){return null}
+}
+function savePhoto(name,dataUrl){
+  try{ localStorage.setItem('bts_photo_'+name,dataUrl) }catch(e){}
+}
+
+// ── AVATAR HELPERS ─────────────────────────────────────────────────
+function initials(name){
+  return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+}
+function avatarHtml(name,size=36){
+  const photo=getPhoto(name);
+  if(photo) return `<img src="${photo}" alt="${name}">`;
+  return `<span style="font-size:${Math.round(size*0.35)}px">${initials(name)}</span>`;
+}
+
+// ── AGE HELPER ─────────────────────────────────────────────────────
+function calcAge(born){
+  if(!born)return null;
+  const b=new Date(born);
+  if(isNaN(b))return null;
+  const today=new Date();
+  let age=today.getFullYear()-b.getFullYear();
+  const m=today.getMonth()-b.getMonth();
+  if(m<0||(m===0&&today.getDate()<b.getDate()))age--;
+  return age;
+}
+
+// ── RENDER LADDER ──────────────────────────────────────────────────
+function renderLadder(){
+  const podium=document.getElementById('podium');
+  const medals=['🥇','🥈','🥉'];
+  const pClasses=['p1','p2','p3'];
+  podium.innerHTML=players.slice(0,3).map((p,i)=>`
+    <div class="podium-card ${pClasses[i]}" onclick="openModal(${p.id})" style="cursor:pointer">
+      <div class="podium-pos">${p.rank}</div>
+      <div class="podium-avatar" style="width:${i===0?80:64}px;height:${i===0?80:64}px;font-size:${i===0?26:20}px">
+        ${avatarHtml(p.name,i===0?80:64)}
+      </div>
+      <div style="font-size:20px;margin-bottom:6px">${medals[i]}</div>
+      <div class="podium-name">${p.name}</div>
+      <div class="podium-rank-label">${p.wins}V – ${p.losses}F</div>
+    </div>
+  `).join('');
+
+  const list=document.getElementById('ladder-list');
+  list.innerHTML=players.slice(3).map((p,i)=>{
+    const diff=p.prev-p.rank;
+    const mvClass=diff>0?'up':diff<0?'down':'same';
+    const mvIcon=diff>0?'▲':diff<0?'▼':'—';
+    const mvText=diff!==0?Math.abs(diff):'';
+    const sW=p.setsWon||0, sL=p.setsLost||0;
+    const gW=p.gamesWon||0, gL=p.gamesLost||0;
+    const delay=(i*0.03).toFixed(2);
+    return `
+    <div class="ladder-row${p.me?' me':''}" onclick="openModal(${p.id})" style="animation-delay:${delay}s">
+      <div class="rank-num">${p.rank}</div>
+      <div class="player-avatar">${avatarHtml(p.name,36)}</div>
+      <div class="player-info">
+        <div class="player-name">${p.name}${p.note?` <span style="font-size:10px;color:var(--clay)">(${p.note})</span>`:''}</div>
+        <div class="player-meta">BTS</div>
+      </div>
+      <div class="movement ${mvClass}">${mvIcon}${mvText}</div>
+      <div class="player-record">${p.wins}V ${p.losses}F</div>
+      <div class="player-sets-record">${sW+sL>0?`${sW}/${sL} set`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER MATCHES ─────────────────────────────────────────────────
+function renderMatchRow(m){
+  const isWinnerA=m.winner===m.a;
+  return `
+  <div class="match-row">
+    <div class="match-player">
+      <div class="match-player-avatar">${avatarHtml(m.a,32)}</div>
+      <div>
+        <div class="match-player-name ${isWinnerA?'match-winner':'match-loser'}">${m.a}</div>
+        <div class="match-player-rank">#${m.rankA}</div>
+      </div>
+    </div>
+    <div class="match-center">
+      ${m.wo?`<div class="wo-badge">WO</div>`:`<div class="match-score">${m.score}</div>`}
+      <div class="match-vs">vs</div>
+    </div>
+    <div class="match-player right">
+      <div class="match-player-avatar">${avatarHtml(m.b,32)}</div>
+      <div>
+        <div class="match-player-name ${!isWinnerA?'match-winner':'match-loser'}">${m.b}</div>
+        <div class="match-player-rank">#${m.rankB}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function renderMatches(){
+  document.getElementById('matches-w16').innerHTML=matchesW16.map(renderMatchRow).join('');
+  document.getElementById('matches-w15').innerHTML=matchesW15.map(renderMatchRow).join('');
+}
+
+// ── RENDER PLAYERS GRID ────────────────────────────────────────────
+function renderPlayers(){
+  const grid=document.getElementById('players-grid');
+  grid.innerHTML=players.map((p,i)=>{
+    const prof=getProfile(p.name);
+    const age=calcAge(prof.born);
+    const hand=prof.hand||'';
+    const handIcon=hand==='Vänster'?'✋':'';
+    const sW=p.setsWon||0, sL=p.setsLost||0;
+    const gW=p.gamesWon||0, gL=p.gamesLost||0;
+    const wPct=Math.round(p.wins/(p.wins+p.losses)*100)||0;
+    const hasSetStats=sW+sL>0;
+    const hasGameStats=gW+gL>0;
+    return `
+    <div class="player-card${p.rank<=3?' top3':''}" onclick="openModal(${p.id})" style="animation-delay:${(i*0.04).toFixed(2)}s">
+      <div class="player-card-rank${p.rank<=3?' gold':''}">${p.rank}</div>
+      <div class="player-card-avatar">${avatarHtml(p.name,72)}</div>
+      <div class="player-card-name">${p.name}</div>
+      <div class="player-card-hand">${age?age+' år':''} ${hand?'· '+hand:''}${p.note?` · <span style="color:var(--clay)">${p.note}</span>`:''}</div>
+      <div class="player-card-stats-main">
+        <div class="pc-stat"><div class="pc-stat-val">${p.wins}</div><div class="pc-stat-lbl">Vunna</div></div>
+        <div class="pc-stat"><div class="pc-stat-val">${p.losses}</div><div class="pc-stat-lbl">Förl</div></div>
+        <div class="pc-stat"><div class="pc-stat-val">${wPct}%</div><div class="pc-stat-lbl">Win%</div></div>
+      </div>
+      <div class="player-card-stats-sec">
+        <div class="pc-stat-sec">
+          <div class="pc-stat-sec-val">${hasSetStats?`${sW}/${sL}`:'—'}</div>
+          <div class="pc-stat-sec-lbl">Set V/F</div>
+        </div>
+        <div class="pc-stat-sec">
+          <div class="pc-stat-sec-val">${hasGameStats?`${gW}/${gL}`:'—'}</div>
+          <div class="pc-stat-sec-lbl">Games V/F</div>
+        </div>
+      </div>
+      <div class="player-card-phone">${p.phone}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────
+let currentPlayer=null;
+let editingProfile=false;
+
+function openModal(id){
+  const p=players.find(x=>x.id===id);
+  if(!p)return;
+  currentPlayer=p;
+  editingProfile=false;
+  renderModal(p);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function renderModal(p){
+  const prof=getProfile(p.name);
+  const age=calcAge(prof.born);
+
+  // Rank
+  document.getElementById('modal-rank').textContent='#'+p.rank;
+  document.getElementById('modal-name').textContent=p.name;
+
+  // Quick chips
+  const chips=[];
+  if(age) chips.push(`<div class="modal-quick-chip">🎂 ${age} år</div>`);
+  if(prof.hand) chips.push(`<div class="modal-quick-chip">${prof.hand==='Vänster'?'✋':'🤚'} ${prof.hand}hänt</div>`);
+  if(prof.hometown) chips.push(`<div class="modal-quick-chip">📍 ${prof.hometown}</div>`);
+  document.getElementById('modal-quick-info').innerHTML=chips.join('');
+
+  // Avatar
+  const av=document.getElementById('modal-avatar');
+  const photo=getPhoto(p.name);
+  av.innerHTML=`<div class="avatar-upload-hint">Ladda<br>upp foto</div>`+
+    (photo?`<img src="${photo}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">`:
+    `<span style="font-size:28px;font-weight:700;color:var(--muted)">${initials(p.name)}</span>`);
+
+  // Season stats
+  const wPct=Math.round(p.wins/(p.wins+p.losses)*100)||0;
+  const sW=p.setsWon||0, sL=p.setsLost||0;
+  const gW=p.gamesWon||0, gL=p.gamesLost||0;
+  const totalG=gW+gL;
+  const gPct=totalG>0?Math.round(gW/totalG*100):0;
+  const totalS=sW+sL;
+  const diff=p.prev-p.rank;
+
+  // Career stats
+  const career=getCareerStats(p.id);
+  const careerWPct=career.wins+career.losses>0?Math.round(career.wins/(career.wins+career.losses)*100):0;
+  const careerGTotal=career.gamesWon+career.gamesLost;
+  const careerGPct=careerGTotal>0?Math.round(career.gamesWon/careerGTotal*100):0;
+
+  // Win % bar
+  const winBarHtml=`
+  <div class="win-bar-wrap">
+    <div class="win-bar-labels"><span>Win%</span><span>${wPct}%</span></div>
+    <div class="win-bar"><div class="win-bar-fill" style="width:${wPct}%"></div></div>
+  </div>`;
+
+  // Recent matches
+  const allMatches=[...matchesW16.map(m=>({...m,week:16})),...matchesW15.map(m=>({...m,week:15}))];
+  const myMatches=allMatches.filter(m=>m.a===p.name||m.b===p.name).slice(0,5);
+  const recentHtml=myMatches.length?myMatches.map(m=>{
+    const isA=m.a===p.name;
+    const opp=isA?m.b:m.a;
+    const won=m.winner===p.name;
+    return `<div class="modal-match-row">
+      <div class="modal-match-left">
+        <span class="modal-match-week">V${m.week}</span>
+        <span class="modal-match-opp">vs ${opp}</span>
+      </div>
+      <div class="modal-match-right">
+        <span class="modal-match-score ${won?'win':'loss'}">${m.wo?'WO':m.score}</span>
+        <span class="modal-match-badge ${won?'win':'loss'}">${won?'V':'F'}</span>
+      </div>
+    </div>`;
+  }).join(''):`<div style="color:var(--muted2);font-size:13px;padding:12px 0">Inga matcher registrerade</div>`;
+
+  // Personal info section
+  const personalHtml=editingProfile?buildPersonalEdit(p,prof):buildPersonalView(p,prof);
+
+  document.getElementById('modal-body').innerHTML=`
+    <!-- MATCH STATS (current season) -->
+    <div class="modal-section">
+      <div class="modal-section-title">Säsong — ${getSeasons().find(s=>s.id===currentSeason)?.short||currentSeason}</div>
+      <div class="modal-stats-grid">
+        <div class="modal-stat"><div class="modal-stat-val yellow">${p.wins}</div><div class="modal-stat-lbl">Vinster</div></div>
+        <div class="modal-stat"><div class="modal-stat-val">${p.losses}</div><div class="modal-stat-lbl">Förluster</div></div>
+        <div class="modal-stat"><div class="modal-stat-val">${wPct}%</div><div class="modal-stat-lbl">Match Win%</div></div>
+      </div>
+      <div class="modal-stats-grid secondary">
+        <div class="modal-stat highlight"><div class="modal-stat-val green">${sW}<span style="font-size:16px;color:var(--muted2)">/${sL}</span></div><div class="modal-stat-lbl">Set V/F</div></div>
+        <div class="modal-stat highlight"><div class="modal-stat-val green">${gW}<span style="font-size:16px;color:var(--muted2)">/${gL}</span></div><div class="modal-stat-lbl">Games V/F</div></div>
+        <div class="modal-stat highlight"><div class="modal-stat-val green">${gPct}%</div><div class="modal-stat-lbl">Games%</div></div>
+      </div>
+      ${winBarHtml}
+    </div>
+
+    <!-- CAREER STATS (all seasons) -->
+    ${career.seasonsPlayed>0?`
+    <div class="modal-section">
+      <div class="modal-section-title" style="margin-bottom:10px">
+        Karriär — alla säsonger
+        <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px">${career.seasonsPlayed} säsong${career.seasonsPlayed>1?'er':''}</span>
+      </div>
+      <div class="modal-stats-grid">
+        <div class="modal-stat"><div class="modal-stat-val yellow">${career.wins}</div><div class="modal-stat-lbl">Totalt vunna</div></div>
+        <div class="modal-stat"><div class="modal-stat-val">${career.losses}</div><div class="modal-stat-lbl">Totalt förl</div></div>
+        <div class="modal-stat"><div class="modal-stat-val">${careerWPct}%</div><div class="modal-stat-lbl">Karriär Win%</div></div>
+      </div>
+      <div class="modal-stats-grid secondary">
+        <div class="modal-stat"><div class="modal-stat-val green" style="font-size:22px">${career.setsWon}<span style="font-size:14px;color:var(--muted2)">/${career.setsLost}</span></div><div class="modal-stat-lbl">Set V/F totalt</div></div>
+        <div class="modal-stat"><div class="modal-stat-val green" style="font-size:22px">${career.gamesWon}<span style="font-size:14px;color:var(--muted2)">/${career.gamesLost}</span></div><div class="modal-stat-lbl">Games V/F totalt</div></div>
+        <div class="modal-stat"><div class="modal-stat-val green" style="font-size:22px">${careerGPct}%</div><div class="modal-stat-lbl">Karriär Games%</div></div>
+      </div>
+    </div>`:''}
+
+    <!-- PERSONAL INFO -->
+    <div class="modal-section" id="personal-section">
+      ${personalHtml}
+    </div>
+
+    <!-- MATCH HISTORY INFO -->
+    <div class="modal-section">
+      <div class="modal-section-title">Stege-info</div>
+      <div>
+        <div class="modal-info-row">
+          <span class="modal-info-label">Telefon</span>
+          <span class="modal-info-val"><a href="tel:${p.phone}" style="color:var(--green);text-decoration:none">${p.phone}</a></span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-label">Nuvarande position</span>
+          <span class="modal-info-val">#${p.rank}</span>
+        </div>
+        <div class="modal-info-row">
+          <span class="modal-info-label">Förra omgången</span>
+          <span class="modal-info-val">#${p.prev} ${diff>0?`<span style="color:var(--up)">▲${diff}</span>`:diff<0?`<span style="color:var(--down)">▼${Math.abs(diff)}</span>`:'<span style="color:var(--same)">—</span>'}</span>
+        </div>
+        ${p.note?`<div class="modal-info-row"><span class="modal-info-label">Status</span><span class="modal-info-val" style="color:var(--clay)">${p.note}</span></div>`:''}
+      </div>
+    </div>
+
+    <!-- SENASTE MATCHER -->
+    <div class="modal-section">
+      <div class="modal-section-title">Senaste matcher</div>
+      ${recentHtml}
+    </div>
+  `;
+}
+
+function buildPersonalView(p, prof){
+  const age=calcAge(prof.born);
+  const born=prof.born||'';
+  const hand=prof.hand||'—';
+  const hometown=prof.hometown||'—';
+  const favShot=prof.favShot||'—';
+  const favSurface=prof.favSurface||'—';
+  const bio=prof.bio||'';
+
+  return `
+  <div class="modal-section-title">
+    Spelarprofil
+    <button class="modal-section-edit-btn" onclick="startEdit(${p.id})">✎ Redigera</button>
+  </div>
+  <div class="atp-grid">
+    <div class="atp-row">
+      <div class="atp-row-label">Ålder</div>
+      <div class="atp-row-val">${age?age+' år':born?born:'—'}</div>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Spelhand</div>
+      <div class="atp-row-val">${hand}</div>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Hemort</div>
+      <div class="atp-row-val">${hometown}</div>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Favoritslag</div>
+      <div class="atp-row-val">${favShot}</div>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Favoritunderlag</div>
+      <div class="atp-row-val">${favSurface}</div>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">På stegen sedan</div>
+      <div class="atp-row-val">${prof.since||'—'}</div>
+    </div>
+  </div>
+  ${bio?`<div class="atp-bio-row"><div class="atp-row-label" style="margin-bottom:6px">Om mig</div><div style="font-size:13px;color:var(--muted);line-height:1.6">${bio}</div></div>`:''}
+  `;
+}
+
+function buildPersonalEdit(p, prof){
+  return `
+  <div class="modal-section-title">
+    Redigera profil
+    <button class="modal-section-edit-btn active" onclick="cancelEdit(${p.id})">✕ Avbryt</button>
+  </div>
+  <div class="atp-grid">
+    <div class="atp-row">
+      <div class="atp-row-label">Född (åå-mm-dd)</div>
+      <input class="atp-row-input" id="edit-born" type="date" value="${prof.born||''}" placeholder="1985-06-15">
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Spelhand</div>
+      <select class="atp-row-select" id="edit-hand">
+        <option value="">Välj...</option>
+        <option value="Höger" ${prof.hand==='Höger'?'selected':''}>Höger</option>
+        <option value="Vänster" ${prof.hand==='Vänster'?'selected':''}>Vänster</option>
+      </select>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Hemort</div>
+      <input class="atp-row-input" id="edit-hometown" type="text" value="${prof.hometown||''}" placeholder="Båstad">
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Favoritslag</div>
+      <input class="atp-row-input" id="edit-favshot" type="text" value="${prof.favShot||''}" placeholder="Serve, BH, FH...">
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">Favoritunderlag</div>
+      <select class="atp-row-select" id="edit-surface">
+        <option value="">Välj...</option>
+        <option value="Grus" ${prof.favSurface==='Grus'?'selected':''}>Grus</option>
+        <option value="Hard" ${prof.favSurface==='Hard'?'selected':''}>Hard</option>
+        <option value="Gräs" ${prof.favSurface==='Gräs'?'selected':''}>Gräs</option>
+        <option value="Inomhus" ${prof.favSurface==='Inomhus'?'selected':''}>Inomhus</option>
+      </select>
+    </div>
+    <div class="atp-row">
+      <div class="atp-row-label">På stegen sedan</div>
+      <input class="atp-row-input" id="edit-since" type="text" value="${prof.since||''}" placeholder="2020">
+    </div>
+  </div>
+  <div class="atp-bio-row">
+    <div class="atp-row-label" style="margin-bottom:6px">Om mig (visas på profil)</div>
+    <textarea class="atp-bio-textarea" id="edit-bio" placeholder="Berätta något kul om dig själv...">${prof.bio||''}</textarea>
+  </div>
+  <button class="save-profile-btn" onclick="saveProfile(${p.id})">Spara profil →</button>
+  `;
+}
+
+function startEdit(id){
+  editingProfile=true;
+  const p=players.find(x=>x.id===id);
+  const section=document.getElementById('personal-section');
+  if(section) section.innerHTML=buildPersonalEdit(p, getProfile(p.name));
+}
+
+function cancelEdit(id){
+  editingProfile=false;
+  const p=players.find(x=>x.id===id);
+  const section=document.getElementById('personal-section');
+  if(section) section.innerHTML=buildPersonalView(p, getProfile(p.name));
+}
+
+function saveProfile(id){
+  const p=players.find(x=>x.id===id);
+  if(!p)return;
+  const data={
+    born: document.getElementById('edit-born')?.value||'',
+    hand: document.getElementById('edit-hand')?.value||'',
+    hometown: document.getElementById('edit-hometown')?.value||'',
+    favShot: document.getElementById('edit-favshot')?.value||'',
+    favSurface: document.getElementById('edit-surface')?.value||'',
+    since: document.getElementById('edit-since')?.value||'',
+    bio: document.getElementById('edit-bio')?.value||'',
+  };
+  saveProfileData(p.name, data);
+  editingProfile=false;
+  renderModal(p);
+  renderPlayers();
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function triggerPhotoUpload(){
+  document.getElementById('photo-input').click();
+}
+
+function handlePhotoUpload(e){
+  const file=e.target.files[0];
+  if(!file||!currentPlayer)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    savePhoto(currentPlayer.name,ev.target.result);
+    renderModal(currentPlayer);
+    renderLadder(); renderPlayers();
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+
+// ── CAREER STATS ───────────────────────────────────────────────────
+function getCareerStats(playerId){
+  const seasons=getSeasons();
+  const totals={wins:0,losses:0,setsWon:0,setsLost:0,gamesWon:0,gamesLost:0,seasonsPlayed:0};
+  seasons.forEach(s=>{
+    try{
+      const raw=localStorage.getItem('bts_stats_'+s.id);
+      if(!raw)return;
+      const stats=JSON.parse(raw);
+      const d=stats[playerId];
+      if(!d)return;
+      totals.seasonsPlayed++;
+      totals.wins+=(d.wins||0);
+      totals.losses+=(d.losses||0);
+      totals.setsWon+=(d.setsWon||0);
+      totals.setsLost+=(d.setsLost||0);
+      totals.gamesWon+=(d.gamesWon||0);
+      totals.gamesLost+=(d.gamesLost||0);
+    }catch(e){}
+  });
+  return totals;
+}
+
+// ── TABS ───────────────────────────────────────────────────────────
+function showTab(name, el){
+  // Remove active from all panels and buttons
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  // Activate target — small rAF trick so animation replays even when re-clicking same tab
+  requestAnimationFrame(()=>{
+    const panel=document.getElementById('tab-'+name);
+    panel.classList.add('active');
+    if(el) el.classList.add('active');
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+loadPlayerStats();
+renderSeasonSelector();
+renderLadder();
+renderMatches();
+renderPlayers();
+</script>
+</body>
+</html>

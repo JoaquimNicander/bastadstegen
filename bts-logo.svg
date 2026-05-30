@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none">
+  <!-- Shield background -->
+  <path d="M100 8 L192 48 L192 140 Q192 195 100 222 Q8 195 8 140 L8 48 Z" fill="#8B3522" stroke="white" stroke-width="6"/>
+  <!-- Tennis ball at top -->
+  <circle cx="100" cy="36" r="16" fill="none" stroke="white" stroke-width="3"/>
+  <path d="M86 30 Q100 38 114 30" fill="none" stroke="white" stroke-width="2.5"/>
+  <path d="M86 42 Q100 34 114 42" fill="none" stroke="white" stroke-width="2.5"/>
+  <!-- BÅSTAD text -->
+  <text x="100" y="82" text-anchor="middle" font-family="Georgia, serif" font-size="22" font-weight="bold" letter-spacing="4" fill="white">BÅSTAD</text>
+  <!-- Crossed rackets -->
+  <!-- Left racket (angled right) -->
+  <g transform="translate(100,130) rotate(-35)">
+    <ellipse cx="0" cy="-28" rx="18" ry="24" fill="none" stroke="white" stroke-width="2.5"/>
+    <line x1="0" y1="-52" x2="0" y2="32" stroke="white" stroke-width="3.5"/>
+    <!-- Strings vertical -->
+    <line x1="-12" y1="-46" x2="-12" y2="-10" stroke="white" stroke-width="1"/>
+    <line x1="-6" y1="-51" x2="-6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="6" y1="-51" x2="6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="12" y1="-46" x2="12" y2="-10" stroke="white" stroke-width="1"/>
+    <!-- Strings horizontal -->
+    <line x1="-17" y1="-44" x2="17" y2="-44" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-36" x2="18" y2="-36" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-28" x2="18" y2="-28" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-20" x2="18" y2="-20" stroke="white" stroke-width="1"/>
+    <line x1="-17" y1="-12" x2="17" y2="-12" stroke="white" stroke-width="1"/>
+  </g>
+  <!-- Right racket (angled left) -->
+  <g transform="translate(100,130) rotate(35)">
+    <ellipse cx="0" cy="-28" rx="18" ry="24" fill="none" stroke="white" stroke-width="2.5"/>
+    <line x1="0" y1="-52" x2="0" y2="32" stroke="white" stroke-width="3.5"/>
+    <!-- Strings vertical -->
+    <line x1="-12" y1="-46" x2="-12" y2="-10" stroke="white" stroke-width="1"/>
+    <line x1="-6" y1="-51" x2="-6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="6" y1="-51" x2="6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="12" y1="-46" x2="12" y2="-10" stroke="white" stroke-width="1"/>
+    <!-- Strings horizontal -->
+    <line x1="-17" y1="-44" x2="17" y2="-44" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-36" x2="18" y2="-36" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-28" x2="18" y2="-28" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-20" x2="18" y2="-20" stroke="white" stroke-width="1"/>
+    <line x1="-17" y1="-12" x2="17" y2="-12" stroke="white" stroke-width="1"/>
+  </g>
+  <!-- T and S -->
+  <text x="52" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="white">T</text>
+  <text x="148" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="white">S</text>
+  <!-- Est. 1929 -->
+  <text x="100" y="198" text-anchor="middle" font-family="Georgia, serif" font-size="13" font-style="italic" fill="white" letter-spacing="1">Est. 1929</text>
+</svg>

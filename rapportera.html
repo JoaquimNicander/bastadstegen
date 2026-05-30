@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BTS Stegen — Min sida</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A1A0C;--surface:#0F2212;--card:#142816;--card2:#1A3320;
+  --border:#1F4025;--border2:#2A5530;
+  --green:#4CAF50;--yellow:#D4E157;--clay:#C17D4B;
+  --white:#F0F5F0;--muted:rgba(240,245,240,0.5);--muted2:rgba(240,245,240,0.3);
+  --red:#EF5350;--blue:#42A5F5;
+}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px}
+
+/* ── LOGIN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0F2212 0%,var(--bg) 70%)}
+.login-box{background:var(--surface);border:1px solid var(--border2);padding:36px 28px;width:100%;max-width:380px;text-align:center}
+.login-logo-wrap{margin-bottom:20px}
+.login-logo-wrap img,.login-logo-wrap svg{width:80px;height:auto}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:4px}
+.login-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:28px}
+.login-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;text-align:left;margin-bottom:6px;display:block}
+.login-select,.login-input{
+  width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border2);
+  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  margin-bottom:14px;transition:border-color 0.2s;appearance:none;border-radius:0;
+}
+.login-select:focus,.login-input:focus{border-color:var(--green)}
+.login-btn{
+  width:100%;padding:16px;background:var(--green);color:#000;
+  font-family:'Inter',sans-serif;font-size:16px;font-weight:700;
+  border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s;
+  border-radius:0;min-height:52px;
+}
+.login-btn:active{background:#43A047}
+.login-error{color:var(--red);font-size:13px;margin-top:10px;font-family:'Inter',sans-serif}
+.login-hint{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:1px;margin-top:20px;line-height:1.7;border-top:1px solid var(--border);padding-top:16px}
+.link-back{display:block;margin-top:16px;color:var(--muted2);font-family:'Inter',sans-serif;font-size:14px;text-decoration:none;padding:8px}
+.link-back:hover{color:var(--white)}
+
+/* ── HEADER ── */
+header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50}
+.header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.header-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.header-logo-img{width:34px;height:34px;object-fit:contain}
+.header-logo-img svg,.header-logo-img img{width:100%;height:100%}
+.header-info{}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);line-height:1}
+.header-player-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;margin-top:1px}
+.header-actions{display:flex;align-items:center;gap:6px}
+.btn-sm{background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;padding:8px 14px;cursor:pointer;text-decoration:none;transition:all 0.2s;min-height:38px;display:flex;align-items:center}
+.btn-sm:active{border-color:var(--muted);color:var(--white)}
+
+/* ── SEASON BAR ── */
+.season-bar{background:rgba(0,0,0,0.2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto}
+.season-bar-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:6px;height:40px}
+.season-chip{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;background:none;min-height:32px}
+.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
+.season-readonly-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--clay);letter-spacing:1px;background:rgba(193,125,75,0.1);border:1px solid rgba(193,125,75,0.25);padding:3px 10px;white-space:nowrap}
+
+/* ── MAIN ── */
+.main{max-width:600px;margin:0 auto;padding:20px 16px 100px}
+
+/* ── SECTION ── */
+.section{margin-bottom:28px;opacity:0;animation:fadeUp 0.35s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.section:nth-child(1){animation-delay:0s}
+.section:nth-child(2){animation-delay:0.08s}
+.section:nth-child(3){animation-delay:0.14s}
+.section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* ── NOTIFICATION ── */
+.notif-banner{background:rgba(66,165,245,0.08);border:1px solid rgba(66,165,245,0.25);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.notif-text{font-size:15px;line-height:1.5}
+.notif-text strong{color:var(--white)}
+.notif-text small{display:block;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:3px;letter-spacing:1px}
+
+/* ── MATCH CARD ── */
+.match-card{background:var(--card);border:1px solid var(--border2);padding:20px 16px}
+.match-card-round{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:14px}
+.match-versus{display:flex;align-items:center;gap:8px;margin-bottom:24px;background:var(--card2);border:1px solid var(--border);padding:14px}
+.match-versus-player{flex:1}
+.match-versus-name{font-weight:700;font-size:17px;color:var(--white);line-height:1.2}
+.match-versus-rank{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:4px}
+.match-versus-sep{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2);letter-spacing:2px;flex-shrink:0;padding:0 4px}
+.match-vs-right{text-align:right}
+
+/* ── WO OPTION (prominent) ── */
+.wo-option-row{display:flex;gap:10px;margin-bottom:20px}
+.wo-big-btn{
+  flex:1;padding:14px;background:none;border:2px solid var(--border2);
+  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
+  gap:8px;min-height:52px;
+}
+.wo-big-btn:active,.wo-big-btn.active{border-color:var(--clay);color:var(--white);background:rgba(193,125,75,0.12)}
+.score-big-btn{
+  flex:2;padding:14px;background:none;border:2px solid var(--border2);
+  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
+  gap:8px;min-height:52px;
+}
+.score-big-btn.active{border-color:var(--green);color:var(--white);background:rgba(76,175,80,0.08)}
+
+/* ── SET INPUTS ── */
+.set-input-section{margin-bottom:16px}
+.set-divider{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.set-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.set-input-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.set-lbl{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;width:36px;flex-shrink:0;font-weight:700}
+.set-box{display:flex;align-items:center;flex:1;border:1px solid var(--border2);background:var(--card2);overflow:hidden}
+.set-num{
+  flex:1;height:52px;background:transparent;border:none;
+  color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:28px;
+  text-align:center;outline:none;-moz-appearance:textfield;
+  transition:background 0.15s;
+}
+.set-num::-webkit-inner-spin-button,.set-num::-webkit-outer-spin-button{-webkit-appearance:none}
+.set-num:focus{background:rgba(76,175,80,0.08)}
+.set-dash{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2);padding:0 4px;flex-shrink:0;background:var(--border);width:32px;height:52px;display:flex;align-items:center;justify-content:center}
+.stb-row{opacity:0;max-height:0;overflow:hidden;transition:all 0.35s ease;margin-bottom:0}
+.stb-row.visible{opacity:1;max-height:80px;margin-bottom:10px}
+.stb-row .set-lbl{color:var(--clay)}
+.stb-row .set-box{border-color:rgba(193,125,75,0.4)}
+.stb-announce{
+  background:rgba(193,125,75,0.1);border:1px solid rgba(193,125,75,0.3);
+  color:var(--clay);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  padding:10px 14px;margin-bottom:12px;text-align:center;
+  opacity:0;max-height:0;overflow:hidden;transition:all 0.3s ease;
+}
+.stb-announce.visible{opacity:1;max-height:50px}
+.btn-add-stb{background:none;border:1px dashed var(--border2);color:var(--muted2);font-family:'Inter',sans-serif;font-size:13px;padding:10px 16px;cursor:pointer;transition:all 0.2s;margin-bottom:12px;display:block;width:100%;text-align:center;min-height:42px}
+.btn-add-stb:active{border-color:var(--green);color:var(--green)}
+
+/* ── WO WINNER SELECT ── */
+.wo-section{padding:16px;background:rgba(193,125,75,0.06);border:1px solid rgba(193,125,75,0.25);margin-bottom:16px}
+.wo-section-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-bottom:12px}
+.wo-winner-btns{display:flex;flex-direction:column;gap:8px}
+.wo-winner-btn{
+  width:100%;padding:14px 16px;background:var(--card2);border:2px solid var(--border);
+  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;text-align:left;min-height:52px;
+}
+.wo-winner-btn.selected{border-color:var(--clay);color:var(--white);background:rgba(193,125,75,0.1)}
+
+/* ── AUTO WINNER DISPLAY ── */
+.auto-win-display{
+  padding:14px 16px;font-size:16px;font-weight:600;margin-bottom:14px;
+  transition:all 0.25s ease;border:2px solid transparent;
+}
+.auto-win-display.empty{background:var(--card2);border-color:var(--border);color:var(--muted2);font-weight:400;font-size:14px}
+.auto-win-display.detected{background:rgba(76,175,80,0.1);border-color:rgba(76,175,80,0.4);color:var(--green)}
+
+/* ── SUBMIT BUTTON ── */
+.submit-btn{
+  width:100%;padding:18px;background:var(--green);color:#000;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  border:none;cursor:pointer;transition:all 0.2s;min-height:58px;
+  position:relative;overflow:hidden;
+}
+.submit-btn:active{background:#43A047;transform:scale(0.99)}
+.submit-btn:disabled{background:var(--card2);color:var(--muted2);cursor:not-allowed;transform:none}
+
+/* ── RIPPLE ── */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:ripple 0.5s linear;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+
+/* ── CONFIRM ── */
+.confirm-card{background:var(--card);border:1px solid var(--border2);padding:20px 16px;animation:fadeUp 0.3s ease}
+.confirm-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
+.confirm-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.confirm-score{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.confirm-btns{display:flex;gap:8px;margin-top:16px}
+.btn-confirm{flex:1;padding:16px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;min-height:52px}
+.btn-dispute{flex:1;padding:16px;background:none;color:var(--red);font-family:'Inter',sans-serif;font-weight:600;font-size:15px;border:2px solid var(--red);cursor:pointer;min-height:52px}
+
+/* ── SUCCESS ── */
+.success-box{background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.25);padding:28px 20px;text-align:center;animation:successPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes successPop{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.success-icon{font-size:48px;margin-bottom:12px;display:block}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--green);margin-bottom:6px}
+.success-sub{font-size:15px;color:var(--muted);line-height:1.6}
+.success-score{font-family:'Space Mono',monospace;font-size:14px;color:var(--white);font-weight:700;margin-top:12px;letter-spacing:1px;padding:8px;background:var(--card2);display:inline-block}
+.status-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-top:12px}
+.status-tag.pending{background:rgba(212,225,87,0.1);border:1px solid rgba(212,225,87,0.3);color:var(--yellow)}
+.status-tag.confirmed{background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);color:var(--green)}
+
+/* ── PROFILE FORM ── */
+.profile-form{background:var(--card);border:1px solid var(--border);padding:20px 16px}
+.form-row{margin-bottom:14px}
+.form-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block}
+.form-input,.form-select{
+  width:100%;padding:13px 14px;background:var(--card2);border:1px solid var(--border2);
+  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  transition:border-color 0.2s;border-radius:0;-webkit-appearance:none;
+}
+.form-input:focus,.form-select:focus{border-color:var(--green)}
+.form-textarea{
+  width:100%;padding:13px 14px;background:var(--card2);border:1px solid var(--border2);
+  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  resize:none;min-height:80px;line-height:1.5;transition:border-color 0.2s;border-radius:0;
+}
+.form-textarea:focus{border-color:var(--green)}
+.save-btn{
+  background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;
+  font-size:15px;font-weight:700;padding:14px 24px;cursor:pointer;
+  letter-spacing:0.5px;transition:all 0.2s;margin-top:6px;min-height:48px;
+}
+.save-btn:active{background:#43A047}
+.pin-row{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);align-items:flex-end}
+
+.hidden{display:none!important}
+
+/* ── CONFETTI ── */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;opacity:0;animation:confettiFall 1.2s ease-in forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-10px) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <img src="bts-logo.svg" alt="BTS" onerror="this.style.display='none'">
+    </div>
+    <div class="login-title">BTS Stegen</div>
+    <div class="login-sub">Min sida</div>
+    <label class="login-label" for="login-name">Ditt namn</label>
+    <select class="login-select" id="login-name">
+      <option value="">Välj ditt namn...</option>
+    </select>
+    <label class="login-label" for="login-pin">PIN-kod</label>
+    <input type="password" class="login-input" id="login-pin" placeholder="4 siffror" maxlength="4" inputmode="numeric" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Logga in</button>
+    <div class="login-error hidden" id="login-error">Fel PIN. Prova de 4 sista siffrorna i ditt telefonnummer.</div>
+    <div class="login-hint">Standard-PIN = 4 sista siffrorna i ditt telefonnr<br>Du kan byta PIN efter inloggning</div>
+    <a href="stegen.html" class="link-back">← Tillbaka till stegen</a>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+<header>
+  <div class="header-inner">
+    <a class="header-logo" href="stegen.html">
+      <div class="header-logo-img">
+        <img src="bts-logo.svg" alt="BTS" onerror="this.outerHTML='<span style=font-size:24px>🎾</span>'">
+      </div>
+      <div class="header-info">
+        <div class="header-title">BTS Stegen</div>
+        <div class="header-player-name" id="header-name"></div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a href="stegen.html" class="btn-sm">Stegen</a>
+      <button class="btn-sm" onclick="logout()">Logga ut</button>
+    </div>
+  </div>
+</header>
+
+<div class="season-bar">
+  <div class="season-bar-inner" id="season-bar"></div>
+</div>
+
+<div class="main" id="app-main"></div>
+</div>
+
+<!-- CONFETTI CONTAINER -->
+<div class="confetti-wrap hidden" id="confetti-wrap"></div>
+
+<script>
+// ── PLAYERS ───────────────────────────────────────────────────
+const basePlayers = [
+  {id:1, name:"John Andersson",    rank:1,  phone:"0727333333"},
+  {id:2, name:"Andreas Almroth",   rank:2,  phone:"0768231313"},
+  {id:3, name:"Philip Pahlett",    rank:3,  phone:"0735223809"},
+  {id:4, name:"Johan Olmarker",    rank:4,  phone:"0736540324"},
+  {id:5, name:"Andreas Gustafson", rank:5,  phone:"0704244341"},
+  {id:6, name:"Johan Ludvigsson",  rank:6,  phone:"0705874471"},
+  {id:7, name:"Mats Johansson",    rank:7,  phone:"0706425156"},
+  {id:8, name:"Håkan Bergman",     rank:8,  phone:"0702172230"},
+  {id:9, name:"Mats Ljungström",   rank:9,  phone:"0708784133"},
+  {id:10,name:"Niklas Strömberg",  rank:10, phone:"0705756786"},
+  {id:11,name:"Rasmus Winther",    rank:11, phone:"0708670885"},
+  {id:12,name:"Joaquim Nicander",  rank:12, phone:"0720787845"},
+  {id:13,name:"Stefan Munge",      rank:13, phone:"0706402286"},
+  {id:14,name:"Oscar Hänsel",      rank:14, phone:"0708750404"},
+  {id:15,name:"Johan Wastensson",  rank:15, phone:"0733369718"},
+  {id:16,name:"Anders Schillström",rank:16, phone:"0707993028"},
+  {id:17,name:"Peter Widen",       rank:17, phone:"0706636460"},
+  {id:18,name:"James Ljungström",  rank:18, phone:"0709569308"},
+  {id:19,name:"Lars Paulsson",     rank:19, phone:"0724433243"},
+  {id:20,name:"John Lundqvist",    rank:20, phone:"0702990303"},
+  {id:21,name:"Jeff Bork",         rank:21, phone:"0761000000"},
+  {id:22,name:"Johan Zetterberg",  rank:22, phone:"0705598997"},
+  {id:23,name:"Matilda Svensson",  rank:23, phone:"0703341469"},
+  {id:24,name:"Igor Mirkovic",     rank:24, phone:"0725310210"},
+  {id:25,name:"Stefan Angvald",    rank:25, phone:"0702451256"},
+  {id:26,name:"Fredrik Gradin",    rank:26, phone:"0735446548"},
+  {id:27,name:"Jan Andresen",      rank:27, phone:"0735073506"},
+  {id:28,name:"Roger Edmark",      rank:28, phone:"0730790838"},
+  {id:29,name:"Karl Thorngren",    rank:29, phone:"0702959477"},
+  {id:30,name:"Sam Lindgren",      rank:30, phone:"0761424103"},
+];
+function getPlayers(){ try{return JSON.parse(localStorage.getItem('bts_players')||'null')||basePlayers}catch(e){return basePlayers} }
+
+// ── SEASONS ───────────────────────────────────────────────────
+const DEFAULT_SEASONS=[
+  {id:'VT2026',name:'Vårtermin 2026',short:'VT 2026',start:'2026-01-01',end:'2026-06-20'},
+  {id:'ST2026',name:'Sommartermin 2026',short:'ST 2026',start:'2026-06-21',end:'2026-12-20'},
+];
+function getSeasons(){try{return JSON.parse(localStorage.getItem('bts_seasons')||'null')||DEFAULT_SEASONS}catch(e){return DEFAULT_SEASONS}}
+function getActiveSeason(){
+  const override=localStorage.getItem('bts_active_season');
+  if(override)return override;
+  const today=new Date().toISOString().slice(0,10);
+  for(const s of getSeasons()){if(today>=s.start&&today<=s.end)return s.id;}
+  return getSeasons().slice(-1)[0].id;
+}
+
+// ── STATE ─────────────────────────────────────────────────────
+let me=null, currentSeason='VT2026', activeSeason='VT2026';
+let reportMode='score'; // 'score' or 'wo'
+let stbVisible=false;
+let woWinner=null;
+
+// ── STORAGE ───────────────────────────────────────────────────
+function sk(key){return key+'_'+currentSeason}
+function getPin(name){return localStorage.getItem('bts_pin_'+name)||defaultPin(name)}
+function setPin(name,pin){localStorage.setItem('bts_pin_'+name,pin)}
+function defaultPin(name){const p=getPlayers().find(x=>x.name===name);return p?p.phone.replace(/\D/g,'').slice(-4):'0000'}
+function getLadder(){try{return JSON.parse(localStorage.getItem(sk('bts_ladder'))||'null')||getPlayers().map(p=>p.id)}catch(e){return getPlayers().map(p=>p.id)}}
+function getCurrentRound(){return parseInt(localStorage.getItem(sk('bts_round'))||'1')}
+function getPending(){try{return JSON.parse(localStorage.getItem(sk('bts_pending'))||'{}')}catch(e){return {}}}
+function savePending(d){localStorage.setItem(sk('bts_pending'),JSON.stringify(d))}
+function getProfile(name){try{return JSON.parse(localStorage.getItem('bts_profile_'+name)||'{}')}catch(e){return {}}}
+function saveProfileData(name,d){localStorage.setItem('bts_profile_'+name,JSON.stringify(d))}
+
+// ── SETUP ─────────────────────────────────────────────────────
+function setupLoginDropdown(){
+  const sel=document.getElementById('login-name');
+  getPlayers().forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=`${p.name} (#${p.rank})`;sel.appendChild(o)});
+}
+
+function doLogin(){
+  const name=document.getElementById('login-name').value;
+  const pin=document.getElementById('login-pin').value;
+  const errEl=document.getElementById('login-error');
+  if(!name){errEl.classList.remove('hidden');errEl.textContent='Välj ditt namn i listan.';return}
+  if(pin===getPin(name)){
+    me=getPlayers().find(p=>p.name===name);
+    activeSeason=getActiveSeason();currentSeason=activeSeason;
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('header-name').textContent=me.name;
+    renderSeasonBar();renderApp();
+  } else {
+    errEl.classList.remove('hidden');errEl.textContent='Fel PIN. Prova de 4 sista siffrorna i ditt telefonnummer.';
+    document.getElementById('login-pin').value='';
+  }
+}
+function logout(){
+  me=null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login-pin').value='';
+  document.getElementById('login-error').classList.add('hidden');
+}
+
+// ── SEASON BAR ────────────────────────────────────────────────
+function renderSeasonBar(){
+  const seasons=getSeasons();
+  const today=new Date().toISOString().slice(0,10);
+  const bar=document.getElementById('season-bar');
+  bar.innerHTML=seasons.map(s=>{
+    const isPast=today>s.end;
+    return `<button class="season-chip${s.id===currentSeason?' active':''}${isPast?' past':''}" onclick="switchSeason('${s.id}')">${s.short}${isPast?' ✓':s.id===activeSeason?' ★':''}</button>`;
+  }).join('');
+  if(currentSeason!==activeSeason) bar.innerHTML+=`<span class="season-readonly-badge">Arkiv</span>`;
+}
+
+function switchSeason(id){currentSeason=id;reportMode='score';stbVisible=false;woWinner=null;renderSeasonBar();renderApp()}
+
+// ── MY MATCH ──────────────────────────────────────────────────
+function getMyMatch(){
+  const ladder=getLadder();
+  const myRank=ladder.indexOf(me.id)+1;
+  if(myRank<=0)return null;
+  const posA=myRank%2===1?myRank:myRank-1;
+  const posB=posA+1;
+  if(posB>ladder.length)return null;
+  const oppId=ladder[posA===myRank?posB-1:posA-1];
+  const opp=getPlayers().find(p=>p.id===oppId);
+  return{posA,posB,key:`${posA}v${posB}`,opp,myPos:myRank};
+}
+function getPendingForMe(){
+  const pending=getPending();const round=getCurrentRound();const match=getMyMatch();if(!match)return null;
+  const p=(pending[round]||{})[match.key];
+  if(!p||p.reporter===me.name||p.status==='confirmed'||p.status==='disputed')return null;
+  return{...p,key:match.key};
+}
+function myReportStatus(){
+  const match=getMyMatch();if(!match)return null;
+  return((getPending()[getCurrentRound()])||{})[match.key]||null;
+}
+function setsToStr(sets){return(sets||[]).map(s=>`${s.a}-${s.b}`).join(' ')}
+function firstName(name){return name.split(' ')[0]}
+
+// ── REPORT MODE TOGGLE ────────────────────────────────────────
+function setReportMode(mode){
+  reportMode=mode;stbVisible=false;woWinner=null;
+  document.getElementById('score-big-btn').classList.toggle('active',mode==='score');
+  document.getElementById('wo-big-btn').classList.toggle('active',mode==='wo');
+  document.getElementById('score-section').classList.toggle('hidden',mode==='wo');
+  document.getElementById('auto-win-row').classList.toggle('hidden',mode==='wo');
+  document.getElementById('wo-section').classList.toggle('hidden',mode==='score');
+  if(mode==='wo') document.getElementById('score-section').classList.add('hidden');
+}
+
+// ── SET INPUT ─────────────────────────────────────────────────
+function onSetInput(){
+  const v=id=>parseInt(document.getElementById(id)?.value)||0;
+  const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b');
+  const s1A=s1a>s1b&&(s1a||s1b),s1B=s1b>s1a&&(s1a||s1b);
+  const s2A=s2a>s2b&&(s2a||s2b),s2B=s2b>s2a&&(s2a||s2b);
+  if((s1A&&s2B)||(s1B&&s2A)){
+    if(!stbVisible){
+      stbVisible=true;
+      document.getElementById('stb-announce')?.classList.add('visible');
+      document.getElementById('stb-row')?.classList.add('visible');
+      document.getElementById('btn-stb')?.classList.add('hidden');
+      setTimeout(()=>document.getElementById('r-stba')?.focus(),350);
+    }
+  }
+  updateAutoWinner();
+}
+function updateAutoWinner(){
+  if(reportMode==='wo')return;
+  const match=getMyMatch();if(!match)return;
+  const v=id=>parseInt(document.getElementById(id)?.value)||0;
+  const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b'),stba=v('r-stba'),stbb=v('r-stbb');
+  let sA=0,sB=0;
+  if(s1a||s1b){if(s1a>s1b)sA++;else if(s1b>s1a)sB++;}
+  if(s2a||s2b){if(s2a>s2b)sA++;else if(s2b>s2a)sB++;}
+  if(stba||stbb){if(stba>stbb)sA++;else if(stbb>stba)sB++;}
+  const meIsA=match.posA===match.myPos;
+  const disp=document.getElementById('auto-win-display');if(!disp)return;
+  if(sA>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+(meIsA?me.name:match.opp.name)}
+  else if(sB>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+(meIsA?match.opp.name:me.name)}
+  else if(sA||sB){disp.className='auto-win-display empty';disp.textContent=`${sA}–${sB} i set…`}
+  else{disp.className='auto-win-display empty';disp.textContent='Fyll i set-resultaten ovan'}
+}
+function showSTB(){
+  stbVisible=true;
+  document.getElementById('stb-announce')?.classList.add('visible');
+  document.getElementById('stb-row')?.classList.add('visible');
+  document.getElementById('btn-stb')?.classList.add('hidden');
+}
+function selectWoWinner(name){
+  woWinner=name;
+  document.querySelectorAll('.wo-winner-btn').forEach(b=>b.classList.toggle('selected',b.dataset.player===name));
+}
+
+// ── RENDER APP ────────────────────────────────────────────────
+function renderApp(){
+  reportMode='score';stbVisible=false;woWinner=null;
+  const match=getMyMatch();
+  const round=getCurrentRound();
+  const isReadOnly=currentSeason!==activeSeason;
+  const pending=isReadOnly?null:getPendingForMe();
+  const myReport=isReadOnly?null:myReportStatus();
+  const main=document.getElementById('app-main');
+  let html='';
+
+  if(isReadOnly){
+    const sName=getSeasons().find(s=>s.id===currentSeason)?.name||currentSeason;
+    html=`<div class="section">
+      <div class="section-label">Arkiv — ${sName}</div>
+      <div style="color:var(--muted);font-size:15px;line-height:1.7;padding:12px 0">
+        Du visar en avslutad säsong.<br>
+        <a href="#" onclick="switchSeason('${activeSeason}');return false" style="color:var(--green);text-decoration:none;font-weight:600">→ Gå till aktiv säsong</a>
+      </div>
+    </div>`;
+    main.innerHTML=html;return;
+  }
+
+  // Pending confirmation
+  if(pending){
+    html+=`
+    <div class="section">
+      <div class="section-label">Bekräfta match</div>
+      <div class="confirm-card">
+        <div class="confirm-title">Motståndaren rapporterade!</div>
+        <div class="confirm-sub">Omgång ${round}</div>
+        <div class="confirm-score">${pending.wo?'WO':setsToStr(pending.sets)}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:4px">Rapporterat av ${pending.reporter}</div>
+        <div style="font-size:15px;color:var(--muted);margin-top:12px;line-height:1.5">
+          <strong style="color:var(--white)">${pending.winnerName}</strong> vann enligt rapporten. Stämmer det?
+        </div>
+        <div class="confirm-btns">
+          <button class="btn-confirm" onclick="confirmMatch('${pending.key}',true)">✓ Ja, stämmer!</button>
+          <button class="btn-dispute" onclick="confirmMatch('${pending.key}',false)">✕ Fel resultat</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Current match
+  if(!match){
+    html+=`<div class="section"><div style="color:var(--muted2);font-size:15px;padding:16px 0">Ingen match hittad för omgång ${round}.</div></div>`;
+  } else if(myReport&&myReport.status!=='disputed'){
+    html+=`
+    <div class="section">
+      <div class="section-label">Omgång ${round} — Din match</div>
+      <div class="success-box">
+        <span class="success-icon">${myReport.status==='confirmed'?'✅':'⏳'}</span>
+        <div class="success-title">${myReport.status==='confirmed'?'Bekräftad!':'Rapporterad!'}</div>
+        <div class="success-sub">
+          vs <strong style="color:var(--white)">${match.opp.name}</strong><br>
+          ${myReport.status==='confirmed'?'✓ Bekräftad av '+match.opp.name:'Väntar på att '+match.opp.name+' bekräftar…'}
+        </div>
+        <div><div class="success-score">${myReport.wo?'WO':setsToStr(myReport.sets)}</div></div>
+        <div><span class="status-tag ${myReport.status}">${myReport.status==='confirmed'?'Bekräftad':'Väntar'}</span></div>
+      </div>
+      ${myReport.status!=='confirmed'?`<button class="btn-sm" style="width:100%;padding:14px;text-align:center;margin-top:8px;font-size:14px;justify-content:center" onclick="undoReport()">← Ångra rapportering</button>`:''}
+    </div>`;
+  } else {
+    html+=`
+    <div class="section">
+      <div class="section-label">Omgång ${round} — Rapportera</div>
+      ${myReport?.status==='disputed'?`<div class="notif-banner"><div class="notif-icon">⚠️</div><div class="notif-text"><strong>Bestriden match</strong><small>Motståndaren bestred. Ange korrekt resultat.</small></div></div>`:''}
+
+      <div class="match-card">
+        <div class="match-card-round">Omgång ${round}</div>
+
+        <!-- PLAYERS -->
+        <div class="match-versus">
+          <div class="match-versus-player">
+            <div class="match-versus-name">${me.name}</div>
+            <div class="match-versus-rank">#${match.myPos}</div>
+          </div>
+          <div class="match-versus-sep">VS</div>
+          <div class="match-versus-player match-vs-right">
+            <div class="match-versus-name">${match.opp.name}</div>
+            <div class="match-versus-rank">#${match.posA===match.myPos?match.posB:match.posA}</div>
+          </div>
+        </div>
+
+        <!-- SCORE / WO TOGGLE -->
+        <div class="wo-option-row">
+          <button class="score-big-btn active" id="score-big-btn" onclick="setReportMode('score')">🎾 Ange resultat</button>
+          <button class="wo-big-btn" id="wo-big-btn" onclick="setReportMode('wo')">WO</button>
+        </div>
+
+        <!-- SCORE SECTION -->
+        <div id="score-section">
+          <div class="set-divider">Set-resultat</div>
+          <div class="set-input-row">
+            <div class="set-lbl">S1</div>
+            <div class="set-box">
+              <input type="number" class="set-num" id="r-s1a" min="0" max="7" placeholder="0" oninput="onSetInput()">
+              <div class="set-dash">–</div>
+              <input type="number" class="set-num" id="r-s1b" min="0" max="7" placeholder="0" oninput="onSetInput()">
+            </div>
+          </div>
+          <div class="set-input-row">
+            <div class="set-lbl">S2</div>
+            <div class="set-box">
+              <input type="number" class="set-num" id="r-s2a" min="0" max="7" placeholder="0" oninput="onSetInput()">
+              <div class="set-dash">–</div>
+              <input type="number" class="set-num" id="r-s2b" min="0" max="7" placeholder="0" oninput="onSetInput()">
+            </div>
+          </div>
+          <div class="stb-announce" id="stb-announce">1–1 i set! Supertiebreak till 10 🎾</div>
+          <div class="set-input-row stb-row" id="stb-row">
+            <div class="set-lbl">STB</div>
+            <div class="set-box" style="border-color:rgba(193,125,75,0.4)">
+              <input type="number" class="set-num" id="r-stba" min="0" max="15" placeholder="0" oninput="updateAutoWinner()" style="color:var(--clay)">
+              <div class="set-dash" style="background:rgba(193,125,75,0.3)">–</div>
+              <input type="number" class="set-num" id="r-stbb" min="0" max="15" placeholder="0" oninput="updateAutoWinner()" style="color:var(--clay)">
+            </div>
+          </div>
+          <button class="btn-add-stb" id="btn-stb" onclick="showSTB()">+ Lägg till supertiebreak manuellt</button>
+        </div>
+
+        <!-- AUTO WINNER -->
+        <div id="auto-win-row">
+          <div class="auto-win-display empty" id="auto-win-display">Fyll i set-resultaten ovan</div>
+        </div>
+
+        <!-- WO SECTION -->
+        <div class="wo-section hidden" id="wo-section">
+          <div class="wo-section-title">Vem vann via WO?</div>
+          <div class="wo-winner-btns">
+            <button class="wo-winner-btn" data-player="${me.name}" onclick="selectWoWinner('${me.name}')">
+              ${me.name} (jag vann, motståndaren kom inte)
+            </button>
+            <button class="wo-winner-btn" data-player="${match.opp.name}" onclick="selectWoWinner('${match.opp.name}')">
+              ${match.opp.name} (jag kunde inte spela)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitResult(event)">Rapportera resultat →</button>
+    </div>`;
+  }
+
+  // Profile section
+  const prof=getProfile(me.name);
+  html+=`
+  <div class="section">
+    <div class="section-label">Min profil</div>
+    <div class="profile-form">
+      <div class="form-row"><label class="form-label">Född (åå-mm-dd)</label><input class="form-input" id="p-born" type="date" value="${prof.born||''}"></div>
+      <div class="form-row"><label class="form-label">Spelhand</label>
+        <select class="form-select" id="p-hand">
+          <option value="">Välj...</option>
+          <option value="Höger" ${prof.hand==='Höger'?'selected':''}>Höger</option>
+          <option value="Vänster" ${prof.hand==='Vänster'?'selected':''}>Vänster</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">Hemort</label><input class="form-input" id="p-hometown" type="text" value="${prof.hometown||''}" placeholder="Båstad"></div>
+      <div class="form-row"><label class="form-label">Favoritslag</label><input class="form-input" id="p-favshot" type="text" value="${prof.favShot||''}" placeholder="Serve, BH, FH..."></div>
+      <div class="form-row"><label class="form-label">Favoritunderlag</label>
+        <select class="form-select" id="p-surface">
+          <option value="">Välj...</option>
+          <option value="Grus" ${prof.favSurface==='Grus'?'selected':''}>Grus</option>
+          <option value="Hard" ${prof.favSurface==='Hard'?'selected':''}>Hard</option>
+          <option value="Gräs" ${prof.favSurface==='Gräs'?'selected':''}>Gräs</option>
+          <option value="Inomhus" ${prof.favSurface==='Inomhus'?'selected':''}>Inomhus</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">På stegen sedan</label><input class="form-input" id="p-since" type="text" value="${prof.since||''}" placeholder="2020"></div>
+      <div class="form-row"><label class="form-label">Om mig</label><textarea class="form-textarea" id="p-bio" placeholder="Berätta något kul om dig själv...">${prof.bio||''}</textarea></div>
+      <button class="save-btn" onclick="saveMyProfile(this)">Spara profil →</button>
+      <div class="pin-row">
+        <div style="flex:1"><label class="form-label" style="margin-bottom:6px">Byt PIN-kod</label><input class="form-input" id="p-newpin" type="password" maxlength="4" inputmode="numeric" placeholder="Ny 4-siffrig PIN"></div>
+        <button class="save-btn" onclick="savePin()">Byt</button>
+      </div>
+    </div>
+  </div>`;
+
+  main.innerHTML=html;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+function submitResult(e){
+  // Ripple effect
+  const btn=document.getElementById('submit-btn');
+  if(btn&&e){
+    const r=document.createElement('span');r.className='ripple';
+    const rect=btn.getBoundingClientRect();
+    r.style.width=r.style.height=Math.max(rect.width,rect.height)+'px';
+    r.style.left=(e.clientX-rect.left-r.offsetWidth/2)+'px';
+    r.style.top=(e.clientY-rect.top-r.offsetHeight/2)+'px';
+    btn.appendChild(r);setTimeout(()=>r.remove(),600);
+  }
+
+  const match=getMyMatch();if(!match)return;
+  const round=getCurrentRound();
+  let winnerName,sets=[],isWO=reportMode==='wo';
+
+  if(isWO){
+    if(!woWinner){alert('Välj vem som vann via WO!');return;}
+    winnerName=woWinner;
+  } else {
+    const v=id=>parseInt(document.getElementById(id)?.value)||0;
+    const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b'),stba=v('r-stba'),stbb=v('r-stbb');
+    if(s1a||s1b)sets.push({a:s1a,b:s1b});
+    if(s2a||s2b)sets.push({a:s2a,b:s2b});
+    if((stba||stbb)&&stbVisible)sets.push({a:stba,b:stbb,super:true});
+    if(!sets.length){alert('Ange minst ett set!');return;}
+    let sA=0,sB=0;
+    sets.forEach(s=>{if(s.a>s.b)sA++;else if(s.b>s.a)sB++;});
+    const meIsA=match.posA===match.myPos;
+    if(sA>=2)winnerName=meIsA?me.name:match.opp.name;
+    else if(sB>=2)winnerName=meIsA?match.opp.name:me.name;
+    else{alert('Vinnare ej fastställd. Kontrollera set-resultaten.');return;}
+  }
+
+  const meIsA=match.posA===match.myPos;
+  const winnerPos=winnerName===me.name?(meIsA?match.posA:match.posB):(meIsA?match.posB:match.posA);
+  const pending=getPending();
+  if(!pending[round])pending[round]={};
+  pending[round][match.key]={
+    posA:match.posA,posB:match.posB,winner:winnerPos,winnerName,
+    sets,wo:isWO,score:isWO?'WO':setsToStr(sets),
+    reporter:me.name,status:'pending',timestamp:Date.now()
+  };
+  savePending(pending);
+  renderApp();
+}
+
+function confirmMatch(key,confirmed){
+  const round=getCurrentRound();const pending=getPending();
+  if(pending[round]?.[key]){
+    pending[round][key].status=confirmed?'confirmed':'disputed';
+    pending[round][key].confirmedBy=me.name;
+    pending[round][key].confirmedAt=Date.now();
+  }
+  savePending(pending);
+  if(confirmed){
+    const r=pending[round][key];
+    const results=JSON.parse(localStorage.getItem(sk('bts_results'))||'{}');
+    if(!results[round])results[round]={};results[round][key]=r;
+    localStorage.setItem(sk('bts_results'),JSON.stringify(results));
+    launchConfetti();
+  }
+  renderApp();
+}
+
+function undoReport(){
+  const match=getMyMatch();if(!match)return;
+  const round=getCurrentRound();const pending=getPending();
+  if(pending[round])delete pending[round][match.key];
+  savePending(pending);renderApp();
+}
+
+// ── CONFETTI ──────────────────────────────────────────────────
+function launchConfetti(){
+  const wrap=document.getElementById('confetti-wrap');
+  wrap.classList.remove('hidden');wrap.innerHTML='';
+  const colors=['#4CAF50','#D4E157','#42A5F5','#C17D4B','#F0F5F0'];
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='confetti-piece';
+    p.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${Math.random()*0.5}s;animation-duration:${0.9+Math.random()*0.6}s`;
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>{wrap.classList.add('hidden');wrap.innerHTML=''},2000);
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+function saveMyProfile(btn){
+  saveProfileData(me.name,{
+    born:document.getElementById('p-born')?.value||'',
+    hand:document.getElementById('p-hand')?.value||'',
+    hometown:document.getElementById('p-hometown')?.value||'',
+    favShot:document.getElementById('p-favshot')?.value||'',
+    favSurface:document.getElementById('p-surface')?.value||'',
+    since:document.getElementById('p-since')?.value||'',
+    bio:document.getElementById('p-bio')?.value||'',
+  });
+  if(btn){const t=btn.textContent;btn.textContent='Sparad! ✓';setTimeout(()=>btn.textContent=t,2000);}
+}
+function savePin(){
+  const p=document.getElementById('p-newpin')?.value||'';
+  if(p.length!==4||!/^\d{4}$/.test(p)){alert('PIN måste vara exakt 4 siffror');return;}
+  setPin(me.name,p);document.getElementById('p-newpin').value='';alert('PIN ändrad! Kom ihåg den.');
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+setupLoginDropdown();
+</script>
+</body>
+</html>

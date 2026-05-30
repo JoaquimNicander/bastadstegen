@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS Stegen — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A1A0C;--surface:#0F2212;--card:#142816;--card2:#1A3320;
+  --border:#1F4025;--border2:#2A5530;
+  --green:#4CAF50;--yellow:#D4E157;--clay:#C17D4B;
+  --white:#F0F5F0;--muted:rgba(240,245,240,0.45);--muted2:rgba(240,245,240,0.25);
+  --red:#EF5350;--blue:#42A5F5;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--surface);border:1px solid var(--border2);padding:48px 40px;width:100%;max-width:380px;text-align:center}
+.login-logo{font-size:40px;margin-bottom:16px}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:6px}
+.login-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:36px}
+.login-input{width:100%;padding:14px 18px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:15px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.login-input:focus{border-color:var(--green)}
+.login-btn{width:100%;padding:14px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s}
+.login-btn:hover{background:#43A047}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;font-family:'Space Mono',monospace}
+
+/* HEADER */
+header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1px solid var(--border);padding:0 32px}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:30px;height:30px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white)}
+.logo-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--clay);background:rgba(193,125,75,0.12);border:1px solid rgba(193,125,75,0.3);padding:2px 8px;border-radius:100px}
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn-sm{background:none;border:1px solid var(--border2);color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px;padding:5px 12px;cursor:pointer;text-decoration:none;transition:all 0.2s}
+.btn-sm:hover{color:var(--white);border-color:var(--muted)}
+
+/* SEASON BAR */
+.season-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px}
+.season-bar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;height:42px;overflow-x:auto}
+.season-chip{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;background:none}
+.season-chip:hover{border-color:var(--muted);color:var(--white)}
+.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
+.season-chip.upcoming{border-color:var(--yellow);color:var(--yellow);background:rgba(212,225,87,0.06)}
+.btn-new-season{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);border:1px dashed var(--border2);padding:5px 12px;cursor:pointer;background:none;white-space:nowrap;transition:all 0.2s}
+.btn-new-season:hover{color:var(--green);border-color:var(--green)}
+
+/* MASTER ADMIN */
+.master-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--yellow);background:rgba(212,225,87,0.08);border:1px solid rgba(212,225,87,0.3);padding:2px 8px;border-radius:100px;cursor:pointer;transition:all 0.2s}
+.master-badge:hover{background:rgba(212,225,87,0.15)}
+.master-badge.unlocked{color:#000;background:var(--yellow);border-color:var(--yellow)}
+
+/* PLAYER MANAGEMENT TABLE */
+.player-mgmt-table{width:100%;border-collapse:collapse}
+.player-mgmt-table th{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.player-mgmt-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.player-mgmt-table tr:last-child td{border-bottom:none}
+.player-mgmt-table tr:hover td{background:rgba(255,255,255,0.02)}
+.rank-cell{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);width:40px}
+.player-edit-input{background:var(--card2);border:1px solid var(--green);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;outline:none;width:100%}
+.move-btns{display:flex;gap:3px}
+.move-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-size:11px;width:26px;height:26px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
+.move-btn:hover{border-color:var(--white);color:var(--white)}
+.action-btns{display:flex;gap:4px}
+.action-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:4px 9px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.action-btn.edit:hover{border-color:var(--blue);color:var(--blue)}
+.action-btn.save{border-color:var(--green);color:var(--green)}
+.action-btn.save:hover{background:rgba(76,175,80,0.1)}
+.action-btn.del:hover{border-color:var(--red);color:var(--red)}
+.add-player-form{background:var(--card);border:1px solid var(--border2);padding:16px 20px;display:flex;gap:10px;align-items:flex-end;margin-top:8px;flex-wrap:wrap}
+.add-player-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px}
+.add-player-label{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase}
+.add-player-input{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color 0.2s}
+.add-player-input:focus{border-color:var(--green)}
+.add-player-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;white-space:nowrap;transition:background 0.2s}
+.add-player-btn:hover{background:#43A047}
+
+/* RESULT OVERRIDE TABLE */
+.result-table{width:100%;border-collapse:collapse}
+.result-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.result-table tr:last-child td{border-bottom:none}
+.result-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* MAIN */
+.main{max-width:1200px;margin:0 auto;padding:28px 32px 80px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
+.page-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:28px}
+
+/* SECTION */
+.section{margin-bottom:44px}
+.section-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--green);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+
+/* ROUND BAR */
+.round-bar{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.round-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase}
+.round-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow);line-height:1}
+.btn-round{background:var(--card);border:1px solid var(--border2);color:var(--white);width:30px;height:30px;font-size:16px;cursor:pointer;transition:background 0.2s}
+.btn-round:hover{background:var(--card2)}
+
+/* MATCH CARD */
+.match-input-grid{display:flex;flex-direction:column;gap:4px}
+.match-card{background:var(--card);border:1px solid var(--border);transition:border-color 0.2s}
+.match-card.has-result{border-left:3px solid var(--green)}
+.match-card-header{display:flex;align-items:center;gap:10px;padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.match-pos{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;background:var(--card2);border:1px solid var(--border);padding:2px 7px;flex-shrink:0}
+.match-players{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.match-player-name{font-size:13px;font-weight:600;color:var(--white)}
+.match-player-rank{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);display:block;margin-top:1px}
+.match-vs-sep{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:2px;padding:0 4px;flex-shrink:0}
+
+/* SET INPUTS */
+.match-card-body{display:flex;align-items:center;gap:10px;padding:8px 14px 10px;flex-wrap:wrap}
+.sets-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.set-block{display:flex;align-items:center;gap:3px;background:var(--card2);border:1px solid var(--border2);padding:3px 7px}
+.set-block-label{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-right:2px}
+.set-score-input{width:36px;height:28px;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:17px;text-align:center;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
+.set-score-input::-webkit-inner-spin-button,.set-score-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.set-score-input:focus{border-color:var(--green)}
+.set-sep{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted2)}
+.btn-add-stb{background:none;border:1px dashed var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:3px 9px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-add-stb:hover{border-color:var(--green);color:var(--green)}
+.stb-block{border-color:var(--clay) !important}
+.stb-block .set-block-label{color:var(--clay)}
+
+/* MATCH FOOTER */
+.match-card-footer{display:flex;align-items:center;gap:8px;padding:0 14px 10px;flex-wrap:wrap}
+.auto-winner-hint{font-family:'Space Mono',monospace;font-size:8px;color:var(--green);letter-spacing:1px;margin-left:auto}
+.winner-select{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:12px;padding:6px 10px;outline:none;cursor:pointer;flex:1;min-width:140px;max-width:220px}
+.winner-select:focus{border-color:var(--green)}
+.wo-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:6px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.wo-btn:hover{border-color:var(--clay);color:var(--clay)}
+.wo-btn.active{border-color:var(--clay);color:var(--clay);background:rgba(193,125,75,0.1)}
+.save-match-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;cursor:pointer;letter-spacing:0.5px;transition:background 0.2s;white-space:nowrap;margin-left:auto}
+.save-match-btn:hover{background:#43A047}
+.saved-badge{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-left:auto;display:flex;align-items:center;gap:6px}
+.edit-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:3px 9px;cursor:pointer;transition:all 0.2s}
+.edit-btn:hover{color:var(--white);border-color:var(--muted)}
+.saved-score{font-family:'Space Mono',monospace;font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px}
+
+/* STATS */
+.stats-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.stat-box{background:var(--card);border:1px solid var(--border);padding:12px;text-align:center}
+.stat-box-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--yellow);line-height:1}
+.stat-box-lbl{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
+
+/* PUBLISH */
+.publish-box{background:var(--card);border:1px solid var(--border2);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.publish-info h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.publish-info p{font-size:12px;color:var(--muted);line-height:1.6}
+.publish-btn{background:var(--yellow);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;cursor:pointer;transition:background 0.2s;white-space:nowrap;flex-shrink:0}
+.publish-btn:hover{background:#C6D115}
+
+/* LADDER MINI */
+.ladder-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.ladder-mini-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:8px 12px}
+.ladder-mini-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);width:24px;flex-shrink:0;line-height:1}
+.ladder-mini-name{font-size:12px;font-weight:500}
+
+/* NEW SEASON MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.overlay-box{background:var(--surface);border:1px solid var(--border2);padding:36px;width:100%;max-width:440px}
+.overlay-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:6px}
+.overlay-sub{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.form-row{margin-bottom:14px}
+.form-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s}
+.form-input:focus,.form-select:focus{border-color:var(--green)}
+.form-checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 0}
+.form-btns{display:flex;gap:8px;margin-top:20px}
+.btn-primary{flex:1;padding:11px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.btn-cancel{padding:11px 20px;background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--green);color:#000;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700;padding:12px 22px;z-index:999;transform:translateY(80px);opacity:0;transition:transform 0.3s,opacity 0.3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* PENDING SIGNUPS */
+.pending-list{display:flex;flex-direction:column;gap:3px}
+.pending-card{background:var(--card);border:1px solid var(--border);padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;transition:border-color 0.2s}
+.pending-card:hover{border-color:rgba(193,125,75,0.3)}
+.pending-name{font-size:14px;font-weight:600;margin-bottom:5px}
+.pending-meta{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px;line-height:1.8}
+.pending-actions{display:flex;gap:6px;flex-shrink:0}
+.approve-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:8px 16px;cursor:pointer;transition:background 0.2s;white-space:nowrap}
+.approve-btn:hover{background:#43A047}
+.reject-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:8px 12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.reject-btn:hover{border-color:var(--red);color:var(--red)}
+.pending-count-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:#000;background:var(--clay);padding:2px 8px;display:inline-block;vertical-align:middle;margin-left:8px}
+.pending-empty{color:var(--muted2);font-size:12px;padding:14px;font-family:'Space Mono',monospace}
+
+.hidden{display:none}
+
+@media(max-width:900px){
+  header,.season-bar{padding:0 16px}
+  .main{padding:20px 16px 60px}
+  .ladder-mini{grid-template-columns:1fr 1fr}
+  .stats-summary{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🎾</div>
+    <div class="login-title">BTS Admin</div>
+    <div class="login-sub">Båstad Tennissällskap</div>
+    <input type="password" class="login-input" id="pw-input" placeholder="Lösenord" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Logga in</button>
+    <div class="login-error hidden" id="login-error">Fel lösenord.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">🎾</div>
+      <div class="logo-text">BTS Admin</div>
+    </a>
+    <div class="logo-badge">ADMIN</div>
+    <div class="header-actions">
+      <button class="master-badge" id="master-btn" onclick="promptMaster()" title="Master-admin">🔐 Master</button>
+      <a href="stegen.html" class="btn-sm">← Stegen</a>
+      <button class="btn-sm" onclick="logout()">Logga ut</button>
+    </div>
+  </div>
+</header>
+
+<!-- SEASON BAR -->
+<div class="season-bar">
+  <div class="season-bar-inner" id="season-bar-inner">
+    <!-- rendered by JS -->
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-title" id="page-title">Resultatregistrering</div>
+  <div class="page-sub" id="page-sub">Mata in matcher och publicera stege</div>
+
+  <!-- ROUND -->
+  <div class="round-bar">
+    <div class="round-label">Omgång</div>
+    <button class="btn-round" onclick="changeRound(-1)">−</button>
+    <div class="round-num" id="round-display">1</div>
+    <button class="btn-round" onclick="changeRound(1)">+</button>
+  </div>
+
+  <!-- MATCH INPUT -->
+  <div class="section">
+    <div class="section-title">Matcher — Omgång <span id="section-round">1</span></div>
+    <div id="round-stats-summary" class="stats-summary hidden"></div>
+    <div class="match-input-grid" id="match-input-grid"></div>
+  </div>
+
+  <!-- PUBLISH -->
+  <div class="section">
+    <div class="section-title">Publicera stege</div>
+    <div class="publish-box">
+      <div class="publish-info">
+        <h3>Stäng omgång och uppdatera stegen</h3>
+        <p>Vinnare klättrar upp, förlorare åker ned.<br>Games- och set-statistik uppdateras automatiskt.</p>
+      </div>
+      <button class="publish-btn" onclick="publishRound()">Publicera →</button>
+    </div>
+  </div>
+
+  <!-- CURRENT LADDER -->
+  <div class="section">
+    <div class="section-title">Nuvarande stege</div>
+    <div class="ladder-mini" id="ladder-mini"></div>
+  </div>
+
+  <!-- MASTER: SPELARHANTERING (hidden until unlocked) -->
+  <div class="section hidden" id="master-section">
+    <div class="section-title" style="color:var(--yellow)">⚡ Master — Spelarhantering</div>
+
+    <!-- PENDING SIGNUPS -->
+    <div style="margin-bottom:28px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin-bottom:10px;display:flex;align-items:center">
+        Väntande anmälningar
+        <span id="pending-count-badge"></span>
+      </div>
+      <div class="pending-list" id="pending-signups-list">
+        <div class="pending-empty">Laddar...</div>
+      </div>
+    </div>
+
+    <!-- RESULT OVERRIDES -->
+    <div style="margin-bottom:24px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Resultat omgång <span id="master-round-lbl">—</span></div>
+      <div style="background:var(--card);border:1px solid var(--border);overflow:hidden">
+        <table class="result-table" id="result-override-table">
+          <tr><td style="color:var(--muted2);font-size:12px;padding:16px">Inga resultat sparade för denna omgång.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- PLAYER TABLE -->
+    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px">Spelarlista & ranking</div>
+    <div style="background:var(--card);border:1px solid var(--border);overflow:hidden;margin-bottom:8px">
+      <table class="player-mgmt-table" id="player-mgmt-table">
+        <!-- rendered by JS -->
+      </table>
+    </div>
+
+    <!-- ADD PLAYER FORM -->
+    <div class="add-player-form">
+      <div class="add-player-field">
+        <div class="add-player-label">Namn</div>
+        <input class="add-player-input" id="new-player-name" type="text" placeholder="Förnamn Efternamn">
+      </div>
+      <div class="add-player-field">
+        <div class="add-player-label">Telefon</div>
+        <input class="add-player-input" id="new-player-phone" type="tel" placeholder="070XXXXXXX">
+      </div>
+      <div class="add-player-field" style="max-width:120px">
+        <div class="add-player-label">Position (tom=sist)</div>
+        <input class="add-player-input" id="new-player-pos" type="number" min="1" placeholder="Sist">
+      </div>
+      <button class="add-player-btn" onclick="addPlayer()">+ Lägg till</button>
+    </div>
+
+    <!-- STATS RESET -->
+    <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="action-btn" style="border-color:var(--red);color:var(--red)" onclick="resetStats(false)">↺ Nollställ all statistik</button>
+      <button class="action-btn" style="border-color:var(--clay);color:var(--clay)" onclick="exportData()">⬇ Exportera data (JSON)</button>
+    </div>
+  </div>
+</div>
+</div><!-- /app -->
+
+<!-- MASTER UNLOCK OVERLAY -->
+<div class="overlay hidden" id="master-overlay">
+  <div class="overlay-box" style="max-width:360px;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px">🔐</div>
+    <div class="overlay-title">Master Admin</div>
+    <div class="overlay-sub" style="margin-bottom:24px">Ange master-lösenord</div>
+    <input type="password" class="form-input" id="master-pw-input" placeholder="Master-lösenord" onkeydown="if(event.key==='Enter')verifyMaster()">
+    <div class="login-error hidden" id="master-error" style="text-align:center;margin-top:8px">Fel lösenord</div>
+    <div class="form-btns" style="margin-top:16px">
+      <button class="btn-primary" onclick="verifyMaster()">Lås upp</button>
+      <button class="btn-cancel" onclick="document.getElementById('master-overlay').classList.add('hidden')">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW SEASON OVERLAY -->
+<div class="overlay hidden" id="season-overlay">
+  <div class="overlay-box">
+    <div class="overlay-title">Ny säsong</div>
+    <div class="overlay-sub">Skapa ny stegesäsong</div>
+    <div class="form-row">
+      <label class="form-label">Kortnamn (t.ex. ST2026)</label>
+      <input class="form-input" id="new-season-id" placeholder="ST2026" maxlength="10">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Visningsnamn</label>
+      <input class="form-input" id="new-season-name" placeholder="Sommartermin 2026">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Startdatum</label>
+      <input class="form-input" id="new-season-start" type="date" value="2026-06-21">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Slutdatum</label>
+      <input class="form-input" id="new-season-end" type="date" value="2026-12-20">
+    </div>
+    <div class="form-checkbox-row">
+      <input type="checkbox" id="carry-over" checked>
+      <label for="carry-over" style="font-size:13px;color:var(--muted)">Starta från nuvarande stege-rankingen</label>
+    </div>
+    <div class="form-btns">
+      <button class="btn-primary" onclick="createSeason()">Skapa säsong</button>
+      <button class="btn-cancel" onclick="closeSeasonOverlay()">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'bts2026';
+
+// ── SEASONS ────────────────────────────────────────────────────
+const DEFAULT_SEASONS = [
+  {id:'VT2026', name:'Vårtermin 2026', short:'VT 2026', start:'2026-01-01', end:'2026-06-20'},
+  {id:'ST2026', name:'Sommartermin 2026', short:'ST 2026', start:'2026-06-21', end:'2026-12-20'},
+];
+
+function getSeasons(){
+  try{ const s=JSON.parse(localStorage.getItem('bts_seasons')||'null'); return s||DEFAULT_SEASONS; }
+  catch(e){ return DEFAULT_SEASONS; }
+}
+function saveSeasons(seasons){ localStorage.setItem('bts_seasons',JSON.stringify(seasons)); }
+
+function getActiveSeason(){
+  const override=localStorage.getItem('bts_active_season');
+  if(override) return override;
+  const today=new Date().toISOString().slice(0,10);
+  const seasons=getSeasons();
+  for(const s of seasons){ if(today>=s.start&&today<=s.end) return s.id; }
+  return seasons[seasons.length-1].id;
+}
+function setActiveSeason(id){ localStorage.setItem('bts_active_season',id); }
+
+// ── BASE PLAYERS ───────────────────────────────────────────────
+const basePlayers = [
+  {id:1, name:"John Andersson"},{id:2, name:"Andreas Almroth"},{id:3, name:"Philip Pahlett"},
+  {id:4, name:"Johan Olmarker"},{id:5, name:"Andreas Gustafson"},{id:6, name:"Johan Ludvigsson"},
+  {id:7, name:"Mats Johansson"},{id:8, name:"Håkan Bergman"},{id:9, name:"Mats Ljungström"},
+  {id:10, name:"Niklas Strömberg"},{id:11, name:"Rasmus Winther"},{id:12, name:"Joaquim Nicander"},
+  {id:13, name:"Stefan Munge"},{id:14, name:"Oscar Hänsel"},{id:15, name:"Johan Wastensson"},
+  {id:16, name:"Anders Schillström"},{id:17, name:"Peter Widen"},{id:18, name:"James Ljungström"},
+  {id:19, name:"Lars Paulsson"},{id:20, name:"John Lundqvist"},{id:21, name:"Jeff Bork"},
+  {id:22, name:"Johan Zetterberg"},{id:23, name:"Matilda Svensson"},{id:24, name:"Igor Mirkovic"},
+  {id:25, name:"Stefan Angvald"},{id:26, name:"Fredrik Gradin"},{id:27, name:"Jan Andresen"},
+  {id:28, name:"Roger Edmark"},{id:29, name:"Karl Thorngren"},{id:30, name:"Sam Lindgren"},
+];
+
+// ── STATE ──────────────────────────────────────────────────────
+let currentSeason = 'VT2026';
+let currentRound = 1;
+let ladder = [];
+let roundResults = {};
+let woState = {};
+
+// ── SEASON-AWARE STORAGE ───────────────────────────────────────
+function sk(key){ return key+'_'+currentSeason; }
+function saveState(){
+  localStorage.setItem(sk('bts_ladder'), JSON.stringify(ladder));
+  localStorage.setItem(sk('bts_results'), JSON.stringify(roundResults));
+  localStorage.setItem(sk('bts_round'), currentRound);
+}
+function loadState(){
+  const l=localStorage.getItem(sk('bts_ladder'));
+  const r=localStorage.getItem(sk('bts_results'));
+  const rnd=localStorage.getItem(sk('bts_round'));
+  ladder = l ? JSON.parse(l) : basePlayers.map(p=>p.id);
+  roundResults = r ? JSON.parse(r) : {};
+  currentRound = rnd ? parseInt(rnd) : 1;
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────
+function doLogin(){
+  const pw=document.getElementById('pw-input').value;
+  if(pw===ADMIN_PASSWORD){
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    currentSeason=getActiveSeason();
+    loadState();
+    renderSeasonBar();
+    renderAll();
+  } else {
+    document.getElementById('login-error').classList.remove('hidden');
+    document.getElementById('pw-input').value='';
+  }
+}
+function logout(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('pw-input').value='';
+}
+
+// ── SEASON BAR ─────────────────────────────────────────────────
+function renderSeasonBar(){
+  const seasons=getSeasons();
+  const today=new Date().toISOString().slice(0,10);
+  const bar=document.getElementById('season-bar-inner');
+  bar.innerHTML=seasons.map(s=>{
+    const isActive=s.id===currentSeason;
+    const isUpcoming=today<s.start;
+    const cls=isActive?'active':isUpcoming?'upcoming':'';
+    return `<button class="season-chip${cls?' '+cls:''}" onclick="switchSeason('${s.id}')">${s.short}</button>`;
+  }).join('')+`<button class="btn-new-season" onclick="openSeasonOverlay()">+ Ny säsong</button>`;
+}
+
+function switchSeason(id){
+  currentSeason=id;
+  woState={};
+  loadState();
+  renderSeasonBar();
+  renderAll();
+}
+
+// ── NEW SEASON ─────────────────────────────────────────────────
+function openSeasonOverlay(){ document.getElementById('season-overlay').classList.remove('hidden'); }
+function closeSeasonOverlay(){ document.getElementById('season-overlay').classList.add('hidden'); }
+
+function createSeason(){
+  const id=document.getElementById('new-season-id').value.trim().replace(/\s/g,'');
+  const name=document.getElementById('new-season-name').value.trim();
+  const start=document.getElementById('new-season-start').value;
+  const end=document.getElementById('new-season-end').value;
+  const carryOver=document.getElementById('carry-over').checked;
+  if(!id||!name||!start||!end){ showToast('Fyll i alla fält','error'); return; }
+
+  const seasons=getSeasons();
+  if(seasons.find(s=>s.id===id)){ showToast('Säsong-ID finns redan','error'); return; }
+
+  // Create season
+  const newSeason={id, name, short:id.replace(/(\D+)(\d+)/,'$1 $2'), start, end};
+  seasons.push(newSeason);
+  saveSeasons(seasons);
+
+  // Initialize ladder for new season
+  const startingLadder = carryOver ? [...ladder] : basePlayers.map(p=>p.id);
+  localStorage.setItem('bts_ladder_'+id, JSON.stringify(startingLadder));
+  localStorage.setItem('bts_results_'+id, JSON.stringify({}));
+  localStorage.setItem('bts_round_'+id, '1');
+
+  // Switch to new season and set as active
+  setActiveSeason(id);
+  currentSeason=id;
+  loadState();
+  closeSeasonOverlay();
+  renderSeasonBar();
+  renderAll();
+  showToast(`Säsong ${newSeason.short} skapad! ✓`);
+}
+
+// ── ROUND ──────────────────────────────────────────────────────
+function changeRound(d){ currentRound=Math.max(1,currentRound+d); woState={}; saveState(); renderAll(); }
+
+// ── PLAYER AT RANK ─────────────────────────────────────────────
+function playerAtRank(rank){ const id=ladder[rank-1]; return basePlayers.find(p=>p.id===id)||{name:'?',id:-1}; }
+
+// ── MATCH PAIRS ────────────────────────────────────────────────
+function getMatchPairs(){ const pairs=[]; for(let i=1;i<=ladder.length-1;i+=2) pairs.push({posA:i,posB:i+1}); return pairs; }
+
+// ── SCORE STRING ───────────────────────────────────────────────
+function setsToScoreString(sets){ return (sets||[]).map(s=>`${s.a}-${s.b}`).join(' '); }
+
+// ── RENDER SET INPUTS ──────────────────────────────────────────
+function renderSetInputs(key, saved){
+  if(saved && !saved._editing){
+    return `
+    <div class="match-card-body">
+      <span class="saved-score">${saved.wo?'WO':setsToScoreString(saved.sets)}</span>
+      <div class="saved-badge" style="margin-left:auto">
+        <span>✓ Sparat</span>
+        <button class="edit-btn" onclick="editMatch('${key}')">Ändra</button>
+      </div>
+    </div>`;
+  }
+
+  const stbVis = woState[key+'_stb'] || (saved?._editing && (saved?.sets?.length>2));
+  const isWO = woState[key+'_wo']||false;
+  const s = saved?._editing ? saved : null;
+  const sets = s?.sets||[];
+  const gv = (i,side) => sets[i]?.[side]??'';
+
+  if(isWO){
+    return `<div class="match-card-body" id="body-${key}">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px">WO — ingen poäng registreras</div>
+    </div>`;
+  }
+
+  return `
+  <div class="match-card-body" id="body-${key}">
+    <div class="sets-group">
+      <div class="set-block">
+        <span class="set-block-label">S1</span>
+        <input type="number" class="set-score-input" id="s1a-${key}" min="0" max="7" value="${gv(0,'a')}" placeholder="-" oninput="autoWinner('${key}')">
+        <span class="set-sep">–</span>
+        <input type="number" class="set-score-input" id="s1b-${key}" min="0" max="7" value="${gv(0,'b')}" placeholder="-" oninput="autoWinner('${key}')">
+      </div>
+      <div class="set-block">
+        <span class="set-block-label">S2</span>
+        <input type="number" class="set-score-input" id="s2a-${key}" min="0" max="7" value="${gv(1,'a')}" placeholder="-" oninput="autoWinner('${key}')">
+        <span class="set-sep">–</span>
+        <input type="number" class="set-score-input" id="s2b-${key}" min="0" max="7" value="${gv(1,'b')}" placeholder="-" oninput="autoWinner('${key}')">
+      </div>
+      <!-- STB: alltid i DOM, visas automatiskt vid 1-1 -->
+      <div class="set-block stb-block${stbVis?'':' hidden'}" id="stb-block-${key}">
+        <span class="set-block-label">STB</span>
+        <input type="number" class="set-score-input" id="stba-${key}" min="0" max="15" value="${gv(2,'a')}" placeholder="-" oninput="autoWinner('${key}')">
+        <span class="set-sep">–</span>
+        <input type="number" class="set-score-input" id="stbb-${key}" min="0" max="15" value="${gv(2,'b')}" placeholder="-" oninput="autoWinner('${key}')">
+      </div>
+      <button class="btn-add-stb${stbVis?' hidden':''}" id="stb-btn-${key}" onclick="showSTB('${key}')">+ STB</button>
+    </div>
+  </div>`;
+}
+
+// ── RENDER MATCH INPUT ─────────────────────────────────────────
+function renderMatchInput(){
+  document.getElementById('round-display').textContent=currentRound;
+  document.getElementById('section-round').textContent=currentRound;
+  const seasons=getSeasons();
+  const season=seasons.find(s=>s.id===currentSeason);
+  if(season){
+    document.getElementById('page-title').textContent='Resultatregistrering';
+    document.getElementById('page-sub').textContent=`${season.name} · Omgång ${currentRound}`;
+  }
+
+  const results=roundResults[currentRound]||{};
+  const pairs=getMatchPairs();
+  const saved_count=Object.keys(results).length;
+
+  const sumEl=document.getElementById('round-stats-summary');
+  if(saved_count>0){
+    let tG=0,tS=0;
+    Object.values(results).forEach(r=>{ if(!r.wo&&r.sets){r.sets.forEach(s=>{tG+=s.a+s.b;tS++;})} });
+    sumEl.classList.remove('hidden');
+    sumEl.innerHTML=`
+      <div class="stat-box"><div class="stat-box-val">${saved_count}</div><div class="stat-box-lbl">Sparade</div></div>
+      <div class="stat-box"><div class="stat-box-val">${pairs.length}</div><div class="stat-box-lbl">Totalt</div></div>
+      <div class="stat-box"><div class="stat-box-val">${tS}</div><div class="stat-box-lbl">Set spelade</div></div>
+      <div class="stat-box"><div class="stat-box-val">${tG}</div><div class="stat-box-lbl">Games totalt</div></div>`;
+  } else { sumEl.classList.add('hidden'); }
+
+  const grid=document.getElementById('match-input-grid');
+  grid.innerHTML=pairs.map(({posA,posB})=>{
+    const pA=playerAtRank(posA), pB=playerAtRank(posB);
+    const key=`${posA}v${posB}`;
+    const saved=results[key];
+    const isWO=woState[key+'_wo']||false;
+    const winnerVal=woState[key+'_winner']!==undefined?woState[key+'_winner']:(saved?saved.winner:'');
+
+    let footer='';
+    if(!saved||saved._editing){
+      footer=`<div class="match-card-footer" id="footer-${key}">
+        ${isWO?`
+          <select class="winner-select" id="winner-${key}">
+            <option value="">Vinnare (WO)...</option>
+            <option value="wo-${posA}" ${winnerVal=='wo-'+posA?'selected':''}>WO → ${pA.name}</option>
+            <option value="wo-${posB}" ${winnerVal=='wo-'+posB?'selected':''}>WO → ${pB.name}</option>
+          </select>`:`
+          <select class="winner-select" id="winner-${key}" onchange="woState['${key}_winner']=parseInt(this.value)||this.value">
+            <option value="">Vinnare...</option>
+            <option value="${posA}" ${winnerVal==posA?'selected':''}>${pA.name}</option>
+            <option value="${posB}" ${winnerVal==posB?'selected':''}>${pB.name}</option>
+          </select>`}
+        <button class="wo-btn${isWO?' active':''}" onclick="toggleWO('${key}')">${isWO?'✕ WO':'WO'}</button>
+        <div id="auto-winner-hint-${key}" class="auto-winner-hint"></div>
+        <button class="save-match-btn" onclick="saveMatch('${key}',${posA},${posB})">Spara →</button>
+      </div>`;
+    }
+
+    return `
+    <div class="match-card${saved&&!saved._editing?' has-result':''}" id="card-${key}">
+      <div class="match-card-header">
+        <div class="match-pos">${posA}v${posB}</div>
+        <div class="match-players">
+          <div><div class="match-player-name">${pA.name}</div><span class="match-player-rank">#${posA}</span></div>
+          <div class="match-vs-sep">vs</div>
+          <div><div class="match-player-name">${pB.name}</div><span class="match-player-rank">#${posB}</span></div>
+        </div>
+        ${saved&&!saved._editing?`<div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);margin-left:auto">Vinnare: <strong style="color:var(--white)">${saved.winnerName||''}</strong></div>`:''}
+      </div>
+      ${renderSetInputs(key,saved)}
+      ${footer}
+    </div>`;
+  }).join('');
+}
+
+// ── AUTO WINNER (med STB auto-show vid 1-1) ────────────────────
+function autoWinner(key){
+  const v=id=>parseInt(document.getElementById(id)?.value)||0;
+  const s1a=v('s1a-'+key),s1b=v('s1b-'+key);
+  const s2a=v('s2a-'+key),s2b=v('s2b-'+key);
+  const stba=v('stba-'+key),stbb=v('stbb-'+key);
+
+  let sA=0,sB=0;
+  if(s1a||s1b){ if(s1a>s1b)sA++; else if(s1b>s1a)sB++; }
+  if(s2a||s2b){ if(s2a>s2b)sA++; else if(s2b>s2a)sB++; }
+  if(stba||stbb){ if(stba>stbb)sA++; else if(stbb>stba)sB++; }
+
+  // Auto-visa STB vid 1-1
+  if(sA===1&&sB===1&&!woState[key+'_stb']){
+    woState[key+'_stb']=true;
+    document.getElementById('stb-block-'+key)?.classList.remove('hidden');
+    document.getElementById('stb-btn-'+key)?.classList.add('hidden');
+    setTimeout(()=>document.getElementById('stba-'+key)?.focus(),40);
+  }
+
+  const [posA,posB]=key.split('v').map(Number);
+  const winnerEl=document.getElementById('winner-'+key);
+  const hintEl=document.getElementById('auto-winner-hint-'+key);
+
+  if(sA>=2&&winnerEl){ winnerEl.value=posA; woState[key+'_winner']=posA; if(hintEl)hintEl.textContent=''; }
+  else if(sB>=2&&winnerEl){ winnerEl.value=posB; woState[key+'_winner']=posB; if(hintEl)hintEl.textContent=''; }
+  else if(hintEl&&(sA||sB)){ hintEl.textContent=`${sA}-${sB} set`; }
+}
+
+function showSTB(key){
+  woState[key+'_stb']=true;
+  document.getElementById('stb-block-'+key)?.classList.remove('hidden');
+  document.getElementById('stb-btn-'+key)?.classList.add('hidden');
+}
+
+function toggleWO(key){
+  woState[key+'_wo']=!woState[key+'_wo'];
+  renderMatchInput();
+}
+
+function editMatch(key){
+  const results=roundResults[currentRound]||{};
+  if(results[key]){ results[key]._editing=true; if(results[key].wo)woState[key+'_wo']=true; if(results[key].sets?.length>2)woState[key+'_stb']=true; }
+  renderMatchInput();
+}
+
+// ── GET SETS FROM DOM ──────────────────────────────────────────
+function getSetsFromDOM(key){
+  const sets=[];
+  const p=(id)=>{const v=parseInt(document.getElementById(id)?.value);return isNaN(v)?null:v;};
+  const s1a=p('s1a-'+key),s1b=p('s1b-'+key);
+  const s2a=p('s2a-'+key),s2b=p('s2b-'+key);
+  const stba=p('stba-'+key),stbb=p('stbb-'+key);
+  if(s1a!==null&&s1b!==null&&(s1a||s1b)) sets.push({a:s1a,b:s1b});
+  if(s2a!==null&&s2b!==null&&(s2a||s2b)) sets.push({a:s2a,b:s2b});
+  if(stba!==null&&stbb!==null&&(stba||stbb)) sets.push({a:stba,b:stbb,super:true});
+  return sets;
+}
+
+// ── SAVE MATCH ─────────────────────────────────────────────────
+function saveMatch(key,posA,posB){
+  const winnerEl=document.getElementById('winner-'+key);
+  const winnerVal=winnerEl?winnerEl.value:'';
+  const isWO=woState[key+'_wo']||false;
+  if(!winnerVal){ showToast('Välj vinnare!','error'); return; }
+
+  const wo=winnerVal.startsWith('wo-');
+  const winnerPos=wo?parseInt(winnerVal.replace('wo-','')):parseInt(winnerVal);
+  const sets=isWO?[]:getSetsFromDOM(key);
+  if(!isWO&&sets.length===0){ showToast('Ange minst ett set!','error'); return; }
+
+  const winnerPlayer=playerAtRank(winnerPos);
+  if(!roundResults[currentRound]) roundResults[currentRound]={};
+  roundResults[currentRound][key]={posA,posB,winner:winnerPos,winnerName:winnerPlayer.name,sets,score:isWO?'WO':setsToScoreString(sets),wo:isWO};
+  delete woState[key+'_wo']; delete woState[key+'_stb']; delete woState[key+'_winner'];
+  saveState();
+  renderMatchInput();
+  showToast('Match sparad! ✓');
+}
+
+// ── PUBLISH ────────────────────────────────────────────────────
+function publishRound(){
+  const results=roundResults[currentRound]||{};
+  if(!Object.keys(results).length){ showToast('Inga resultat!','error'); return; }
+  calculateStats(currentRound);
+  const newLadder=[...ladder];
+  Object.values(results).forEach(r=>{
+    if(r.winner===r.posB){
+      [newLadder[r.posA-1],newLadder[r.posB-1]]=[newLadder[r.posB-1],newLadder[r.posA-1]];
+    }
+  });
+  ladder=newLadder;
+  currentRound++;
+  woState={};
+  saveState();
+  renderAll();
+  showToast(`Omgång ${currentRound-1} publicerad! ✓`);
+}
+
+// ── CALCULATE STATS ────────────────────────────────────────────
+function calculateStats(roundNum){
+  const results=roundResults[roundNum]||{};
+  let stats={};
+  try{ stats=JSON.parse(localStorage.getItem(sk('bts_stats'))||'{}'); }catch(e){}
+  Object.values(results).forEach(r=>{
+    if(r.wo||!r.sets?.length)return;
+    const idA=ladder[r.posA-1],idB=ladder[r.posB-1];
+    if(!idA||!idB)return;
+    if(!stats[idA])stats[idA]={setsWon:0,setsLost:0,gamesWon:0,gamesLost:0};
+    if(!stats[idB])stats[idB]={setsWon:0,setsLost:0,gamesWon:0,gamesLost:0};
+    r.sets.forEach(s=>{
+      if(s.a>s.b){stats[idA].setsWon++;stats[idB].setsLost++;}
+      else if(s.b>s.a){stats[idB].setsWon++;stats[idA].setsLost++;}
+      stats[idA].gamesWon+=s.a;stats[idA].gamesLost+=s.b;
+      stats[idB].gamesWon+=s.b;stats[idB].gamesLost+=s.a;
+    });
+  });
+  localStorage.setItem(sk('bts_stats'),JSON.stringify(stats));
+}
+
+// ── LADDER MINI ────────────────────────────────────────────────
+function renderLadderMini(){
+  document.getElementById('ladder-mini').innerHTML=ladder.map((id,i)=>{
+    const p=basePlayers.find(x=>x.id===id);
+    return `<div class="ladder-mini-row"><div class="ladder-mini-rank">${i+1}</div><div class="ladder-mini-name">${p.name}</div></div>`;
+  }).join('');
+}
+
+// renderAll definieras nedan i master-sektionen med utökad funktionalitet
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=type==='error'?'#EF5350':'var(--green)';
+  t.style.color=type==='error'?'#fff':'#000';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── MASTER ADMIN ──────────────────────────────────────────────
+const MASTER_PASSWORD = 'master2026';
+let masterUnlocked = false;
+let editingPlayerId = null;
+
+function promptMaster(){
+  if(masterUnlocked){ lockMaster(); return; }
+  document.getElementById('master-overlay').classList.remove('hidden');
+  document.getElementById('master-pw-input').value='';
+  document.getElementById('master-error').classList.add('hidden');
+  setTimeout(()=>document.getElementById('master-pw-input').focus(),100);
+}
+
+function verifyMaster(){
+  const pw=document.getElementById('master-pw-input').value;
+  if(pw===MASTER_PASSWORD){
+    masterUnlocked=true;
+    document.getElementById('master-overlay').classList.add('hidden');
+    document.getElementById('master-btn').className='master-badge unlocked';
+    document.getElementById('master-btn').textContent='⚡ Master';
+    document.getElementById('master-section').classList.remove('hidden');
+    renderPendingSignups();
+    renderPlayerMgmt();
+    renderResultOverride();
+  } else {
+    document.getElementById('master-error').classList.remove('hidden');
+    document.getElementById('master-pw-input').value='';
+  }
+}
+
+function lockMaster(){
+  masterUnlocked=false;
+  editingPlayerId=null;
+  document.getElementById('master-btn').className='master-badge';
+  document.getElementById('master-btn').textContent='🔐 Master';
+  document.getElementById('master-section').classList.add('hidden');
+}
+
+// ── LOAD/SAVE PLAYERS ─────────────────────────────────────────
+function loadPlayers(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('bts_players')||'null');
+    return saved||basePlayers;
+  }catch(e){return basePlayers;}
+}
+function savePlayers(p){ localStorage.setItem('bts_players',JSON.stringify(p)); }
+
+// ── RENDER PLAYER MANAGEMENT ──────────────────────────────────
+function renderPlayerMgmt(){
+  if(!masterUnlocked)return;
+  const currentPlayers=loadPlayers();
+  const table=document.getElementById('player-mgmt-table');
+  if(!table)return;
+
+  // Sync: make sure ladder length matches players length
+  while(ladder.length<currentPlayers.length) ladder.push(currentPlayers.find(p=>!ladder.includes(p.id))?.id||0);
+
+  table.innerHTML=`
+    <thead>
+      <tr>
+        <th style="width:40px">Rank</th>
+        <th>Namn</th>
+        <th>Telefon</th>
+        <th style="width:80px">Flytta</th>
+        <th style="width:120px">Åtgärd</th>
+      </tr>
+    </thead>
+    <tbody>
+    ${ladder.map((playerId,i)=>{
+      const rank=i+1;
+      const p=currentPlayers.find(x=>x.id===playerId)||{id:playerId,name:'?',phone:''};
+      const isEditing=editingPlayerId===playerId;
+      return `
+      <tr id="mgmt-row-${playerId}">
+        <td class="rank-cell">${rank}</td>
+        <td>${isEditing
+          ? `<input class="player-edit-input" id="edit-name-${playerId}" value="${p.name}" style="margin-bottom:4px">`
+          : `<strong>${p.name}</strong>`}
+        </td>
+        <td>${isEditing
+          ? `<input class="player-edit-input" id="edit-phone-${playerId}" value="${p.phone||''}" placeholder="07XXXXXXXX">`
+          : `<span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)">${p.phone||'—'}</span>`}
+        </td>
+        <td>
+          <div class="move-btns">
+            <button class="move-btn" onclick="movePlayer(${playerId},-1)" title="Flytta upp">▲</button>
+            <button class="move-btn" onclick="movePlayer(${playerId},1)" title="Flytta ned">▼</button>
+          </div>
+        </td>
+        <td>
+          <div class="action-btns">
+            ${isEditing
+              ? `<button class="action-btn save" onclick="savePlayerEdit(${playerId})">✓ Spara</button>
+                 <button class="action-btn" onclick="cancelEdit()">✕</button>`
+              : `<button class="action-btn edit" onclick="startEdit(${playerId})">✎ Redigera</button>
+                 <button class="action-btn del" onclick="removePlayer(${playerId})">✕</button>`}
+          </div>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>`;
+}
+
+function startEdit(id){ editingPlayerId=id; renderPlayerMgmt(); }
+function cancelEdit(){ editingPlayerId=null; renderPlayerMgmt(); }
+
+function savePlayerEdit(id){
+  const players=loadPlayers();
+  const p=players.find(x=>x.id===id);
+  if(!p)return;
+  const nameEl=document.getElementById('edit-name-'+id);
+  const phoneEl=document.getElementById('edit-phone-'+id);
+  if(nameEl) p.name=nameEl.value.trim()||p.name;
+  if(phoneEl) p.phone=phoneEl.value.trim();
+  savePlayers(players);
+  editingPlayerId=null;
+  renderPlayerMgmt();
+  renderAll();
+  showToast('Spelare uppdaterad ✓');
+}
+
+function movePlayer(id, dir){
+  const idx=ladder.indexOf(id);
+  if(idx<0)return;
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=ladder.length)return;
+  [ladder[idx],ladder[newIdx]]=[ladder[newIdx],ladder[idx]];
+  saveState();
+  renderPlayerMgmt();
+  renderLadderMini();
+  showToast('Position uppdaterad ✓');
+}
+
+function addPlayer(){
+  const name=document.getElementById('new-player-name').value.trim();
+  const phone=document.getElementById('new-player-phone').value.trim();
+  const posInput=document.getElementById('new-player-pos').value;
+  if(!name){showToast('Ange spelarens namn','error');return;}
+
+  const players=loadPlayers();
+  const newId=Math.max(...players.map(p=>p.id),0)+1;
+  const newPlayer={id:newId, name, phone};
+  players.push(newPlayer);
+  savePlayers(players);
+
+  // Insert in ladder
+  const pos=parseInt(posInput);
+  if(pos>0&&pos<=ladder.length){
+    ladder.splice(pos-1,0,newId);
+  } else {
+    ladder.push(newId);
+  }
+  saveState();
+
+  document.getElementById('new-player-name').value='';
+  document.getElementById('new-player-phone').value='';
+  document.getElementById('new-player-pos').value='';
+  renderPlayerMgmt();
+  renderAll();
+  showToast(`${name} tillagd ✓`);
+}
+
+function removePlayer(id){
+  const players=loadPlayers();
+  const p=players.find(x=>x.id===id);
+  if(!p)return;
+  if(!confirm(`Ta bort ${p.name} från stegen? Det går inte att ångra.`))return;
+  const newPlayers=players.filter(x=>x.id!==id);
+  savePlayers(newPlayers);
+  ladder=ladder.filter(x=>x!==id);
+  saveState();
+  renderPlayerMgmt();
+  renderAll();
+  showToast(`${p.name} borttagen`);
+}
+
+// ── RESULT OVERRIDE ───────────────────────────────────────────
+function renderResultOverride(){
+  if(!masterUnlocked)return;
+  document.getElementById('master-round-lbl').textContent=currentRound;
+  const results=roundResults[currentRound]||{};
+  const entries=Object.entries(results);
+  const table=document.getElementById('result-override-table');
+  if(!table)return;
+  if(!entries.length){
+    table.innerHTML=`<tr><td style="color:var(--muted2);font-size:12px;padding:16px">Inga resultat sparade för omgång ${currentRound}.</td></tr>`;
+    return;
+  }
+  table.innerHTML=entries.map(([key,r])=>`
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);width:50px">${key}</td>
+      <td style="font-size:13px"><strong>${r.winnerName||'?'}</strong> vann</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green)">${r.wo?'WO':r.score||''}</td>
+      <td><button class="action-btn del" onclick="deleteResult('${key}')">✕ Ta bort</button></td>
+    </tr>`).join('');
+}
+
+function deleteResult(key){
+  if(!roundResults[currentRound]||!roundResults[currentRound][key])return;
+  const r=roundResults[currentRound][key];
+  if(!confirm(`Ta bort resultat ${key} (${r.winnerName} vann)?`))return;
+  delete roundResults[currentRound][key];
+  saveState();
+  renderMatchInput();
+  renderResultOverride();
+  showToast('Resultat borttaget');
+}
+
+// ── STATS RESET ───────────────────────────────────────────────
+function resetStats(playerOnly){
+  if(!confirm('Nollställ ALL statistik för denna säsong?'))return;
+  localStorage.removeItem(sk('bts_stats'));
+  showToast('Statistik nollställd');
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function exportData(){
+  const data={
+    season:currentSeason,
+    ladder,
+    players:loadPlayers(),
+    roundResults,
+    stats: JSON.parse(localStorage.getItem(sk('bts_stats'))||'{}'),
+    exported: new Date().toISOString()
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`bts-stegen-${currentSeason}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── PENDING SIGNUPS ───────────────────────────────────────────
+function getPendingSignups(){
+  try{ return JSON.parse(localStorage.getItem('bts_pending_signups')||'[]'); }
+  catch(e){ return []; }
+}
+function savePendingSignups(arr){ localStorage.setItem('bts_pending_signups',JSON.stringify(arr)); }
+
+function renderPendingSignups(){
+  if(!masterUnlocked) return;
+  const pending = getPendingSignups();
+  const listEl = document.getElementById('pending-signups-list');
+  const badgeEl = document.getElementById('pending-count-badge');
+  if(!listEl) return;
+
+  // Badge
+  if(badgeEl){
+    badgeEl.innerHTML = pending.length > 0
+      ? `<span class="pending-count-badge">${pending.length} ny${pending.length>1?'a':''}</span>`
+      : '';
+  }
+
+  if(!pending.length){
+    listEl.innerHTML = '<div class="pending-empty">Inga väntande anmälningar.</div>';
+    return;
+  }
+
+  listEl.innerHTML = pending.map(s=>{
+    const date = new Date(s.submittedAt);
+    const dateStr = date.toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'});
+    const metaParts = [`📱 ${s.phone}`];
+    if(s.born) metaParts.push(`🎂 ${s.born}`);
+    if(s.hand) metaParts.push(`✋ ${s.hand}hänt`);
+    if(s.hometown) metaParts.push(`📍 ${s.hometown}`);
+    if(s.season) metaParts.push(`📅 ${s.season}`);
+    return `
+    <div class="pending-card">
+      <div>
+        <div class="pending-name">${s.name}</div>
+        <div class="pending-meta">${metaParts.join(' · ')}</div>
+        <div class="pending-meta" style="color:rgba(240,245,240,0.18);margin-top:2px">Anmält: ${dateStr}</div>
+      </div>
+      <div class="pending-actions">
+        <button class="approve-btn" onclick="approveSignup(${s.id})">✓ Godkänn</button>
+        <button class="reject-btn" onclick="rejectSignup(${s.id})">✕ Avvisa</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function approveSignup(signupId){
+  const pending = getPendingSignups();
+  const s = pending.find(x=>x.id===signupId);
+  if(!s) return;
+
+  // Add to player list
+  const players = loadPlayers();
+  if(players.find(p=>p.name===s.name)){
+    showToast(`${s.name} finns redan på stegen!`,'error');
+    return;
+  }
+  const newId = Math.max(...players.map(p=>p.id), 0) + 1;
+  players.push({id:newId, name:s.name, phone:s.phone});
+  savePlayers(players);
+
+  // Add last on ladder
+  ladder.push(newId);
+  saveState();
+
+  // Set PIN (last 4 digits of phone)
+  const digits = s.phone.replace(/\D/g,'');
+  const pin = digits.length>=4 ? digits.slice(-4) : digits;
+  if(pin) localStorage.setItem('bts_pin_'+s.name, pin);
+
+  // Save profile fields
+  const prof = {};
+  if(s.born) prof.born = s.born;
+  if(s.hand) prof.hand = s.hand;
+  if(s.hometown) prof.hometown = s.hometown;
+  if(Object.keys(prof).length) localStorage.setItem('bts_profile_'+s.name, JSON.stringify(prof));
+
+  // Remove from pending
+  savePendingSignups(pending.filter(x=>x.id!==signupId));
+  renderPendingSignups();
+  renderPlayerMgmt();
+  renderLadderMini();
+  showToast(`${s.name} tillagd på stegen som #${ladder.length} ✓`);
+}
+
+function rejectSignup(signupId){
+  const pending = getPendingSignups();
+  const s = pending.find(x=>x.id===signupId);
+  if(!s) return;
+  if(!confirm(`Avvisa ${s.name}s anmälan? Det går inte att ångra.`)) return;
+  savePendingSignups(pending.filter(x=>x.id!==signupId));
+  renderPendingSignups();
+  showToast(`Anmälan från ${s.name} avvisad`);
+}
+
+// Override renderAll to also update master view
+function renderAll(){
+  renderMatchInput();
+  renderLadderMini();
+  if(masterUnlocked){ renderPendingSignups(); renderPlayerMgmt(); renderResultOverride(); }
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('hidden'))doLogin(); });
+</script>
+</body>
+</html>

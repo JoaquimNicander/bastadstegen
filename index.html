@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS Stegen — Båstad Tennissällskap</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --clay:#C17849;--clay2:#8B3A1E;--clay3:#5E2410;
+  --green:#1B3A1E;--green2:#2A5530;--green3:#4CAF50;
+  --yellow:#D4E157;--cream:#F5ECD7;--cream2:#EAD9BC;
+  --white:#FAFAF5;--muted:rgba(245,236,215,0.58);--muted2:rgba(245,236,215,0.3);
+  --bg:#0C1E0E;--surface:#111F13;--card:#162118;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;font-size:16px;-webkit-font-smoothing:antialiased}
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:0 48px;height:70px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(180deg,rgba(12,30,14,0.95) 0%,rgba(12,30,14,0) 100%);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(193,120,73,0.12);
+  transition:background 0.3s,border-color 0.3s;
+}
+nav.scrolled{background:rgba(12,30,14,0.97);border-bottom-color:rgba(193,120,73,0.28)}
+.nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.nav-logo img{width:40px;height:40px;object-fit:contain}
+.nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
+.nav-logo-sub{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:1px}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 14px;border:1px solid transparent;transition:all 0.2s}
+.nav-link:hover{color:var(--white);border-color:rgba(255,255,255,0.12)}
+.nav-cta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#0C0A06;background:var(--clay);text-decoration:none;padding:10px 20px;transition:background 0.2s}
+.nav-cta:hover{background:var(--clay2)}
+
+/* ─── HERO ───────────────────────────────────────────────────── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:100px 24px 100px;text-align:center;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    repeating-linear-gradient(135deg,transparent,transparent 60px,rgba(193,120,73,0.022) 60px,rgba(193,120,73,0.022) 61px),
+    linear-gradient(180deg,#0C1E0E 0%,#0F1F10 50%,#121A0C 100%);
+}
+.hero-glow{
+  position:absolute;top:15%;left:50%;transform:translateX(-50%);
+  width:700px;height:600px;
+  background:radial-gradient(ellipse,rgba(193,120,73,0.17) 0%,transparent 68%);
+  pointer-events:none;z-index:0;
+  animation:glow-pulse 4s ease-in-out infinite;
+}
+@keyframes glow-pulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:0.7;transform:translateX(-50%) scale(1.07)}}
+.hero-lines{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent calc(50% - 0.5px),rgba(193,120,73,0.07) calc(50% - 0.5px),rgba(193,120,73,0.07) calc(50% + 0.5px),transparent calc(50% + 0.5px))}
+
+.hero-content{position:relative;z-index:1;max-width:960px}
+.hero-eyebrow{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--clay);margin-bottom:48px;display:inline-flex;align-items:center;gap:12px;
+  animation:fade-up 0.8s both;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';height:1px;width:36px;background:var(--clay);opacity:0.5}
+
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(76px,14vw,168px);
+  line-height:0.88;letter-spacing:-1px;
+  margin-bottom:6px;
+  animation:fade-up 0.8s 0.1s both;
+}
+.hero-title .clay-word{color:var(--clay)}
+.hero-title .white-word{color:var(--white)}
+
+.hero-subtitle{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(26px,4.5vw,52px);
+  letter-spacing:5px;color:var(--cream2);
+  margin-bottom:36px;animation:fade-up 0.8s 0.2s both;
+}
+.hero-desc{
+  font-size:18px;font-weight:400;color:var(--muted);
+  max-width:460px;margin:0 auto 52px;line-height:1.7;
+  animation:fade-up 0.8s 0.3s both;
+}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fade-up 0.8s 0.4s both}
+.btn-primary{
+  background:var(--clay);color:#0C0A06;font-family:'Inter',sans-serif;font-weight:700;
+  font-size:14px;letter-spacing:0.5px;padding:17px 38px;text-decoration:none;display:inline-block;
+  border:2px solid var(--clay);transition:all 0.2s;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.btn-primary:hover{background:var(--clay2);border-color:var(--clay2);transform:translateY(-2px)}
+.btn-secondary{
+  color:var(--cream);font-family:'Inter',sans-serif;font-weight:600;font-size:14px;letter-spacing:0.5px;
+  padding:16px 38px;text-decoration:none;display:inline-block;
+  border:1.5px solid rgba(193,120,73,0.4);transition:all 0.2s;background:rgba(193,120,73,0.06);
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.btn-secondary:hover{border-color:var(--clay);background:rgba(193,120,73,0.13);transform:translateY(-2px)}
+
+.hero-scroll{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);
+  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fade-up 1s 0.9s both;
+}
+.hero-scroll-line{width:1px;height:36px;background:linear-gradient(180deg,var(--clay) 0%,transparent 100%);animation:scroll-line 2s ease-in-out infinite}
+@keyframes scroll-line{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* ─── STATS STRIP ────────────────────────────────────────────── */
+.stats-strip{
+  background:var(--clay);padding:22px 48px;
+  display:flex;align-items:center;justify-content:center;gap:0;
+  position:relative;z-index:1;overflow:hidden;
+}
+.stats-strip::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(0,0,0,0.05) 120px,rgba(0,0,0,0.05) 121px)}
+.stat-item{text-align:center;padding:0 52px;position:relative;z-index:1;flex:1;max-width:240px;border-right:1px solid rgba(0,0,0,0.14)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:#0C0A06;line-height:1}
+.stat-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(0,0,0,0.5);text-transform:uppercase;margin-top:2px}
+
+/* ─── SHARED SECTION ─────────────────────────────────────────── */
+.section-inner{max-width:1100px;margin:0 auto;padding:100px 48px}
+.section-eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--clay);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-eyebrow::after{content:'';height:1px;width:32px;background:var(--clay);opacity:0.5}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:1px;line-height:0.95;margin-bottom:20px}
+.section-desc{font-size:17px;color:var(--muted);max-width:540px;line-height:1.75}
+
+/* ─── WHY SECTION (Tennis hela säsongen) ─────────────────────── */
+.why-section{background:linear-gradient(180deg,var(--bg) 0%,#0E1A10 100%)}
+.why-inner{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.why-quote{border-left:3px solid var(--clay);padding:18px 22px;background:rgba(193,120,73,0.05);margin-top:32px}
+.why-quote p{font-size:15px;color:var(--muted);line-height:1.75;font-style:italic}
+.why-quote cite{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-top:10px;display:block}
+.why-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:36px}
+.why-pill{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border:1px solid rgba(193,120,73,0.25);color:var(--muted2);background:rgba(193,120,73,0.04)}
+.why-visual{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.why-vis-card{background:var(--card);border:1px solid rgba(193,120,73,0.1);padding:28px 22px;display:flex;flex-direction:column;gap:10px;transition:border-color 0.2s,transform 0.2s}
+.why-vis-card:hover{border-color:rgba(193,120,73,0.3);transform:translateY(-2px)}
+.why-vis-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--clay);line-height:1}
+.why-vis-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
+.why-vis-card.span2{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;gap:20px}
+.why-vis-card.span2 .why-vis-num{font-size:36px}
+
+/* ─── HOW IT WORKS ───────────────────────────────────────────── */
+.how-section{background:linear-gradient(180deg,#0E1A10 0%,#0A1508 100%)}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px}
+.step{background:var(--card);border:1px solid rgba(193,120,73,0.1);padding:40px 32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
+.step:hover{border-color:rgba(193,120,73,0.38);transform:translateY(-4px)}
+.step-icon{
+  width:56px;height:56px;background:rgba(193,120,73,0.08);border:1px solid rgba(193,120,73,0.18);
+  display:flex;align-items:center;justify-content:center;margin-bottom:28px;
+  color:var(--clay);flex-shrink:0;
+}
+.step-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;margin-bottom:14px;color:var(--cream)}
+.step-desc{font-size:15px;color:var(--muted);line-height:1.7}
+.step-rule{
+  margin-top:18px;padding:12px 14px;background:rgba(193,120,73,0.06);
+  border-left:2px solid rgba(193,120,73,0.4);
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--clay);
+  line-height:1.6;
+}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:100px;color:rgba(193,120,73,0.06);position:absolute;bottom:-16px;right:14px;line-height:1}
+
+/* ─── SOMMARSTEGEN ───────────────────────────────────────────── */
+.summer-section{
+  background:linear-gradient(135deg,#0A1508 0%,#0C1E0E 100%);
+  position:relative;overflow:hidden;
+}
+.summer-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 60% 50%,rgba(193,120,73,0.12) 0%,transparent 65%);
+  pointer-events:none;
+}
+.summer-inner{max-width:1100px;margin:0 auto;padding:100px 48px;position:relative;z-index:1}
+.summer-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+
+.summer-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--clay);margin-bottom:20px;
+}
+.summer-badge::before{content:'';width:8px;height:8px;background:var(--clay);border-radius:50%;animation:badge-pulse 1.8s ease-in-out infinite}
+@keyframes badge-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+.summer-title{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,100px);
+  line-height:0.88;letter-spacing:1px;margin-bottom:24px;
+}
+.summer-title span{color:var(--clay)}
+
+.summer-date{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,36px);
+  letter-spacing:3px;color:var(--cream2);margin-bottom:32px;
+}
+.summer-desc{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:440px}
+
+.summer-facts{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
+.summer-fact{
+  display:flex;align-items:center;gap:14px;font-size:15px;color:var(--muted);
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.summer-fact:last-child{border-bottom:none}
+.summer-fact-icon{
+  width:32px;height:32px;flex-shrink:0;background:rgba(193,120,73,0.1);border:1px solid rgba(193,120,73,0.2);
+  display:flex;align-items:center;justify-content:center;color:var(--clay);
+}
+.summer-fact-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+
+.summer-form-card{
+  background:var(--card);border:1px solid rgba(193,120,73,0.18);padding:40px;
+  position:relative;overflow:hidden;
+}
+.summer-form-card::before{
+  content:'SOMMARSTEGEN';font-family:'Bebas Neue',sans-serif;font-size:80px;
+  color:rgba(193,120,73,0.05);position:absolute;bottom:-10px;right:-10px;line-height:1;
+  letter-spacing:2px;pointer-events:none;
+}
+.summer-form-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-bottom:6px;color:var(--cream)}
+.summer-form-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-bottom:28px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.form-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
+.form-input{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(193,120,73,0.2);
+  color:var(--white);font-family:'Inter',sans-serif;font-size:15px;
+  padding:13px 16px;outline:none;transition:border-color 0.2s;width:100%;
+}
+.form-input:focus{border-color:var(--clay)}
+.form-input::placeholder{color:var(--muted2)}
+.form-submit{
+  width:100%;background:var(--clay);color:#0C0A06;border:none;
+  font-family:'Inter',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;
+  padding:16px;cursor:pointer;margin-top:8px;transition:background 0.2s;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
+}
+.form-submit:hover{background:var(--clay2)}
+.form-note{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted2);text-align:center;margin-top:12px}
+
+/* ─── CTA ────────────────────────────────────────────────────── */
+.cta-section{
+  background:linear-gradient(135deg,var(--clay2) 0%,var(--clay3) 100%);
+  position:relative;overflow:hidden;
+}
+.cta-section::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 40px,rgba(0,0,0,0.05) 40px,rgba(0,0,0,0.05) 41px)}
+.cta-inner{max-width:800px;margin:0 auto;padding:100px 48px;text-align:center;position:relative;z-index:1}
+.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,9vw,100px);line-height:0.9;letter-spacing:1px;margin-bottom:20px;color:var(--cream)}
+.cta-desc{font-size:18px;color:rgba(245,236,215,0.65);margin-bottom:48px;line-height:1.65;max-width:440px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn-white{background:var(--cream);color:var(--clay3);font-family:'Inter',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;padding:18px 40px;text-decoration:none;display:inline-block;border:2px solid var(--cream);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.btn-white:hover{background:transparent;color:var(--cream);transform:translateY(-2px)}
+.btn-ghost{color:var(--cream);font-family:'Inter',sans-serif;font-weight:600;font-size:15px;letter-spacing:0.5px;padding:17px 40px;text-decoration:none;display:inline-block;border:1.5px solid rgba(245,236,215,0.4);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.btn-ghost:hover{border-color:var(--cream);background:rgba(245,236,215,0.1);transform:translateY(-2px)}
+
+/* ─── FOOTER ─────────────────────────────────────────────────── */
+footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px 48px 40px}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:1fr auto 1fr;gap:48px;align-items:start;margin-bottom:48px}
+.footer-logo img{width:50px;height:50px;object-fit:contain;margin-bottom:10px}
+.footer-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
+.footer-brand-sub{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:14px}
+.footer-desc{font-size:13px;color:var(--muted2);line-height:1.75;max-width:220px}
+.footer-nav{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+.footer-nav-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--clay);margin-bottom:10px}
+.footer-nav a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);text-decoration:none;text-transform:uppercase;padding:4px 0;transition:color 0.2s}
+.footer-nav a:hover{color:var(--clay)}
+.footer-contact{text-align:right}
+.footer-contact-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--clay);margin-bottom:14px}
+.footer-contact p{font-size:13px;color:var(--muted2);line-height:1.85}
+.footer-contact a{color:var(--muted);text-decoration:none;transition:color 0.2s}
+.footer-contact a:hover{color:var(--clay)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.05);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-bottom p{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase}
+.footer-est{font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(193,120,73,0.22);letter-spacing:4px}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────── */
+@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.12s}
+.reveal-delay-2{transition-delay:0.24s}
+.reveal-delay-3{transition-delay:0.36s}
+
+/* ─── MOBILE ─────────────────────────────────────────────────── */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .section-inner,.summer-inner{padding:72px 24px}
+  .why-inner,.summer-grid{grid-template-columns:1fr;gap:48px}
+  .why-visual{grid-template-columns:1fr 1fr}
+  .steps-grid{grid-template-columns:1fr;gap:2px}
+  .footer-top{grid-template-columns:1fr;gap:32px}
+  .footer-contact{text-align:left}
+  .footer-bottom{flex-direction:column;align-items:flex-start}
+  .cta-inner{padding:72px 24px}
+}
+@media(max-width:600px){
+  nav{padding:0 16px;height:60px}
+  .nav-link{display:none}
+  .hero{padding:90px 16px 80px}
+  .hero-eyebrow{margin-bottom:36px}
+  .stats-strip{padding:18px 12px}
+  .stat-item{padding:0 20px}
+  .stat-num{font-size:40px}
+  .section-inner,.summer-inner{padding:56px 16px}
+  .step{padding:28px 20px}
+  .why-visual{grid-template-columns:1fr}
+  .summer-form-card{padding:28px 20px}
+  .cta-inner{padding:56px 16px}
+  footer{padding:48px 20px 32px}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────────── -->
+<nav id="main-nav">
+  <a class="nav-logo" href="#">
+    <img src="bts-logo.svg" alt="BTS" onerror="this.style.display='none'">
+    <div>
+      <div class="nav-logo-text">BTS Stegen</div>
+      <div class="nav-logo-sub">Båstad Tennissällskap</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#hur" class="nav-link">Hur det funkar</a>
+    <a href="#sommar" class="nav-link">Sommarstegen</a>
+    <a href="stegen.html" class="nav-cta">Till stegen →</a>
+  </div>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────────────────── -->
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Båstad Tennissällskap · Est. 1929</div>
+    <h1 class="hero-title">
+      <span class="clay-word">BÅSTAD</span><br>
+      <span class="white-word">TENNIS</span><br>
+      <span class="clay-word">STEGEN</span>
+    </h1>
+    <div class="hero-subtitle">Säsongen 2026</div>
+    <p class="hero-desc">Tävla om rankingen, klättra stegen och möt motståndet vecka för vecka. Vem tar toppen i slutet?</p>
+    <div class="hero-btns">
+      <a href="stegen.html" class="btn-primary">Se aktuell stege</a>
+      <a href="#sommar" class="btn-secondary">Anmäl sommarstegen</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scrolla</span>
+  </div>
+</section>
+
+<!-- ─── STATS STRIP ───────────────────────────────────────────── -->
+<div class="stats-strip">
+  <div class="stat-item">
+    <div class="stat-num">30</div>
+    <div class="stat-lbl">Spelare</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">97</div>
+    <div class="stat-lbl">Matcher spelade</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">10</div>
+    <div class="stat-lbl">Omgångar per säsong</div>
+  </div>
+</div>
+
+<!-- ─── TENNIS HELA SÄSONGEN ──────────────────────────────────── -->
+<section class="why-section">
+  <div class="section-inner">
+    <div class="why-inner">
+      <div class="reveal">
+        <div class="section-eyebrow">Varför stegen?</div>
+        <h2 class="section-title">Tennis hela säsongen</h2>
+        <p class="section-desc">Stegen ger alla — oavsett nivå — en motståndare som matchar dem, en anledning att boka banan och något att kämpa för varje vecka.</p>
+        <div class="why-quote">
+          <p>"Stegen är det bästa sättet att hålla igång och tävla under hela säsongen, oavsett om man siktar på toppen eller bara vill ha roliga matcher varje vecka."</p>
+          <cite>Båstad Tennissällskap · Grundat 1929</cite>
+        </div>
+        <div class="why-pills">
+          <div class="why-pill">Grusunderlag</div>
+          <div class="why-pill">Vår &amp; sommar</div>
+          <div class="why-pill">Alla nivåer</div>
+          <div class="why-pill">Båstad</div>
+        </div>
+      </div>
+      <div class="why-visual reveal reveal-delay-1">
+        <div class="why-vis-card">
+          <div class="why-vis-num">VT</div>
+          <div class="why-vis-lbl">Vårtermin 2026</div>
+        </div>
+        <div class="why-vis-card">
+          <div class="why-vis-num">ST</div>
+          <div class="why-vis-lbl">Sommartermin 2026</div>
+        </div>
+        <div class="why-vis-card span2">
+          <div>
+            <div class="why-vis-num">30</div>
+          </div>
+          <div>
+            <div class="why-vis-lbl">Spelare på stegen</div>
+            <p style="font-size:13px;color:var(--muted2);margin-top:4px;line-height:1.5">Båstads bästa tennisspelare samlade i ett system.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HUR DET FUNKAR ────────────────────────────────────────── -->
+<section class="how-section" id="hur">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Systemet</div>
+      <h2 class="section-title">Hur stegen funkar</h2>
+      <p class="section-desc">En klassisk tennistege — enkel, rättvis, kul. Spelarna möts i par varje omgång och den lägre rankade kan klättra genom att slå sin motståndare.</p>
+    </div>
+    <div class="steps-grid">
+
+      <!-- STEG 1 -->
+      <div class="step reveal reveal-delay-1">
+        <div class="step-icon">
+          <svg viewBox="0 0 26 26">
+            <!-- Bracket pairing icon -->
+            <rect x="1" y="3" width="9" height="5" rx="1"/>
+            <rect x="1" y="18" width="9" height="5" rx="1"/>
+            <line x1="10" y1="5.5" x2="15" y2="5.5"/>
+            <line x1="10" y1="20.5" x2="15" y2="20.5"/>
+            <line x1="15" y1="5.5" x2="15" y2="20.5"/>
+            <line x1="15" y1="13" x2="20" y2="13"/>
+            <circle cx="23" cy="13" r="2.5" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="step-title">Omgången delas ut</div>
+        <p class="step-desc">Varje omgång paras spelare ihop automatiskt — den övre mot den nedre i varje par. Spelar du varje vecka klättrar du hela säsongen.</p>
+        <div class="step-rule">Ny matchplan varje omgång — 10 omgångar per säsong</div>
+        <div class="step-num">1</div>
+      </div>
+
+      <!-- STEG 2 -->
+      <div class="step reveal reveal-delay-2">
+        <div class="step-icon">
+          <svg viewBox="0 0 26 26">
+            <!-- Tennis ball icon with seams -->
+            <circle cx="13" cy="13" r="10"/>
+            <path d="M5 9 Q9 13 5 17"/>
+            <path d="M21 9 Q17 13 21 17"/>
+            <line x1="3" y1="13" x2="23" y2="13" stroke-width="0.8" stroke-dasharray="2,2"/>
+          </svg>
+        </div>
+        <div class="step-title">Matchen spelas</div>
+        <p class="step-desc">Bäst av tre set. Vid 40–40 spelas en avgörande boll — servmottagaren väljer ruta att spela i. Om det blir 1–1 i set avgörs det med ett supertiebreak till 10.</p>
+        <div class="step-rule">40–40 = avgörande boll · Mottagaren väljer ruta · 1–1 = Supertiebreak till 10</div>
+        <div class="step-num">2</div>
+      </div>
+
+      <!-- STEG 3 -->
+      <div class="step reveal reveal-delay-3">
+        <div class="step-icon">
+          <svg viewBox="0 0 26 26">
+            <!-- Phone/score report icon -->
+            <rect x="6" y="2" width="14" height="22" rx="2"/>
+            <line x1="9" y1="8" x2="17" y2="8"/>
+            <line x1="9" y1="13" x2="17" y2="13"/>
+            <polyline points="9,19 12,22 17,16"/>
+          </svg>
+        </div>
+        <div class="step-title">Rapportera resultatet</div>
+        <p class="step-desc">Logga in med ditt namn och PIN-kod, mata in resultatet set för set och vänta på att motspelaren bekräftar. Rankingen uppdateras direkt efter varje omgång.</p>
+        <div class="step-rule">Motspelaren bekräftar · Ranking uppdateras automatiskt</div>
+        <div class="step-num">3</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── SOMMARSTEGEN ───────────────────────────────────────────── -->
+<section class="summer-section" id="sommar">
+  <div class="summer-inner">
+    <div class="summer-grid">
+      <div class="reveal">
+        <div class="summer-badge">Ny säsong · Anmälan öppen</div>
+        <h2 class="summer-title">SOMMAR<br><span>STEGEN</span></h2>
+        <div class="summer-date">Börjar 21 Juni 2026</div>
+        <p class="summer-desc">En hel sommar av tennis i Båstad — tio omgångar, ett mästare. Anmäl dig och klättra stegen hela sommaren.</p>
+        <div class="summer-facts">
+          <div class="summer-fact">
+            <div class="summer-fact-icon">
+              <svg viewBox="0 0 14 14"><rect x="1" y="2" width="12" height="11" rx="1"/><line x1="1" y1="5" x2="13" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="10" y1="1" x2="10" y2="3"/></svg>
+            </div>
+            <span><strong style="color:var(--cream)">Startdatum:</strong> 21 Juni 2026</span>
+          </div>
+          <div class="summer-fact">
+            <div class="summer-fact-icon">
+              <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><polyline points="7,4 7,7 9,9"/></svg>
+            </div>
+            <span><strong style="color:var(--cream)">10 omgångar</strong> under hela sommaren</span>
+          </div>
+          <div class="summer-fact">
+            <div class="summer-fact-icon">
+              <svg viewBox="0 0 14 14"><path d="M7 1 L9 5 L13 5.5 L10 8.5 L10.5 13 L7 11 L3.5 13 L4 8.5 L1 5.5 L5 5 Z"/></svg>
+            </div>
+            <span><strong style="color:var(--cream)">30 spelare</strong> tävlar om toppen</span>
+          </div>
+          <div class="summer-fact">
+            <div class="summer-fact-icon">
+              <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M5 9 Q7 7 9 5" stroke-width="1.5"/></svg>
+            </div>
+            <span><strong style="color:var(--cream)">Grusunderlag</strong> i Båstad</span>
+          </div>
+        </div>
+        <a href="rapportera.html" class="btn-primary">Gå till min profil →</a>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="summer-form-card" id="signup-card">
+          <div class="summer-form-title">Anmäl intresse</div>
+          <div class="summer-form-sub">Sommarstegen ST 2026 · Startar 21 Juni</div>
+
+          <div class="form-group">
+            <div class="form-label">Namn <span style="color:var(--clay)">*</span></div>
+            <input type="text" class="form-input" id="signup-name" placeholder="Förnamn Efternamn" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <div class="form-label">Telefon <span style="color:var(--clay)">*</span></div>
+            <input type="tel" class="form-input" id="signup-phone" placeholder="070 000 00 00" autocomplete="tel">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">Födelseår (valfritt)</div>
+              <input type="number" class="form-input" id="signup-born" placeholder="1985" min="1930" max="2015">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <div class="form-label">Spelhand (valfritt)</div>
+              <select class="form-input" id="signup-hand" style="cursor:pointer">
+                <option value="">Välj...</option>
+                <option value="Höger">Höger</option>
+                <option value="Vänster">Vänster</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:10px">
+            <div class="form-label">Hemort (valfritt)</div>
+            <input type="text" class="form-input" id="signup-hometown" placeholder="Båstad">
+          </div>
+
+          <div style="background:rgba(193,120,73,0.06);border:1px solid rgba(193,120,73,0.18);padding:10px 14px;margin-bottom:16px">
+            <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-bottom:4px">Din PIN-kod</div>
+            <div style="font-size:13px;color:var(--muted)">Sätts automatiskt till de <strong style="color:var(--cream)">sista 4 siffrorna</strong> i ditt telefonnummer. Du kan ändra det senare i din profil.</div>
+          </div>
+
+          <button class="form-submit" id="signup-btn" onclick="handleSignup()">Anmäl mig till sommarstegen →</button>
+          <div class="form-note" id="form-note">Anmälan bekräftas av BTS via telefon · <span style="color:rgba(193,120,73,0.7)">ST 2026</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2 class="cta-title reveal">Redo att klättra?</h2>
+    <p class="cta-desc reveal">Logga in med ditt namn och PIN-kod, rapportera din senaste match och följ din resa uppåt på stegen.</p>
+    <div class="cta-btns reveal">
+      <a href="stegen.html" class="btn-white">Se stegen</a>
+      <a href="rapportera.html" class="btn-ghost">Rapportera match</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <img src="bts-logo.svg" alt="BTS" class="footer-logo" onerror="this.style.display='none'" style="width:50px;height:50px;object-fit:contain;display:block;margin-bottom:10px">
+        <div class="footer-brand">BTS Stegen</div>
+        <div class="footer-brand-sub">Båstad Tennissällskap</div>
+        <p class="footer-desc">Tennisklubben i Båstad med anor sedan 1929. Välkommen till stegen!</p>
+      </div>
+      <div class="footer-nav">
+        <div class="footer-nav-title">Sidor</div>
+        <a href="stegen.html">Stegen</a>
+        <a href="stegen.html">Matcher</a>
+        <a href="stegen.html">Spelare</a>
+        <a href="rapportera.html">Rapportera</a>
+        <a href="#sommar">Sommarstegen</a>
+        <a href="admin.html">Admin</a>
+      </div>
+      <div class="footer-contact">
+        <div class="footer-contact-title">Kontakt</div>
+        <p>
+          Båstad Tennissällskap<br>
+          Båstad, Sverige<br>
+          Est. 1929<br><br>
+          <a href="mailto:info@bastadstegen.se">info@bastadstegen.se</a>
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Båstad Tennissällskap · bastadstegen.se</p>
+      <div class="footer-est">1929</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// NAV scroll
+window.addEventListener('scroll',()=>{
+  document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// Reveal on scroll
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
+},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Signup form
+function handleSignup(){
+  const name = document.getElementById('signup-name').value.trim();
+  const phone = document.getElementById('signup-phone').value.trim();
+  const born = document.getElementById('signup-born').value.trim();
+  const hand = document.getElementById('signup-hand').value;
+  const hometown = document.getElementById('signup-hometown').value.trim();
+  const note = document.getElementById('form-note');
+  const btn = document.getElementById('signup-btn');
+
+  if(!name || !phone){
+    note.style.color='#EF5350';
+    note.textContent = 'Ange namn och telefonnummer för att anmäla dig.';
+    if(!name) document.getElementById('signup-name').focus();
+    else document.getElementById('signup-phone').focus();
+    return;
+  }
+
+  // Build signup object
+  const signup = {
+    id: Date.now(),
+    name, phone,
+    born: born || '',
+    hand: hand || '',
+    hometown: hometown || '',
+    season: 'ST2026',
+    submittedAt: new Date().toISOString()
+  };
+
+  // Save to localStorage queue
+  try{
+    const existing = JSON.parse(localStorage.getItem('bts_pending_signups') || '[]');
+    // Prevent duplicate by phone
+    if(existing.find(s => s.phone === phone)){
+      note.style.color='#EF5350';
+      note.textContent = 'En anmälan med detta telefonnummer finns redan.';
+      return;
+    }
+    existing.push(signup);
+    localStorage.setItem('bts_pending_signups', JSON.stringify(existing));
+  } catch(e) {}
+
+  // Show confirmation
+  btn.textContent = '✓ Anmälan mottagen!';
+  btn.style.background = '#2E7D32';
+  btn.disabled = true;
+  note.style.color = '#4CAF50';
+  note.innerHTML = `Tack ${name}! Vi ses på banan. BTS bekräftar din plats via telefon.`;
+  ['signup-name','signup-phone','signup-born','signup-hand','signup-hometown'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.disabled = true;
+  });
+}
+</script>
+</body>
+</html>
