@@ -291,6 +291,15 @@ header{
 .season-sel-chip:hover{border-color:var(--muted);color:var(--white)}
 .season-sel-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
 
+/* ── ROUND CHIPS ── */
+#round-selector{display:flex;flex-wrap:wrap;gap:5px;padding:12px 16px 8px;border-bottom:1px solid var(--border)}
+.round-chip{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.5px;padding:4px 9px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;background:none;transition:all 0.15s;white-space:nowrap;border-radius:2px}
+.round-chip:hover{border-color:var(--muted);color:var(--white)}
+.round-chip.active{border-color:var(--clay);color:var(--clay);background:rgba(213,95,42,0.08)}
+/* Pending match */
+.match-player-name.pending{color:var(--muted2)}
+.match-score.pending{color:var(--muted2);font-size:18px}
+
 /* ── FOOTER ── */
 .site-footer{border-top:1px solid var(--border);padding:24px 48px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase}
 
@@ -359,7 +368,7 @@ header{
         <div class="logo-sub">Båstad Tennissällskap</div>
       </div>
     </a>
-    <div id="season-round-badge" class="round-badge">VT 2026</div>
+    <div id="season-round-badge" class="round-badge">Omgång 18</div>
     <div class="header-right">
       <a href="rapportera.html" class="player-login-btn">Rapportera →</a>
     </div>
@@ -389,14 +398,8 @@ header{
 
   <!-- ── MATCHES TAB ── -->
   <div id="tab-matches" class="tab-panel">
-    <div class="week-section">
-      <div class="week-title">Omgång 16 — Resultat</div>
-      <div class="matches-grid" id="matches-w16"></div>
-    </div>
-    <div class="week-section">
-      <div class="week-title">Omgång 15 — Resultat</div>
-      <div class="matches-grid" id="matches-w15"></div>
-    </div>
+    <div id="round-selector"></div>
+    <div id="matches-container"></div>
   </div>
 
   <!-- ── PLAYERS TAB ── -->
@@ -435,70 +438,332 @@ header{
 
 <script>
 // ── PLAYER DATA ────────────────────────────────────────────────────
+// ── WEEK 18 LADDER (aktuell stege, sista omgången) ────────────
 const players = [
-  {id:1,  name:"John Andersson",    rank:1,  prev:1,  phone:"0727333333", wins:10, losses:5},
-  {id:2,  name:"Andreas Almroth",   rank:2,  prev:3,  phone:"0768231313", wins:12, losses:4},
-  {id:3,  name:"Philip Pahlett",    rank:3,  prev:2,  phone:"0735223809", wins:9,  losses:7},
-  {id:4,  name:"Johan Olmarker",    rank:4,  prev:5,  phone:"0736540324", wins:11, losses:5},
-  {id:5,  name:"Andreas Gustafson", rank:5,  prev:4,  phone:"0704244341", wins:8,  losses:8},
-  {id:6,  name:"Johan Ludvigsson",  rank:6,  prev:7,  phone:"0705874471", wins:9,  losses:7},
-  {id:7,  name:"Mats Johansson",    rank:7,  prev:6,  phone:"0706425156", wins:8,  losses:8},
-  {id:8,  name:"Håkan Bergman",     rank:8,  prev:9,  phone:"0702172230", wins:10, losses:6},
-  {id:9,  name:"Mats Ljungström",   rank:9,  prev:8,  phone:"0708784133", wins:8,  losses:8},
-  {id:10, name:"Niklas Strömberg",  rank:10, prev:12, phone:"0705756786", wins:7,  losses:9},
-  {id:11, name:"Rasmus Winther",    rank:11, prev:10, phone:"0708670885", wins:9,  losses:7},
-  {id:12, name:"Joaquim Nicander",  rank:12, prev:13, phone:"0720787845", wins:7,  losses:9, me:true},
-  {id:13, name:"Stefan Munge",      rank:13, prev:11, phone:"0706402286", wins:8,  losses:8},
-  {id:14, name:"Oscar Hänsel",      rank:14, prev:16, phone:"0708750404", wins:7,  losses:9},
-  {id:15, name:"Johan Wastensson",  rank:15, prev:14, phone:"0733369718", wins:5,  losses:7, note:"Skadad"},
-  {id:16, name:"Anders Schillström",rank:16, prev:17, phone:"0707993028", wins:6,  losses:10},
-  {id:17, name:"Peter Widen",       rank:17, prev:15, phone:"0706636460", wins:7,  losses:9},
-  {id:18, name:"James Ljungström",  rank:18, prev:19, phone:"0709569308", wins:5,  losses:11},
-  {id:19, name:"Lars Paulsson",     rank:19, prev:18, phone:"0724433243", wins:6,  losses:10},
-  {id:20, name:"John Lundqvist",    rank:20, prev:22, phone:"0702990303", wins:5,  losses:11},
-  {id:21, name:"Jeff Bork",         rank:21, prev:20, phone:"0761000000", wins:5,  losses:11},
-  {id:22, name:"Johan Zetterberg",  rank:22, prev:24, phone:"0705598997", wins:5,  losses:11},
-  {id:23, name:"Matilda Svensson",  rank:23, prev:21, phone:"0703341469", wins:6,  losses:10},
-  {id:24, name:"Igor Mirkovic",     rank:24, prev:26, phone:"0725310210", wins:4,  losses:12},
-  {id:25, name:"Stefan Angvald",    rank:25, prev:23, phone:"0702451256", wins:5,  losses:11},
-  {id:26, name:"Fredrik Gradin",    rank:26, prev:27, phone:"0735446548", wins:3,  losses:13},
-  {id:27, name:"Jan Andresen",      rank:27, prev:28, phone:"0735073506", wins:4,  losses:12},
-  {id:28, name:"Roger Edmark",      rank:28, prev:29, phone:"0730790838", wins:3,  losses:13, note:"Bortrest maj"},
-  {id:29, name:"Karl Thorngren",    rank:29, prev:30, phone:"0702959477", wins:2,  losses:14},
-  {id:30, name:"Sam Lindgren",      rank:30, prev:25, phone:"0761424103", wins:4,  losses:12},
+  {id:1,  name:"Philip Pahlett",     rank:1,  prev:2,  phone:"0735223809"},
+  {id:2,  name:"Johan Ludvigsson",   rank:2,  prev:4,  phone:"0705874471"},
+  {id:3,  name:"Andreas Almroth",    rank:3,  prev:1,  phone:"0768231313"},
+  {id:4,  name:"Johan Olmarker",     rank:4,  prev:5,  phone:"0736540324"},
+  {id:5,  name:"John Andersson",     rank:5,  prev:3,  phone:"0727333333"},
+  {id:6,  name:"Niklas Strömberg",   rank:6,  prev:8,  phone:"0705756786"},
+  {id:7,  name:"Håkan Bergman",      rank:7,  prev:6,  phone:"0702172230"},
+  {id:8,  name:"Mats Johansson",     rank:8,  prev:9,  phone:"0706425156"},
+  {id:9,  name:"Andreas Gustafson",  rank:9,  prev:7,  phone:"0704244341"},
+  {id:10, name:"Mats Ljungström",    rank:10, prev:11, phone:"0708784133"},
+  {id:11, name:"Rasmus Winther",     rank:11, prev:10, phone:"0708670885"},
+  {id:12, name:"Joaquim Nicander",   rank:12, prev:13, phone:"0720787845", me:true},
+  {id:13, name:"Oscar Hänsel",       rank:13, prev:12, phone:"0708750404"},
+  {id:14, name:"James Ljungström",   rank:14, prev:16, phone:"0709569308"},
+  {id:15, name:"Anders Schillström", rank:15, prev:14, phone:"0707993028"},
+  {id:16, name:"John Lundqvist",     rank:16, prev:18, phone:"0702990303"},
+  {id:17, name:"Stefan Munge",       rank:17, prev:15, phone:"0706402286"},
+  {id:18, name:"Johan Zetterberg",   rank:18, prev:20, phone:"0705598997"},
+  {id:19, name:"Johan Wastensson",   rank:19, prev:17, phone:"0733369718"},
+  {id:20, name:"Igor Mirkovic",      rank:20, prev:22, phone:"0725310210"},
+  {id:21, name:"Peter Widen",        rank:21, prev:19, phone:"0706636460"},
+  {id:22, name:"Fredrik Gradin",     rank:22, prev:24, phone:"0735446548"},
+  {id:23, name:"Lars Paulsson",      rank:23, prev:21, phone:"0724433243"},
+  {id:24, name:"Karl Thorngren",     rank:24, prev:26, phone:"0702959477"},
+  {id:25, name:"Jeff Bork",          rank:25, prev:23, phone:"0761000000"},
+  {id:26, name:"Stefan Angvald",     rank:26, prev:27, phone:"0702451256"},
+  {id:27, name:"Matilda Svensson",   rank:27, prev:25, phone:"0703341469"},
+  {id:28, name:"Sam Lindgren",       rank:28, prev:29, phone:"0761424103"},
+  {id:29, name:"Jan Andresen",       rank:29, prev:28, phone:"0735073506"},
+  {id:30, name:"Roger Edmark",       rank:30, prev:30, phone:"0730790838"},
 ];
 
-const matchesW16 = [
-  {a:"John Andersson",   b:"Andreas Almroth",   score:"6-4 6-2",      winner:"John Andersson",   wo:false, rankA:1,  rankB:2},
-  {a:"Philip Pahlett",   b:"Johan Olmarker",     score:"6-3 6-4",      winner:"Johan Olmarker",   wo:false, rankA:2,  rankB:3},
-  {a:"Andreas Gustafson",b:"Johan Ludvigsson",   score:"6-1 6-3",      winner:"Johan Ludvigsson", wo:false, rankA:4,  rankB:5},
-  {a:"Mats Johansson",   b:"Håkan Bergman",      score:"4-6 7-6 10-5", winner:"Håkan Bergman",    wo:false, rankA:6,  rankB:7},
-  {a:"Mats Ljungström",  b:"Niklas Strömberg",   score:"WO",           winner:"Niklas Strömberg", wo:true,  rankA:8,  rankB:9},
-  {a:"Rasmus Winther",   b:"Joaquim Nicander",   score:"6-4 6-2",      winner:"Rasmus Winther",   wo:false, rankA:10, rankB:11},
-  {a:"Stefan Munge",     b:"Oscar Hänsel",       score:"6-3 7-5",      winner:"Oscar Hänsel",     wo:false, rankA:11, rankB:12},
-  {a:"Johan Wastensson", b:"Anders Schillström", score:"WO",           winner:"Anders Schillström",wo:true, rankA:14, rankB:15},
-  {a:"Peter Widen",      b:"James Ljungström",   score:"3-6 6-4 10-7", winner:"James Ljungström", wo:false, rankA:15, rankB:16},
-  {a:"Lars Paulsson",    b:"John Lundqvist",     score:"6-7 3-6",      winner:"John Lundqvist",   wo:false, rankA:18, rankB:19},
-  {a:"Jeff Bork",        b:"Johan Zetterberg",   score:"4-6 6-7",      winner:"Johan Zetterberg", wo:false, rankA:20, rankB:21},
-  {a:"Matilda Svensson", b:"Igor Mirkovic",      score:"6-7 3-6",      winner:"Igor Mirkovic",    wo:false, rankA:21, rankB:22},
-  {a:"Stefan Angvald",   b:"Fredrik Gradin",     score:"WO",           winner:"Fredrik Gradin",   wo:true,  rankA:23, rankB:24},
-];
+// Wins/losses computed from allRounds (set after allRounds is defined)
+function computeWinsLosses(){
+  players.forEach(p=>{p.wins=0;p.losses=0;});
+  Object.values(allRounds).forEach(matches=>{
+    matches.forEach(m=>{
+      if(!m.winner)return;
+      const wp=players.find(p=>p.name===m.winner);
+      const lname=m.winner===m.a?m.b:m.a;
+      const lp=players.find(p=>p.name===lname);
+      if(wp)wp.wins++;
+      if(lp)lp.losses++;
+    });
+  });
+}
 
-const matchesW15 = [
-  {a:"John Andersson",   b:"Philip Pahlett",     score:"6-4 7-5",      winner:"John Andersson",   wo:false, rankA:1,  rankB:2},
-  {a:"Andreas Almroth",  b:"Andreas Gustafson",  score:"6-2 6-1",      winner:"Andreas Almroth",  wo:false, rankA:3,  rankB:4},
-  {a:"Johan Olmarker",   b:"Mats Johansson",     score:"7-5 6-3",      winner:"Johan Olmarker",   wo:false, rankA:5,  rankB:6},
-  {a:"Johan Ludvigsson", b:"Mats Ljungström",    score:"WO",           winner:"Johan Ludvigsson", wo:true,  rankA:7,  rankB:8},
-  {a:"Håkan Bergman",    b:"Rasmus Winther",     score:"6-1 6-2",      winner:"Håkan Bergman",    wo:false, rankA:9,  rankB:10},
-  {a:"Stefan Munge",     b:"Niklas Strömberg",   score:"3-6 7-5 10-8", winner:"Stefan Munge",     wo:false, rankA:11, rankB:12},
-  {a:"Joaquim Nicander", b:"Johan Wastensson",   score:"6-3 6-1",      winner:"Joaquim Nicander", wo:false, rankA:13, rankB:14},
-  {a:"Peter Widen",      b:"Oscar Hänsel",       score:"6-4 7-6",      winner:"Oscar Hänsel",     wo:false, rankA:15, rankB:16},
-  {a:"Anders Schillström",b:"James Ljungström",  score:"6-2 6-4",      winner:"Anders Schillström",wo:false,rankA:17, rankB:18},
-  {a:"Lars Paulsson",    b:"Jeff Bork",          score:"WO",           winner:"Lars Paulsson",    wo:true,  rankA:18, rankB:19},
-  {a:"John Lundqvist",   b:"Matilda Svensson",   score:"6-3 6-2",      winner:"John Lundqvist",   wo:false, rankA:22, rankB:21},
-  {a:"Johan Zetterberg", b:"Igor Mirkovic",      score:"7-5 6-4",      winner:"Johan Zetterberg", wo:false, rankA:24, rankB:23},
-  {a:"Stefan Angvald",   b:"Sam Lindgren",       score:"6-1 6-0",      winner:"Stefan Angvald",   wo:false, rankA:23, rankB:25},
-];
+// ── ALL ROUNDS VT 2026 ─────────────────────────────────────────
+const allRounds = {
+  1: [
+    {a:"Håkan Bergman",b:"Stefan Munge",rankA:1,rankB:2,winner:"Stefan Munge",score:"WO",wo:true},
+    {a:"John Andersson",b:"Philip Pahlett",rankA:3,rankB:4,winner:"John Andersson",score:"6-7 6-4 10-7",wo:false},
+    {a:"Johan Olmarker",b:"Joaquim Nicander",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-4 6-2",wo:false},
+    {a:"Oscar Hänsel",b:"Peter Widen",rankA:7,rankB:8,winner:"Oscar Hänsel",score:"6-4 6-2",wo:false},
+    {a:"Lars Paulsson",b:"Mats Johansson",rankA:9,rankB:10,winner:"Mats Johansson",score:"7-6 6-1",wo:false},
+    {a:"Johan Zetterberg",b:"Sam Lindgren",rankA:11,rankB:12,winner:"Johan Zetterberg",score:"WO",wo:true},
+    {a:"Jeff Bork",b:"Jan Andresen",rankA:13,rankB:14,winner:"Jeff Bork",score:"7-6 2-6 10-7",wo:false},
+    {a:"Stefan Angvald",b:"Nils de Salle",rankA:15,rankB:16,winner:"Nils de Salle",score:"WO",wo:true},
+    {a:"Andreas Gustafson",b:"Andreas Almroth",rankA:17,rankB:18,winner:"Andreas Almroth",score:"6-4 6-1",wo:false},
+    {a:"Mats Ljungström",b:"Igor Mirkovic",rankA:19,rankB:20,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Niklas Strömberg",b:"Rasmus Winther",rankA:21,rankB:22,winner:"Rasmus Winther",score:"2-6 6-4 11-9",wo:false},
+    {a:"Matilda Svensson",b:"Roger Edmark",rankA:23,rankB:24,winner:"Matilda Svensson",score:"6-1 6-7(5) 10-5",wo:false},
+  ],
+  2: [
+    {a:"Stefan Munge",b:"John Andersson",rankA:1,rankB:2,winner:null,score:null,wo:false},
+    {a:"Håkan Bergman",b:"Johan Olmarker",rankA:3,rankB:4,winner:"Johan Olmarker",score:"6-1 ret",wo:false},
+    {a:"Philip Pahlett",b:"Oscar Hänsel",rankA:5,rankB:6,winner:"Oscar Hänsel",score:"WO",wo:true},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:7,rankB:8,winner:"Joaquim Nicander",score:"6-1 6-3",wo:false},
+    {a:"Peter Widen",b:"Johan Zetterberg",rankA:9,rankB:10,winner:"Peter Widen",score:"6-1 6-2",wo:false},
+    {a:"Lars Paulsson",b:"Jeff Bork",rankA:11,rankB:12,winner:"Lars Paulsson",score:"6-0 6-0",wo:false},
+    {a:"Sam Lindgren",b:"Stefan Angvald",rankA:13,rankB:14,winner:"Stefan Angvald",score:"6-7 6-2 10-8",wo:false},
+    {a:"Jan Andresen",b:"Andreas Almroth",rankA:15,rankB:16,winner:"Andreas Almroth",score:"6-0 6-1",wo:false},
+    {a:"Mats Ljungström",b:"Andreas Gustafson",rankA:17,rankB:18,winner:"Mats Ljungström",score:"3-6 7-6 10-7",wo:false},
+    {a:"Rasmus Winther",b:"Igor Mirkovic",rankA:19,rankB:20,winner:"Rasmus Winther",score:"6-1 6-1",wo:false},
+    {a:"Matilda Svensson",b:"Niklas Strömberg",rankA:21,rankB:22,winner:"Niklas Strömberg",score:"6-2 6-3",wo:false},
+    {a:"Niklas Strömberg",b:"Roger Edmark",rankA:23,rankB:24,winner:null,score:null,wo:false},
+  ],
+  3: [
+    {a:"John Andersson",b:"Johan Olmarker",rankA:1,rankB:2,winner:"John Andersson",score:"6-1 0-6 10-5",wo:false},
+    {a:"Stefan Munge",b:"Oscar Hänsel",rankA:3,rankB:4,winner:"Stefan Munge",score:"6-2 6-7(6) 10-8",wo:false},
+    {a:"Håkan Bergman",b:"Joaquim Nicander",rankA:5,rankB:6,winner:"Håkan Bergman",score:"7-5 6-1",wo:false},
+    {a:"Philip Pahlett",b:"Peter Widen",rankA:7,rankB:8,winner:"Philip Pahlett",score:"6-2 6-2",wo:false},
+    {a:"Mats Johansson",b:"Lars Paulsson",rankA:9,rankB:10,winner:"Mats Johansson",score:"4-6 7-5 10-8",wo:false},
+    {a:"Johan Zetterberg",b:"Stefan Angvald",rankA:11,rankB:12,winner:"Stefan Angvald",score:"WO",wo:true},
+    {a:"Jeff Bork",b:"Andreas Almroth",rankA:13,rankB:14,winner:"Andreas Almroth",score:"6-0 6-1",wo:false},
+    {a:"Sam Lindgren",b:"Mats Ljungström",rankA:15,rankB:16,winner:"Mats Ljungström",score:"6-0 6-0",wo:false},
+    {a:"Jan Andresen",b:"Rasmus Winther",rankA:17,rankB:18,winner:"Rasmus Winther",score:"6-1 6-0",wo:false},
+    {a:"Andreas Gustafson",b:"Niklas Strömberg",rankA:19,rankB:20,winner:"Andreas Gustafson",score:"6-3 6-3",wo:false},
+    {a:"Igor Mirkovic",b:"Matilda Svensson",rankA:21,rankB:22,winner:"Igor Mirkovic",score:"6-3 3-6 10-6",wo:false},
+  ],
+  4: [
+    {a:"John Andersson",b:"Stefan Munge",rankA:1,rankB:2,winner:"Stefan Munge",score:"4-6 6-4 10-8",wo:false},
+    {a:"Johan Olmarker",b:"Håkan Bergman",rankA:3,rankB:4,winner:"Håkan Bergman",score:"3-6 6-4 10-5",wo:false},
+    {a:"Oscar Hänsel",b:"Philip Pahlett",rankA:5,rankB:6,winner:"Philip Pahlett",score:"6-3 6-1",wo:false},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:7,rankB:8,winner:"Joaquim Nicander",score:"2-6 6-1 10-2",wo:false},
+    {a:"Peter Widen",b:"Stefan Angvald",rankA:9,rankB:10,winner:"Peter Widen",score:"6-1 6-1",wo:false},
+    {a:"Lars Paulsson",b:"Andreas Almroth",rankA:11,rankB:12,winner:"Andreas Almroth",score:"6-4 6-4",wo:false},
+    {a:"Johan Zetterberg",b:"Mats Ljungström",rankA:13,rankB:14,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Jeff Bork",b:"Rasmus Winther",rankA:15,rankB:16,winner:"Rasmus Winther",score:"6-1 6-1",wo:false},
+    {a:"Sam Lindgren",b:"Andreas Gustafson",rankA:17,rankB:18,winner:"Andreas Gustafson",score:"6-0 6-2",wo:false},
+    {a:"Jan Andresen",b:"Igor Mirkovic",rankA:19,rankB:20,winner:"Igor Mirkovic",score:"6-1 6-0",wo:false},
+    {a:"Niklas Strömberg",b:"Roger Edmark",rankA:21,rankB:22,winner:"Niklas Strömberg",score:"6-0 6-0",wo:false},
+    {a:"Matilda Svensson",b:"James Ljungström",rankA:23,rankB:24,winner:"Matilda Svensson",score:"6-0 6-1",wo:false},
+    {a:"Johan Wastensson",b:"Johan Ludvigsson",rankA:25,rankB:26,winner:"Johan Ludvigsson",score:"6-0 6-0",wo:false},
+  ],
+  5: [
+    {a:"Stefan Munge",b:"Håkan Bergman",rankA:1,rankB:2,winner:"Stefan Munge",score:"6-3 3-6 10-8",wo:false},
+    {a:"John Andersson",b:"Philip Pahlett",rankA:3,rankB:4,winner:"John Andersson",score:"6-3 6-2",wo:false},
+    {a:"Johan Olmarker",b:"Joaquim Nicander",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-2 6-2",wo:false},
+    {a:"Oscar Hänsel",b:"Peter Widen",rankA:7,rankB:8,winner:"Peter Widen",score:"WO",wo:true},
+    {a:"Mats Johansson",b:"Andreas Almroth",rankA:9,rankB:10,winner:"Andreas Almroth",score:"6-0 6-1",wo:false},
+    {a:"Stefan Angvald",b:"Mats Ljungström",rankA:11,rankB:12,winner:"Mats Ljungström",score:"6-1 6-1",wo:false},
+    {a:"Lars Paulsson",b:"Rasmus Winther",rankA:13,rankB:14,winner:"Lars Paulsson",score:"6-4 7-6",wo:false},
+    {a:"Andreas Gustafson",b:"Jeff Bork",rankA:15,rankB:16,winner:"Andreas Gustafson",score:"6-0 6-0",wo:false},
+    {a:"Igor Mirkovic",b:"Sam Lindgren",rankA:17,rankB:18,winner:"Igor Mirkovic",score:"6-1 6-2",wo:false},
+    {a:"Niklas Strömberg",b:"Jan Andresen",rankA:19,rankB:20,winner:"Jan Andresen",score:"WO",wo:true},
+    {a:"Matilda Svensson",b:"Roger Edmark",rankA:21,rankB:22,winner:"Matilda Svensson",score:"6-1 6-1",wo:false},
+    {a:"Johan Ludvigsson",b:"James Ljungström",rankA:23,rankB:24,winner:"Johan Ludvigsson",score:"WO",wo:true},
+  ],
+  6: [
+    {a:"Stefan Munge",b:"John Andersson",rankA:1,rankB:2,winner:"John Andersson",score:"4-6 6-1 10-5",wo:false},
+    {a:"Håkan Bergman",b:"Johan Olmarker",rankA:3,rankB:4,winner:"Johan Olmarker",score:"4-6 7-5 10-7",wo:false},
+    {a:"Philip Pahlett",b:"Peter Widen",rankA:5,rankB:6,winner:"Philip Pahlett",score:"6-3 6-2",wo:false},
+    {a:"Joaquim Nicander",b:"Andreas Almroth",rankA:7,rankB:8,winner:"Andreas Almroth",score:"6-0 6-1",wo:false},
+    {a:"Oscar Hänsel",b:"Mats Ljungström",rankA:9,rankB:10,winner:"Mats Ljungström",score:"6-4 6-1",wo:false},
+    {a:"Mats Johansson",b:"Lars Paulsson",rankA:11,rankB:12,winner:"Mats Johansson",score:"7-5 6-3",wo:false},
+    {a:"Stefan Angvald",b:"Andreas Gustafson",rankA:13,rankB:14,winner:"Andreas Gustafson",score:"6-0 6-2",wo:false},
+    {a:"Rasmus Winther",b:"Igor Mirkovic",rankA:15,rankB:16,winner:"Rasmus Winther",score:"6-2 6-2",wo:false},
+    {a:"Jeff Bork",b:"Jan Andresen",rankA:17,rankB:18,winner:"Jeff Bork",score:"6-1 6-3",wo:false},
+    {a:"Sam Lindgren",b:"Matilda Svensson",rankA:19,rankB:20,winner:"Matilda Svensson",score:"7-6(3) 7-5",wo:false},
+    {a:"Niklas Strömberg",b:"Johan Ludvigsson",rankA:21,rankB:22,winner:"Johan Ludvigsson",score:"7-6 6-2",wo:false},
+    {a:"Roger Edmark",b:"Johan Wastensson",rankA:23,rankB:24,winner:"Johan Wastensson",score:"6-3 6-0",wo:false},
+    {a:"James Ljungström",b:"Anders Schillström",rankA:25,rankB:26,winner:"James Ljungström",score:"6-3 6-2",wo:false},
+  ],
+  7: [
+    {a:"John Andersson",b:"Johan Olmarker",rankA:1,rankB:2,winner:"John Andersson",score:"6-4 6-1",wo:false},
+    {a:"Stefan Munge",b:"Philip Pahlett",rankA:3,rankB:4,winner:"Philip Pahlett",score:"2-6 7-6 11-9",wo:false},
+    {a:"Håkan Bergman",b:"Andreas Almroth",rankA:5,rankB:6,winner:"Andreas Almroth",score:"6-3 6-4",wo:false},
+    {a:"Peter Widen",b:"Mats Ljungström",rankA:7,rankB:8,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:9,rankB:10,winner:"Joaquim Nicander",score:"7-5 6-7 10-6",wo:false},
+    {a:"Oscar Hänsel",b:"Andreas Gustafson",rankA:11,rankB:12,winner:"Andreas Gustafson",score:"7-5 6-3",wo:false},
+    {a:"Lars Paulsson",b:"Rasmus Winther",rankA:13,rankB:14,winner:"Lars Paulsson",score:"WO",wo:true},
+    {a:"Stefan Angvald",b:"Jeff Bork",rankA:15,rankB:16,winner:"Jeff Bork",score:"WO",wo:true},
+    {a:"Igor Mirkovic",b:"Matilda Svensson",rankA:17,rankB:18,winner:"Igor Mirkovic",score:"WO",wo:true},
+    {a:"Jan Andresen",b:"Johan Ludvigsson",rankA:19,rankB:20,winner:"Johan Ludvigsson",score:"6-0 6-0",wo:false},
+    {a:"Sam Lindgren",b:"Johan Wastensson",rankA:21,rankB:22,winner:"Johan Wastensson",score:"WO",wo:true},
+    {a:"Niklas Strömberg",b:"James Ljungström",rankA:23,rankB:24,winner:"James Ljungström",score:"WO",wo:true},
+    {a:"Roger Edmark",b:"Anders Schillström",rankA:25,rankB:26,winner:"Anders Schillström",score:"6-0 6-1",wo:false},
+  ],
+  8: [
+    {a:"John Andersson",b:"Philip Pahlett",rankA:1,rankB:2,winner:"John Andersson",score:"7-5 7-6(2)",wo:false},
+    {a:"Johan Olmarker",b:"Andreas Almroth",rankA:3,rankB:4,winner:"Andreas Almroth",score:"6-3 6-3",wo:false},
+    {a:"Stefan Munge",b:"Mats Ljungström",rankA:5,rankB:6,winner:"Stefan Munge",score:"WO",wo:true},
+    {a:"Håkan Bergman",b:"Joaquim Nicander",rankA:7,rankB:8,winner:"Håkan Bergman",score:"6-3 6-0",wo:false},
+    {a:"Mats Johansson",b:"Lars Paulsson",rankA:11,rankB:12,winner:"Mats Johansson",score:"6-2 2-6 10-4",wo:false},
+    {a:"Oscar Hänsel",b:"Jeff Bork",rankA:13,rankB:14,winner:"Oscar Hänsel",score:"6-2 6-1",wo:false},
+    {a:"Rasmus Winther",b:"Igor Mirkovic",rankA:15,rankB:16,winner:"Rasmus Winther",score:"6-2 6-3",wo:false},
+    {a:"Stefan Angvald",b:"Johan Ludvigsson",rankA:17,rankB:18,winner:"Johan Ludvigsson",score:"6-0 6-0",wo:false},
+    {a:"Matilda Svensson",b:"Johan Wastensson",rankA:19,rankB:20,winner:"Matilda Svensson",score:"WO",wo:true},
+    {a:"Jan Andresen",b:"James Ljungström",rankA:21,rankB:22,winner:"James Ljungström",score:"WO",wo:true},
+    {a:"Sam Lindgren",b:"Anders Schillström",rankA:23,rankB:24,winner:"Anders Schillström",score:"WO",wo:true},
+  ],
+  9: [
+    {a:"John Andersson",b:"Andreas Almroth",rankA:1,rankB:2,winner:"Andreas Almroth",score:"WO",wo:true},
+    {a:"Philip Pahlett",b:"Stefan Munge",rankA:3,rankB:4,winner:"Philip Pahlett",score:"WO",wo:true},
+    {a:"Johan Olmarker",b:"Håkan Bergman",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-3 6-2",wo:false},
+    {a:"Mats Ljungström",b:"Andreas Gustafson",rankA:7,rankB:8,winner:"Andreas Gustafson",score:"WO",wo:true},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:9,rankB:10,winner:"Joaquim Nicander",score:"7-5 1-6 11-9",wo:false},
+    {a:"Peter Widen",b:"Oscar Hänsel",rankA:11,rankB:12,winner:"Peter Widen",score:"6-0 6-3",wo:false},
+    {a:"Lars Paulsson",b:"Rasmus Winther",rankA:13,rankB:14,winner:"Lars Paulsson",score:"6-1 6-2",wo:false},
+    {a:"Jeff Bork",b:"Johan Ludvigsson",rankA:15,rankB:16,winner:"Johan Ludvigsson",score:"6-0 6-0",wo:false},
+    {a:"Igor Mirkovic",b:"Matilda Svensson",rankA:17,rankB:18,winner:"Matilda Svensson",score:"6-5 ret",wo:false},
+    {a:"Stefan Angvald",b:"James Ljungström",rankA:19,rankB:20,winner:"Stefan Angvald",score:"WO",wo:true},
+    {a:"Johan Wastensson",b:"Anders Schillström",rankA:21,rankB:22,winner:"Johan Wastensson",score:"6-1 6-4",wo:false},
+    {a:"Jan Andresen",b:"Niklas Strömberg",rankA:23,rankB:24,winner:"Niklas Strömberg",score:"6-0 6-1",wo:false},
+    {a:"Sam Lindgren",b:"Roger Edmark",rankA:25,rankB:26,winner:"Sam Lindgren",score:"6-3 4-6 10-6",wo:false},
+  ],
+  10: [
+    {a:"Andreas Almroth",b:"Philip Pahlett",rankA:1,rankB:2,winner:"Andreas Almroth",score:"6-3 7-6(6)",wo:false},
+    {a:"John Andersson",b:"Johan Olmarker",rankA:3,rankB:4,winner:"Johan Olmarker",score:"WO",wo:true},
+    {a:"Stefan Munge",b:"Andreas Gustafson",rankA:5,rankB:6,winner:"Andreas Gustafson",score:"6-4 6-2",wo:false},
+    {a:"Håkan Bergman",b:"Joaquim Nicander",rankA:7,rankB:8,winner:"Håkan Bergman",score:"6-2 6-1",wo:false},
+    {a:"Mats Ljungström",b:"Peter Widen",rankA:9,rankB:10,winner:"Peter Widen",score:"WO",wo:true},
+    {a:"Mats Johansson",b:"Lars Paulsson",rankA:11,rankB:12,winner:"Mats Johansson",score:"6-4 6-2",wo:false},
+    {a:"Oscar Hänsel",b:"Johan Ludvigsson",rankA:13,rankB:14,winner:"Johan Ludvigsson",score:"6-1 6-2",wo:false},
+    {a:"Rasmus Winther",b:"Matilda Svensson",rankA:15,rankB:16,winner:"Rasmus Winther",score:"WO",wo:true},
+    {a:"Jeff Bork",b:"Stefan Angvald",rankA:17,rankB:18,winner:"Stefan Angvald",score:"6-3 7-5",wo:false},
+    {a:"Igor Mirkovic",b:"Johan Wastensson",rankA:19,rankB:20,winner:"Johan Wastensson",score:"WO",wo:true},
+    {a:"James Ljungström",b:"Niklas Strömberg",rankA:21,rankB:22,winner:"Niklas Strömberg",score:"WO",wo:true},
+    {a:"Anders Schillström",b:"Sam Lindgren",rankA:23,rankB:24,winner:"Anders Schillström",score:"6-0 6-1",wo:false},
+    {a:"Jan Andresen",b:"Roger Edmark",rankA:25,rankB:26,winner:"Roger Edmark",score:"WO",wo:true},
+  ],
+  11: [
+    {a:"Andreas Almroth",b:"Johan Olmarker",rankA:1,rankB:2,winner:"Andreas Almroth",score:"6-2 6-1",wo:false},
+    {a:"Philip Pahlett",b:"Andreas Gustafson",rankA:3,rankB:4,winner:"Philip Pahlett",score:"4-6 7-6 10-7",wo:false},
+    {a:"John Andersson",b:"Håkan Bergman",rankA:5,rankB:6,winner:"John Andersson",score:"2-6 6-2 10-7",wo:false},
+    {a:"Stefan Munge",b:"Peter Widen",rankA:7,rankB:8,winner:"Stefan Munge",score:"6-4 3-6 10-8",wo:false},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:9,rankB:10,winner:"Joaquim Nicander",score:"3-6 6-3 10-8",wo:false},
+    {a:"Mats Ljungström",b:"Johan Ludvigsson",rankA:11,rankB:12,winner:"Johan Ludvigsson",score:"6-3 6-2",wo:false},
+    {a:"Lars Paulsson",b:"Rasmus Winther",rankA:13,rankB:14,winner:"Rasmus Winther",score:"6-2 7-6",wo:false},
+    {a:"Oscar Hänsel",b:"Stefan Angvald",rankA:15,rankB:16,winner:"Oscar Hänsel",score:"WO",wo:true},
+    {a:"Matilda Svensson",b:"Johan Wastensson",rankA:17,rankB:18,winner:"Johan Wastensson",score:"WO",wo:true},
+    {a:"Jeff Bork",b:"Niklas Strömberg",rankA:19,rankB:20,winner:"Niklas Strömberg",score:"6-0 6-1",wo:false},
+    {a:"Igor Mirkovic",b:"Anders Schillström",rankA:21,rankB:22,winner:"Anders Schillström",score:"WO",wo:true},
+    {a:"James Ljungström",b:"Roger Edmark",rankA:23,rankB:24,winner:"James Ljungström",score:"6-2 6-4",wo:false},
+    {a:"Sam Lindgren",b:"Jan Andresen",rankA:25,rankB:26,winner:"Sam Lindgren",score:"6-0 6-1",wo:false},
+  ],
+  12: [
+    {a:"Andreas Almroth",b:"Philip Pahlett",rankA:1,rankB:2,winner:"Philip Pahlett",score:"ret",wo:false},
+    {a:"Johan Olmarker",b:"John Andersson",rankA:3,rankB:4,winner:"John Andersson",score:"2-6 6-0 10-6",wo:false},
+    {a:"Andreas Gustafson",b:"Stefan Munge",rankA:5,rankB:6,winner:"Andreas Gustafson",score:"ret",wo:false},
+    {a:"Håkan Bergman",b:"Joaquim Nicander",rankA:7,rankB:8,winner:"Håkan Bergman",score:"6-7(9) 6-1 10-8",wo:false},
+    {a:"Peter Widen",b:"Johan Ludvigsson",rankA:9,rankB:10,winner:"Johan Ludvigsson",score:"6-2 6-1",wo:false},
+    {a:"Mats Johansson",b:"Rasmus Winther",rankA:11,rankB:12,winner:"Mats Johansson",score:"7-6 6-4",wo:false},
+    {a:"Mats Ljungström",b:"Oscar Hänsel",rankA:13,rankB:14,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Lars Paulsson",b:"Johan Wastensson",rankA:15,rankB:16,winner:"Johan Wastensson",score:"6-3 4-6 10-7",wo:false},
+    {a:"Stefan Angvald",b:"Niklas Strömberg",rankA:17,rankB:18,winner:"Niklas Strömberg",score:"6-0 6-1",wo:false},
+    {a:"Matilda Svensson",b:"Anders Schillström",rankA:19,rankB:20,winner:"Anders Schillström",score:"6-3 6-3",wo:false},
+    {a:"Jeff Bork",b:"James Ljungström",rankA:21,rankB:22,winner:"James Ljungström",score:"6-1 2-6 10-7",wo:false},
+    {a:"Igor Mirkovic",b:"Sam Lindgren",rankA:23,rankB:24,winner:"Sam Lindgren",score:"WO",wo:true},
+    {a:"Roger Edmark",b:"Jan Andresen",rankA:25,rankB:26,winner:"Roger Edmark",score:"6-4 6-1",wo:false},
+    {a:"Johan Zetterberg",b:"John Lundqvist",rankA:27,rankB:28,winner:"John Lundqvist",score:"WO",wo:true},
+  ],
+  13: [
+    {a:"Philip Pahlett",b:"John Andersson",rankA:1,rankB:2,winner:"John Andersson",score:"7-5 5-7 14-12",wo:false},
+    {a:"Andreas Almroth",b:"Andreas Gustafson",rankA:3,rankB:4,winner:"Andreas Almroth",score:"6-2 6-4",wo:false},
+    {a:"Johan Olmarker",b:"Håkan Bergman",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-3 4-6 10-5",wo:false},
+    {a:"Stefan Munge",b:"Johan Ludvigsson",rankA:7,rankB:8,winner:"Johan Ludvigsson",score:"6-3 6-3",wo:false},
+    {a:"Joaquim Nicander",b:"Mats Johansson",rankA:9,rankB:10,winner:"Mats Johansson",score:"4-6 6-4 10-5",wo:false},
+    {a:"Peter Widen",b:"Mats Ljungström",rankA:11,rankB:12,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Rasmus Winther",b:"Johan Wastensson",rankA:13,rankB:14,winner:"Rasmus Winther",score:"WO",wo:true},
+    {a:"Oscar Hänsel",b:"Niklas Strömberg",rankA:15,rankB:16,winner:"Niklas Strömberg",score:"WO",wo:true},
+    {a:"Lars Paulsson",b:"Anders Schillström",rankA:17,rankB:18,winner:"Anders Schillström",score:"WO",wo:true},
+    {a:"Stefan Angvald",b:"James Ljungström",rankA:19,rankB:20,winner:"James Ljungström",score:"6-2 6-0",wo:false},
+    {a:"Matilda Svensson",b:"Sam Lindgren",rankA:21,rankB:22,winner:"Matilda Svensson",score:"3-6 7-5 10-8",wo:false},
+    {a:"Jeff Bork",b:"Roger Edmark",rankA:23,rankB:24,winner:"Jeff Bork",score:"6-4 6-2",wo:false},
+    {a:"Igor Mirkovic",b:"John Lundqvist",rankA:25,rankB:26,winner:"John Lundqvist",score:"6-1 6-1",wo:false},
+    {a:"Jan Andresen",b:"Johan Zetterberg",rankA:27,rankB:28,winner:"Johan Zetterberg",score:"4-6 6-3 10-3",wo:false},
+  ],
+  14: [
+    {a:"John Andersson",b:"Andreas Almroth",rankA:1,rankB:2,winner:"John Andersson",score:"4-6 7-5 10-4",wo:false},
+    {a:"Philip Pahlett",b:"Johan Olmarker",rankA:3,rankB:4,winner:"Philip Pahlett",score:"6-4 6-3",wo:false},
+    {a:"Andreas Gustafson",b:"Johan Ludvigsson",rankA:5,rankB:6,winner:"Andreas Gustafson",score:"7-5 7-5",wo:false},
+    {a:"Håkan Bergman",b:"Mats Johansson",rankA:7,rankB:8,winner:"Mats Johansson",score:"6-4 0-6 10-7",wo:false},
+    {a:"Stefan Munge",b:"Mats Ljungström",rankA:9,rankB:10,winner:"Mats Ljungström",score:"WO",wo:true},
+    {a:"Joaquim Nicander",b:"Rasmus Winther",rankA:11,rankB:12,winner:"Rasmus Winther",score:"3-6 6-4 10-7",wo:false},
+    {a:"Peter Widen",b:"Niklas Strömberg",rankA:13,rankB:14,winner:"Niklas Strömberg",score:"7-5 6-1",wo:false},
+    {a:"Johan Wastensson",b:"Anders Schillström",rankA:15,rankB:16,winner:"Johan Wastensson",score:"WO",wo:true},
+    {a:"Oscar Hänsel",b:"James Ljungström",rankA:17,rankB:18,winner:"Oscar Hänsel",score:"6-3 7-6(6)",wo:false},
+    {a:"Lars Paulsson",b:"Matilda Svensson",rankA:19,rankB:20,winner:"Lars Paulsson",score:"6-3 6-2",wo:false},
+    {a:"Stefan Angvald",b:"Jeff Bork",rankA:21,rankB:22,winner:"Jeff Bork",score:"6-2 2-6 10-6",wo:false},
+    {a:"Sam Lindgren",b:"John Lundqvist",rankA:23,rankB:24,winner:"John Lundqvist",score:"6-1 6-1",wo:false},
+    {a:"Roger Edmark",b:"Johan Zetterberg",rankA:25,rankB:26,winner:"Johan Zetterberg",score:"6-1 6-4",wo:false},
+    {a:"Igor Mirkovic",b:"Jan Andresen",rankA:27,rankB:28,winner:"Igor Mirkovic",score:"6-1 6-2",wo:false},
+    {a:"Fredrik Gradin",b:"Karl Thorngren",rankA:29,rankB:30,winner:"Fredrik Gradin",score:"6-4 6-0",wo:false},
+  ],
+  15: [
+    {a:"John Andersson",b:"Philip Pahlett",rankA:1,rankB:2,winner:"John Andersson",score:"6-4 7-5",wo:false},
+    {a:"Andreas Almroth",b:"Andreas Gustafson",rankA:3,rankB:4,winner:"Andreas Almroth",score:"6-4 3-6 12-10",wo:false},
+    {a:"Johan Olmarker",b:"Mats Johansson",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-1 6-2",wo:false},
+    {a:"Johan Ludvigsson",b:"Mats Ljungström",rankA:7,rankB:8,winner:"Johan Ludvigsson",score:"5-7 6-4 10-2",wo:false},
+    {a:"Håkan Bergman",b:"Rasmus Winther",rankA:9,rankB:10,winner:"Håkan Bergman",score:"6-2 6-0",wo:false},
+    {a:"Stefan Munge",b:"Niklas Strömberg",rankA:11,rankB:12,winner:"Niklas Strömberg",score:"6-1 6-1",wo:false},
+    {a:"Joaquim Nicander",b:"Johan Wastensson",rankA:13,rankB:14,winner:"Joaquim Nicander",score:"WO",wo:true},
+    {a:"Peter Widen",b:"Oscar Hänsel",rankA:15,rankB:16,winner:"Oscar Hänsel",score:"5-7 6-1 10-8",wo:false},
+    {a:"Anders Schillström",b:"Lars Paulsson",rankA:17,rankB:18,winner:"Anders Schillström",score:"6-7 6-2 10-4",wo:false},
+    {a:"James Ljungström",b:"Jeff Bork",rankA:19,rankB:20,winner:"James Ljungström",score:"6-3 6-0",wo:false},
+    {a:"Matilda Svensson",b:"John Lundqvist",rankA:21,rankB:22,winner:"John Lundqvist",score:"6-0 6-0",wo:false},
+    {a:"Stefan Angvald",b:"Johan Zetterberg",rankA:23,rankB:24,winner:"Johan Zetterberg",score:"6-4 6-1",wo:false},
+    {a:"Sam Lindgren",b:"Igor Mirkovic",rankA:25,rankB:26,winner:"Igor Mirkovic",score:"6-1 6-3",wo:false},
+    {a:"Roger Edmark",b:"Fredrik Gradin",rankA:27,rankB:28,winner:"Fredrik Gradin",score:"6-0 6-1",wo:false},
+    {a:"Jan Andresen",b:"Karl Thorngren",rankA:29,rankB:30,winner:"Karl Thorngren",score:"6-1 6-0",wo:false},
+  ],
+  16: [
+    {a:"John Andersson",b:"Andreas Almroth",rankA:1,rankB:2,winner:"Andreas Almroth",score:"6-3 6-2",wo:false},
+    {a:"Philip Pahlett",b:"Johan Olmarker",rankA:3,rankB:4,winner:"Philip Pahlett",score:"6-2 6-3",wo:false},
+    {a:"Mats Johansson",b:"Håkan Bergman",rankA:7,rankB:8,winner:"Håkan Bergman",score:"WO",wo:true},
+    {a:"Mats Ljungström",b:"Niklas Strömberg",rankA:9,rankB:10,winner:"Niklas Strömberg",score:"6-1 7-5",wo:false},
+    {a:"Rasmus Winther",b:"Joaquim Nicander",rankA:11,rankB:12,winner:"Rasmus Winther",score:"6-4 6-2",wo:false},
+    {a:"Stefan Munge",b:"Oscar Hänsel",rankA:13,rankB:14,winner:"Oscar Hänsel",score:"3-6 6-2 10-4",wo:false},
+    {a:"Johan Wastensson",b:"Anders Schillström",rankA:15,rankB:16,winner:"Anders Schillström",score:"6-1 ret",wo:false},
+    {a:"Peter Widen",b:"James Ljungström",rankA:17,rankB:18,winner:"James Ljungström",score:"6-1 3-6 10-6",wo:false},
+    {a:"Lars Paulsson",b:"John Lundqvist",rankA:19,rankB:20,winner:"John Lundqvist",score:"6-1 6-3",wo:false},
+    {a:"Jeff Bork",b:"Johan Zetterberg",rankA:21,rankB:22,winner:"Johan Zetterberg",score:"2-6 6-1 10-3",wo:false},
+    {a:"Matilda Svensson",b:"Igor Mirkovic",rankA:23,rankB:24,winner:"Igor Mirkovic",score:"5-7 7-6(5) 10-8",wo:false},
+    {a:"Stefan Angvald",b:"Fredrik Gradin",rankA:25,rankB:26,winner:"Fredrik Gradin",score:"6-2 6-4",wo:false},
+    {a:"Sam Lindgren",b:"Karl Thorngren",rankA:27,rankB:28,winner:"Karl Thorngren",score:"6-0 6-0",wo:false},
+    {a:"Roger Edmark",b:"Jan Andresen",rankA:29,rankB:30,winner:"Jan Andresen",score:"WO",wo:true},
+  ],
+  17: [
+    {a:"Andreas Almroth",b:"Philip Pahlett",rankA:1,rankB:2,winner:"Philip Pahlett",score:"WO",wo:true},
+    {a:"John Andersson",b:"Johan Ludvigsson",rankA:3,rankB:4,winner:"Johan Ludvigsson",score:"7-5 6-3",wo:false},
+    {a:"Johan Olmarker",b:"Håkan Bergman",rankA:5,rankB:6,winner:"Johan Olmarker",score:"6-3 6-1",wo:false},
+    {a:"Andreas Gustafson",b:"Niklas Strömberg",rankA:7,rankB:8,winner:"Niklas Strömberg",score:"7-6 6-2",wo:false},
+    {a:"Mats Johansson",b:"Rasmus Winther",rankA:9,rankB:10,winner:"Mats Johansson",score:"6-0 6-4",wo:false},
+    {a:"Mats Ljungström",b:"Oscar Hänsel",rankA:11,rankB:12,winner:"Mats Ljungström",score:"7-5 6-3",wo:false},
+    {a:"Joaquim Nicander",b:"Anders Schillström",rankA:13,rankB:14,winner:"Joaquim Nicander",score:"6-3 6-3",wo:false},
+    {a:"Stefan Munge",b:"James Ljungström",rankA:15,rankB:16,winner:"James Ljungström",score:"3-6 7-6(9) 10-8",wo:false},
+    {a:"Johan Wastensson",b:"John Lundqvist",rankA:17,rankB:18,winner:"John Lundqvist",score:"WO",wo:true},
+    {a:"Peter Widen",b:"Johan Zetterberg",rankA:19,rankB:20,winner:"Johan Zetterberg",score:"WO",wo:true},
+    {a:"Lars Paulsson",b:"Igor Mirkovic",rankA:21,rankB:22,winner:"Igor Mirkovic",score:"6-4 ret",wo:false},
+    {a:"Jeff Bork",b:"Fredrik Gradin",rankA:23,rankB:24,winner:"Fredrik Gradin",score:"6-0 6-1",wo:false},
+    {a:"Matilda Svensson",b:"Karl Thorngren",rankA:25,rankB:26,winner:"Karl Thorngren",score:"7-6 1-6 10-3",wo:false},
+    {a:"Stefan Angvald",b:"Jan Andresen",rankA:27,rankB:28,winner:"Stefan Angvald",score:"6-0 6-1",wo:false},
+    {a:"Sam Lindgren",b:"Roger Edmark",rankA:29,rankB:30,winner:"Sam Lindgren",score:"WO",wo:true},
+  ],
+  18: [
+    {a:"Philip Pahlett",b:"Johan Ludvigsson",rankA:1,rankB:2,winner:null,score:null,wo:false},
+    {a:"Andreas Almroth",b:"Johan Olmarker",rankA:3,rankB:4,winner:null,score:null,wo:false},
+    {a:"John Andersson",b:"Niklas Strömberg",rankA:5,rankB:6,winner:null,score:null,wo:false},
+    {a:"Håkan Bergman",b:"Mats Johansson",rankA:7,rankB:8,winner:null,score:null,wo:false},
+    {a:"Andreas Gustafson",b:"Mats Ljungström",rankA:9,rankB:10,winner:null,score:null,wo:false},
+    {a:"Rasmus Winther",b:"Joaquim Nicander",rankA:11,rankB:12,winner:null,score:null,wo:false},
+    {a:"Oscar Hänsel",b:"James Ljungström",rankA:13,rankB:14,winner:null,score:null,wo:false},
+    {a:"Anders Schillström",b:"John Lundqvist",rankA:15,rankB:16,winner:null,score:null,wo:false},
+    {a:"Stefan Munge",b:"Johan Zetterberg",rankA:17,rankB:18,winner:null,score:null,wo:false},
+    {a:"Johan Wastensson",b:"Igor Mirkovic",rankA:19,rankB:20,winner:"Igor Mirkovic",score:"WO",wo:true},
+    {a:"Peter Widen",b:"Fredrik Gradin",rankA:21,rankB:22,winner:null,score:null,wo:false},
+    {a:"Lars Paulsson",b:"Karl Thorngren",rankA:23,rankB:24,winner:null,score:null,wo:false},
+    {a:"Jeff Bork",b:"Stefan Angvald",rankA:25,rankB:26,winner:null,score:null,wo:false},
+    {a:"Matilda Svensson",b:"Sam Lindgren",rankA:27,rankB:28,winner:null,score:null,wo:false},
+    {a:"Jan Andresen",b:"Roger Edmark",rankA:29,rankB:30,winner:null,score:null,wo:false},
+  ],
+};
 
 // ── SEASONS ────────────────────────────────────────────────────────
 const DEFAULT_SEASONS=[
@@ -524,7 +789,7 @@ function renderSeasonSelector(){
   sel.innerHTML=seasons.map(s=>`<button class="season-sel-chip${s.id===currentSeason?' active':''}" onclick="switchSeason('${s.id}')">${s.short}</button>`).join('');
   // Update round badge
   const badge=document.getElementById('season-round-badge');
-  if(badge){ const s=seasons.find(x=>x.id===currentSeason); badge.textContent=s?s.short:currentSeason; }
+  if(badge){ badge.textContent='Omgång '+Object.keys(allRounds).length; }
 }
 
 function switchSeason(id){
@@ -636,33 +901,58 @@ function renderLadder(){
 }
 
 // ── RENDER MATCHES ─────────────────────────────────────────────────
+let currentRound=18;
+
 function renderMatchRow(m){
+  const isPending=m.winner===null;
   const isWinnerA=m.winner===m.a;
   return `
   <div class="match-row">
     <div class="match-player">
       <div class="match-player-avatar">${avatarHtml(m.a,32)}</div>
       <div>
-        <div class="match-player-name ${isWinnerA?'match-winner':'match-loser'}">${m.a}</div>
+        <div class="match-player-name ${isPending?'pending':isWinnerA?'match-winner':'match-loser'}">${m.a}</div>
         <div class="match-player-rank">#${m.rankA}</div>
       </div>
     </div>
     <div class="match-center">
-      ${m.wo?`<div class="wo-badge">WO</div>`:`<div class="match-score">${m.score}</div>`}
+      ${m.wo?`<div class="wo-badge">WO</div>`:isPending?`<div class="match-score pending">—</div>`:`<div class="match-score">${m.score}</div>`}
       <div class="match-vs">vs</div>
     </div>
     <div class="match-player right">
       <div class="match-player-avatar">${avatarHtml(m.b,32)}</div>
       <div>
-        <div class="match-player-name ${!isWinnerA?'match-winner':'match-loser'}">${m.b}</div>
+        <div class="match-player-name ${isPending?'pending':!isWinnerA?'match-winner':'match-loser'}">${m.b}</div>
         <div class="match-player-rank">#${m.rankB}</div>
       </div>
     </div>
   </div>`;
 }
+
+function renderRoundSelector(){
+  const sel=document.getElementById('round-selector');
+  if(!sel)return;
+  const rounds=Object.keys(allRounds).map(Number).sort((a,b)=>a-b);
+  sel.innerHTML=rounds.map(r=>`<button class="round-chip${r===currentRound?' active':''}" onclick="selectRound(${r})">Omg ${r}</button>`).join('');
+}
+
+function selectRound(r){
+  currentRound=r;
+  renderMatches();
+}
+
 function renderMatches(){
-  document.getElementById('matches-w16').innerHTML=matchesW16.map(renderMatchRow).join('');
-  document.getElementById('matches-w15').innerHTML=matchesW15.map(renderMatchRow).join('');
+  renderRoundSelector();
+  const matches=allRounds[currentRound]||[];
+  const hasResults=matches.some(m=>m.winner!==null);
+  const allDone=matches.length>0&&matches.every(m=>m.winner!==null);
+  const label=allDone?'Resultat':hasResults?'Pågår':'Schema';
+  const container=document.getElementById('matches-container');
+  container.innerHTML=`
+    <div class="week-section">
+      <div class="week-title">Omgång ${currentRound} — ${label}</div>
+      <div class="matches-grid">${matches.map(renderMatchRow).join('')}</div>
+    </div>`;
 }
 
 // ── RENDER PLAYERS GRID ────────────────────────────────────────────
@@ -762,7 +1052,7 @@ function renderModal(p){
   </div>`;
 
   // Recent matches
-  const allMatches=[...matchesW16.map(m=>({...m,week:16})),...matchesW15.map(m=>({...m,week:15}))];
+  const allMatches=Object.entries(allRounds).flatMap(([wk,ms])=>ms.filter(m=>m.winner!==null).map(m=>({...m,week:parseInt(wk)}))).sort((a,b)=>b.week-a.week);
   const myMatches=allMatches.filter(m=>m.a===p.name||m.b===p.name).slice(0,5);
   const recentHtml=myMatches.length?myMatches.map(m=>{
     const isA=m.a===p.name;
@@ -1038,6 +1328,7 @@ function showTab(name, el){
 
 // ── INIT ───────────────────────────────────────────────────────────
 loadPlayerStats();
+computeWinsLosses();
 renderSeasonSelector();
 renderLadder();
 renderMatches();
