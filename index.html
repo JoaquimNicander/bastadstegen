@@ -282,11 +282,26 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
 
 /* ─── ANIMATIONS ─────────────────────────────────────────────── */
 @keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+
+/* Scroll reveals */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1)}
 .reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:0.12s}
-.reveal-delay-2{transition-delay:0.24s}
-.reveal-delay-3{transition-delay:0.36s}
+.reveal-left{opacity:0;transform:translateX(-48px);transition:opacity 0.75s cubic-bezier(0.22,1,0.36,1),transform 0.75s cubic-bezier(0.22,1,0.36,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(48px);transition:opacity 0.75s cubic-bezier(0.22,1,0.36,1),transform 0.75s cubic-bezier(0.22,1,0.36,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(0.93);transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+.reveal-delay-4{transition-delay:0.4s}
+
+/* Line wipe for eyebrows */
+.reveal-line{display:inline-block;overflow:hidden}
+.reveal-line span{display:block;transform:translateY(100%);transition:transform 0.6s cubic-bezier(0.22,1,0.36,1)}
+.reveal-line.visible span{transform:translateY(0)}
 
 /* ─── MOBILE ─────────────────────────────────────────────────── */
 @media(max-width:900px){
@@ -330,7 +345,7 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
   </a>
   <div class="nav-links">
     <a href="#hur" class="nav-link">Hur det funkar</a>
-    <a href="#sommar" class="nav-link">Sommarstegen</a>
+    <a href="#varfor" class="nav-link">Varför stegen</a>
     <a href="stegen.html" class="nav-cta">Till stegen →</a>
   </div>
 </nav>
@@ -351,7 +366,7 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
     <p class="hero-desc">Tävla om rankingen, klättra stegen och möt motståndet vecka för vecka. Vem tar toppen i slutet?</p>
     <div class="hero-btns">
       <a href="stegen.html" class="btn-primary">Se aktuell stege</a>
-      <a href="#sommar" class="btn-secondary">Anmäl sommarstegen</a>
+      <a href="#hur" class="btn-secondary">Hur det funkar</a>
     </div>
   </div>
   <div class="hero-scroll">
@@ -376,48 +391,6 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
   </div>
 </div>
 
-<!-- ─── TENNIS HELA SÄSONGEN ──────────────────────────────────── -->
-<section class="why-section">
-  <div class="section-inner">
-    <div class="why-inner">
-      <div class="reveal">
-        <div class="section-eyebrow">Varför stegen?</div>
-        <h2 class="section-title">Tennis hela säsongen</h2>
-        <p class="section-desc">Stegen ger alla — oavsett nivå — en motståndare som matchar dem, en anledning att boka banan och något att kämpa för varje vecka.</p>
-        <div class="why-quote">
-          <p>"Stegen är det bästa sättet att hålla igång och tävla under hela säsongen, oavsett om man siktar på toppen eller bara vill ha roliga matcher varje vecka."</p>
-          <cite>Båstad Tennissällskap · Grundat 1929</cite>
-        </div>
-        <div class="why-pills">
-          <div class="why-pill">Grusunderlag</div>
-          <div class="why-pill">Vår &amp; sommar</div>
-          <div class="why-pill">Alla nivåer</div>
-          <div class="why-pill">Båstad</div>
-        </div>
-      </div>
-      <div class="why-visual reveal reveal-delay-1">
-        <div class="why-vis-card">
-          <div class="why-vis-num">VT</div>
-          <div class="why-vis-lbl">Vårtermin 2026</div>
-        </div>
-        <div class="why-vis-card">
-          <div class="why-vis-num">ST</div>
-          <div class="why-vis-lbl">Sommartermin 2026</div>
-        </div>
-        <div class="why-vis-card span2">
-          <div>
-            <div class="why-vis-num">30</div>
-          </div>
-          <div>
-            <div class="why-vis-lbl">Spelare på stegen</div>
-            <p style="font-size:13px;color:var(--muted2);margin-top:4px;line-height:1.5">Båstads bästa tennisspelare samlade i ett system.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ─── HUR DET FUNKAR ────────────────────────────────────────── -->
 <section class="how-section" id="hur">
   <div class="section-inner">
@@ -429,10 +402,9 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
     <div class="steps-grid">
 
       <!-- STEG 1 -->
-      <div class="step reveal reveal-delay-1">
+      <div class="step reveal-scale reveal-delay-1">
         <div class="step-icon">
           <svg viewBox="0 0 26 26">
-            <!-- Bracket pairing icon -->
             <rect x="1" y="3" width="9" height="5" rx="1"/>
             <rect x="1" y="18" width="9" height="5" rx="1"/>
             <line x1="10" y1="5.5" x2="15" y2="5.5"/>
@@ -444,15 +416,14 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
         </div>
         <div class="step-title">Omgången delas ut</div>
         <p class="step-desc">Varje omgång paras spelare ihop automatiskt — den övre mot den nedre i varje par. Spelar du varje vecka klättrar du hela säsongen.</p>
-        <div class="step-rule">Ny matchplan varje omgång — 10 omgångar per säsong</div>
+        <div class="step-rule">Ny matchplan varje omgång — 18 omgångar per säsong</div>
         <div class="step-num">1</div>
       </div>
 
       <!-- STEG 2 -->
-      <div class="step reveal reveal-delay-2">
+      <div class="step reveal-scale reveal-delay-2">
         <div class="step-icon">
           <svg viewBox="0 0 26 26">
-            <!-- Tennis ball icon with seams -->
             <circle cx="13" cy="13" r="10"/>
             <path d="M5 9 Q9 13 5 17"/>
             <path d="M21 9 Q17 13 21 17"/>
@@ -466,10 +437,9 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
       </div>
 
       <!-- STEG 3 -->
-      <div class="step reveal reveal-delay-3">
+      <div class="step reveal-scale reveal-delay-3">
         <div class="step-icon">
           <svg viewBox="0 0 26 26">
-            <!-- Phone/score report icon -->
             <rect x="6" y="2" width="14" height="22" rx="2"/>
             <line x1="9" y1="8" x2="17" y2="8"/>
             <line x1="9" y1="13" x2="17" y2="13"/>
@@ -486,85 +456,42 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
   </div>
 </section>
 
-<!-- ─── SOMMARSTEGEN ───────────────────────────────────────────── -->
-<section class="summer-section" id="sommar">
-  <div class="summer-inner">
-    <div class="summer-grid">
-      <div class="reveal">
-        <div class="summer-badge">Ny säsong · Anmälan öppen</div>
-        <h2 class="summer-title">SOMMAR<br><span>STEGEN</span></h2>
-        <div class="summer-date">Börjar 21 Juni 2026</div>
-        <p class="summer-desc">En hel sommar av tennis i Båstad — tio omgångar, ett mästare. Anmäl dig och klättra stegen hela sommaren.</p>
-        <div class="summer-facts">
-          <div class="summer-fact">
-            <div class="summer-fact-icon">
-              <svg viewBox="0 0 14 14"><rect x="1" y="2" width="12" height="11" rx="1"/><line x1="1" y1="5" x2="13" y2="5"/><line x1="4" y1="1" x2="4" y2="3"/><line x1="10" y1="1" x2="10" y2="3"/></svg>
-            </div>
-            <span><strong style="color:var(--cream)">Startdatum:</strong> 21 Juni 2026</span>
-          </div>
-          <div class="summer-fact">
-            <div class="summer-fact-icon">
-              <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><polyline points="7,4 7,7 9,9"/></svg>
-            </div>
-            <span><strong style="color:var(--cream)">10 omgångar</strong> under hela sommaren</span>
-          </div>
-          <div class="summer-fact">
-            <div class="summer-fact-icon">
-              <svg viewBox="0 0 14 14"><path d="M7 1 L9 5 L13 5.5 L10 8.5 L10.5 13 L7 11 L3.5 13 L4 8.5 L1 5.5 L5 5 Z"/></svg>
-            </div>
-            <span><strong style="color:var(--cream)">30 spelare</strong> tävlar om toppen</span>
-          </div>
-          <div class="summer-fact">
-            <div class="summer-fact-icon">
-              <svg viewBox="0 0 14 14"><circle cx="7" cy="7" r="5"/><path d="M5 9 Q7 7 9 5" stroke-width="1.5"/></svg>
-            </div>
-            <span><strong style="color:var(--cream)">Grusunderlag</strong> i Båstad</span>
-          </div>
+<!-- ─── TENNIS HELA SÄSONGEN ──────────────────────────────────── -->
+<section class="why-section" id="varfor">
+  <div class="section-inner">
+    <div class="why-inner">
+      <div class="reveal-left">
+        <div class="section-eyebrow">Varför stegen?</div>
+        <h2 class="section-title">Tennis hela säsongen</h2>
+        <p class="section-desc">Stegen ger alla — oavsett nivå — en motståndare som matchar dem, en anledning att boka banan och något att kämpa för varje vecka.</p>
+        <div class="why-quote">
+          <p>"Stegen är det bästa sättet att hålla igång och tävla under hela säsongen, oavsett om man siktar på toppen eller bara vill ha roliga matcher varje vecka."</p>
+          <cite>Båstad Tennissällskap · Grundat 1929</cite>
         </div>
-        <a href="rapportera.html" class="btn-primary">Gå till min profil →</a>
+        <div class="why-pills">
+          <div class="why-pill">Grusunderlag</div>
+          <div class="why-pill">Vår &amp; sommar</div>
+          <div class="why-pill">Alla nivåer</div>
+          <div class="why-pill">Båstad</div>
+        </div>
       </div>
-
-      <div class="reveal reveal-delay-2">
-        <div class="summer-form-card" id="signup-card">
-          <div class="summer-form-title">Anmäl intresse</div>
-          <div class="summer-form-sub">Sommarstegen ST 2026 · Startar 21 Juni</div>
-
-          <div class="form-group">
-            <div class="form-label">Namn <span style="color:var(--clay)">*</span></div>
-            <input type="text" class="form-input" id="signup-name" placeholder="Förnamn Efternamn" autocomplete="name">
+      <div class="why-visual reveal-right">
+        <div class="why-vis-card reveal-scale reveal-delay-1">
+          <div class="why-vis-num">VT</div>
+          <div class="why-vis-lbl">Vårtermin 2026</div>
+        </div>
+        <div class="why-vis-card reveal-scale reveal-delay-2">
+          <div class="why-vis-num">ST</div>
+          <div class="why-vis-lbl">Sommartermin 2026</div>
+        </div>
+        <div class="why-vis-card span2 reveal-scale reveal-delay-3">
+          <div>
+            <div class="why-vis-num">30</div>
           </div>
-          <div class="form-group">
-            <div class="form-label">Telefon <span style="color:var(--clay)">*</span></div>
-            <input type="tel" class="form-input" id="signup-phone" placeholder="070 000 00 00" autocomplete="tel">
+          <div>
+            <div class="why-vis-lbl">Spelare på stegen</div>
+            <p style="font-size:13px;color:var(--muted2);margin-top:4px;line-height:1.5">Båstads bästa tennisspelare samlade i ett system.</p>
           </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="form-group" style="margin-bottom:0">
-              <div class="form-label">Födelseår (valfritt)</div>
-              <input type="number" class="form-input" id="signup-born" placeholder="1985" min="1930" max="2015">
-            </div>
-            <div class="form-group" style="margin-bottom:0">
-              <div class="form-label">Spelhand (valfritt)</div>
-              <select class="form-input" id="signup-hand" style="cursor:pointer">
-                <option value="">Välj...</option>
-                <option value="Höger">Höger</option>
-                <option value="Vänster">Vänster</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top:10px">
-            <div class="form-label">Hemort (valfritt)</div>
-            <input type="text" class="form-input" id="signup-hometown" placeholder="Båstad">
-          </div>
-
-          <div style="background:rgba(193,120,73,0.06);border:1px solid rgba(193,120,73,0.18);padding:10px 14px;margin-bottom:16px">
-            <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-bottom:4px">Din PIN-kod</div>
-            <div style="font-size:13px;color:var(--muted)">Sätts automatiskt till de <strong style="color:var(--cream)">sista 4 siffrorna</strong> i ditt telefonnummer. Du kan ändra det senare i din profil.</div>
-          </div>
-
-          <button class="form-submit" id="signup-btn" onclick="handleSignup()">Anmäl mig till sommarstegen →</button>
-          <div class="form-note" id="form-note">Anmälan bekräftas av BTS via telefon · <span style="color:rgba(193,120,73,0.7)">ST 2026</span></div>
         </div>
       </div>
     </div>
@@ -625,65 +552,41 @@ window.addEventListener('scroll',()=>{
   document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>60);
 });
 
-// Reveal on scroll
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
-},{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-// Signup form
-function handleSignup(){
-  const name = document.getElementById('signup-name').value.trim();
-  const phone = document.getElementById('signup-phone').value.trim();
-  const born = document.getElementById('signup-born').value.trim();
-  const hand = document.getElementById('signup-hand').value;
-  const hometown = document.getElementById('signup-hometown').value.trim();
-  const note = document.getElementById('form-note');
-  const btn = document.getElementById('signup-btn');
-
-  if(!name || !phone){
-    note.style.color='#EF5350';
-    note.textContent = 'Ange namn och telefonnummer för att anmäla dig.';
-    if(!name) document.getElementById('signup-name').focus();
-    else document.getElementById('signup-phone').focus();
-    return;
-  }
-
-  // Build signup object
-  const signup = {
-    id: Date.now(),
-    name, phone,
-    born: born || '',
-    hand: hand || '',
-    hometown: hometown || '',
-    season: 'ST2026',
-    submittedAt: new Date().toISOString()
-  };
-
-  // Save to localStorage queue
-  try{
-    const existing = JSON.parse(localStorage.getItem('bts_pending_signups') || '[]');
-    // Prevent duplicate by phone
-    if(existing.find(s => s.phone === phone)){
-      note.style.color='#EF5350';
-      note.textContent = 'En anmälan med detta telefonnummer finns redan.';
-      return;
+// Reveal on scroll — alla reveal-varianter
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
     }
-    existing.push(signup);
-    localStorage.setItem('bts_pending_signups', JSON.stringify(existing));
-  } catch(e) {}
-
-  // Show confirmation
-  btn.textContent = '✓ Anmälan mottagen!';
-  btn.style.background = '#2E7D32';
-  btn.disabled = true;
-  note.style.color = '#4CAF50';
-  note.innerHTML = `Tack ${name}! Vi ses på banan. BTS bekräftar din plats via telefon.`;
-  ['signup-name','signup-phone','signup-born','signup-hand','signup-hometown'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.disabled = true;
   });
+},{threshold:0.08,rootMargin:'0px 0px -48px 0px'});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-line').forEach(el=>revealObserver.observe(el));
+
+// Stats counter animation
+function animateCount(el,target,duration=1200){
+  const start=performance.now();
+  const isNum=/^\d+$/.test(target);
+  if(!isNum){el.textContent=target;return;}
+  const end=parseInt(target);
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(ease*end);
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
+const statsObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const num=e.target.querySelector('.stat-num');
+      if(num){animateCount(num,num.textContent.trim());}
+      statsObserver.unobserve(e.target);
+    }
+  });
+},{threshold:0.5});
+document.querySelectorAll('.stat-item').forEach(el=>statsObserver.observe(el));
 </script>
 </body>
 </html>
