@@ -447,15 +447,15 @@ function updateAutoWinner(){
   const match=getMyMatch();if(!match)return;
   const v=id=>parseInt(document.getElementById(id)?.value)||0;
   const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b'),stba=v('r-stba'),stbb=v('r-stbb');
-  let sA=0,sB=0;
-  if(s1a||s1b){if(s1a>s1b)sA++;else if(s1b>s1a)sB++;}
-  if(s2a||s2b){if(s2a>s2b)sA++;else if(s2b>s2a)sB++;}
-  if(stba||stbb){if(stba>stbb)sA++;else if(stbb>stba)sB++;}
-  const meIsA=match.posA===match.myPos;
+  // a-fälten = vänster = jag, b-fälten = höger = motståndare
+  let sMe=0,sOpp=0;
+  if(s1a||s1b){if(s1a>s1b)sMe++;else if(s1b>s1a)sOpp++;}
+  if(s2a||s2b){if(s2a>s2b)sMe++;else if(s2b>s2a)sOpp++;}
+  if(stba||stbb){if(stba>stbb)sMe++;else if(stbb>stba)sOpp++;}
   const disp=document.getElementById('auto-win-display');if(!disp)return;
-  if(sA>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+(meIsA?me.name:match.opp.name)}
-  else if(sB>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+(meIsA?match.opp.name:me.name)}
-  else if(sA||sB){disp.className='auto-win-display empty';disp.textContent=`${sA}–${sB} i set…`}
+  if(sMe>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+me.name}
+  else if(sOpp>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+match.opp.name}
+  else if(sMe||sOpp){disp.className='auto-win-display empty';disp.textContent=`${sMe}–${sOpp} i set…`}
   else{disp.className='auto-win-display empty';disp.textContent='Fyll i set-resultaten ovan'}
 }
 function showSTB(){
@@ -675,20 +675,23 @@ function submitResult(e){
   } else {
     const v=id=>parseInt(document.getElementById(id)?.value)||0;
     const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b'),stba=v('r-stba'),stbb=v('r-stbb');
+    // Formuläret: a = vänster = jag, b = höger = motståndare
     if(s1a||s1b)sets.push({a:s1a,b:s1b});
     if(s2a||s2b)sets.push({a:s2a,b:s2b});
     if((stba||stbb)&&stbVisible)sets.push({a:stba,b:stbb,super:true});
     if(!sets.length){alert('Ange minst ett set!');return;}
-    let sA=0,sB=0;
-    sets.forEach(s=>{if(s.a>s.b)sA++;else if(s.b>s.a)sB++;});
-    const meIsA=match.posA===match.myPos;
-    if(sA>=2)winnerName=meIsA?me.name:match.opp.name;
-    else if(sB>=2)winnerName=meIsA?match.opp.name:me.name;
+    let sMe=0,sOpp=0;
+    sets.forEach(s=>{if(s.a>s.b)sMe++;else if(s.b>s.a)sOpp++;});
+    if(sMe>=2)winnerName=me.name;
+    else if(sOpp>=2)winnerName=match.opp.name;
     else{alert('Vinnare ej fastställd. Kontrollera set-resultaten.');return;}
+    // Normalisera sets för lagring: posA:s poäng = a, posB:s poäng = b
+    const meIsA=match.posA===match.myPos;
+    if(!meIsA)sets=sets.map(s=>({a:s.b,b:s.a,super:s.super}));
   }
 
   const meIsA=match.posA===match.myPos;
-  const winnerPos=winnerName===me.name?(meIsA?match.posA:match.posB):(meIsA?match.posB:match.posA);
+  const winnerPos=winnerName===me.name?match.myPos:(meIsA?match.posB:match.posA);
   const pending=getPending();
   if(!pending[round])pending[round]={};
   pending[round][match.key]={
