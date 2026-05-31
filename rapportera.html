@@ -446,12 +446,13 @@ function updateAutoWinner(){
   if(reportMode==='wo')return;
   const match=getMyMatch();if(!match)return;
   const v=id=>parseInt(document.getElementById(id)?.value)||0;
+  const filled=id=>document.getElementById(id)?.value!=='';
   const s1a=v('r-s1a'),s1b=v('r-s1b'),s2a=v('r-s2a'),s2b=v('r-s2b'),stba=v('r-stba'),stbb=v('r-stbb');
-  // a-fälten = vänster = jag, b-fälten = höger = motståndare
+  // Räkna bara set där BÅDA fälten är ifyllda. a=vänster=jag, b=höger=motståndare
   let sMe=0,sOpp=0;
-  if(s1a||s1b){if(s1a>s1b)sMe++;else if(s1b>s1a)sOpp++;}
-  if(s2a||s2b){if(s2a>s2b)sMe++;else if(s2b>s2a)sOpp++;}
-  if(stba||stbb){if(stba>stbb)sMe++;else if(stbb>stba)sOpp++;}
+  if(filled('r-s1a')&&filled('r-s1b')){if(s1a>s1b)sMe++;else if(s1b>s1a)sOpp++;}
+  if(filled('r-s2a')&&filled('r-s2b')){if(s2a>s2b)sMe++;else if(s2b>s2a)sOpp++;}
+  if(filled('r-stba')&&filled('r-stbb')){if(stba>stbb)sMe++;else if(stbb>stba)sOpp++;}
   const disp=document.getElementById('auto-win-display');if(!disp)return;
   if(sMe>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+me.name}
   else if(sOpp>=2){disp.className='auto-win-display detected';disp.textContent='✓ Vinnare: '+match.opp.name}
