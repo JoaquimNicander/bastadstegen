@@ -164,8 +164,8 @@ header{
 }
 .match-row.has-result::before{background:rgba(193,120,73,0.4)}
 .match-row:hover{background:var(--card2);border-color:var(--border2)}
-.match-player{display:flex;align-items:center;gap:10px;padding:14px 16px 14px 20px}
-.match-player.right{flex-direction:row-reverse;text-align:right;padding:14px 20px 14px 16px}
+.match-player{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 10px;min-height:80px;text-align:center}
+.match-player.right{flex-direction:column;text-align:center;padding:14px 10px;min-height:80px}
 .match-player-avatar{
   width:34px;height:34px;border-radius:50%;
   background:var(--card2);border:1.5px solid var(--border2);
@@ -175,11 +175,16 @@ header{
   transition:border-color 0.2s;
 }
 .match-player-avatar img{width:100%;height:100%;object-fit:cover}
-.match-winner .match-player-avatar{border-color:rgba(193,120,73,0.5)}
-.match-player-name{font-weight:500;font-size:14px;line-height:1.2}
-.match-player-rank{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-top:1px}
-.match-winner .match-player-name{font-weight:700;color:#FFFFFF}
-.match-loser .match-player-name{color:var(--muted)}
+.match-winner .match-player-avatar{border-color:var(--clay);box-shadow:0 0 8px rgba(212,137,90,0.25)}
+.match-player-name{font-weight:500;font-size:14px;line-height:1.2;display:flex;flex-direction:column;gap:0}
+.mn-first{font-size:11px;color:var(--muted);font-weight:400;line-height:1.2;text-align:center}
+.mn-last{font-size:14px;font-weight:600;line-height:1.2;letter-spacing:0.1px;text-align:center}
+.match-player-rank{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:1px;margin-top:1px;text-align:center}
+.match-winner .match-player-rank{color:var(--clay)}
+.match-winner .match-player-name .mn-last{font-weight:800;color:#FFFFFF;font-size:15px}
+.match-winner .match-player-name .mn-first{font-weight:700;color:rgba(255,255,255,0.85);font-size:12px}
+.match-loser .match-player-name .mn-last{color:var(--muted)}
+.match-loser .match-player-name .mn-first{color:var(--muted2)}
 .match-loser .match-player-avatar{opacity:0.6}
 .match-center{
   text-align:center;padding:10px 6px;
@@ -493,8 +498,17 @@ header{
   .pc-stat-val{font-size:17px}
   .pc-stat-lbl{font-size:8px}
   /* Matches */
-  .match-row{grid-template-columns:1fr auto 1fr;padding:12px 10px;gap:6px}
+  .match-row{grid-template-columns:1fr 52px 1fr;min-height:88px;padding:0;gap:0;align-items:stretch}
+  .match-player{padding:12px 8px;min-height:88px;align-items:center;justify-content:center}
+  .match-player.right{padding:12px 8px}
   .match-player-name{font-size:13px}
+  .mn-last{font-size:14px}
+  .mn-first{font-size:11px}
+  .match-player-rank{font-size:8px}
+  .match-player-avatar{width:30px;height:30px;font-size:9px;flex-shrink:0}
+  .match-center{padding:8px 4px;border-left:1px solid var(--border);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:88px}
+  .match-score{font-size:9px;letter-spacing:0.5px}
+  .match-vs{font-size:8px}
   /* Nav */
   .nav-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .tab-btn{font-size:13px;padding:0 16px;height:48px}
@@ -1059,6 +1073,13 @@ function renderLadder(){
 // ── RENDER MATCHES ─────────────────────────────────────────────────
 let currentRound=18;
 
+function splitName(name){
+  const parts=name.trim().split(' ');
+  if(parts.length<=1)return {first:name,last:''};
+  const last=parts.pop();
+  return {first:parts.join(' '),last};
+}
+
 function renderMatchRow(m){
   const isPending=m.winner===null;
   const isWinnerA=m.winner===m.a;
@@ -1070,7 +1091,10 @@ function renderMatchRow(m){
     <div class="match-player ${sideA}">
       <div class="match-player-avatar">${avatarHtml(m.a,34)}</div>
       <div>
-        <div class="match-player-name${isPending?' pending':''}">${m.a}</div>
+        <div class="match-player-name${isPending?' pending':''}">
+          <span class="mn-first">${splitName(m.a).first}</span>
+          ${splitName(m.a).last?`<span class="mn-last">${splitName(m.a).last}</span>`:''}
+        </div>
         <div class="match-player-rank">#${m.rankA}</div>
       </div>
     </div>
@@ -1080,7 +1104,10 @@ function renderMatchRow(m){
     <div class="match-player right ${sideB}">
       <div class="match-player-avatar">${avatarHtml(m.b,34)}</div>
       <div>
-        <div class="match-player-name${isPending?' pending':''}">${m.b}</div>
+        <div class="match-player-name${isPending?' pending':''}">
+          <span class="mn-first">${splitName(m.b).first}</span>
+          ${splitName(m.b).last?`<span class="mn-last">${splitName(m.b).last}</span>`:''}
+        </div>
         <div class="match-player-rank">#${m.rankB}</div>
       </div>
     </div>
