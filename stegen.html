@@ -1099,7 +1099,7 @@ function renderMatchRow(m){
       </div>
     </div>
     <div class="match-center">
-      ${m.wo?`<div class="wo-badge">WO</div><div class="match-vs">vs</div>`:isPending?`<div class="match-score pending">· · ·</div><div class="match-vs">vs</div>`:`<div class="match-score">${m.score.replace(/ /g,'<br>')}</div>`}
+      ${m.wo?`<div class="wo-badge">WO</div><div class="match-vs">vs</div>`:isPending?`<div class="match-score pending">· · ·</div><div class="match-vs">vs</div>`:`<div class="match-score">${m.score.replace(/ /g,'<br>')}</div>${m.awaitingConfirm?'<div class="wo-badge" style="color:var(--clay);border-color:rgba(193,120,73,0.35);margin-top:2px">VÄN</div>':''}`}
     </div>
     <div class="match-player right ${sideB}">
       <div class="match-player-avatar">${avatarHtml(m.b,34)}</div>
@@ -1126,9 +1126,31 @@ function selectRound(r){
   renderMatches();
 }
 
+// ── MERGE STORED RESULTS (from rapportera.html) ────────────────────
+function getStoredResults(){try{return JSON.parse(localStorage.getItem('bts_results_'+currentSeason)||'{}')}catch(e){return {}}}
+function getStoredPending(){try{return JSON.parse(localStorage.getItem('bts_pending_'+currentSeason)||'{}')}catch(e){return {}}}
+
+function mergeRoundMatches(matches,round){
+  const results=getStoredResults();
+  const pending=getStoredPending();
+  return matches.map(m=>{
+    const key=`${m.rankA}v${m.rankB}`;
+    const confirmed=(results[round]||{})[key];
+    const pend=(pending[round]||{})[key];
+    if(confirmed){
+      return{...m,winner:confirmed.winnerName,score:confirmed.score,wo:confirmed.wo||false};
+    }
+    if(pend&&pend.status!=='disputed'){
+      return{...m,winner:pend.winnerName,score:pend.score,wo:pend.wo||false,awaitingConfirm:pend.status==='pending'};
+    }
+    return m;
+  });
+}
+
 function renderMatches(){
   renderRoundSelector();
-  const matches=allRounds[currentRound]||[];
+  const baseMatches=allRounds[currentRound]||[];
+  const matches=mergeRoundMatches(baseMatches,currentRound);
   const hasResults=matches.some(m=>m.winner!==null);
   const allDone=matches.length>0&&matches.every(m=>m.winner!==null);
   const labelText=allDone?'Klar':hasResults?'Pågår':'Schema';
