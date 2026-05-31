@@ -149,26 +149,62 @@ nav.scrolled{background:rgba(12,30,14,0.97);border-bottom-color:rgba(193,120,73,
 .why-vis-card.span2{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;gap:20px}
 .why-vis-card.span2 .why-vis-num{font-size:36px}
 
-/* ─── HOW IT WORKS ───────────────────────────────────────────── */
+/* ─── HOW CAROUSEL ───────────────────────────────────────────── */
 .how-section{background:linear-gradient(180deg,#0E1A10 0%,#0A1508 100%)}
-.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:56px}
-.step{background:var(--card);border:1px solid rgba(193,120,73,0.1);padding:40px 32px;position:relative;overflow:hidden;transition:border-color 0.3s,transform 0.3s}
-.step:hover{border-color:rgba(193,120,73,0.38);transform:translateY(-4px)}
-.step-icon{
-  width:56px;height:56px;background:rgba(193,120,73,0.08);border:1px solid rgba(193,120,73,0.18);
-  display:flex;align-items:center;justify-content:center;margin-bottom:28px;
-  color:var(--clay);flex-shrink:0;
+.how-carousel{margin-top:56px;background:var(--card);border:1px solid rgba(193,120,73,0.15);overflow:hidden;position:relative}
+.how-track{display:flex;transition:transform 0.5s cubic-bezier(0.22,1,0.36,1)}
+.how-slide{min-width:100%;display:grid;grid-template-columns:1fr 1fr;min-height:360px}
+.how-slide-text{padding:52px 48px;display:flex;flex-direction:column;justify-content:center;gap:16px;border-right:1px solid rgba(193,120,73,0.1)}
+.how-step-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--clay);text-transform:uppercase}
+.how-slide-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,3.8vw,50px);line-height:0.95;letter-spacing:1px;color:var(--white)}
+.how-slide-desc{font-size:15px;color:var(--muted);line-height:1.75;max-width:380px}
+.how-slide-visual{padding:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.18)}
+.how-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-top:1px solid rgba(193,120,73,0.1);background:rgba(0,0,0,0.1)}
+.how-btn{background:none;border:1px solid rgba(193,120,73,0.3);color:var(--clay);font-family:'Space Mono',monospace;font-size:15px;width:44px;height:44px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
+.how-btn:hover:not(:disabled){background:rgba(193,120,73,0.1);border-color:var(--clay)}
+.how-btn:disabled{opacity:0.3;cursor:not-allowed}
+.how-dots{display:flex;gap:10px;align-items:center}
+.how-dot{width:8px;height:8px;border-radius:0;background:rgba(193,120,73,0.25);border:none;cursor:pointer;transition:all 0.25s;padding:0}
+.how-dot.active{background:var(--clay);width:28px}
+/* Vis: Ladder */
+.vis-ladder{display:flex;flex-direction:column;gap:4px;width:100%;max-width:280px}
+.vis-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid rgba(193,120,73,0.12);background:var(--surface)}
+.vis-row-1{background:rgba(212,225,87,0.9);border-color:transparent}
+.vis-row-1 .vis-rank,.vis-row-1 .vis-name{color:#0C1E0E !important;font-weight:700}
+.vis-row-2{background:var(--clay);border-color:transparent}
+.vis-row-2 .vis-rank,.vis-row-2 .vis-name{color:#0C1E0E !important;font-weight:700}
+.vis-row-3{background:var(--clay2);border-color:transparent}
+.vis-row-3 .vis-rank,.vis-row-3 .vis-name{color:var(--cream)}
+.vis-rank{font-family:'Space Mono',monospace;font-size:11px;color:var(--clay);min-width:30px}
+.vis-name{font-size:14px;color:var(--muted)}
+.vis-dots{text-align:center;color:var(--muted);padding:4px 0;font-size:18px}
+/* Vis: Pairs */
+.vis-pairs{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px}
+.vis-pair{display:flex;align-items:center}
+.vis-pair-player{flex:1;text-align:center;padding:13px 8px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;background:var(--clay2);border:1px solid var(--clay);color:var(--white)}
+.vis-pair-player.dim{background:var(--surface);border-color:rgba(193,120,73,0.15);color:var(--muted);font-size:18px}
+.vis-pair-vs{padding:0 12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--clay);letter-spacing:2px;flex-shrink:0}
+.vis-pair-vs.dim{color:rgba(193,120,73,0.3)}
+.vis-pair-dots{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;padding-top:4px}
+/* Vis: Swap */
+.vis-swap{display:flex;align-items:center;gap:14px;width:100%;max-width:320px}
+.vis-swap-col{flex:1;display:flex;flex-direction:column;gap:6px}
+.vis-swap-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;text-align:center}
+.vis-swap-row{padding:10px 12px;font-size:13px;border:1px solid rgba(193,120,73,0.12);background:var(--surface);color:var(--muted);text-align:center;line-height:1.4}
+.vis-swap-row.clay-win{background:var(--clay2);border-color:var(--clay);color:var(--cream);font-weight:600}
+.vis-swap-arrow{font-family:'Space Mono',monospace;font-size:18px;color:var(--clay);flex-shrink:0}
+/* Vis: Steps */
+.vis-steps{display:flex;flex-direction:column;width:100%;max-width:280px}
+.vis-step{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(193,120,73,0.08)}
+.vis-step:last-child{border-bottom:none}
+.vis-step-num{width:36px;height:36px;border-radius:50%;background:var(--clay2);border:1px solid var(--clay);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vis-step-text{font-size:14px;color:var(--muted);line-height:1.45}
+@media(max-width:768px){
+  .how-slide{grid-template-columns:1fr;min-height:auto}
+  .how-slide-visual{display:none}
+  .how-slide-text{padding:36px 28px;border-right:none}
+  .how-nav{padding:16px 20px}
 }
-.step-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.step-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;margin-bottom:14px;color:var(--cream)}
-.step-desc{font-size:15px;color:var(--muted);line-height:1.7}
-.step-rule{
-  margin-top:18px;padding:12px 14px;background:rgba(193,120,73,0.06);
-  border-left:2px solid rgba(193,120,73,0.4);
-  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--clay);
-  line-height:1.6;
-}
-.step-num{font-family:'Bebas Neue',sans-serif;font-size:100px;color:rgba(193,120,73,0.06);position:absolute;bottom:-16px;right:14px;line-height:1}
 
 /* ─── SOMMARSTEGEN ───────────────────────────────────────────── */
 .summer-section{
@@ -397,62 +433,114 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
     <div class="reveal">
       <div class="section-eyebrow">Systemet</div>
       <h2 class="section-title">Hur stegen funkar</h2>
-      <p class="section-desc">En klassisk tennistege — enkel, rättvis, kul. Spelarna möts i par varje omgång och den lägre rankade kan klättra genom att slå sin motståndare.</p>
+      <p class="section-desc">Enkel, rättvis, kul. Klicka dig igenom förklaringen nedan.</p>
     </div>
-    <div class="steps-grid">
 
-      <!-- STEG 1 -->
-      <div class="step reveal-scale reveal-delay-1">
-        <div class="step-icon">
-          <svg viewBox="0 0 26 26">
-            <rect x="1" y="3" width="9" height="5" rx="1"/>
-            <rect x="1" y="18" width="9" height="5" rx="1"/>
-            <line x1="10" y1="5.5" x2="15" y2="5.5"/>
-            <line x1="10" y1="20.5" x2="15" y2="20.5"/>
-            <line x1="15" y1="5.5" x2="15" y2="20.5"/>
-            <line x1="15" y1="13" x2="20" y2="13"/>
-            <circle cx="23" cy="13" r="2.5" stroke-width="1.5"/>
-          </svg>
+    <div class="how-carousel reveal reveal-delay-1" id="howCarousel">
+      <div class="how-track" id="howTrack">
+
+        <!-- SLIDE 1 -->
+        <div class="how-slide">
+          <div class="how-slide-text">
+            <div class="how-step-label">01 / 04</div>
+            <h3 class="how-slide-title">Flera spelare.<br>En stege.</h3>
+            <p class="how-slide-desc">Alla spelare tilldelas en placering på stegen — #1 är toppen. Nya spelare som tillkommer under säsongen börjar alltid längst ner, oavsett nivå.</p>
+          </div>
+          <div class="how-slide-visual">
+            <div class="vis-ladder">
+              <div class="vis-row vis-row-1"><span class="vis-rank">#1</span><span class="vis-name">Emma S</span></div>
+              <div class="vis-row vis-row-2"><span class="vis-rank">#2</span><span class="vis-name">Jonas L</span></div>
+              <div class="vis-row vis-row-3"><span class="vis-rank">#3</span><span class="vis-name">Maria K</span></div>
+              <div class="vis-row"><span class="vis-rank">#4</span><span class="vis-name">Peter B</span></div>
+              <div class="vis-row"><span class="vis-rank">#5</span><span class="vis-name">Anna W</span></div>
+              <div class="vis-dots">⋮</div>
+            </div>
+          </div>
         </div>
-        <div class="step-title">Omgången delas ut</div>
-        <p class="step-desc">Varje omgång paras spelare ihop automatiskt — den övre mot den nedre i varje par. Spelar du varje vecka klättrar du hela säsongen.</p>
-        <div class="step-rule">Ny matchplan varje omgång — 18 omgångar per säsong</div>
-        <div class="step-num">1</div>
-      </div>
 
-      <!-- STEG 2 -->
-      <div class="step reveal-scale reveal-delay-2">
-        <div class="step-icon">
-          <svg viewBox="0 0 26 26">
-            <circle cx="13" cy="13" r="10"/>
-            <path d="M5 9 Q9 13 5 17"/>
-            <path d="M21 9 Q17 13 21 17"/>
-            <line x1="3" y1="13" x2="23" y2="13" stroke-width="0.8" stroke-dasharray="2,2"/>
-          </svg>
+        <!-- SLIDE 2 -->
+        <div class="how-slide">
+          <div class="how-slide-text">
+            <div class="how-step-label">02 / 04</div>
+            <h3 class="how-slide-title">Grannar möts.<br>Varje omgång.</h3>
+            <p class="how-slide-desc">Varje omgång paras spelare mot sin närmaste granne på stegen: #1 mot #2, #3 mot #4, #5 mot #6 ... Ingen slipper undan — alla spelar varje omgång.</p>
+          </div>
+          <div class="how-slide-visual">
+            <div class="vis-pairs">
+              <div class="vis-pair">
+                <div class="vis-pair-player">#1</div>
+                <div class="vis-pair-vs">vs</div>
+                <div class="vis-pair-player">#2</div>
+              </div>
+              <div class="vis-pair">
+                <div class="vis-pair-player dim">#3</div>
+                <div class="vis-pair-vs dim">vs</div>
+                <div class="vis-pair-player dim">#4</div>
+              </div>
+              <div class="vis-pair">
+                <div class="vis-pair-player dim">#5</div>
+                <div class="vis-pair-vs dim">vs</div>
+                <div class="vis-pair-player dim">#6</div>
+              </div>
+              <div class="vis-pair-dots">⋮ och så vidare</div>
+            </div>
+          </div>
         </div>
-        <div class="step-title">Matchen spelas</div>
-        <p class="step-desc">Bäst av tre set. Vid 40–40 spelas en avgörande boll — servmottagaren väljer ruta att spela i. Om det blir 1–1 i set avgörs det med ett supertiebreak till 10.</p>
-        <div class="step-rule">40–40 = avgörande boll · Mottagaren väljer ruta · 1–1 = Supertiebreak till 10</div>
-        <div class="step-num">2</div>
-      </div>
 
-      <!-- STEG 3 -->
-      <div class="step reveal-scale reveal-delay-3">
-        <div class="step-icon">
-          <svg viewBox="0 0 26 26">
-            <rect x="6" y="2" width="14" height="22" rx="2"/>
-            <line x1="9" y1="8" x2="17" y2="8"/>
-            <line x1="9" y1="13" x2="17" y2="13"/>
-            <polyline points="9,19 12,22 17,16"/>
-          </svg>
+        <!-- SLIDE 3 -->
+        <div class="how-slide">
+          <div class="how-slide-text">
+            <div class="how-step-label">03 / 04</div>
+            <h3 class="how-slide-title">Vinnaren klättrar.<br>Förloraren sjunker.</h3>
+            <p class="how-slide-desc">Det händer alltid något — du rör dig alltid upp eller ner. Vinnaren tar den bättre platsen, förloraren tar den sämre. Enkel regel, varje match.</p>
+          </div>
+          <div class="how-slide-visual">
+            <div class="vis-swap">
+              <div class="vis-swap-col">
+                <div class="vis-swap-label">Innan</div>
+                <div class="vis-swap-row">#4 Anna</div>
+                <div class="vis-swap-row clay-win">#5 Erik ← vinner</div>
+              </div>
+              <div class="vis-swap-arrow">→</div>
+              <div class="vis-swap-col">
+                <div class="vis-swap-label">Efter</div>
+                <div class="vis-swap-row clay-win">#4 Erik</div>
+                <div class="vis-swap-row">#5 Anna</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="step-title">Rapportera resultatet</div>
-        <p class="step-desc">Logga in med ditt namn och PIN-kod, mata in resultatet set för set och vänta på att motspelaren bekräftar. Rankingen uppdateras direkt efter varje omgång.</p>
-        <div class="step-rule">Motspelaren bekräftar · Ranking uppdateras automatiskt</div>
-        <div class="step-num">3</div>
-      </div>
 
-    </div>
+        <!-- SLIDE 4 -->
+        <div class="how-slide">
+          <div class="how-slide-text">
+            <div class="how-step-label">04 / 04</div>
+            <h3 class="how-slide-title">Rapportera direkt<br>i appen.</h3>
+            <p class="how-slide-desc">Vinnaren — eller förloraren — rapporterar resultatet direkt i BTS-appen efter matchen. Ange vem som vann, och om det var en WO. Det tar 30 sekunder.</p>
+          </div>
+          <div class="how-slide-visual">
+            <div class="vis-steps">
+              <div class="vis-step"><div class="vis-step-num">1</div><div class="vis-step-text">Öppna rapportera-sidan på bastadstegen.se</div></div>
+              <div class="vis-step"><div class="vis-step-num">2</div><div class="vis-step-text">Välj rätt match — visas automatiskt</div></div>
+              <div class="vis-step"><div class="vis-step-num">3</div><div class="vis-step-text">Markera vinnaren, eller välj WO</div></div>
+              <div class="vis-step"><div class="vis-step-num">4</div><div class="vis-step-text">Skicka in — stegen uppdateras direkt!</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /how-track -->
+
+      <div class="how-nav">
+        <button class="how-btn how-prev" id="howPrev" aria-label="Föregående">←</button>
+        <div class="how-dots">
+          <button class="how-dot active" data-idx="0"></button>
+          <button class="how-dot" data-idx="1"></button>
+          <button class="how-dot" data-idx="2"></button>
+          <button class="how-dot" data-idx="3"></button>
+        </div>
+        <button class="how-btn how-next" id="howNext" aria-label="Nästa">→</button>
+      </div>
+    </div><!-- /how-carousel -->
   </div>
 </section>
 
@@ -587,6 +675,32 @@ const statsObserver=new IntersectionObserver(entries=>{
   });
 },{threshold:0.5});
 document.querySelectorAll('.stat-item').forEach(el=>statsObserver.observe(el));
+
+// ── How-carousel ──
+(function(){
+  var track=document.getElementById('howTrack');
+  if(!track)return;
+  var dots=document.querySelectorAll('.how-dot');
+  var current=0, total=4;
+  function goTo(idx){
+    current=Math.max(0,Math.min(total-1,idx));
+    track.style.transform='translateX(-'+current*100+'%)';
+    dots.forEach(function(d,i){d.classList.toggle('active',i===current);});
+    document.getElementById('howPrev').disabled=current===0;
+    document.getElementById('howNext').disabled=current===total-1;
+  }
+  document.getElementById('howPrev').addEventListener('click',function(){goTo(current-1);});
+  document.getElementById('howNext').addEventListener('click',function(){goTo(current+1);});
+  dots.forEach(function(d){d.addEventListener('click',function(){goTo(+d.dataset.idx);});});
+  goTo(0);
+  // Swipe
+  var sx=0;
+  track.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
+  track.addEventListener('touchend',function(e){
+    var diff=sx-e.changedTouches[0].clientX;
+    if(Math.abs(diff)>50)goTo(current+(diff>0?1:-1));
+  },{passive:true});
+})();
 </script>
 </body>
 </html>
