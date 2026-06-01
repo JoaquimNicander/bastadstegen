@@ -20,8 +20,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-
 /* ── LOGIN ── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0F2212 0%,var(--bg) 70%)}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:36px 28px;width:100%;max-width:380px;text-align:center}
-.login-logo-wrap{margin-bottom:20px}
-.login-logo-wrap img,.login-logo-wrap svg{width:80px;height:auto}
+.login-logo-wrap{margin-bottom:24px}
+.login-logo-wrap svg{width:200px;height:auto;display:block;margin:0 auto}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:4px}
 .login-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:28px}
 .login-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;text-align:left;margin-bottom:6px;display:block}
@@ -229,9 +229,28 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo-wrap">
-      <img src="bts-logo.svg" alt="BTS" onerror="this.style.display='none'">
+      <svg viewBox="0 0 233.1 171.3" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="lclay" cx="113.6356" cy="164.2249" r="73.4464" gradientTransform="matrix(0.9952 0 0 1.2602 0.9847 -124.8108)" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#C68D64"/>
+            <stop offset="1" stop-color="#9D603B"/>
+          </radialGradient>
+        </defs>
+        <rect x="43.1" y="56.5" fill="url(#lclay)" stroke="#FFF" stroke-miterlimit="10" width="142" height="51.3"/>
+        <rect x="113.7" y="54.5" fill="#FFF" width="1.1" height="55.7"/>
+        <rect x="43.6" y="101.4" fill="#FFF" width="141.5" height="0.4"/>
+        <rect x="43.6" y="62.8" fill="#FFF" width="141.5" height="0.4"/>
+        <polygon fill="#FFF" points="149.5,82.2 149.5,82.6 79.1,82.6 79.1,82.1"/>
+        <g opacity="0.4"><polygon fill="#888" points="114.8,54.4 114.8,110.1 117.8,111.2 117.8,55.5"/></g>
+        <rect x="78.8" y="62.8" fill="#FFF" width="0.6" height="39"/>
+        <rect x="149.1" y="62.8" fill="#FFF" width="0.5" height="39"/>
+        <polygon fill="#FFF" points="44.4,82.2 44.4,82.6 42.7,82.6 42.7,82.2"/>
+        <polygon fill="#FFF" points="185.2,82.2 185.2,82.6 183.6,82.6 183.6,82.2"/>
+        <text transform="matrix(1 0 0 1 51.0092 90.4508)" fill="#FFF" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="29.75">TENNIS</text>
+        <text transform="matrix(1 0 0 1 51.6933 44.3829)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.33">BÅSTAD</text>
+        <text transform="matrix(0.9837 0 0 1 51.6933 140.4015)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.48">STEGEN</text>
+      </svg>
     </div>
-    <div class="login-title">BTS Stegen</div>
     <div class="login-sub">Min sida</div>
     <label class="login-label" for="login-name">Ditt namn</label>
     <select class="login-select" id="login-name">
