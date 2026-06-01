@@ -1,70 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 28.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 233.1 171.3" style="enable-background:new 0 0 233.1 171.3;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:url(#SVGID_1_);stroke:#FFFFFF;stroke-miterlimit:10;}
-	.st1{fill:#FFFFFF;}
-	.st2{opacity:0.5;}
-	.st3{fill:url(#SVGID_00000140724766118535705420000003523566472712099249_);}
-	.st4{font-family:'ArchivoBlack-Regular';}
-	.st5{font-size:29.7492px;}
-	.st6{fill:#B77C52;}
-	.st7{font-size:28.3274px;}
-	.st8{font-size:28.484px;}
-</style>
-<radialGradient id="SVGID_1_" cx="113.6356" cy="164.2249" r="73.4464" gradientTransform="matrix(0.9952 0 0 1.2602 0.9847 -124.8108)" gradientUnits="userSpaceOnUse">
-	<stop  offset="0" style="stop-color:#C68D64"/>
-	<stop  offset="1" style="stop-color:#9D603B"/>
-</radialGradient>
-<rect x="43.1" y="56.5" class="st0" width="142" height="51.3"/>
-<rect x="113.7" y="54.5" class="st1" width="1.1" height="55.7"/>
-<g>
-	<rect x="43.6" y="101.4" class="st1" width="141.5" height="0.4"/>
-	<rect x="43.6" y="62.8" class="st1" width="141.5" height="0.4"/>
-</g>
-<g>
-	<polygon class="st1" points="149.5,82.2 149.5,82.6 79.1,82.6 79.1,82.1 	"/>
-</g>
-<g class="st2">
-	
-		<radialGradient id="SVGID_00000029041361365907764030000016287386800029976466_" cx="-54.7374" cy="123.8324" r="26.4677" gradientTransform="matrix(5.788923e-11 -0.7591 1.2894 3.408291e-11 -43.349 41.2722)" gradientUnits="userSpaceOnUse">
-		<stop  offset="0.1197" style="stop-color:#7D7D7D"/>
-		<stop  offset="1" style="stop-color:#565656"/>
-	</radialGradient>
-	<polygon style="fill:url(#SVGID_00000029041361365907764030000016287386800029976466_);" points="114.8,54.4 114.8,110.1 
-		117.8,111.2 117.8,55.5 	"/>
-</g>
-<rect x="78.8" y="62.8" class="st1" width="0.6" height="39"/>
-<rect x="149.1" y="62.8" class="st1" width="0.5" height="39"/>
-<g>
-	
-		<image style="overflow:visible;opacity:0.75;" width="549" height="164" xlink:href="72CE96A9FCAF41C4.png"  transform="matrix(0.24 0 0 0.24 49.8742 64.16)">
-	</image>
-	<g>
-		<text transform="matrix(1 0 0 1 51.0092 90.4508)" class="st1 st4 st5">TENNIS</text>
-	</g>
-</g>
-<g>
-	
-		<image style="overflow:visible;opacity:0.75;" width="564" height="170" xlink:href="72CE96A9FCAF41C5.png"  transform="matrix(0.24 0 0 0.24 50.5942 16.16)">
-	</image>
-	<g>
-		<text transform="matrix(1 0 0 1 51.6933 44.3829)" class="st6 st4 st7">BÅSTAD</text>
-	</g>
-</g>
-<g>
-	
-		<image style="overflow:visible;opacity:0.75;" width="558" height="158" xlink:href="72CE96A9FCAF41C3.png"  transform="matrix(0.24 0 0 0.24 50.5942 115.28)">
-	</image>
-	<g>
-		<text transform="matrix(0.9837 0 0 1 51.6933 140.4015)" class="st6 st4 st8">STEGEN</text>
-	</g>
-</g>
-<g>
-	<polygon class="st1" points="44.4,82.2 44.4,82.6 42.7,82.6 42.7,82.2 	"/>
-</g>
-<g>
-	<polygon class="st1" points="185.2,82.2 185.2,82.6 183.6,82.6 183.6,82.2 	"/>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" fill="none">
+  <!-- Shield background -->
+  <path d="M100 8 L192 48 L192 140 Q192 195 100 222 Q8 195 8 140 L8 48 Z" fill="#8B3522" stroke="white" stroke-width="6"/>
+  <!-- Tennis ball at top -->
+  <circle cx="100" cy="36" r="16" fill="none" stroke="white" stroke-width="3"/>
+  <path d="M86 30 Q100 38 114 30" fill="none" stroke="white" stroke-width="2.5"/>
+  <path d="M86 42 Q100 34 114 42" fill="none" stroke="white" stroke-width="2.5"/>
+  <!-- BÅSTAD text -->
+  <text x="100" y="82" text-anchor="middle" font-family="Georgia, serif" font-size="22" font-weight="bold" letter-spacing="4" fill="white">BÅSTAD</text>
+  <!-- Crossed rackets -->
+  <!-- Left racket (angled right) -->
+  <g transform="translate(100,130) rotate(-35)">
+    <ellipse cx="0" cy="-28" rx="18" ry="24" fill="none" stroke="white" stroke-width="2.5"/>
+    <line x1="0" y1="-52" x2="0" y2="32" stroke="white" stroke-width="3.5"/>
+    <!-- Strings vertical -->
+    <line x1="-12" y1="-46" x2="-12" y2="-10" stroke="white" stroke-width="1"/>
+    <line x1="-6" y1="-51" x2="-6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="6" y1="-51" x2="6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="12" y1="-46" x2="12" y2="-10" stroke="white" stroke-width="1"/>
+    <!-- Strings horizontal -->
+    <line x1="-17" y1="-44" x2="17" y2="-44" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-36" x2="18" y2="-36" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-28" x2="18" y2="-28" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-20" x2="18" y2="-20" stroke="white" stroke-width="1"/>
+    <line x1="-17" y1="-12" x2="17" y2="-12" stroke="white" stroke-width="1"/>
+  </g>
+  <!-- Right racket (angled left) -->
+  <g transform="translate(100,130) rotate(35)">
+    <ellipse cx="0" cy="-28" rx="18" ry="24" fill="none" stroke="white" stroke-width="2.5"/>
+    <line x1="0" y1="-52" x2="0" y2="32" stroke="white" stroke-width="3.5"/>
+    <!-- Strings vertical -->
+    <line x1="-12" y1="-46" x2="-12" y2="-10" stroke="white" stroke-width="1"/>
+    <line x1="-6" y1="-51" x2="-6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="6" y1="-51" x2="6" y2="-7" stroke="white" stroke-width="1"/>
+    <line x1="12" y1="-46" x2="12" y2="-10" stroke="white" stroke-width="1"/>
+    <!-- Strings horizontal -->
+    <line x1="-17" y1="-44" x2="17" y2="-44" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-36" x2="18" y2="-36" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-28" x2="18" y2="-28" stroke="white" stroke-width="1"/>
+    <line x1="-18" y1="-20" x2="18" y2="-20" stroke="white" stroke-width="1"/>
+    <line x1="-17" y1="-12" x2="17" y2="-12" stroke="white" stroke-width="1"/>
+  </g>
+  <!-- T and S -->
+  <text x="52" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="white">T</text>
+  <text x="148" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="white">S</text>
+  <!-- Est. 1929 -->
+  <text x="100" y="198" text-anchor="middle" font-family="Georgia, serif" font-size="13" font-style="italic" fill="white" letter-spacing="1">Est. 1929</text>
 </svg>
