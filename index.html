@@ -92,8 +92,9 @@ nav.scrolled{background:rgba(12,30,14,0.97);border-bottom-color:rgba(193,120,73,
   margin-bottom:36px;animation:fade-up 0.8s 0.2s both;
 }
 .hero-desc{
-  font-size:18px;font-weight:400;color:var(--muted);
-  max-width:460px;margin:0 auto 52px;line-height:1.7;
+  font-size:clamp(15px,3.8vw,18px);font-weight:400;color:var(--muted);
+  max-width:min(460px,88vw);margin:0 auto 52px;line-height:1.7;
+  overflow-wrap:break-word;word-break:break-word;hyphens:auto;
   animation:fade-up 0.8s 0.3s both;
 }
 .hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fade-up 0.8s 0.4s both}
