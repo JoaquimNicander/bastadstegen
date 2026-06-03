@@ -154,6 +154,14 @@ const BTS = {
     return data;
   },
 
+  // Verifiera adminlösenord server-side (exponerar det inte i koden)
+  async adminCheck(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_check', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data === true;
+  },
+
   async adminPublishRound(adminPw, competitionId, round) {
     _assert();
     const { error } = await _sb.rpc('bts_admin_publish_round', {

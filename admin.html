@@ -489,10 +489,15 @@ async function loadState(){
 }
 
 // ── LOGIN ──────────────────────────────────────────────────────
-function doLogin(){
+async function doLogin(){
   const pw=document.getElementById('pw-input').value;
-  if(pw===ADMIN_PASSWORD){
-    adminPw=pw;   // sparas för skyddade serveranrop
+  // Verifiera lösenordet server-side i DB-läge (lösenordet finns ej i koden);
+  // fallback till lokal konstant endast om databasen inte är kopplad.
+  let ok=false;
+  if(window.BTS && BTS.ready()){ try{ ok=await BTS.adminCheck(pw); }catch(e){ ok=false; } }
+  else { ok=(pw===ADMIN_PASSWORD); }
+  if(ok){
+    adminPw=pw;   // sparas i minnet för skyddade serveranrop
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     currentSeason=getActiveSeason();
