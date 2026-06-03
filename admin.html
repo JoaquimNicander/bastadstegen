@@ -471,7 +471,8 @@ async function loadState(){
             posA:m.pos_a,posB:m.pos_b,
             winner:m.winner_id===m.player_a_id?m.pos_a:m.pos_b,
             winnerName:nameById[m.winner_id]||'',
-            sets:m.sets||[],score:m.score||'',wo:!!m.wo
+            sets:m.sets||[],score:m.score||'',wo:!!m.wo,
+            status:m.status
           };
         });
         ADB={idByRoundKey};
@@ -588,7 +589,9 @@ function renderSetInputs(key, saved){
     <div class="match-card-body">
       <span class="saved-score">${saved.wo?'WO':setsToScoreString(saved.sets)}</span>
       <div class="saved-badge" style="margin-left:auto">
-        <span>✓ Sparat</span>
+        ${saved.status==='reported'?'<span style="color:#D4E157">⏳ Väntar på bekräftelse</span>'
+          :saved.status==='disputed'?'<span style="color:#EF5350">⚠️ Bestridd</span>'
+          :'<span style="color:#4CAF50">✓ Bekräftad</span>'}
         <button class="edit-btn" onclick="editMatch('${key}')">Ändra</button>
         <button class="edit-btn" onclick="resetMatch('${key}')">Nollställ</button>
       </div>
@@ -653,12 +656,14 @@ function renderMatchInput(){
   if(saved_count>0){
     let tG=0,tS=0;
     Object.values(results).forEach(r=>{ if(!r.wo&&r.sets){r.sets.forEach(s=>{tG+=s.a+s.b;tS++;})} });
+    const waiting=Object.values(results).filter(r=>r.status==='reported').length;
+    const disputed=Object.values(results).filter(r=>r.status==='disputed').length;
     sumEl.classList.remove('hidden');
     sumEl.innerHTML=`
       <div class="stat-box"><div class="stat-box-val">${saved_count}</div><div class="stat-box-lbl">Sparade</div></div>
       <div class="stat-box"><div class="stat-box-val">${pairs.length}</div><div class="stat-box-lbl">Totalt</div></div>
-      <div class="stat-box"><div class="stat-box-val">${tS}</div><div class="stat-box-lbl">Set spelade</div></div>
-      <div class="stat-box"><div class="stat-box-val">${tG}</div><div class="stat-box-lbl">Games totalt</div></div>`;
+      <div class="stat-box"><div class="stat-box-val" style="color:#D4E157">${waiting}</div><div class="stat-box-lbl">Väntar på bekräftelse</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:${disputed?'#EF5350':'inherit'}">${disputed}</div><div class="stat-box-lbl">Bestridda</div></div>`;
   } else { sumEl.classList.add('hidden'); }
 
   const grid=document.getElementById('match-input-grid');
