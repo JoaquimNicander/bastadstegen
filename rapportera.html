@@ -703,6 +703,8 @@ function renderApp(){
   <div class="section">
     <div class="section-label">Min profil</div>
     <div class="profile-form">
+      <div class="form-row"><label class="form-label">E-post (för notiser, hålls privat)</label><input class="form-input" id="p-email" type="email" value="${prof.email||''}" placeholder="namn@exempel.se"></div>
+      <div class="form-row"><label class="form-label">Profilbild (syns för alla på stegen)</label><input class="form-input" id="p-photo" type="file" accept="image/*" onchange="uploadPhoto(this)"><div id="p-photo-status" class="form-label" style="margin-top:4px"></div></div>
       <div class="form-row"><label class="form-label">Född (åå-mm-dd)</label><input class="form-input" id="p-born" type="date" value="${prof.born||''}"></div>
       <div class="form-row"><label class="form-label">Spelhand</label>
         <select class="form-select" id="p-hand">
@@ -871,7 +873,9 @@ function launchConfetti(){
 
 // ── PROFILE ───────────────────────────────────────────────────
 function saveMyProfile(btn){
+  const email=document.getElementById('p-email')?.value||'';
   saveProfileData(me.name,{
+    email,
     born:document.getElementById('p-born')?.value||'',
     hand:document.getElementById('p-hand')?.value||'',
     hometown:document.getElementById('p-hometown')?.value||'',
@@ -880,7 +884,19 @@ function saveMyProfile(btn){
     since:document.getElementById('p-since')?.value||'',
     bio:document.getElementById('p-bio')?.value||'',
   });
+  // Spara mejlen säkert i databasen (PIN-skyddat) om angiven
+  if(DBC && email.trim() && window.BTS){ BTS.setEmail(me.id, me._pin, email.trim()).catch(e=>console.warn('Kunde inte spara mejl:',e)); }
   if(btn){const t=btn.textContent;btn.textContent='Sparad! ✓';setTimeout(()=>btn.textContent=t,2000);}
+}
+async function uploadPhoto(input){
+  const f=input.files&&input.files[0]; if(!f||!me)return;
+  if(!DBC){ alert('Profilbild kräver databasanslutning.'); return; }
+  const st=document.getElementById('p-photo-status'); if(st)st.textContent='Laddar upp…';
+  try{
+    const url=await BTS.uploadAvatar(me.id,f);
+    await BTS.setPhoto(me.id,me._pin,url);
+    if(st)st.textContent='✓ Bild sparad — syns för alla på stegen.';
+  }catch(e){ if(st)st.textContent='Fel: '+(e.message||e); }
 }
 function savePin(){
   const p=document.getElementById('p-newpin')?.value||'';

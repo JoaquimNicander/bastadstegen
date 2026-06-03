@@ -1045,7 +1045,9 @@ function saveProfileData(name, data){
 }
 
 // ── PHOTO STORAGE ──────────────────────────────────────────────────
+let dbPhotos={};
 function getPhoto(name){
+  if(dbPhotos[name]) return dbPhotos[name];
   try{ return localStorage.getItem('bts_photo_'+name)||null }catch(e){return null}
 }
 function savePhoto(name,dataUrl){
@@ -1605,6 +1607,8 @@ async function reloadLadderFromDB(){
 
     // id → namn för alla spelare (inkl. ev. avhoppade)
     const nameById = {}; allPlayers.forEach(p => nameById[p.id] = p.name);
+    // profilbilder från databasen (delas mellan alla)
+    dbPhotos = {}; allPlayers.forEach(p => { if(p.photo_url) dbPhotos[p.name] = p.photo_url; });
 
     // Behåll movement (prev) och "me"-flaggan från fallback, matchat på namn
     const prevByName = {}; players.forEach(p => prevByName[p.name] = p.prev);

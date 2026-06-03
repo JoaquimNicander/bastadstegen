@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS Sommarstege 2026</title>
+<style>
+  :root{
+    --bg:#0C1409; --surface:#0F1A0C; --card:#13200F; --card2:#182810;
+    --border:#1e2a1a; --border2:#2a3a22; --cream:#EDEAE0; --white:#fff;
+    --muted:#9aa78c; --muted2:#6f7766; --green:#4CAF50; --clay:#C17849;
+    --yellow:#D4E157; --down:#EF5350; --sun:#F4B740;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  .topbar{display:flex;justify-content:flex-end;padding:12px 18px}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 32px;background:linear-gradient(165deg,#E9A864 0%,#C17849 42%,#6b5230 70%,var(--bg) 100%)}
+  .hero .sun{position:absolute;top:-46px;right:-22px;width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,#FFE9A8 0%,#F4B740 56%,rgba(244,183,64,0) 72%)}
+  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;margin:0;color:#fff;position:relative}
+  .hero .tag{position:relative;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#2a1c0e;margin-top:8px}
+  .wrap{max-width:680px;margin:0 auto;padding:20px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
+  .tab{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent}
+  .tab.active{color:var(--cream);border-color:var(--clay)}
+  .ev{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:12px}
+  .ev-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--sun)}
+  .ev-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin:2px 0 10px}
+  .row{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card2)}
+  .rank{font-family:'Space Mono',monospace;color:var(--clay);width:26px;font-weight:700;text-align:center}
+  .nm{flex:1;font-weight:500}
+  .meta{color:var(--muted2);font-size:12px;font-family:'Space Mono',monospace}
+  .vs{display:flex;align-items:center;gap:10px}
+  .vs .side{flex:1}.vs .side.b{text-align:right}
+  .vs .x{color:var(--muted2);font-family:'Space Mono',monospace;font-size:11px}
+  .winner{color:var(--green);font-weight:700}
+  .court{text-align:center;color:var(--sun);font-size:12px;font-family:'Space Mono',monospace;margin-bottom:8px}
+  .btn{background:var(--clay);color:#0C0A06;border:none;font-weight:700;padding:12px 16px;border-radius:8px;cursor:pointer;font-size:14px;width:100%;margin-top:6px}
+  .btn.alt{background:var(--card2);color:var(--cream);border:1px solid var(--border2)}
+  .btn.green{background:var(--green);color:#063}
+  .btn.sm{width:auto;margin:0;padding:8px 12px;font-size:13px}
+  .panel{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:18px;margin-bottom:16px}
+  .label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  input,select{width:100%;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--white);font-size:15px;margin-bottom:8px}
+  .muted{color:var(--muted2);font-size:13px;line-height:1.6}
+  .pill{font-size:10px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:100px;border:1px solid var(--border2);color:var(--muted)}
+  .pill.drawn{color:var(--green);border-color:rgba(76,175,80,.4)}
+  .hidden{display:none}
+  .admin-toggle{font-size:11px;color:var(--muted2);text-align:center;margin-top:30px;cursor:pointer}
+  .err{color:var(--down);font-size:13px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="stegen.html">Ordinarie stege →</a></div>
+<div class="hero">
+  <div class="sun"></div>
+  <h1>SOMMARSTEGE 2026</h1>
+  <div class="tag">🎾 Spel på söndagar · drop-in · Båstad TS</div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="anmalan" onclick="showTab('anmalan',this)">Anmälan</button>
+    <button class="tab" data-tab="matcher" onclick="showTab('matcher',this)">Matcher</button>
+    <button class="tab" data-tab="stallning" onclick="showTab('stallning',this)">Ställning</button>
+  </div>
+
+  <div id="view-anmalan"></div>
+  <div id="view-matcher" class="hidden"></div>
+  <div id="view-stallning" class="hidden"></div>
+
+  <div class="admin-toggle" onclick="document.getElementById('admin-panel').classList.toggle('hidden')">⚙︎ Admin</div>
+  <div id="admin-panel" class="panel hidden" style="margin-top:12px">
+    <div class="label">Admin</div>
+    <input type="password" id="admin-pw" placeholder="Adminlösenord">
+
+    <div class="label" style="margin-top:14px">Skapa speldag</div>
+    <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
+    <input type="date" id="ev-date">
+    <input type="text" id="ev-courts" placeholder="Banor, t.ex. 1, 2, 3" value="1, 2, 3">
+    <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
+    <button class="btn alt" onclick="createEvent()">Skapa / uppdatera speldag</button>
+    <div id="ev-msg" class="muted" style="margin-top:8px"></div>
+
+    <div class="label" style="margin-top:20px">Speldagar</div>
+    <div id="admin-events"></div>
+
+    <div class="label" style="margin-top:20px">Lägg till spelare</div>
+    <input type="text" id="np-name" placeholder="Namn">
+    <input type="text" id="np-phone" placeholder="Telefon (PIN = 4 sista)">
+    <input type="text" id="np-email" placeholder="E-post (valfritt)">
+    <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
+    <div id="np-msg" class="muted" style="margin-top:8px"></div>
+
+    <div class="label" style="margin-top:20px">Väntande intresseanmälningar</div>
+    <button class="btn alt" onclick="loadJoins()">Visa ansökningar</button>
+    <div id="joins-list" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const COMP='ST2026';
+let me=null, players=[], ladder=[], events=[], signupsAll=[], matches=[], tab='anmalan';
+
+function nameById(id){ const p=players.find(x=>x.id===id); return p?p.name:'#'+id; }
+function posById(id){ const l=ladder.find(x=>x.player_id===id); return l?l.position:'—'; }
+function fmtDate(s){ return new Date(s+'T00:00:00').toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'}); }
+function signupsFor(d){ return signupsAll.filter(s=>s.play_date===d); }
+function matchesFor(d){ return matches.filter(m=>m.play_date===d); }
+function iAmSignedUp(d){ return me && signupsAll.some(s=>s.play_date===d && s.player_id===me.id); }
+
+async function load(){
+  if(!window.BTS||!BTS.ready()){ document.getElementById('view-anmalan').innerHTML='<div class="muted">Databasen ej konfigurerad.</div>'; return; }
+  try{
+    [players, ladder, events, signupsAll, matches] = await Promise.all([
+      BTS.getPlayers(), BTS.getLadder(COMP), BTS.getEvents(COMP), BTS.getAllSignups(COMP), BTS.getMatches(COMP)
+    ]);
+  }catch(e){ console.warn(e); }
+  render();
+}
+function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderAdminEvents(); }
+
+// ── ANMÄLAN ──
+function renderAnmalan(){
+  const el=document.getElementById('view-anmalan');
+  let html='';
+  if(!me){
+    html+=`<div class="panel"><div class="label">Logga in för att anmäla dig</div>
+      <select id="login-name"><option value="">Välj namn…</option>${players.filter(p=>p.active!==false).map(p=>`<option>${p.name}</option>`).join('')}</select>
+      <input type="password" id="login-pin" placeholder="PIN (4 siffror)">
+      <button class="btn" onclick="login()">Logga in</button>
+      <div id="login-err" class="err hidden"></div></div>`;
+  } else {
+    html+=`<div class="muted" style="margin-bottom:14px">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
+  }
+
+  const upcoming=events.filter(e=>e.status!=='drawn');
+  if(!upcoming.length){ html+='<div class="muted">Inga kommande speldagar upplagda än.</div>'; }
+  else html+=upcoming.map(e=>{
+    const su=signupsFor(e.play_date);
+    const mine=iAmSignedUp(e.play_date);
+    return `<div class="ev">
+      <div class="ev-name">${e.name}</div>
+      <div class="ev-meta">${fmtDate(e.play_date)}${e.start_time?` · kl ${e.start_time}`:''} · banor ${e.courts}</div>
+      ${me?(mine
+        ? `<button class="btn alt" onclick="toggleSignup('${e.play_date}',false)">✓ Du är anmäld — avanmäl</button>`
+        : `<button class="btn green" onclick="toggleSignup('${e.play_date}',true)">Anmäl mig</button>`):''}
+      <div class="label" style="margin:14px 0 8px">Anmälda (${su.length})</div>
+      ${su.length?su.map((s,i)=>`<div class="row"><div class="rank">${i+1}</div><div class="nm">${s.player?s.player.name:nameById(s.player_id)}</div><div class="meta">#${posById(s.player_id)}</div></div>`).join(''):'<div class="muted">Inga anmälda än.</div>'}
+    </div>`;
+  }).join('');
+
+  html+=`<div class="panel" style="margin-top:18px"><div class="label">Inte med än? Anmäl intresse</div>
+    <div class="muted" style="margin-bottom:8px">Har du inte spelat i stegen förut men vill vara med? Skicka en intresseanmälan så godkänner admin dig.</div>
+    <input id="join-name" placeholder="Namn"><input id="join-phone" placeholder="Telefon (blir din PIN: 4 sista)"><input id="join-email" placeholder="E-post (för notiser)">
+    <button class="btn alt" onclick="requestJoin()">Skicka intresseanmälan</button>
+    <div id="join-msg" class="muted" style="margin-top:8px"></div></div>`;
+  el.innerHTML=html;
+}
+
+// ── MATCHER ──
+function renderMatcher(){
+  const el=document.getElementById('view-matcher');
+  const drawn=events.filter(e=>matchesFor(e.play_date).length);
+  if(!drawn.length){ el.innerHTML='<div class="muted">Inga matcher lottade än. Admin lottar en speldag när anmälan stängt.</div>'; return; }
+  el.innerHTML=drawn.map(e=>{
+    const ms=matchesFor(e.play_date);
+    return `<div style="margin-bottom:22px"><div class="ev-name">${e.name}</div><div class="ev-meta">${fmtDate(e.play_date)}</div>`
+    + ms.map(m=>{
+      const aWin=m.winner_id===m.player_a_id, bWin=m.winner_id===m.player_b_id;
+      const canReport=me&&(m.player_a_id===me.id||m.player_b_id===me.id)&&!m.winner_id;
+      return `<div class="ev" style="padding:14px 16px">
+        ${(m.court||m.start_time)?`<div class="court">${m.court?`Bana ${m.court}`:''}${m.court&&m.start_time?' · ':''}${m.start_time?`kl ${m.start_time}`:''}</div>`:''}
+        <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
+        ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · ${m.status==='confirmed'?'bekräftad':'rapporterad'}</div>`:''}
+        ${canReport?`<div style="margin-top:10px">
+          <select id="win-${m.id}"><option value="">Vinnare…</option><option value="${m.player_a_id}">${nameById(m.player_a_id)}</option><option value="${m.player_b_id}">${nameById(m.player_b_id)}</option></select>
+          <input id="sc-${m.id}" placeholder="Resultat, t.ex. 6-4 6-3 (valfritt)">
+          <button class="btn" onclick="reportDropin('${m.id}')">Rapportera</button></div>`:''}
+      </div>`;
+    }).join('')+`</div>`;
+  }).join('');
+}
+
+// ── STÄLLNING ──
+function renderStallning(){
+  const el=document.getElementById('view-stallning');
+  const wl={};
+  matches.forEach(m=>{ if(!m.winner_id)return; const lo=m.winner_id===m.player_a_id?m.player_b_id:m.player_a_id;
+    wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0}; wl[m.winner_id].w++; wl[lo]=wl[lo]||{w:0,l:0}; wl[lo].l++; });
+  el.innerHTML=`<div class="label">Sommarställning (seedad från ordinarie ranking)</div>`+
+    ladder.map(l=>{ const s=wl[l.player_id]||{w:0,l:0}; return `<div class="row"><div class="rank">${l.position}</div><div class="nm">${l.player?l.player.name:nameById(l.player_id)}</div><div class="meta">${s.w}V – ${s.l}F</div></div>`;}).join('');
+}
+
+// ── ADMIN: speldagslista ──
+function renderAdminEvents(){
+  const box=document.getElementById('admin-events'); if(!box)return;
+  if(!events.length){ box.innerHTML='<div class="muted">Inga speldagar än.</div>'; return; }
+  box.innerHTML=events.map(e=>{
+    const cnt=signupsFor(e.play_date).length;
+    return `<div class="row" style="flex-wrap:wrap">
+      <div class="nm">${e.name}<div class="meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts} · ${cnt} anmälda ${e.status==='drawn'?'<span class="pill drawn">lottad</span>':''}</div></div>
+      ${e.status!=='drawn'?`<button class="btn sm" onclick="drawEvent('${e.play_date}')">Lotta</button>`:''}
+      <button class="btn sm alt" onclick="deleteEvent('${e.id}')">Ta bort</button>
+    </div>`;
+  }).join('');
+}
+
+// ── ACTIONS ──
+async function login(){
+  const name=document.getElementById('login-name').value, pin=document.getElementById('login-pin').value, err=document.getElementById('login-err');
+  const p=players.find(x=>x.name===name);
+  if(!p){ err.textContent='Välj ditt namn.'; err.classList.remove('hidden'); return; }
+  try{ if(await BTS.verifyPin(p.id,pin)){ me=p; me._pin=pin; renderAnmalan(); renderMatcher(); }
+    else { err.textContent='Fel PIN (4 sista i telefonnumret).'; err.classList.remove('hidden'); } }
+  catch(e){ err.textContent='Fel: '+(e.message||e); err.classList.remove('hidden'); }
+}
+function logout(){ me=null; render(); }
+async function toggleSignup(date,on){
+  try{ if(on) await BTS.addSignup(COMP,date,me.id,me._pin); else await BTS.removeSignup(COMP,date,me.id,me._pin); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function reportDropin(id){
+  const winnerId=parseInt(document.getElementById('win-'+id).value)||null, score=document.getElementById('sc-'+id).value;
+  if(!winnerId){ alert('Välj vinnare'); return; }
+  try{ await BTS.reportResult(id,{playerId:me.id,pin:me._pin,winnerId,sets:[],wo:false,score}); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function requestJoin(){
+  const name=document.getElementById('join-name').value.trim(), phone=document.getElementById('join-phone').value.trim(), email=document.getElementById('join-email').value.trim(), msg=document.getElementById('join-msg');
+  if(!name){ msg.textContent='Ange ditt namn.'; return; }
+  try{ await BTS.requestJoin(COMP,name,phone,email); msg.textContent='Tack! Din intresseanmälan är skickad — admin godkänner den.';
+    document.getElementById('join-name').value='';document.getElementById('join-phone').value='';document.getElementById('join-email').value=''; }
+  catch(e){ msg.textContent='Fel: '+(e.message||e); }
+}
+async function createEvent(){
+  const pw=document.getElementById('admin-pw').value, name=document.getElementById('ev-name').value.trim(),
+    date=document.getElementById('ev-date').value, courts=document.getElementById('ev-courts').value.trim(),
+    time=document.getElementById('ev-time').value.trim(), msg=document.getElementById('ev-msg');
+  if(!name||!date||!courts){ msg.textContent='Fyll i namn, datum och banor.'; return; }
+  try{ await BTS.adminCreateEvent(pw,{competitionId:COMP,playDate:date,name,courts,startTime:time});
+    msg.textContent=`Speldag "${name}" sparad.`; document.getElementById('ev-name').value=''; await load(); }
+  catch(e){ msg.textContent='Fel: '+(e.message||e); }
+}
+async function drawEvent(date){
+  const pw=document.getElementById('admin-pw').value;
+  if(!confirm('Lotta matcher för denna speldag? Tidigare lottning för dagen ersätts.')) return;
+  try{ const n=await BTS.adminDrawWeek(pw,COMP,date); alert(`Lottning klar — ${n} matcher skapade.`); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function deleteEvent(id){
+  const pw=document.getElementById('admin-pw').value;
+  if(!confirm('Ta bort speldagen?')) return;
+  try{ await BTS.adminDeleteEvent(pw,id); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function addPlayer(){
+  const pw=document.getElementById('admin-pw').value, name=document.getElementById('np-name').value.trim(),
+    phone=document.getElementById('np-phone').value.trim(), email=document.getElementById('np-email').value.trim(), msg=document.getElementById('np-msg');
+  if(!name){ msg.textContent='Ange namn.'; return; }
+  try{ await BTS.adminAddPlayer(pw,{name,phone,email,competitionId:COMP});
+    msg.textContent=`${name} tillagd. PIN: ${phone.replace(/\D/g,'').slice(-4)||'(sätt telefon)'}`;
+    document.getElementById('np-name').value='';document.getElementById('np-phone').value='';document.getElementById('np-email').value=''; await load(); }
+  catch(e){ msg.textContent='Fel: '+(e.message||e); }
+}
+async function loadJoins(){
+  const pw=document.getElementById('admin-pw').value, box=document.getElementById('joins-list');
+  try{ const list=await BTS.adminListJoins(pw,COMP);
+    box.innerHTML=list.length?list.map(j=>`<div class="row" style="flex-wrap:wrap"><div class="nm">${j.name}<div class="meta">${j.phone||'(ingen tel)'} · ${j.email||'(ingen mejl)'}</div></div>
+      <button class="btn sm green" onclick="approveJoin('${j.id}')">Godkänn</button>
+      <button class="btn sm alt" onclick="rejectJoin('${j.id}')">Avslå</button></div>`).join(''):'<div class="muted">Inga väntande ansökningar.</div>'; }
+  catch(e){ box.innerHTML='<div class="err">Fel: '+(e.message||e)+'</div>'; }
+}
+async function approveJoin(id){ const pw=document.getElementById('admin-pw').value; try{ await BTS.adminApproveJoin(pw,id); await load(); loadJoins(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+async function rejectJoin(id){ const pw=document.getElementById('admin-pw').value; try{ await BTS.adminRejectJoin(pw,id); loadJoins(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+
+function showTab(name,el){
+  tab=name;
+  ['anmalan','matcher','stallning'].forEach(t=>document.getElementById('view-'+t).classList.toggle('hidden',t!==name));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+}
+
+load();
+setInterval(()=>{ if(window.BTS&&BTS.ready()) load(); }, 60000);
+</script>
+</body>
+</html>

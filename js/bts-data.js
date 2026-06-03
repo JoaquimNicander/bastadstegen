@@ -38,6 +38,23 @@ const BTS = {
     return data;
   },
 
+  // Ladda upp profilbild till Storage och returnera publik url
+  async uploadAvatar(playerId, file) {
+    _assert();
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `player-${playerId}-${Date.now()}.${ext}`;
+    const { error } = await _sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    return _sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  },
+
+  // Spara bild-url på spelaren (PIN-skyddat)
+  async setPhoto(playerId, pin, url) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_photo', { p_player_id: playerId, p_pin: pin, p_url: url });
+    if (error) throw error;
+  },
+
   // Verifiera spelarens PIN (server-side, exponerar inte koden)
   async verifyPin(playerId, pin) {
     _assert();
@@ -77,7 +94,7 @@ const BTS = {
     _assert();
     const { data, error } = await _sb
       .from('ladder_positions')
-      .select('position, player_id, player:players(id,name,phone,born,photo_url,is_admin,active)')
+      .select('position, player_id, player:players(id,name,phone,born,photo_url,is_admin,active)')  /* photo_url för avatarer */
       .eq('competition_id', competitionId)
       .order('position');
     if (error) throw error;
@@ -198,20 +215,99 @@ const BTS = {
     return data;
   },
 
-  async addSignup(competitionId, playDate, playerId) {
+  // Anmäl dig (PIN-skyddat)
+  async addSignup(competitionId, playDate, playerId, pin) {
     _assert();
-    const { data, error } = await _sb.from('dropin_signups')
-      .insert({ competition_id: competitionId, play_date: playDate, player_id: playerId })
-      .select().single();
+    const { error } = await _sb.rpc('bts_signup', {
+      p_player_id: playerId, p_pin: pin, p_comp: competitionId, p_play_date: playDate });
+    if (error) throw error;
+  },
+
+  // Avanmäl dig (PIN-skyddat)
+  async removeSignup(competitionId, playDate, playerId, pin) {
+    _assert();
+    const { error } = await _sb.rpc('bts_unsignup', {
+      p_player_id: playerId, p_pin: pin, p_comp: competitionId, p_play_date: playDate });
+    if (error) throw error;
+  },
+
+  // Spelare sparar sin mejladress (PIN-skyddat)
+  async setEmail(playerId, pin, email) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_email', { p_player_id: playerId, p_pin: pin, p_email: email || '' });
+    if (error) throw error;
+  },
+
+  // Intresseanmälan (vem som helst) — skapar en förfrågan admin får godkänna
+  async requestJoin(competitionId, name, phone, email) {
+    _assert();
+    const { error } = await _sb.rpc('bts_request_join', { p_comp: competitionId, p_name: name, p_phone: phone || '', p_email: email || '' });
+    if (error) throw error;
+  },
+  async adminListJoins(adminPw, competitionId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_list_joins', { p_admin_pw: adminPw, p_comp: competitionId });
+    if (error) throw error;
+    return data || [];
+  },
+  async adminApproveJoin(adminPw, requestId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_approve_join', { p_admin_pw: adminPw, p_request_id: requestId });
+    if (error) throw error;
+    return data;
+  },
+  async adminRejectJoin(adminPw, requestId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_reject_join', { p_admin_pw: adminPw, p_request_id: requestId });
+    if (error) throw error;
+  },
+
+  // Admin lägger till ny spelare (placeras sist i tävlingens stege)
+  async adminAddPlayer(adminPw, { name, phone, email, competitionId }) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_add_player', {
+      p_admin_pw: adminPw, p_name: name, p_phone: phone || '', p_email: email || '', p_comp: competitionId });
     if (error) throw error;
     return data;
   },
 
-  async removeSignup(competitionId, playDate, playerId) {
+  // ── SPELDAGAR (event) ─────────────────────────────────────────────
+  async getEvents(competitionId) {
     _assert();
-    const { error } = await _sb.from('dropin_signups').delete()
-      .eq('competition_id', competitionId).eq('play_date', playDate).eq('player_id', playerId);
+    const { data, error } = await _sb.from('dropin_events')
+      .select('*').eq('competition_id', competitionId).order('play_date');
     if (error) throw error;
+    return data || [];
+  },
+  // Alla anmälningar för tävlingen (gruppera per speldag i klienten)
+  async getAllSignups(competitionId) {
+    _assert();
+    const { data, error } = await _sb.from('dropin_signups')
+      .select('player_id, play_date, created_at, player:players(id,name,phone)')
+      .eq('competition_id', competitionId);
+    if (error) throw error;
+    return data || [];
+  },
+  async adminCreateEvent(adminPw, { competitionId, playDate, name, courts, startTime }) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_create_event', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate,
+      p_name: name, p_courts: courts, p_start_time: startTime || '' });
+    if (error) throw error;
+    return data;
+  },
+  async adminDeleteEvent(adminPw, eventId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_delete_event', { p_admin_pw: adminPw, p_event_id: eventId });
+    if (error) throw error;
+  },
+  // Lotta en speldag (banor/tid hämtas från eventet). Returnerar antal matcher.
+  async adminDrawWeek(adminPw, competitionId, playDate) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_draw_week', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate });
+    if (error) throw error;
+    return data;
   },
 
   // ── ADMIN: publicera omgång (flyttar stegen) ──────────────────────────
