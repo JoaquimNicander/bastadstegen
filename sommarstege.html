@@ -16,7 +16,10 @@
   .topbar{display:flex;justify-content:flex-end;padding:12px 18px}
   .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
   .hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 32px;background:linear-gradient(165deg,#E9A864 0%,#C17849 42%,#6b5230 70%,var(--bg) 100%)}
-  .hero .sun{position:absolute;top:-46px;right:-22px;width:148px;height:148px;border-radius:50%;background:radial-gradient(circle,#FFE9A8 0%,#F4B740 56%,rgba(244,183,64,0) 72%)}
+  .hero .sun{position:absolute;top:-34px;right:-20px;width:150px;height:150px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 36% 30%,#f4fa84 0%,#dcec55 45%,#c0d23a 74%,#9fb22d 100%);box-shadow:0 0 42px 14px rgba(212,225,87,.42),inset -13px -15px 32px rgba(58,68,16,.5),inset 9px 9px 22px rgba(255,255,255,.42)}
+  .hero .sun::before,.hero .sun::after{content:'';position:absolute;left:50%;width:150px;height:150px;border-radius:50%;border:11px solid #fcfdf2;box-sizing:border-box;transform:translateX(-50%)}
+  .hero .sun::before{top:-80px}
+  .hero .sun::after{bottom:-80px}
   .hero h1{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;margin:0;color:#fff;position:relative}
   .hero .tag{position:relative;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#2a1c0e;margin-top:8px}
   .wrap{max-width:680px;margin:0 auto;padding:20px}

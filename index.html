@@ -214,6 +214,14 @@ nav.scrolled{background:rgba(12,30,14,0.97);border-bottom-color:rgba(193,120,73,
   .how-nav{padding:16px 20px}
 }
 
+/* ─── TENNISBOLL-SOL (delad) ─────────────────────────────────── */
+.tennisboll{position:absolute;top:-46px;right:-30px;width:172px;height:172px;border-radius:50%;overflow:hidden;z-index:0;
+  background:radial-gradient(circle at 36% 30%,#f4fa84 0%,#dcec55 45%,#c0d23a 74%,#9fb22d 100%);
+  box-shadow:0 0 46px 16px rgba(212,225,87,.40),inset -15px -17px 36px rgba(58,68,16,.5),inset 10px 10px 24px rgba(255,255,255,.42)}
+.tennisboll::before,.tennisboll::after{content:'';position:absolute;left:50%;width:172px;height:172px;border-radius:50%;border:12px solid #fcfdf2;box-sizing:border-box;transform:translateX(-50%)}
+.tennisboll::before{top:-92px}
+.tennisboll::after{bottom:-92px}
+
 /* ─── SOMMARSTEGEN ───────────────────────────────────────────── */
 .summer-section{
   background:linear-gradient(135deg,#0A1508 0%,#0C1E0E 100%);
@@ -453,12 +461,13 @@ footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px
 </div>
 
 <!-- ─── SOMMARSTEGE-CTA ───────────────────────────────────────── -->
-<section style="background:linear-gradient(135deg,#13200f,#1e3318);padding:52px 20px;text-align:center;border-top:1px solid #1e2a1a;border-bottom:1px solid #1e2a1a;">
-  <div style="max-width:640px;margin:0 auto;">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#C17849;margin-bottom:10px;">Nyhet · spel söndagar från 21 juni</div>
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#EDEAE0;margin:0 0 12px;letter-spacing:1px;">Sommarstegen 2026</h2>
-    <p style="color:#9aa78c;font-size:16px;line-height:1.65;margin:0 0 26px;">Spontan drop-in-stege på söndagar — anmäl dig vecka för vecka, vi lottar matcherna. Inte med förut? Skicka en intresseanmälan så godkänner vi dig.</p>
-    <a href="sommarstege.html" style="display:inline-block;background:#C17849;color:#0C0A06;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px 34px;border-radius:8px;text-decoration:none;">Anmäl dig till sommarstegen →</a>
+<section style="position:relative;overflow:hidden;background:linear-gradient(165deg,#E9A864 0%,#C17849 42%,#6b5230 70%,#0C1409 100%);padding:56px 20px;text-align:center;border-top:1px solid #1e2a1a;border-bottom:1px solid #1e2a1a;">
+  <div class="tennisboll"></div>
+  <div style="position:relative;z-index:1;max-width:640px;margin:0 auto;">
+    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2a1c0e;margin-bottom:10px;">Nyhet · spel söndagar från 21 juni</div>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fff;margin:0 0 12px;letter-spacing:1px;">Sommarstegen 2026</h2>
+    <p style="color:#3a2c1a;font-size:16px;line-height:1.65;margin:0 0 26px;">Spontan drop-in-stege på söndagar — anmäl dig vecka för vecka, vi lottar matcherna. Inte med förut? Skicka en intresseanmälan så godkänner vi dig.</p>
+    <a href="sommarstege.html" style="display:inline-block;background:#0C1409;color:#EDEAE0;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px 34px;border-radius:8px;text-decoration:none;">Anmäl dig till sommarstegen →</a>
   </div>
 </section>
 
