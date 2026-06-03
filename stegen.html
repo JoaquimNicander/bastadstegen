@@ -645,10 +645,15 @@ header{
 
 <footer class="site-footer">© 2026 Båstad Tennissällskap — Stegen VT 2026</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
 <script>
 // ── PLAYER DATA ────────────────────────────────────────────────────
+// Nedanstående hårdkodade data används som FALLBACK om databasen inte
+// svarar. Vid normal drift skrivs players/allRounds över av databasen
+// längst ner (se "DATABAS-BOOTSTRAP").
 // ── WEEK 18 LADDER (aktuell stege, sista omgången) ────────────
-const players = [
+let players = [
   {id:1,  name:"Philip Pahlett",     rank:1,  prev:2,  phone:"0735223809"},
   {id:2,  name:"Johan Ludvigsson",   rank:2,  prev:4,  phone:"0705874471"},
   {id:3,  name:"Andreas Almroth",    rank:3,  prev:1,  phone:"0768231313"},
@@ -696,8 +701,8 @@ function computeWinsLosses(){
   });
 }
 
-// ── ALL ROUNDS VT 2026 ─────────────────────────────────────────
-const allRounds = {
+// ── ALL ROUNDS VT 2026 (fallback — skrivs över av databasen) ────
+let allRounds = {
   1: [
     {a:"Håkan Bergman",b:"Stefan Munge",rankA:1,rankB:2,winner:"Stefan Munge",score:"WO",wo:true},
     {a:"John Andersson",b:"Philip Pahlett",rankA:3,rankB:4,winner:"John Andersson",score:"6-7 6-4 10-7",wo:false},
@@ -1576,13 +1581,79 @@ function showTab(name, el){
   });
 }
 
-// ── INIT ───────────────────────────────────────────────────────────
+// ── INIT (renderar direkt med fallback-data) ────────────────────────
 loadPlayerStats();
 computeWinsLosses();
 renderSeasonSelector();
 renderLadder();
 renderMatches();
 renderPlayers();
+
+// ── DATABAS-BOOTSTRAP ───────────────────────────────────────────────
+// Hämtar live-data från Supabase och bygger om players/allRounds, sen
+// renderar om. Om databasen inte svarar behålls fallback-datan ovan.
+async function reloadLadderFromDB(){
+  try {
+    if(!window.BTS || !BTS.ready()) return;        // ej konfigurerad → behåll fallback
+    const comp = currentSeason || 'VT2026';
+    const [allPlayers, ladderRows, matchRows] = await Promise.all([
+      BTS.getPlayers(),
+      BTS.getLadder(comp),
+      BTS.getMatches(comp),
+    ]);
+    if(!ladderRows || !ladderRows.length) return;  // tom databas → behåll fallback
+
+    // id → namn för alla spelare (inkl. ev. avhoppade)
+    const nameById = {}; allPlayers.forEach(p => nameById[p.id] = p.name);
+
+    // Behåll movement (prev) och "me"-flaggan från fallback, matchat på namn
+    const prevByName = {}; players.forEach(p => prevByName[p.name] = p.prev);
+
+    // Bygg players ur stegen
+    players = ladderRows.map(l => {
+      const name = l.player ? l.player.name : (nameById[l.player_id] || '#'+l.player_id);
+      return {
+        id: l.player_id,
+        name,
+        rank: l.position,
+        prev: (prevByName[name] != null ? prevByName[name] : l.position),
+        phone: l.player ? (l.player.phone || '') : '',
+        me: name === 'Joaquim Nicander',
+      };
+    });
+
+    // Bygg allRounds ur matcherna (samma form som fallback)
+    const grouped = {};
+    matchRows.forEach(m => {
+      (grouped[m.round] = grouped[m.round] || []).push({
+        a: nameById[m.player_a_id] || '',
+        b: nameById[m.player_b_id] || '',
+        rankA: m.pos_a, rankB: m.pos_b,
+        winner: m.winner_id ? (nameById[m.winner_id] || null) : null,
+        score: m.score || null,
+        wo: !!m.wo,
+      });
+    });
+    allRounds = grouped;
+
+    // Sätt aktuell omgång till den senaste som finns
+    const roundNums = Object.keys(allRounds).map(Number);
+    if(roundNums.length) currentRound = Math.max(...roundNums);
+
+    // Rendera om med färsk data
+    loadPlayerStats();
+    computeWinsLosses();
+    renderSeasonSelector();
+    renderLadder();
+    renderMatches();
+    renderPlayers();
+  } catch(e){
+    console.warn('Kunde inte läsa från databasen, använder fallback-data:', e);
+  }
+}
+reloadLadderFromDB();
+// Live: uppdatera stegen automatiskt en gång per minut så nya resultat syns
+setInterval(()=>{ if(window.BTS && BTS.ready()) reloadLadderFromDB(); }, 60000);
 
 // Splash screen
 (function(){

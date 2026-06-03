@@ -387,6 +387,8 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────
 const ADMIN_PASSWORD = 'bts2026';
@@ -413,8 +415,8 @@ function getActiveSeason(){
 }
 function setActiveSeason(id){ localStorage.setItem('bts_active_season',id); }
 
-// ── BASE PLAYERS ───────────────────────────────────────────────
-const basePlayers = [
+// ── BASE PLAYERS (fallback — skrivs över av databasen vid login) ─
+let basePlayers = [
   {id:1, name:"John Andersson"},{id:2, name:"Andreas Almroth"},{id:3, name:"Philip Pahlett"},
   {id:4, name:"Johan Olmarker"},{id:5, name:"Andreas Gustafson"},{id:6, name:"Johan Ludvigsson"},
   {id:7, name:"Mats Johansson"},{id:8, name:"Håkan Bergman"},{id:9, name:"Mats Ljungström"},
@@ -435,13 +437,49 @@ let roundResults = {};
 let woState = {};
 
 // ── SEASON-AWARE STORAGE ───────────────────────────────────────
+let ADB=null;       // databas-cache (null = fallback till localStorage)
+let adminPw='';     // adminlösenord (för skyddade serveranrop)
 function sk(key){ return key+'_'+currentSeason; }
 function saveState(){
+  if(ADB) return; // databasen är källan; spara inte till localStorage i DB-läge
   localStorage.setItem(sk('bts_ladder'), JSON.stringify(ladder));
   localStorage.setItem(sk('bts_results'), JSON.stringify(roundResults));
   localStorage.setItem(sk('bts_round'), currentRound);
 }
-function loadState(){
+// Match-id för en viss omgång+key (för att uppdatera rätt rad i DB)
+function matchIdFor(round,key){ return ADB?.idByRoundKey?.[round+'|'+key] || null; }
+
+async function loadState(){
+  // Försök läsa live från databasen
+  try{
+    if(window.BTS && BTS.ready()){
+      const [allPlayers,ladderRows,matchRows]=await Promise.all([
+        BTS.getPlayers(),BTS.getLadder(currentSeason),BTS.getMatches(currentSeason)
+      ]);
+      if(allPlayers.length && ladderRows.length){
+        basePlayers = allPlayers.map(p=>({id:p.id,name:p.name}));
+        const nameById={}; allPlayers.forEach(p=>nameById[p.id]=p.name);
+        ladder = ladderRows.slice().sort((a,b)=>a.position-b.position).map(l=>l.player_id);
+        currentRound = matchRows.length?Math.max(...matchRows.map(m=>m.round)):1;
+        roundResults={}; const idByRoundKey={};
+        matchRows.forEach(m=>{
+          const key=`${m.pos_a}v${m.pos_b}`;
+          idByRoundKey[m.round+'|'+key]=m.id;
+          if(!m.winner_id)return; // bara faktiska resultat i roundResults
+          (roundResults[m.round]=roundResults[m.round]||{})[key]={
+            posA:m.pos_a,posB:m.pos_b,
+            winner:m.winner_id===m.player_a_id?m.pos_a:m.pos_b,
+            winnerName:nameById[m.winner_id]||'',
+            sets:m.sets||[],score:m.score||'',wo:!!m.wo
+          };
+        });
+        ADB={idByRoundKey};
+        return;
+      }
+    }
+  }catch(e){ console.warn('Admin: DB ej tillgänglig, fallback till localStorage:',e); }
+  // Fallback: localStorage
+  ADB=null;
   const l=localStorage.getItem(sk('bts_ladder'));
   const r=localStorage.getItem(sk('bts_results'));
   const rnd=localStorage.getItem(sk('bts_round'));
@@ -454,12 +492,11 @@ function loadState(){
 function doLogin(){
   const pw=document.getElementById('pw-input').value;
   if(pw===ADMIN_PASSWORD){
+    adminPw=pw;   // sparas för skyddade serveranrop
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     currentSeason=getActiveSeason();
-    loadState();
-    renderSeasonBar();
-    renderAll();
+    loadState().then(()=>{ renderSeasonBar(); renderAll(); });
   } else {
     document.getElementById('login-error').classList.remove('hidden');
     document.getElementById('pw-input').value='';
@@ -487,9 +524,7 @@ function renderSeasonBar(){
 function switchSeason(id){
   currentSeason=id;
   woState={};
-  loadState();
-  renderSeasonBar();
-  renderAll();
+  loadState().then(()=>{ renderSeasonBar(); renderAll(); });
 }
 
 // ── NEW SEASON ─────────────────────────────────────────────────
@@ -739,6 +774,25 @@ function saveMatch(key,posA,posB){
   if(!roundResults[currentRound]) roundResults[currentRound]={};
   roundResults[currentRound][key]={posA,posB,winner:winnerPos,winnerName:winnerPlayer.name,sets,score:isWO?'WO':setsToScoreString(sets),wo:isWO};
   delete woState[key+'_wo']; delete woState[key+'_stb']; delete woState[key+'_winner'];
+
+  // ── Skriv till databasen (admin = direkt bekräftad, lösenordsskyddat) ──
+  if(ADB){
+    const id=matchIdFor(currentRound,key);
+    const score=isWO?'WO':setsToScoreString(sets);
+    (async()=>{
+      let okSaved=false;
+      try{
+        await BTS.adminSaveResult(adminPw,{matchId:id,competitionId:currentSeason,round:currentRound,
+          posA,posB,playerAId:playerAtRank(posA).id,playerBId:playerAtRank(posB).id,
+          winnerId:winnerPlayer.id,sets,wo:isWO,score});
+        await loadState(); okSaved=true;
+      }catch(err){ showToast('DB-fel: '+(err?.message||err),'error'); }
+      renderMatchInput();
+      if(okSaved) showToast('Match sparad! ✓');
+    })();
+    return;
+  }
+
   saveState();
   renderMatchInput();
   showToast('Match sparad! ✓');
@@ -746,6 +800,17 @@ function saveMatch(key,posA,posB){
 
 // ── PUBLISH ────────────────────────────────────────────────────
 function publishRound(){
+  if(ADB){
+    (async()=>{
+      try{
+        await BTS.adminPublishRound(adminPw,currentSeason,currentRound);
+        await loadState();
+        renderAll();
+        showToast('Omgång publicerad — stegen flyttad! ✓');
+      }catch(err){ showToast(err?.message||String(err),'error'); }
+    })();
+    return;
+  }
   const results=roundResults[currentRound]||{};
   if(!Object.keys(results).length){ showToast('Inga resultat!','error'); return; }
   calculateStats(currentRound);

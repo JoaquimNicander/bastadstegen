@@ -1,3 +1,9 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Lokala setup-/databasfiler — ska INTE publiceras (innehåller
+# telefonnummer, adminlösenord och annan känslig setup)
+supabase/
+db-test.html
+BESLUT.md

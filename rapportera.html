@@ -295,8 +295,10 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 <!-- CONFETTI CONTAINER -->
 <div class="confetti-wrap hidden" id="confetti-wrap"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
 <script>
-// ── PLAYERS ───────────────────────────────────────────────────
+// ── PLAYERS (fallback om databasen inte svarar) ───────────────
 const basePlayers = [
   {id:1, name:"John Andersson",    rank:1,  phone:"0727333333"},
   {id:2, name:"Andreas Almroth",   rank:2,  phone:"0768231313"},
@@ -329,7 +331,7 @@ const basePlayers = [
   {id:29,name:"Karl Thorngren",    rank:29, phone:"0702959477"},
   {id:30,name:"Sam Lindgren",      rank:30, phone:"0761424103"},
 ];
-function getPlayers(){ try{return JSON.parse(localStorage.getItem('bts_players')||'null')||basePlayers}catch(e){return basePlayers} }
+function getPlayers(){ if(DBC&&DBC.players.length)return DBC.players; try{return JSON.parse(localStorage.getItem('bts_players')||'null')||basePlayers}catch(e){return basePlayers} }
 
 // ── SEASONS ───────────────────────────────────────────────────
 const DEFAULT_SEASONS=[
@@ -350,16 +352,59 @@ let me=null, currentSeason='VT2026', activeSeason='VT2026';
 let reportMode='score'; // 'score' or 'wo'
 let stbVisible=false;
 let woWinner=null;
+let DBC=null;            // databas-cache (null = ej laddad → fallback till localStorage)
 
 // ── STORAGE ───────────────────────────────────────────────────
 function sk(key){return key+'_'+currentSeason}
 function getPin(name){return localStorage.getItem('bts_pin_'+name)||defaultPin(name)}
 function setPin(name,pin){localStorage.setItem('bts_pin_'+name,pin)}
 function defaultPin(name){const p=getPlayers().find(x=>x.name===name);return p?p.phone.replace(/\D/g,'').slice(-4):'0000'}
-function getLadder(){try{return JSON.parse(localStorage.getItem(sk('bts_ladder'))||'null')||getPlayers().map(p=>p.id)}catch(e){return getPlayers().map(p=>p.id)}}
-function getCurrentRound(){return parseInt(localStorage.getItem(sk('bts_round'))||'1')}
-function getPending(){try{return JSON.parse(localStorage.getItem(sk('bts_pending'))||'{}')}catch(e){return {}}}
-function savePending(d){localStorage.setItem(sk('bts_pending'),JSON.stringify(d))}
+function getLadder(){if(DBC&&DBC.ladderIds.length)return DBC.ladderIds;try{return JSON.parse(localStorage.getItem(sk('bts_ladder'))||'null')||getPlayers().map(p=>p.id)}catch(e){return getPlayers().map(p=>p.id)}}
+function getCurrentRound(){if(DBC)return DBC.currentRound;return parseInt(localStorage.getItem(sk('bts_round'))||'1')}
+function getPending(){if(DBC)return DBC.pending;try{return JSON.parse(localStorage.getItem(sk('bts_pending'))||'{}')}catch(e){return {}}}
+function savePending(d){if(DBC)return;localStorage.setItem(sk('bts_pending'),JSON.stringify(d))}
+
+// ── DATABAS-CACHE ─────────────────────────────────────────────
+// Läser allt som behövs från Supabase och bygger om DBC. Anropas vid
+// start, efter varje rapport/bekräftelse, och med jämna mellanrum (live).
+async function refreshDBC(){
+  if(!window.BTS||!BTS.ready())return false;
+  const comp=currentSeason||'VT2026';
+  const [allPlayers,ladderRows,matchRows]=await Promise.all([
+    BTS.getPlayers(),BTS.getLadder(comp),BTS.getMatches(comp)
+  ]);
+  if(!allPlayers.length||!ladderRows.length)return false;
+  const nameById={}; allPlayers.forEach(p=>nameById[p.id]=p.name);
+  const posByPid={}; ladderRows.forEach(l=>posByPid[l.player_id]=l.position);
+  // players i samma form som fallback ({id,name,rank,phone})
+  const players=allPlayers.map(p=>({id:p.id,name:p.name,phone:p.phone||'',rank:posByPid[p.id]||999}))
+    .sort((a,b)=>a.rank-b.rank);
+  const ladderIds=ladderRows.slice().sort((a,b)=>a.position-b.position).map(l=>l.player_id);
+  const currentRound=matchRows.length?Math.max(...matchRows.map(m=>m.round)):1;
+  // pending-struktur {round:{key:{...}}} ur matcherna (rapporterade/bekräftade/bestridda)
+  const pending={};
+  matchRows.forEach(m=>{
+    if(!['reported','confirmed','disputed'].includes(m.status))return;
+    const key=`${m.pos_a}v${m.pos_b}`;
+    (pending[m.round]=pending[m.round]||{})[key]={
+      _id:m.id, posA:m.pos_a, posB:m.pos_b,
+      winner:m.winner_id===m.player_a_id?m.pos_a:m.pos_b,
+      winnerName:nameById[m.winner_id]||'',
+      sets:m.sets||[], wo:!!m.wo, score:m.score||'',
+      reporter:nameById[m.reporter_id]||'',
+      status:m.status,
+    };
+  });
+  DBC={players,ladderIds,currentRound,matches:matchRows,pending,nameById};
+  return true;
+}
+// Hitta databas-matchens id för en viss omgång+key
+function matchIdForKey(round,key){ return DBC?.pending?.[round]?.[key]?._id || null; }
+// Hitta omgångens DB-match där jag är spelare (robust paring)
+function dbMatchForMe(round){
+  if(!DBC)return null;
+  return DBC.matches.find(m=>m.round===round&&(m.player_a_id===me.id||m.player_b_id===me.id))||null;
+}
 function getProfile(name){try{return JSON.parse(localStorage.getItem('bts_profile_'+name)||'{}')}catch(e){return {}}}
 function saveProfileData(name,d){localStorage.setItem('bts_profile_'+name,JSON.stringify(d))}
 
@@ -369,13 +414,22 @@ function setupLoginDropdown(){
   getPlayers().forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=`${p.name} (#${p.rank})`;sel.appendChild(o)});
 }
 
-function doLogin(){
+async function doLogin(){
   const name=document.getElementById('login-name').value;
   const pin=document.getElementById('login-pin').value;
   const errEl=document.getElementById('login-error');
   if(!name){errEl.classList.remove('hidden');errEl.textContent='Välj ditt namn i listan.';return}
-  if(pin===getPin(name)){
-    me=getPlayers().find(p=>p.name===name);
+  const player=getPlayers().find(p=>p.name===name);
+  // Verifiera PIN säkert (server-side) i DB-läge, annars lokalt
+  let ok=false;
+  if(DBC && window.BTS && BTS.ready() && player){
+    try{ ok=await BTS.verifyPin(player.id,pin); }catch(e){ ok=false; }
+  } else {
+    ok=(pin===getPin(name));
+  }
+  if(ok){
+    me=player||getPlayers().find(p=>p.name===name);
+    me._pin=pin;                       // sparas i minnet för skyddade skrivningar
     activeSeason=getActiveSeason();currentSeason=activeSeason;
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
@@ -410,6 +464,15 @@ function switchSeason(id){currentSeason=id;reportMode='score';stbVisible=false;w
 
 // ── MY MATCH ──────────────────────────────────────────────────
 function getMyMatch(){
+  // Föredra databasens omgångsmatch (rätt paring), annars härled ur stegen
+  const round=getCurrentRound();
+  const dbm=dbMatchForMe(round);
+  if(dbm){
+    const oppId=dbm.player_a_id===me.id?dbm.player_b_id:dbm.player_a_id;
+    const opp=getPlayers().find(p=>p.id===oppId);
+    const myPos=dbm.player_a_id===me.id?dbm.pos_a:dbm.pos_b;
+    return{posA:dbm.pos_a,posB:dbm.pos_b,key:`${dbm.pos_a}v${dbm.pos_b}`,opp,myPos};
+  }
   const ladder=getLadder();
   const myRank=ladder.indexOf(me.id)+1;
   if(myRank<=0)return null;
@@ -712,6 +775,26 @@ function submitResult(e){
 
   const meIsA=match.posA===match.myPos;
   const winnerPos=winnerName===me.name?match.myPos:(meIsA?match.posB:match.posA);
+
+  // ── Skriv till databasen (om kopplad) ──
+  if(DBC){
+    const dbm=dbMatchForMe(round);
+    const winnerId=winnerName===me.name?me.id:match.opp.id;
+    const score=isWO?'WO':setsToStr(sets);
+    const btn=document.getElementById('submit-btn'); if(btn)btn.disabled=true;
+    (async()=>{
+      try{
+        if(!dbm) throw new Error('Ingen match hittad för omgången');
+        await BTS.reportResult(dbm.id,{playerId:me.id,pin:me._pin,winnerId,sets,wo:isWO,score});
+        await refreshDBC();
+      }catch(err){ alert('Kunde inte spara mot databasen: '+(err?.message||err)); }
+      if(btn)btn.disabled=false;
+      renderApp();
+    })();
+    return;
+  }
+
+  // ── Fallback: localStorage ──
   const pending=getPending();
   if(!pending[round])pending[round]={};
   pending[round][match.key]={
@@ -724,7 +807,21 @@ function submitResult(e){
 }
 
 function confirmMatch(key,confirmed){
-  const round=getCurrentRound();const pending=getPending();
+  const round=getCurrentRound();
+  // ── Databas ──
+  if(DBC){
+    const id=matchIdForKey(round,key);
+    if(!id){renderApp();return;}
+    (async()=>{
+      try{ await BTS.confirmMatch(id,{playerId:me.id,pin:me._pin,agree:confirmed}); await refreshDBC(); }
+      catch(err){ alert('Kunde inte spara: '+(err?.message||err)); }
+      if(confirmed)launchConfetti();
+      renderApp();
+    })();
+    return;
+  }
+  // ── Fallback: localStorage ──
+  const pending=getPending();
   if(pending[round]?.[key]){
     pending[round][key].status=confirmed?'confirmed':'disputed';
     pending[round][key].confirmedBy=me.name;
@@ -743,7 +840,18 @@ function confirmMatch(key,confirmed){
 
 function undoReport(){
   const match=getMyMatch();if(!match)return;
-  const round=getCurrentRound();const pending=getPending();
+  const round=getCurrentRound();
+  if(DBC){
+    const id=matchIdForKey(round,match.key);
+    if(!id){renderApp();return;}
+    (async()=>{
+      try{ await BTS.unreportMatch(id,{playerId:me.id,pin:me._pin}); await refreshDBC(); }
+      catch(err){ alert('Kunde inte ångra: '+(err?.message||err)); }
+      renderApp();
+    })();
+    return;
+  }
+  const pending=getPending();
   if(pending[round])delete pending[round][match.key];
   savePending(pending);renderApp();
 }
@@ -777,11 +885,31 @@ function saveMyProfile(btn){
 function savePin(){
   const p=document.getElementById('p-newpin')?.value||'';
   if(p.length!==4||!/^\d{4}$/.test(p)){alert('PIN måste vara exakt 4 siffror');return;}
+  if(DBC){
+    (async()=>{
+      try{
+        const ok=await BTS.setPin(me.id,me._pin,p);
+        if(ok){ me._pin=p; document.getElementById('p-newpin').value=''; alert('PIN ändrad! Kom ihåg den.'); }
+        else alert('Kunde inte byta PIN.');
+      }catch(err){ alert('Fel vid PIN-byte: '+(err?.message||err)); }
+    })();
+    return;
+  }
   setPin(me.name,p);document.getElementById('p-newpin').value='';alert('PIN ändrad! Kom ihåg den.');
 }
 
 // ── INIT ─────────────────────────────────────────────────────
-setupLoginDropdown();
+(async function initRapportera(){
+  await refreshDBC().catch(e=>console.warn('DB ej tillgänglig, fallback:',e));
+  setupLoginDropdown();
+  // Live: hämta nya resultat en gång per minut och rita om om MIN match ändrats
+  setInterval(async()=>{
+    if(!DBC||!me)return;
+    const before=JSON.stringify([getPendingForMe(),myReportStatus()]);
+    await refreshDBC().catch(()=>{});
+    if(JSON.stringify([getPendingForMe(),myReportStatus()])!==before) renderApp();
+  },60000);
+})();
 </script>
 </body>
 </html>
