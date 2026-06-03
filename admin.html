@@ -270,6 +270,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
         <p>Vinnare klättrar upp, förlorare åker ned.<br>Games- och set-statistik uppdateras automatiskt.</p>
       </div>
       <button class="publish-btn" onclick="publishRound()">Publicera →</button>
+      <button class="publish-btn" style="background:transparent;border:1px solid var(--border2);color:var(--muted)" onclick="resetRound()">Nollställ omgång</button>
     </div>
   </div>
 
@@ -589,6 +590,7 @@ function renderSetInputs(key, saved){
       <div class="saved-badge" style="margin-left:auto">
         <span>✓ Sparat</span>
         <button class="edit-btn" onclick="editMatch('${key}')">Ändra</button>
+        <button class="edit-btn" onclick="resetMatch('${key}')">Nollställ</button>
       </div>
     </div>`;
   }
@@ -804,6 +806,34 @@ function saveMatch(key,posA,posB){
 }
 
 // ── PUBLISH ────────────────────────────────────────────────────
+function resetMatch(key){
+  if(!ADB){ showToast('Nollställning kräver databasanslutning','error'); return; }
+  const id=matchIdFor(currentRound,key);
+  if(!id){ showToast('Hittar inte matchen','error'); return; }
+  if(!confirm('Nollställ den här matchen? Resultatet rensas och matchen blir ospelad igen.')) return;
+  (async()=>{
+    try{
+      await BTS.adminResetMatch(adminPw,id);
+      await loadState();
+      renderMatchInput();
+      showToast('Match nollställd ✓');
+    }catch(err){ showToast(err?.message||String(err),'error'); }
+  })();
+}
+
+function resetRound(){
+  if(!ADB){ showToast('Nollställning kräver databasanslutning','error'); return; }
+  if(!confirm(`Nollställ omgång ${currentRound}? Alla resultat i omgången rensas och matcherna blir ospelade igen. Detta går inte att ångra.`)) return;
+  (async()=>{
+    try{
+      await BTS.adminResetRound(adminPw,currentSeason,currentRound);
+      await loadState();
+      renderAll();
+      showToast(`Omgång ${currentRound} nollställd ✓`);
+    }catch(err){ showToast(err?.message||String(err),'error'); }
+  })();
+}
+
 function publishRound(){
   if(ADB){
     (async()=>{

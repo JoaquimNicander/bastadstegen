@@ -170,6 +170,24 @@ const BTS = {
     if (error) throw error;
   },
 
+  // Nollställ en omgångs resultat → matcherna blir 'scheduled' igen
+  async adminResetRound(adminPw, competitionId, round) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_reset_round', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_round: round,
+    });
+    if (error) throw error;
+  },
+
+  // Nollställ EN match → tillbaka till 'scheduled'
+  async adminResetMatch(adminPw, matchId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_reset_match', {
+      p_admin_pw: adminPw, p_match_id: matchId,
+    });
+    if (error) throw error;
+  },
+
   // ── SOMMARSTEGE: veckoanmälan ─────────────────────────────────────────
   async getSignups(competitionId, playDate) {
     _assert();
