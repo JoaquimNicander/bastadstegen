@@ -735,6 +735,13 @@ function renderApp(){
   </div>`;
 
   main.innerHTML=html;
+
+  // Förifyll mejl från databasen (PIN-skyddat, hålls privat) — så sparad mejl syns
+  if(DBC && me && me._pin && window.BTS){
+    BTS.getEmail(me.id, me._pin)
+      .then(v=>{ const el=document.getElementById('p-email'); if(el && v && !el.value) el.value=v; })
+      .catch(e=>console.warn('Kunde inte läsa mejl:',e));
+  }
 }
 
 // ── SUBMIT ────────────────────────────────────────────────────

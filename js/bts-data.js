@@ -238,6 +238,14 @@ const BTS = {
     if (error) throw error;
   },
 
+  // Spelare läser sin egen mejladress (PIN-skyddat, hålls privat)
+  async getEmail(playerId, pin) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_get_email', { p_player_id: playerId, p_pin: pin });
+    if (error) throw error;
+    return data || '';
+  },
+
   // Intresseanmälan (vem som helst) — skapar en förfrågan admin får godkänna
   async requestJoin(competitionId, name, phone, email) {
     _assert();
