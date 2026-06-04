@@ -33,7 +33,7 @@ const BTS = {
     _assert();
     // OBS: läser INTE pin-kolumnen (dold av säkerhetsskäl)
     const { data, error } = await _sb.from('players')
-      .select('id,name,phone,born,photo_url,is_admin,active').order('name');
+      .select('id,name,phone,born,photo_url,is_admin,active,hand,hometown,fav_shot,fav_surface,since_year,bio').order('name');
     if (error) throw error;
     return data;
   },
@@ -52,6 +52,18 @@ const BTS = {
   async setPhoto(playerId, pin, url) {
     _assert();
     const { error } = await _sb.rpc('bts_set_photo', { p_player_id: playerId, p_pin: pin, p_url: url });
+    if (error) throw error;
+  },
+
+  // Spara hela den delade spelarprofilen (PIN-skyddat). Fälten är publika.
+  async setProfile(playerId, pin, { born, hand, hometown, favShot, favSurface, since, bio } = {}) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_profile', {
+      p_player_id: playerId, p_pin: pin,
+      p_born: born || '', p_hand: hand || '', p_hometown: hometown || '',
+      p_fav_shot: favShot || '', p_fav_surface: favSurface || '',
+      p_since: since || '', p_bio: bio || '',
+    });
     if (error) throw error;
   },
 
@@ -94,7 +106,7 @@ const BTS = {
     _assert();
     const { data, error } = await _sb
       .from('ladder_positions')
-      .select('position, player_id, player:players(id,name,phone,born,photo_url,is_admin,active)')  /* photo_url för avatarer */
+      .select('position, player_id, player:players(id,name,phone,born,photo_url,is_admin,active,hand,hometown,fav_shot,fav_surface,since_year,bio)')  /* photo_url för avatarer */
       .eq('competition_id', competitionId)
       .order('position');
     if (error) throw error;

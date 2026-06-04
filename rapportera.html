@@ -395,7 +395,7 @@ async function refreshDBC(){
       status:m.status,
     };
   });
-  DBC={players,ladderIds,currentRound,matches:matchRows,pending,nameById};
+  DBC={players,ladderIds,currentRound,matches:matchRows,pending,nameById,allPlayers};
   return true;
 }
 // Hitta databas-matchens id för en viss omgång+key
@@ -407,6 +407,22 @@ function dbMatchForMe(round){
 }
 function getProfile(name){try{return JSON.parse(localStorage.getItem('bts_profile_'+name)||'{}')}catch(e){return {}}}
 function saveProfileData(name,d){localStorage.setItem('bts_profile_'+name,JSON.stringify(d))}
+// Min delade profil från databasen (om inloggad), annars localStorage-fallback.
+function dbProfileForMe(){
+  const local=me?getProfile(me.name):{};
+  const row=(DBC&&me&&DBC.allPlayers)?DBC.allPlayers.find(p=>p.id===me.id):null;
+  if(!row)return local;
+  return {
+    born:row.born||local.born||'',
+    hand:row.hand||local.hand||'',
+    hometown:row.hometown||local.hometown||'',
+    favShot:row.fav_shot||local.favShot||'',
+    favSurface:row.fav_surface||local.favSurface||'',
+    since:row.since_year||local.since||'',
+    bio:row.bio||local.bio||'',
+    email:local.email||'',
+  };
+}
 
 // ── SETUP ─────────────────────────────────────────────────────
 function setupLoginDropdown(){
@@ -697,8 +713,8 @@ function renderApp(){
     </div>`;
   }
 
-  // Profile section
-  const prof=getProfile(me.name);
+  // Profile section — läs den DELADE profilen från databasen (fallback: localStorage)
+  const prof=dbProfileForMe();
   html+=`
   <div class="section">
     <div class="section-label">Min profil</div>
@@ -879,10 +895,9 @@ function launchConfetti(){
 }
 
 // ── PROFILE ───────────────────────────────────────────────────
-function saveMyProfile(btn){
+async function saveMyProfile(btn){
   const email=document.getElementById('p-email')?.value||'';
-  saveProfileData(me.name,{
-    email,
+  const data={
     born:document.getElementById('p-born')?.value||'',
     hand:document.getElementById('p-hand')?.value||'',
     hometown:document.getElementById('p-hometown')?.value||'',
@@ -890,10 +905,24 @@ function saveMyProfile(btn){
     favSurface:document.getElementById('p-surface')?.value||'',
     since:document.getElementById('p-since')?.value||'',
     bio:document.getElementById('p-bio')?.value||'',
-  });
-  // Spara mejlen säkert i databasen (PIN-skyddat) om angiven
-  if(DBC && email.trim() && window.BTS){ BTS.setEmail(me.id, me._pin, email.trim()).catch(e=>console.warn('Kunde inte spara mejl:',e)); }
-  if(btn){const t=btn.textContent;btn.textContent='Sparad! ✓';setTimeout(()=>btn.textContent=t,2000);}
+  };
+  // Behåll localStorage som offline-fallback
+  saveProfileData(me.name,{email,...data});
+  const orig=btn?btn.textContent:'';
+  if(btn){btn.textContent='Sparar…';btn.disabled=true;}
+  try{
+    if(DBC && window.BTS){
+      // Hela profilen sparas DELAT i databasen (PIN-skyddat) → syns för alla
+      await BTS.setProfile(me.id, me._pin, data);
+      // Mejlen sparas separat (privat) om angiven
+      if(email.trim()) await BTS.setEmail(me.id, me._pin, email.trim());
+      await refreshDBC().catch(()=>{});
+    }
+    if(btn){btn.textContent='Sparad! ✓';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);}
+  }catch(e){
+    if(btn){btn.textContent=orig;btn.disabled=false;}
+    alert('Kunde inte spara profilen: '+(e?.message||e));
+  }
 }
 async function uploadPhoto(input){
   const f=input.files&&input.files[0]; if(!f||!me)return;

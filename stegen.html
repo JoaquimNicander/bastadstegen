@@ -627,8 +627,7 @@ header{
     <div class="modal-header">
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div class="modal-player-row">
-        <div class="modal-avatar" id="modal-avatar" onclick="triggerPhotoUpload()">
-          <div class="avatar-upload-hint">Ladda<br>upp foto</div>
+        <div class="modal-avatar" id="modal-avatar" style="cursor:default">
         </div>
         <div class="modal-player-info">
           <div class="modal-rank" id="modal-rank"></div>
@@ -1035,7 +1034,11 @@ function loadPlayerStats(){
 }
 
 // ── LOAD PLAYER PROFILES (personal info) ──────────────────────────
+// Profilerna delas nu via databasen (dbProfiles), fylls i reloadLadderFromDB.
+// localStorage finns kvar som fallback om databasen inte svarar.
+let dbProfiles={};
 function getProfile(name){
+  if(dbProfiles[name]) return dbProfiles[name];
   try{ return JSON.parse(localStorage.getItem('bts_profile_'+name)||'{}'); }
   catch(e){ return {}; }
 }
@@ -1282,7 +1285,7 @@ function renderModal(p){
   // Avatar
   const av=document.getElementById('modal-avatar');
   const photo=getPhoto(p.name);
-  av.innerHTML=`<div class="avatar-upload-hint">Ladda<br>upp foto</div>`+
+  av.innerHTML=
     (photo?`<img src="${photo}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%">`:
     `<span style="font-size:28px;font-weight:700;color:var(--muted)">${initials(p.name)}</span>`);
 
@@ -1411,7 +1414,7 @@ function buildPersonalView(p, prof){
   return `
   <div class="modal-section-title">
     Spelarprofil
-    <button class="modal-section-edit-btn" onclick="startEdit(${p.id})">✎ Redigera</button>
+    <span class="modal-section-edit-hint" style="font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:0.5px;text-transform:none">Redigera under Rapportera → Min profil</span>
   </div>
   <div class="atp-grid">
     <div class="atp-row">
@@ -1609,6 +1612,17 @@ async function reloadLadderFromDB(){
     const nameById = {}; allPlayers.forEach(p => nameById[p.id] = p.name);
     // profilbilder från databasen (delas mellan alla)
     dbPhotos = {}; allPlayers.forEach(p => { if(p.photo_url) dbPhotos[p.name] = p.photo_url; });
+    // hela profilen från databasen (delas mellan alla) — born/spelhand/hemort/…
+    dbProfiles = {};
+    allPlayers.forEach(p => {
+      if(p.born||p.hand||p.hometown||p.fav_shot||p.fav_surface||p.since_year||p.bio){
+        dbProfiles[p.name] = {
+          born: p.born||'', hand: p.hand||'', hometown: p.hometown||'',
+          favShot: p.fav_shot||'', favSurface: p.fav_surface||'',
+          since: p.since_year||'', bio: p.bio||'',
+        };
+      }
+    });
 
     // Behåll movement (prev) och "me"-flaggan från fallback, matchat på namn
     const prevByName = {}; players.forEach(p => prevByName[p.name] = p.prev);
