@@ -201,6 +201,19 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
   .ladder-mini{grid-template-columns:1fr 1fr}
   .stats-summary{grid-template-columns:1fr 1fr}
 }
+/* ── SKICKA MEDDELANDE ── */
+.sms-ch{font-family:'Space Mono',monospace;font-size:12px;padding:7px 16px;background:transparent;color:var(--muted);border:none;border-right:1px solid var(--border2);cursor:pointer}
+.sms-ch:last-child{border-right:none}
+.sms-ch.active{background:var(--clay);color:#0C0A06}
+.sms-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--clay);padding:12px 14px;margin-bottom:8px}
+.sms-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:14px;font-weight:600;color:var(--white)}
+.sms-cnt{font-family:'Space Mono',monospace;font-size:11px;font-weight:400;color:var(--clay)}
+.sms-send{font-family:'Space Mono',monospace;font-size:11px;color:#0C0A06;background:var(--clay);border:none;padding:7px 16px;cursor:pointer;white-space:nowrap}
+.sms-send:hover{background:#a5663a}
+.sms-send:disabled{opacity:0.5;cursor:default}
+.sms-ta{width:100%;background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;line-height:1.5;padding:9px 11px;resize:vertical;min-height:52px;box-sizing:border-box}
+.sms-ta:focus{outline:none;border-color:var(--clay)}
+.sms-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:4px}
 </style>
 </head>
 <body>
@@ -278,6 +291,62 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
   <div class="section">
     <div class="section-title">Nuvarande stege</div>
     <div class="ladder-mini" id="ladder-mini"></div>
+  </div>
+
+  <!-- SKICKA MEDDELANDE (SMS / e-post) -->
+  <div class="section" id="sms-section">
+    <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+      <span>Skicka meddelande</span>
+      <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--clay);border:1px solid var(--border2);padding:3px 8px">Avsändare: BTS STEGEN</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin:6px 0 16px;flex-wrap:wrap">
+      <div style="display:inline-flex;border:1px solid var(--border2)">
+        <button type="button" class="sms-ch active" data-ch="sms" onclick="setSmsChannel('sms',this)">SMS</button>
+        <button type="button" class="sms-ch" data-ch="email" onclick="setSmsChannel('email',this)">E-post</button>
+        <button type="button" class="sms-ch" data-ch="both" onclick="setSmsChannel('both',this)">Båda</button>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2)">Täckning: SMS <span id="sms-cov-sms">–</span> · e-post <span id="sms-cov-email">–</span></div>
+    </div>
+
+    <div class="sms-card" style="border-left-color:var(--clay)">
+      <div class="sms-head"><span>Ny spelaromgång ute <span class="sms-cnt">· <span id="sms-cnt-new_round">–</span> st</span></span>
+        <button class="sms-send" onclick="doSend('new_round')">Skicka →</button></div>
+      <textarea id="sms-tpl-new_round" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! Ny omgång i Båstadstegen är igång — din match mot [motståndare]. Rapportera när ni spelat: [länk]</textarea>
+      <div class="sms-meta"></div>
+    </div>
+
+    <div class="sms-card" style="border-left-color:rgba(255,255,255,0.18)">
+      <div class="sms-head"><span>Påminn: ej rapporterat <span class="sms-cnt">· <span id="sms-cnt-unreported">–</span> st</span></span>
+        <button class="sms-send" onclick="doSend('unreported')">Skicka →</button></div>
+      <textarea id="sms-tpl-unreported" class="sms-ta" oninput="smsCount(this)">Hejsan [förnamn]! Din match mot [motståndare] är inte rapporterad — har ni inte spelat? Rapportera här: [länk]</textarea>
+      <div class="sms-meta"></div>
+    </div>
+
+    <div class="sms-card" style="border-left-color:var(--yellow)">
+      <div class="sms-head"><span>Påminn: ej bekräftat <span class="sms-cnt">· <span id="sms-cnt-unconfirmed">–</span> st</span></span>
+        <button class="sms-send" onclick="doSend('unconfirmed')">Skicka →</button></div>
+      <textarea id="sms-tpl-unconfirmed" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! Din match mot [motståndare] är inte bekräftad än — bekräfta här: [länk]</textarea>
+      <div class="sms-meta"></div>
+    </div>
+
+    <div class="sms-card" style="border-left-color:var(--green);margin-top:14px">
+      <div class="sms-head"><span>Skicka till alla i stegen <span class="sms-cnt">· <span id="sms-cnt-all_ladder">–</span> st</span></span>
+        <button class="sms-send" onclick="doSend('all_ladder')">Skicka →</button></div>
+      <textarea id="sms-tpl-all_ladder" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! </textarea>
+      <div class="sms-meta"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;flex-wrap:wrap">
+      <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase">Testa till dig själv</span>
+      <input id="sms-test-num" type="tel" placeholder="07XXXXXXXX (SMS)" style="background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:160px">
+      <input id="sms-test-email" type="email" placeholder="din@mejl.se (e-post)" style="background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:190px">
+      <button class="sms-send" onclick="doTest()" style="background:var(--border2);color:var(--white)">Skicka test →</button>
+      <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2)">vald kanal + texten i "alla i stegen"</span>
+    </div>
+
+    <div id="sms-result" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);margin-top:12px;border-top:1px solid var(--border);padding-top:10px">Senaste utskick: — inga ännu</div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);margin-top:8px;line-height:1.6">Varje SMS avslutas automatiskt med "Du kan inte svara på detta SMS." · E-post når bara spelare med sparad adress (kräver verifierad domän för att gå ut skarpt).</div>
   </div>
 
   <!-- MASTER: SPELARHANTERING (hidden until unlocked) -->
@@ -1243,10 +1312,111 @@ function rejectSignup(signupId){
 function renderAll(){
   renderMatchInput();
   renderLadderMini();
+  try{ renderSms(); }catch(e){}
   if(masterUnlocked){ renderPendingSignups(); renderPlayerMgmt(); renderResultOverride(); }
 }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('hidden'))doLogin(); });
+</script>
+
+<script>
+// ── SKICKA MEDDELANDE (SMS / e-post via edge-funktion) ──────────────
+const SMS_FN = "https://fueggdqtgmvldjbhcdfn.supabase.co/functions/v1/send-message";
+const SMS_PUBKEY = "sb_publishable_vZCnLnp41c29DFN7MLpYsQ_AUBnxJPy";
+let smsChannel = "sms";
+
+function setSmsChannel(c, el){
+  smsChannel = c;
+  document.querySelectorAll('.sms-ch').forEach(b=>b.classList.toggle('active', b===el));
+  document.querySelectorAll('.sms-ta').forEach(smsCount);
+}
+
+function smsParts(text){
+  const unicode = /[^\u0000-\u00FF]/.test(text);
+  const per = unicode ? 70 : 160;
+  return { len: text.length, parts: Math.max(1, Math.ceil(text.length/per)), unicode };
+}
+function smsCount(ta){
+  const meta = ta.parentElement.querySelector('.sms-meta');
+  if(!meta) return;
+  const preview = ta.value.replace(/\[förnamn\]/g,'Andreas').replace(/\[motståndare\]/g,'Mats').replace(/\[länk\]/g,'bastadstegen.se');
+  if(smsChannel === 'email'){ meta.textContent = preview.length + ' tecken · e-post (knapp läggs till automatiskt)'; return; }
+  const full = preview + "\n\nDu kan inte svara på detta SMS.";
+  const s = smsParts(full);
+  meta.textContent = s.len + ' tecken · ' + s.parts + ' SMS' + (s.unicode ? ' (unicode, kortare gräns)' : '') + ' · inkl. avslutning';
+}
+
+async function renderSms(){
+  try{
+    if(!window.BTS || !BTS.ready()) return;
+    const comp = currentSeason || 'VT2026';
+    const [players, matches] = await Promise.all([ BTS.getPlayers(), BTS.getMatches(comp, currentRound) ]);
+    const active = players.filter(p=>p.active);
+    const isActive = id => active.some(p=>p.id===id);
+    const sched = matches.filter(m=>m.status==='scheduled');
+    const reported = matches.filter(m=>m.status==='reported');
+    let nr = 0; matches.forEach(m=>{ if(isActive(m.player_a_id)) nr++; if(isActive(m.player_b_id)) nr++; });
+    if(!matches.length) nr = active.length;
+    const set = (id,n)=>{ const el=document.getElementById(id); if(el) el.textContent=n; };
+    set('sms-cnt-new_round', nr);
+    set('sms-cnt-unreported', sched.length*2);
+    set('sms-cnt-unconfirmed', reported.length);
+    set('sms-cnt-all_ladder', active.length);
+    set('sms-cov-sms', active.length);
+    set('sms-cov-email', active.filter(p=>p.email).length);
+    document.querySelectorAll('.sms-ta').forEach(smsCount);
+  }catch(e){ /* tyst — visningssiffror */ }
+}
+
+async function doSend(aud){
+  const ta = document.getElementById('sms-tpl-'+aud);
+  const template = ta ? ta.value.trim() : '';
+  if(!template){ alert('Skriv ett meddelande först.'); return; }
+  if(typeof adminPw==='undefined' || !adminPw){ alert('Logga in som admin först.'); return; }
+  const base = { adminPw, channel: smsChannel, audience: aud, template,
+    competition: currentSeason||'VT2026', round: currentRound };
+  const btns = Array.from(document.querySelectorAll('.sms-send'));
+  const post = (body)=>fetch(SMS_FN,{ method:'POST',
+    headers:{ 'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY },
+    body: JSON.stringify(body) }).then(r=>r.json());
+  try{
+    btns.forEach(b=>b.disabled=true);
+    const dry = await post({ ...base, dryRun:true });
+    if(dry.error) throw new Error(dry.error);
+    const chLabel = smsChannel==='both'?'SMS + e-post':smsChannel==='email'?'e-post':'SMS';
+    if(!confirm('Skicka via '+chLabel+' till '+dry.recipients+' mottagare?')) return;
+    const res = await post(base);
+    if(res.error) throw new Error(res.error);
+    const r = document.getElementById('sms-result');
+    if(r) r.innerHTML = 'Senaste utskick ('+chLabel+'): SMS '+res.sms.sent+' skickade'+(res.sms.failed?(' / '+res.sms.failed+' fel'):'')+
+      (smsChannel!=='sms'?(' · e-post '+res.email.sent+' skickade'+(res.email.failed?(' / '+res.email.failed+' fel'):'')):'')+
+      (res.errors&&res.errors.length?('<br><span style="color:var(--yellow)">'+res.errors.join('<br>')+'</span>'):'');
+  }catch(e){
+    alert('Kunde inte skicka: '+(e.message||e));
+  }finally{
+    btns.forEach(b=>b.disabled=false);
+  }
+}
+
+async function doTest(){
+  const num = (document.getElementById('sms-test-num')||{}).value || '';
+  const email = (document.getElementById('sms-test-email')||{}).value || '';
+  const ta = document.getElementById('sms-tpl-all_ladder');
+  const template = ta ? ta.value.trim() : '';
+  if(!template){ alert('Skriv en text i "alla i stegen"-rutan att testa med. (Lägg gärna [länk] för att se knappen i mejlet.)'); return; }
+  if(typeof adminPw==='undefined' || !adminPw){ alert('Logga in som admin först.'); return; }
+  if((smsChannel==='sms'||smsChannel==='both') && !num.trim()){ alert('Fyll i ett mobilnummer för SMS-test.'); return; }
+  if((smsChannel==='email'||smsChannel==='both') && !email.trim()){ alert('Fyll i en mejladress för e-posttest.'); return; }
+  const r = document.getElementById('sms-result');
+  try{
+    const res = await fetch(SMS_FN,{ method:'POST',
+      headers:{ 'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY },
+      body: JSON.stringify({ adminPw, channel:smsChannel, audience:'test', template, testNumber:num.trim(), testEmail:email.trim() }) }).then(r=>r.json());
+    if(res.error) throw new Error(res.error);
+    if(r) r.innerHTML = 'Test ('+smsChannel+'): SMS '+res.sms.sent+' skickade · e-post '+res.email.sent+' skickade'+
+      (res.errors&&res.errors.length?('<br><span style="color:var(--yellow)">'+res.errors.join('<br>')+'</span>'):'');
+  }catch(e){ alert('Test misslyckades: '+(e.message||e)); }
+}
 </script>
 </body>
 </html>

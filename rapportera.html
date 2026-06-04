@@ -428,6 +428,14 @@ function dbProfileForMe(){
 function setupLoginDropdown(){
   const sel=document.getElementById('login-name');
   getPlayers().forEach(p=>{const o=document.createElement('option');o.value=p.name;o.textContent=`${p.name} (#${p.rank})`;sel.appendChild(o)});
+  // Personlig direktlänk från SMS: ?spelare=ID → förvälj namnet och fokusera PIN
+  try{
+    const id=parseInt(new URLSearchParams(location.search).get('spelare')||'');
+    if(id){
+      const p=getPlayers().find(x=>x.id===id);
+      if(p){ sel.value=p.name; const pin=document.getElementById('login-pin'); if(pin) setTimeout(()=>pin.focus(),150); }
+    }
+  }catch(e){}
 }
 
 async function doLogin(){
