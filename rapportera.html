@@ -148,6 +148,8 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
   cursor:pointer;transition:all 0.2s;text-align:left;min-height:52px;
 }
 .wo-winner-btn.selected{border-color:var(--clay);color:var(--white);background:rgba(193,125,75,0.1)}
+.alt-chip{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);background:transparent;border:1px solid rgba(193,125,75,0.22);border-radius:9px;padding:9px 14px;cursor:pointer}
+.alt-chip.active{color:var(--white);border-color:var(--clay);background:rgba(193,125,75,0.12)}
 
 /* ── AUTO WINNER DISPLAY ── */
 .auto-win-display{
@@ -349,7 +351,9 @@ function getActiveSeason(){
 
 // ── STATE ─────────────────────────────────────────────────────
 let me=null, currentSeason='VT2026', activeSeason='VT2026';
-let reportMode='score'; // 'score' or 'wo'
+let reportMode='score'; // 'score' | 'wo' | 'retired'
+let retiredByName=null;  // namn på den som bröt (avbruten match)
+let pendingSubmit=null;  // håller det som ska skickas tills bekräftelse-rutan godkänns
 let stbVisible=false;
 let woWinner=null;
 let DBC=null;            // databas-cache (null = ej laddad → fallback till localStorage)
@@ -522,14 +526,19 @@ function firstName(name){return name.split(' ')[0]}
 
 // ── REPORT MODE TOGGLE ────────────────────────────────────────
 function setReportMode(mode){
-  reportMode=mode;stbVisible=false;woWinner=null;
-  document.getElementById('score-big-btn').classList.toggle('active',mode==='score');
-  document.getElementById('wo-big-btn').classList.toggle('active',mode==='wo');
-  document.getElementById('score-section').classList.toggle('hidden',mode==='wo');
-  document.getElementById('auto-win-row').classList.toggle('hidden',mode==='wo');
-  document.getElementById('wo-section').classList.toggle('hidden',mode==='score');
-  if(mode==='wo') document.getElementById('score-section').classList.add('hidden');
+  reportMode=mode;stbVisible=false;woWinner=null;retiredByName=null;
+  const sb=id=>document.getElementById(id);
+  sb('retired-chip')?.classList.toggle('active',mode==='retired');
+  sb('wo-chip')?.classList.toggle('active',mode==='wo');
+  // Set-inputs visas i BÅDE score och retired (för spelade set), döljs i WO
+  sb('score-section')?.classList.toggle('hidden',mode==='wo');
+  // Auto-vinnare bara i score (i retired avgörs vinst av vem som bröt)
+  sb('auto-win-row')?.classList.toggle('hidden',mode!=='score');
+  sb('wo-section')?.classList.toggle('hidden',mode!=='wo');
+  sb('retired-section')?.classList.toggle('hidden',mode!=='retired');
 }
+// Litet sekundärval: tryck en gång för läget, igen för att gå tillbaka till resultat
+function toggleAltMode(mode){ setReportMode(reportMode===mode?'score':mode); }
 
 // ── SET INPUT ─────────────────────────────────────────────────
 function onSetInput(){
@@ -573,7 +582,11 @@ function showSTB(){
 }
 function selectWoWinner(name){
   woWinner=name;
-  document.querySelectorAll('.wo-winner-btn').forEach(b=>b.classList.toggle('selected',b.dataset.player===name));
+  document.querySelectorAll('#wo-section .wo-winner-btn').forEach(b=>b.classList.toggle('selected',b.dataset.player===name));
+}
+function selectRetiredBy(name){
+  retiredByName=name;
+  document.querySelectorAll('#retired-section .wo-winner-btn').forEach(b=>b.classList.toggle('selected',b.dataset.ret===name));
 }
 
 // ── RENDER APP ────────────────────────────────────────────────
@@ -661,12 +674,6 @@ function renderApp(){
           </div>
         </div>
 
-        <!-- SCORE / WO TOGGLE -->
-        <div class="wo-option-row">
-          <button class="score-big-btn active" id="score-big-btn" onclick="setReportMode('score')">🎾 Ange resultat</button>
-          <button class="wo-big-btn" id="wo-big-btn" onclick="setReportMode('wo')">WO</button>
-        </div>
-
         <!-- SCORE SECTION -->
         <div id="score-section">
           <div class="set-divider">Set-resultat</div>
@@ -703,9 +710,18 @@ function renderApp(){
           <div class="auto-win-display empty" id="auto-win-display">Fyll i set-resultaten ovan</div>
         </div>
 
+        <!-- SEKUNDÄRA UTFALL (litet) -->
+        <div style="text-align:center;margin:16px 0 2px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px">Avslutades matchen annorlunda?</div>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button type="button" class="alt-chip" id="retired-chip" onclick="toggleAltMode('retired')">🚑 Avbruten</button>
+            <button type="button" class="alt-chip" id="wo-chip" onclick="toggleAltMode('wo')">WO</button>
+          </div>
+        </div>
+
         <!-- WO SECTION -->
         <div class="wo-section hidden" id="wo-section">
-          <div class="wo-section-title">Vem vann via WO?</div>
+          <div class="wo-section-title" style="font-size:15px;letter-spacing:1px;margin-bottom:14px">Vem vann via WO?</div>
           <div class="wo-winner-btns">
             <button class="wo-winner-btn" data-player="${me.name}" onclick="selectWoWinner('${me.name}')">
               ${me.name} (jag vann, motståndaren kom inte)
@@ -714,6 +730,21 @@ function renderApp(){
               ${match.opp.name} (jag kunde inte spela)
             </button>
           </div>
+        </div>
+
+        <!-- RETIRED (AVBRUTEN) SECTION -->
+        <div class="wo-section hidden" id="retired-section" style="background:rgba(212,225,87,0.06);border-color:rgba(212,225,87,0.3)">
+          <div class="wo-section-title" style="color:var(--yellow);font-size:15px;letter-spacing:1px;margin-bottom:14px">Vem bröt matchen?</div>
+          <div class="wo-winner-btns">
+            <button class="wo-winner-btn" data-ret="${me.name}" onclick="selectRetiredBy('${me.name}')">
+              ${me.name} (jag bröt — motståndaren vinner)
+            </button>
+            <button class="wo-winner-btn" data-ret="${match.opp.name}" onclick="selectRetiredBy('${match.opp.name}')">
+              ${match.opp.name} (motståndaren bröt — jag vinner)
+            </button>
+          </div>
+          <input id="r-reason" class="form-input" placeholder="Anledning, t.ex. skada i vristen (frivilligt)" style="margin-top:12px;width:100%">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:10px;line-height:1.5">Fyll i de set som hann spelas ovan — de räknas i statistiken. Vinsten går till den som inte bröt.</div>
         </div>
       </div>
 
@@ -783,7 +814,8 @@ function submitResult(e){
 
   const match=getMyMatch();if(!match)return;
   const round=getCurrentRound();
-  let winnerName,sets=[],isWO=reportMode==='wo';
+  const meIsA=match.posA===match.myPos;
+  let winnerName,sets=[],isWO=reportMode==='wo',isRet=reportMode==='retired',retiredById=null,note=null;
 
   if(isWO){
     if(!woWinner){alert('Välj vem som vann via WO!');return;}
@@ -795,47 +827,96 @@ function submitResult(e){
     if(s1a||s1b)sets.push({a:s1a,b:s1b});
     if(s2a||s2b)sets.push({a:s2a,b:s2b});
     if((stba||stbb)&&stbVisible)sets.push({a:stba,b:stbb,super:true});
-    if(!sets.length){alert('Ange minst ett set!');return;}
-    let sMe=0,sOpp=0;
-    sets.forEach(s=>{if(s.a>s.b)sMe++;else if(s.b>s.a)sOpp++;});
-    if(sMe>=2)winnerName=me.name;
-    else if(sOpp>=2)winnerName=match.opp.name;
-    else{alert('Vinnare ej fastställd. Kontrollera set-resultaten.');return;}
+    if(isRet){
+      if(!retiredByName){alert('Välj vem som bröt matchen!');return;}
+      // Vinst går till den som INTE bröt — oavsett ställning
+      winnerName=retiredByName===me.name?match.opp.name:me.name;
+      retiredById=retiredByName===me.name?me.id:match.opp.id;
+      note=(document.getElementById('r-reason')?.value||'').trim()||null;
+    } else {
+      if(!sets.length){alert('Ange minst ett set!');return;}
+      let sMe=0,sOpp=0;
+      sets.forEach(s=>{if(s.a>s.b)sMe++;else if(s.b>s.a)sOpp++;});
+      if(sMe>=2)winnerName=me.name;
+      else if(sOpp>=2)winnerName=match.opp.name;
+      else{alert('Vinnare ej fastställd. Kontrollera set-resultaten.');return;}
+    }
     // Normalisera sets för lagring: posA:s poäng = a, posB:s poäng = b
-    const meIsA=match.posA===match.myPos;
     if(!meIsA)sets=sets.map(s=>({a:s.b,b:s.a,super:s.super}));
   }
 
-  const meIsA=match.posA===match.myPos;
+  const winnerId=winnerName===me.name?me.id:match.opp.id;
   const winnerPos=winnerName===me.name?match.myPos:(meIsA?match.posB:match.posA);
+  const score=isWO?'WO':isRet?((setsToStr(sets)?setsToStr(sets)+' ':'')+'RET'):setsToStr(sets);
+  // Visa bekräftelse-rutan innan något skickas
+  pendingSubmit={match,round,meIsA,winnerName,winnerId,winnerPos,sets,isWO,isRet,retiredById,note,score};
+  showConfirmModal();
+}
 
+// ── BEKRÄFTELSE-RUTA (stämmer det här?) ───────────────────────
+function showConfirmModal(){
+  const ps=pendingSubmit; if(!ps)return;
+  closeConfirmModal();
+  const typeLabel=ps.isWO?'WALKOVER':ps.isRet?'AVBRUTEN – SKADA':'FÄRDIGSPELAD';
+  const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#4CAF50';
+  const scoreDisp=ps.isWO?'WO':(setsToStr(ps.sets)||'—');
+  const breaker=ps.retiredById===me.id?me.name:ps.match.opp.name;
+  const extra=ps.isRet?`<div style="font-size:13px;color:var(--muted);margin-top:8px">${breaker} bröt${ps.note?(' · '+ps.note):''}</div>`:'';
+  const ov=document.createElement('div');
+  ov.id='confirm-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.62);display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.onclick=e=>{ if(e.target===ov) closeConfirmModal(); };
+  ov.innerHTML=`<div style="width:340px;max-width:100%;background:#101d12;border:1px solid rgba(193,125,75,0.35);border-radius:18px;overflow:hidden;color:var(--white)">
+    <div style="background:var(--card);padding:16px;text-align:center;border-bottom:1px solid rgba(193,125,75,0.15)">
+      <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay)">Innan du skickar</div>
+      <div style="font-size:19px;font-weight:700;margin-top:4px">Stämmer det här?</div>
+    </div>
+    <div style="padding:20px">
+      <div style="text-align:center;margin-bottom:14px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${typeColor};border:1px solid ${typeColor};padding:4px 10px;border-radius:6px">${typeLabel}</span></div>
+      <div style="background:#0C1E0E;border:1px solid rgba(76,175,80,0.35);border-radius:13px;padding:18px;text-align:center;margin-bottom:16px">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:6px">Vinnare</div>
+        <div style="font-size:21px;font-weight:700;color:#4CAF50">${ps.winnerName}</div>
+        <div style="font-family:'Space Mono',monospace;font-size:16px;letter-spacing:1px;margin-top:8px">${scoreDisp}</div>
+        ${extra}
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);text-align:center;margin-bottom:16px">${ps.match.opp.name} får bekräfta efteråt</div>
+      <button class="submit-btn" style="width:100%;justify-content:center;margin-bottom:9px" onclick="confirmSubmit()">Ja, skicka in →</button>
+      <button class="btn-sm" style="width:100%;padding:13px;justify-content:center;font-size:14px" onclick="closeConfirmModal()">Nej, ändra</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+function closeConfirmModal(){ const o=document.getElementById('confirm-overlay'); if(o)o.remove(); }
+
+function confirmSubmit(){
+  const ps=pendingSubmit; if(!ps)return;
+  closeConfirmModal();
   // ── Skriv till databasen (om kopplad) ──
   if(DBC){
-    const dbm=dbMatchForMe(round);
-    const winnerId=winnerName===me.name?me.id:match.opp.id;
-    const score=isWO?'WO':setsToStr(sets);
+    const dbm=dbMatchForMe(ps.round);
     const btn=document.getElementById('submit-btn'); if(btn)btn.disabled=true;
     (async()=>{
       try{
         if(!dbm) throw new Error('Ingen match hittad för omgången');
-        await BTS.reportResult(dbm.id,{playerId:me.id,pin:me._pin,winnerId,sets,wo:isWO,score});
+        await BTS.reportResult(dbm.id,{playerId:me.id,pin:me._pin,winnerId:ps.winnerId,sets:ps.sets,wo:ps.isWO,score:ps.score,retiredBy:ps.retiredById,note:ps.note});
         await refreshDBC();
       }catch(err){ alert('Kunde inte spara mot databasen: '+(err?.message||err)); }
       if(btn)btn.disabled=false;
+      pendingSubmit=null;
       renderApp();
     })();
     return;
   }
-
   // ── Fallback: localStorage ──
   const pending=getPending();
-  if(!pending[round])pending[round]={};
-  pending[round][match.key]={
-    posA:match.posA,posB:match.posB,winner:winnerPos,winnerName,
-    sets,wo:isWO,score:isWO?'WO':setsToStr(sets),
+  if(!pending[ps.round])pending[ps.round]={};
+  pending[ps.round][ps.match.key]={
+    posA:ps.match.posA,posB:ps.match.posB,winner:ps.winnerPos,winnerName:ps.winnerName,
+    sets:ps.sets,wo:ps.isWO,score:ps.score,retiredBy:ps.retiredById,note:ps.note,
     reporter:me.name,status:'pending',timestamp:Date.now()
   };
   savePending(pending);
+  pendingSubmit=null;
   renderApp();
 }
 

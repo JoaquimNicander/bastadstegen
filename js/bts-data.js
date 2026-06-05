@@ -143,12 +143,13 @@ const BTS = {
   },
 
   // Rapportera resultat på en befintlig match (PIN-skyddat serveranrop).
-  async reportResult(matchId, { playerId, pin, winnerId, sets = [], wo = false, score }) {
+  async reportResult(matchId, { playerId, pin, winnerId, sets = [], wo = false, score, retiredBy = null, note = null }) {
     _assert();
     const { error } = await _sb.rpc('bts_report_result', {
       p_match_id: matchId, p_player_id: playerId, p_pin: pin,
       p_winner_id: winnerId, p_sets: sets, p_wo: wo,
-      p_score: score ?? (wo ? 'WO' : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_score: score ?? (wo ? 'WO' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_retired_by: retiredBy, p_note: note,
     });
     if (error) throw error;
   },
@@ -171,13 +172,15 @@ const BTS = {
 
   // ── ADMIN (lösenordsskyddat) ──────────────────────────────────────
   async adminSaveResult(adminPw, { matchId = null, competitionId, round, posA, posB,
-                                   playerAId, playerBId, winnerId, sets = [], wo = false, score }) {
+                                   playerAId, playerBId, winnerId, sets = [], wo = false, score,
+                                   retiredBy = null, note = null }) {
     _assert();
     const { data, error } = await _sb.rpc('bts_admin_save_result', {
       p_admin_pw: adminPw, p_match_id: matchId, p_comp: competitionId, p_round: round,
       p_pos_a: posA ?? null, p_pos_b: posB ?? null, p_player_a: playerAId ?? null, p_player_b: playerBId ?? null,
       p_winner_id: winnerId, p_sets: sets, p_wo: wo,
-      p_score: score ?? (wo ? 'WO' : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_score: score ?? (wo ? 'WO' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_retired_by: retiredBy, p_note: note,
     });
     if (error) throw error;
     return data;

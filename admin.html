@@ -312,21 +312,27 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
     <div class="sms-card" style="border-left-color:var(--clay)">
       <div class="sms-head"><span>Ny spelaromgång ute <span class="sms-cnt">· <span id="sms-cnt-new_round">–</span> st</span></span>
         <button class="sms-send" onclick="doSend('new_round')">Skicka →</button></div>
-      <textarea id="sms-tpl-new_round" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! Ny omgång i Båstadstegen är igång — din match mot [motståndare]. Rapportera när ni spelat: [länk]</textarea>
+      <textarea id="sms-tpl-new_round" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]!
+Ny omgång i Båstadstegen, och du möter [motståndare].
+Damma av racketen och kör hårt! [länk]</textarea>
       <div class="sms-meta"></div>
     </div>
 
     <div class="sms-card" style="border-left-color:rgba(255,255,255,0.18)">
       <div class="sms-head"><span>Påminn: ej rapporterat <span class="sms-cnt">· <span id="sms-cnt-unreported">–</span> st</span></span>
         <button class="sms-send" onclick="doSend('unreported')">Skicka →</button></div>
-      <textarea id="sms-tpl-unreported" class="sms-ta" oninput="smsCount(this)">Hejsan [förnamn]! Din match mot [motståndare] är inte rapporterad — har ni inte spelat? Rapportera här: [länk]</textarea>
+      <textarea id="sms-tpl-unreported" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]!
+Hur gick det mot [motståndare]? Dags att skryta lite kanske? :)
+Stegen sitter på helspänn och väntar på ert resultat: [länk]</textarea>
       <div class="sms-meta"></div>
     </div>
 
     <div class="sms-card" style="border-left-color:var(--yellow)">
       <div class="sms-head"><span>Påminn: ej bekräftat <span class="sms-cnt">· <span id="sms-cnt-unconfirmed">–</span> st</span></span>
         <button class="sms-send" onclick="doSend('unconfirmed')">Skicka →</button></div>
-      <textarea id="sms-tpl-unconfirmed" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! Din match mot [motståndare] är inte bekräftad än — bekräfta här: [länk]</textarea>
+      <textarea id="sms-tpl-unconfirmed" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]!
+[motståndare] har rapporterat er match. Håller du med?
+En knapptryckning kvar, sen slipper du fler pip från mig :) [länk]</textarea>
       <div class="sms-meta"></div>
     </div>
 
