@@ -40,11 +40,9 @@
   .hero-sub{ font-weight:300; font-size:clamp(18px,2vw,22px); line-height:1.55; color:var(--navy);
     max-width:520px; margin:30px 0 0; opacity:.92; }
   .hero-cta{ display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; }
-  /* Hero-loggan: responsiv, ~3x större än SVG:ns standardbredd. Ordbilden är
-     vänsterställd i SVG:n; eyebrow ankras strax ovanför BÅSTAD och skalar med. */
+  /* Hero-loggan: responsiv, ~3x större än SVG:ns standardbredd. */
   .hero-lock{ position:relative; width:min(82vw,1000px); }
   .hero-content .bts-lockup{ width:100%; max-width:none; }
-  .hero-eyebrow{ position:absolute; bottom:60%; left:10px; margin:0; text-align:left; z-index:4; }
   .hero .serve{ position:absolute; z-index:2; }
   .scroll-hint{ position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:4;
     font-family:var(--font-mono); font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--navy);
@@ -217,13 +215,12 @@
   </div>
   <div class="wrap hero-content">
     <div class="hero-lock">
-      <div class="eyebrow hero-eyebrow">SÄSONGEN 2026</div>
       <div class="bts-lockup">
         <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
           <g class="bl-trail"></g>
           <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
-            <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/>
-            <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/></g>
+            <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>
           <g class="bl-words">
             <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#0D2E20">BÅSTAD</text>
             <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
@@ -433,7 +430,9 @@
       var t0=null;
       function fr(ts){ if(!t0)t0=ts; var t=(ts-t0)/1000;
         if(t<1.2){ var a=ease(Math.min(t/1.2,1)); var pt=p.getPointAtLength(a*L); setBall(pt.x,pt.y); dots.forEach(function(d){ d.el.setAttribute('opacity', a>=d.at?'0.9':'0'); }); if(t>0.55) words.style.opacity=1; requestAnimationFrame(fr); }
-        else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','0.9');}); words.style.opacity=1; }
+        else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','0.9');}); words.style.transition='none'; words.style.opacity=1;
+          /* iOS Safari tappar ibland bort BÅSTAD efter animeringen – byt ordbilden mot en färsk kopia så den ritas om rent och blir kvar. */
+          var fresh=words.cloneNode(true); fresh.style.opacity=1; fresh.style.transition='none'; words.parentNode.replaceChild(fresh,words); }
       }
       setBall(-22,22); requestAnimationFrame(fr);
     });

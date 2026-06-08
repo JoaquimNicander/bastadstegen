@@ -228,8 +228,8 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
       <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
         <g class="bl-trail"></g>
         <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
-          <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/>
-          <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/></g>
+          <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>
         <g class="bl-words">
           <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#FF8C42">BÅSTAD</text>
           <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
@@ -1600,7 +1600,9 @@ async function doTest(){
     var t0=null;
     function fr(ts){ if(!t0)t0=ts; var t=(ts-t0)/1000;
       if(t<1.2){ var a=ease(Math.min(t/1.2,1)); var pt=p.getPointAtLength(a*L); setBall(pt.x,pt.y); dots.forEach(function(d){ d.el.setAttribute('opacity', a>=d.at?'.9':'0'); }); if(t>0.55) words.style.opacity=1; requestAnimationFrame(fr); }
-      else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.opacity=1; }
+      else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.transition='none'; words.style.opacity=1;
+        /* iOS Safari tappar ibland bort BÅSTAD efter animeringen – byt ordbilden mot en färsk kopia så den ritas om rent och blir kvar. */
+        var fresh=words.cloneNode(true); fresh.style.opacity=1; fresh.style.transition='none'; words.parentNode.replaceChild(fresh,words); }
     }
     setBall(-22,22); requestAnimationFrame(fr);
   });
