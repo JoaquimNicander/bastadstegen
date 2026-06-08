@@ -40,6 +40,11 @@
   .hero-sub{ font-weight:300; font-size:clamp(18px,2vw,22px); line-height:1.55; color:var(--navy);
     max-width:520px; margin:30px 0 0; opacity:.92; }
   .hero-cta{ display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; }
+  /* Hero-loggan: responsiv, ~3x större än SVG:ns standardbredd. Ordbilden är
+     vänsterställd i SVG:n; eyebrow ankras strax ovanför BÅSTAD och skalar med. */
+  .hero-lock{ position:relative; width:min(82vw,1000px); }
+  .hero-content .bts-lockup{ width:100%; max-width:none; }
+  .hero-eyebrow{ position:absolute; bottom:60%; left:10px; margin:0; text-align:left; z-index:4; }
   .hero .serve{ position:absolute; z-index:2; }
   .scroll-hint{ position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:4;
     font-family:var(--font-mono); font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--navy);
@@ -211,9 +216,9 @@
     </div>
   </div>
   <div class="wrap hero-content">
-    <div style="display:inline-block">
-      <div class="eyebrow" style="display:block;text-align:right;margin-right:2px">SÄSONGEN 2026</div>
-      <div class="bts-lockup" style="width:100%;max-width:540px">
+    <div class="hero-lock">
+      <div class="eyebrow hero-eyebrow">SÄSONGEN 2026</div>
+      <div class="bts-lockup">
         <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
           <g class="bl-trail"></g>
           <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
