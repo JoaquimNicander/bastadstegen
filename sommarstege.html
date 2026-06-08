@@ -194,6 +194,12 @@ function renderMatcher(){
 // ── STÄLLNING ──
 function renderStallning(){
   const el=document.getElementById('view-stallning');
+  // Visa ingen ställning förrän sommarstegen dragit igång (första speldagen upplagd).
+  if(!events.length){
+    el.innerHTML=`<div class="label">Sommarställning</div>
+      <div class="muted" style="padding:20px 4px;line-height:1.6">Sommarstegen har inte börjat än.<br>Ställningen visas så fort första speldagen är upplagd.</div>`;
+    return;
+  }
   const wl={};
   matches.forEach(m=>{ if(!m.winner_id)return; const lo=m.winner_id===m.player_a_id?m.player_b_id:m.player_a_id;
     wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0}; wl[m.winner_id].w++; wl[lo]=wl[lo]||{w:0,l:0}; wl[lo].l++; });
