@@ -62,7 +62,7 @@
 <div class="hero">
   <div class="sun"></div>
   <h1>SOMMARSTEGE 2026</h1>
-  <div class="tag">🎾 Spel på söndagar · drop-in · Båstad TS</div>
+  <div class="tag">🎾 Spel på söndagar · Båstad TS</div>
 </div>
 
 <div class="wrap">
@@ -171,7 +171,7 @@ function renderAnmalan(){
 function renderMatcher(){
   const el=document.getElementById('view-matcher');
   const drawn=events.filter(e=>matchesFor(e.play_date).length);
-  if(!drawn.length){ el.innerHTML='<div class="muted">Inga matcher lottade än. Admin lottar en speldag när anmälan stängt.</div>'; return; }
+  if(!drawn.length){ el.innerHTML=''; return; }
   el.innerHTML=drawn.map(e=>{
     const ms=matchesFor(e.play_date);
     return `<div style="margin-bottom:22px"><div class="ev-name">${e.name}</div><div class="ev-meta">${fmtDate(e.play_date)}</div>`
