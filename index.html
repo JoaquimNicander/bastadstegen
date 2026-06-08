@@ -72,12 +72,12 @@
   .sommar-card .court-plane{ position:absolute; inset:0; transform:perspective(780px) rotateX(42deg) rotateZ(-5deg); transform-origin:56% 82%; z-index:1; pointer-events:none; }
   .sommar-card .court-plane .base{ left:-16%; right:-22%; top:72%; height:34px; }
   .sommar-card .court-plane .side{ left:55%; top:54%; bottom:28%; width:34px; }
-  .sommar-burst{ position:absolute; left:50%; top:42%; transform:translate(-50%,-50%) rotate(-6deg); z-index:5; width:188px; height:188px;
+  .sommar-burst{ position:absolute; left:50%; top:42%; transform:translate(-50%,-50%) rotate(-6deg); z-index:5; width:212px; height:212px;
     background:var(--navy); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
     clip-path:polygon(50% 0%,61% 13%,79% 8%,79% 27%,96% 30%,86% 46%,100% 59%,83% 65%,87% 83%,69% 79%,60% 96%,50% 82%,40% 96%,31% 79%,13% 83%,17% 65%,0% 59%,14% 46%,4% 30%,21% 27%,21% 8%,39% 13%); }
-  .sommar-burst .s1{ font-family:var(--font-mono); font-size:10px; letter-spacing:3px; text-transform:uppercase; color:#FFE07A; }
-  .sommar-burst .s2{ font-family:'Anton',sans-serif; font-size:29px; line-height:.86; text-transform:uppercase; text-align:center; color:#fff; }
-  .sommar-burst .s3{ font-family:var(--font-mono); font-size:9px; letter-spacing:2px; margin-top:3px; color:rgba(255,247,226,.7); }
+  .sommar-burst .s1{ font-family:var(--font-mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#FFE07A; }
+  .sommar-burst .s2{ font-family:'Anton',sans-serif; font-size:33px; line-height:.86; text-transform:uppercase; text-align:center; color:#fff; }
+  .sommar-burst .s3{ font-family:var(--font-mono); font-size:10px; letter-spacing:2px; margin-top:3px; color:rgba(255,247,226,.7); }
   .sommar-logo{ position:absolute; right:30px; bottom:28px; z-index:6; text-align:right; }
   .sommar-logo .line{ font-family:'Anton',sans-serif; text-transform:uppercase; line-height:.82; transform:skewX(-8deg); display:block; font-size:30px; }
   @media (prefers-reduced-motion:reduce){ .sommar-card .suns{ animation:none } }
@@ -161,6 +161,13 @@
     .stat .num{ font-size:clamp(34px,11vw,52px); }
     .stat .lbl{ font-size:10px; letter-spacing:1px; }
     .sommar-in{ grid-template-columns:1fr; }
+    /* min-height:540 var högre än vad 4/5-förhållandet ger för mobilbredden,
+       så iOS härledde en bredare bredd → höger kant (ordbilden) klipptes.
+       Ta bort min-height så bredden låses till behållaren. */
+    .sommar-card{ min-height:0; width:100%; max-width:100%; }
+    .sommar-logo{ right:22px; bottom:22px; }
+    .sommar-logo .line{ font-size:clamp(24px,7vw,30px); }
+    .sommar-burst{ width:200px; height:200px; }
     .stepper{ grid-template-columns:1fr; }
     .step-nav{ flex-direction:row; overflow-x:auto; }
     .step-tab{ border-left:0; border-bottom:2px solid rgba(255,255,255,.12); flex-shrink:0; }
