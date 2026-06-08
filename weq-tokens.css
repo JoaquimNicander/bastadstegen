@@ -1,0 +1,172 @@
+/* ============================================================
+   WEQ — Colors & Type tokens
+   Source of truth: weq-website/css/style.css (v2)
+   Brand: Orange / Dark / Cream · Fonts: Outfit + Space Mono
+   ============================================================ */
+
+/* ---- FONTS ---------------------------------------------------- */
+@font-face {
+  font-family: 'Outfit';
+  src: url('fonts/Outfit.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---- BASE COLOR: ORANGE RAMP (light → dark) -------------- */
+  --o1: #FF8C42;   /* highlight / accents on dark, hover glows  */
+  --o2: #E8520A;   /* PRIMARY brand orange — buttons, stat vals */
+  --o3: #C43E00;   /* deep orange — hover/pressed primary       */
+  --o4: #7A2400;   /* darkest chevron, rust                     */
+  --o5: #5A1800;   /* near-black rust, gradient floor           */
+
+  /* ---- BASE COLOR: NEUTRALS -------------------------------- */
+  --void:    #0D0804;   /* page background, darkest             */
+  --surface: #1A0D06;   /* raised dark surface                  */
+  --card:    #1E0E06;   /* card fill on dark                    */
+  --border:  #3D1A08;   /* rust border on dark                  */
+  --cream:   #F5EDE3;   /* warm off-white                       */
+  --white:   #FFF8F3;   /* warm white — primary text on dark    */
+
+  /* ---- BASE COLOR: TEXT OPACITIES (warm white) ------------- */
+  --muted:   rgba(255,248,243,0.38);   /* faint body / leads    */
+  --muted2:  rgba(255,248,243,0.55);   /* secondary nav text    */
+
+  /* ---- SEMANTIC: FOREGROUND -------------------------------- */
+  --fg1:        var(--white);            /* primary text on dark */
+  --fg2:        var(--muted2);           /* secondary text       */
+  --fg3:        var(--muted);            /* tertiary / captions  */
+  --fg-on-light:#0D0804;                 /* text on cream/orange */
+  --fg2-on-light: rgba(13,8,4,0.55);     /* secondary on light   */
+  --accent:     var(--o2);               /* brand accent         */
+  --accent-soft: rgba(232,82,10,0.65);   /* eyebrows on dark     */
+
+  /* ---- SEMANTIC: SURFACES & LINES -------------------------- */
+  --bg:           var(--void);
+  --bg-card:      rgba(255,255,255,0.03); /* glassy card on dark  */
+  --line:         var(--border);
+  --line-soft:    rgba(61,26,8,0.85);
+  --line-on-light:rgba(13,8,4,0.10);
+
+  /* ---- SEMANTIC: GRADIENTS (signature) --------------------- */
+  --grad-hero:   linear-gradient(168deg, #FF8030 0%, #E8520A 28%, #B83A00 60%, #5A1800 100%);
+  --grad-cta:    linear-gradient(168deg, #FF8030 0%, #E8520A 35%, #9B2F00 100%);
+  --grad-dark:   linear-gradient(168deg, #2A1006 0%, #0D0804 100%);
+  --grad-cream:  linear-gradient(168deg, #ffffff 0%, #EDD8C4 100%);
+  --grad-nav:    linear-gradient(168deg, #2A1006, #0D0804);
+
+  /* ---- SEMANTIC: BACKGROUND PATTERNS ----------------------- */
+  /* apply as background-image on an absolutely-positioned layer */
+  --pattern-dot-dark:  radial-gradient(rgba(232,82,10,0.10) 1px, transparent 1px);  /* size 18–20px */
+  --pattern-dot-cream: radial-gradient(rgba(180,80,20,0.08) 1px, transparent 1px);  /* size 20px    */
+  --pattern-dot-nav:   radial-gradient(rgba(232,82,10,0.10) 1px, transparent 1px);  /* size 20px    */
+
+  /* ---- TYPE: FAMILIES -------------------------------------- */
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;  /* everything */
+  --font-mono: 'Space Mono', ui-monospace, monospace;                    /* eyebrows, labels, micro-copy */
+
+  /* ---- TYPE: WEIGHTS --------------------------------------- */
+  --w-light: 300;   /* body, leads, descriptions */
+  --w-reg:   400;   /* nav, mono */
+  --w-med:   500;   /* small buttons */
+  --w-semi:  600;   /* primary buttons */
+  --w-bold:  700;   /* card headings, mono-bold */
+  --w-black: 800;   /* display / wordmark */
+
+  /* ---- TYPE: TRACKING -------------------------------------- */
+  --track-display: -3px;     /* hero h1 (clamps with size)   */
+  --track-title:   -1.5px;   /* section titles               */
+  --track-tight:   -0.5px;   /* wordmark                     */
+  --track-mono:    3px;      /* eyebrows / payoff (letter)   */
+  --track-mono-wide: 4px;    /* section eyebrows             */
+}
+
+/* ============================================================
+   SEMANTIC TYPE CLASSES — base styling building blocks
+   ============================================================ */
+
+.weq-display {           /* hero H1 */
+  font-family: var(--font-sans);
+  font-weight: var(--w-black);
+  font-size: clamp(52px, 8vw, 96px);
+  line-height: 0.95;
+  letter-spacing: var(--track-display);
+  color: #fff;
+}
+
+.weq-h2 {                /* section title */
+  font-family: var(--font-sans);
+  font-weight: var(--w-black);
+  font-size: clamp(32px, 4.5vw, 52px);
+  line-height: 1.08;
+  letter-spacing: var(--track-title);
+}
+
+.weq-h3 {                /* card / feature heading */
+  font-family: var(--font-sans);
+  font-weight: var(--w-bold);
+  font-size: 18px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.weq-lead {              /* intro paragraph under titles */
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.weq-body {              /* default body */
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.weq-body-sm {           /* card descriptions */
+  font-family: var(--font-sans);
+  font-weight: var(--w-light);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.weq-eyebrow {           /* numbered section labels: "02 — Hur det fungerar" */
+  font-family: var(--font-mono);
+  font-weight: var(--w-reg);
+  font-size: 9px;
+  letter-spacing: var(--track-mono-wide);
+  text-transform: uppercase;
+}
+
+.weq-label {             /* micro mono labels, stat captions */
+  font-family: var(--font-mono);
+  font-weight: var(--w-reg);
+  font-size: 9px;
+  letter-spacing: var(--track-mono);
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.weq-stat {              /* big animated numbers */
+  font-family: var(--font-sans);
+  font-weight: var(--w-black);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1;
+  letter-spacing: -1px;
+}

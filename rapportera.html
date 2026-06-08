@@ -4,63 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>BTS Stegen — Min sida</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0A1A0C;--surface:#0F2212;--card:#142816;--card2:#1A3320;
-  --border:#1F4025;--border2:#2A5530;
-  --green:#4CAF50;--yellow:#D4E157;--clay:#C17D4B;
-  --white:#F0F5F0;--muted:rgba(240,245,240,0.5);--muted2:rgba(240,245,240,0.3);
-  --red:#EF5350;--blue:#42A5F5;
+  --bg:#0D2E20;--surface:#0D2A1D;--card:#0D2A1D;--card2:#133124;
+  --border:#1C3A2B;--border2:#2A5A42;
+  --green:#FF8C42;--yellow:#F5EDE3;--clay:#FF8C42;
+  --white:#F5EDE3;--muted:rgba(240,245,240,0.5);--muted2:rgba(240,245,240,0.3);
+  --red:#EF5350;--blue:#FF8C42;
 }
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px}
 
 /* ── LOGIN ── */
-.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0F2212 0%,var(--bg) 70%)}
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0D2A1D 0%,var(--bg) 70%)}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:36px 28px;width:100%;max-width:380px;text-align:center}
 .login-logo-wrap{margin-bottom:24px}
 .login-logo-wrap svg{width:200px;height:auto;display:block;margin:0 auto}
-.login-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:4px}
+.login-title{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:3px;margin-bottom:4px}
 .login-sub{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:28px}
 .login-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;text-align:left;margin-bottom:6px;display:block}
 .login-select,.login-input{
   width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border2);
-  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  color:var(--white);font-family:'Outfit',sans-serif;font-size:16px;outline:none;
   margin-bottom:14px;transition:border-color 0.2s;appearance:none;border-radius:0;
 }
 .login-select:focus,.login-input:focus{border-color:var(--green)}
 .login-btn{
   width:100%;padding:16px;background:var(--green);color:#000;
-  font-family:'Inter',sans-serif;font-size:16px;font-weight:700;
+  font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;
   border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s;
   border-radius:0;min-height:52px;
 }
-.login-btn:active{background:#43A047}
-.login-error{color:var(--red);font-size:13px;margin-top:10px;font-family:'Inter',sans-serif}
+.login-btn:active{background:#F5EDE3}
+.login-error{color:var(--red);font-size:13px;margin-top:10px;font-family:'Outfit',sans-serif}
 .login-hint{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:1px;margin-top:20px;line-height:1.7;border-top:1px solid var(--border);padding-top:16px}
-.link-back{display:block;margin-top:16px;color:var(--muted2);font-family:'Inter',sans-serif;font-size:14px;text-decoration:none;padding:8px}
+.link-back{display:block;margin-top:16px;color:var(--muted2);font-family:'Outfit',sans-serif;font-size:14px;text-decoration:none;padding:8px}
 .link-back:hover{color:var(--white)}
 
 /* ── HEADER ── */
-header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50}
+header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50}
 .header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
 .header-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .header-logo-img{width:34px;height:34px;object-fit:contain}
 .header-logo-img svg,.header-logo-img img{width:100%;height:100%}
 .header-info{}
-.header-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);line-height:1}
+.header-title{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white);line-height:1}
 .header-player-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--green);letter-spacing:1px;margin-top:1px}
 .header-actions{display:flex;align-items:center;gap:6px}
-.btn-sm{background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;padding:8px 14px;cursor:pointer;text-decoration:none;transition:all 0.2s;min-height:38px;display:flex;align-items:center}
+.btn-sm{background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;padding:8px 14px;cursor:pointer;text-decoration:none;transition:all 0.2s;min-height:38px;display:flex;align-items:center}
 .btn-sm:active{border-color:var(--muted);color:var(--white)}
 
 /* ── SEASON BAR ── */
 .season-bar{background:rgba(0,0,0,0.2);border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto}
 .season-bar-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:6px;height:40px}
 .season-chip{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;background:none;min-height:32px}
-.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
+.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(245,237,227,0.08)}
 .season-readonly-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--clay);letter-spacing:1px;background:rgba(193,125,75,0.1);border:1px solid rgba(193,125,75,0.25);padding:3px 10px;white-space:nowrap}
 
 /* ── MAIN ── */
@@ -75,7 +78,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 
 /* ── NOTIFICATION ── */
-.notif-banner{background:rgba(66,165,245,0.08);border:1px solid rgba(66,165,245,0.25);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.notif-banner{background:rgba(255,140,66,0.08);border:1px solid rgba(255,140,66,0.25);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
 .notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
 .notif-text{font-size:15px;line-height:1.5}
 .notif-text strong{color:var(--white)}
@@ -88,25 +91,25 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .match-versus-player{flex:1}
 .match-versus-name{font-weight:700;font-size:17px;color:var(--white);line-height:1.2}
 .match-versus-rank{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:4px}
-.match-versus-sep{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2);letter-spacing:2px;flex-shrink:0;padding:0 4px}
+.match-versus-sep{font-family:'Anton',sans-serif;font-size:22px;color:var(--muted2);letter-spacing:2px;flex-shrink:0;padding:0 4px}
 .match-vs-right{text-align:right}
 
 /* ── WO OPTION (prominent) ── */
 .wo-option-row{display:flex;gap:10px;margin-bottom:20px}
 .wo-big-btn{
   flex:1;padding:14px;background:none;border:2px solid var(--border2);
-  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  color:var(--muted);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;
   cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
   gap:8px;min-height:52px;
 }
 .wo-big-btn:active,.wo-big-btn.active{border-color:var(--clay);color:var(--white);background:rgba(193,125,75,0.12)}
 .score-big-btn{
   flex:2;padding:14px;background:none;border:2px solid var(--border2);
-  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  color:var(--muted);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;
   cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;
   gap:8px;min-height:52px;
 }
-.score-big-btn.active{border-color:var(--green);color:var(--white);background:rgba(76,175,80,0.08)}
+.score-big-btn.active{border-color:var(--green);color:var(--white);background:rgba(245,237,227,0.08)}
 
 /* ── SET INPUTS ── */
 .set-input-section{margin-bottom:16px}
@@ -117,25 +120,25 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .set-box{display:flex;align-items:center;flex:1;border:1px solid var(--border2);background:var(--card2);overflow:hidden}
 .set-num{
   flex:1;height:52px;background:transparent;border:none;
-  color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:28px;
+  color:var(--white);font-family:'Anton',sans-serif;font-size:28px;
   text-align:center;outline:none;-moz-appearance:textfield;
   transition:background 0.15s;
 }
 .set-num::-webkit-inner-spin-button,.set-num::-webkit-outer-spin-button{-webkit-appearance:none}
-.set-num:focus{background:rgba(76,175,80,0.08)}
-.set-dash{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted2);padding:0 4px;flex-shrink:0;background:var(--border);width:32px;height:52px;display:flex;align-items:center;justify-content:center}
+.set-num:focus{background:rgba(245,237,227,0.08)}
+.set-dash{font-family:'Anton',sans-serif;font-size:22px;color:var(--muted2);padding:0 4px;flex-shrink:0;background:var(--border);width:32px;height:52px;display:flex;align-items:center;justify-content:center}
 .stb-row{opacity:0;max-height:0;overflow:hidden;transition:all 0.35s ease;margin-bottom:0}
 .stb-row.visible{opacity:1;max-height:80px;margin-bottom:10px}
 .stb-row .set-lbl{color:var(--clay)}
 .stb-row .set-box{border-color:rgba(193,125,75,0.4)}
 .stb-announce{
   background:rgba(193,125,75,0.1);border:1px solid rgba(193,125,75,0.3);
-  color:var(--clay);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  color:var(--clay);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
   padding:10px 14px;margin-bottom:12px;text-align:center;
   opacity:0;max-height:0;overflow:hidden;transition:all 0.3s ease;
 }
 .stb-announce.visible{opacity:1;max-height:50px}
-.btn-add-stb{background:none;border:1px dashed var(--border2);color:var(--muted2);font-family:'Inter',sans-serif;font-size:13px;padding:10px 16px;cursor:pointer;transition:all 0.2s;margin-bottom:12px;display:block;width:100%;text-align:center;min-height:42px}
+.btn-add-stb{background:none;border:1px dashed var(--border2);color:var(--muted2);font-family:'Outfit',sans-serif;font-size:13px;padding:10px 16px;cursor:pointer;transition:all 0.2s;margin-bottom:12px;display:block;width:100%;text-align:center;min-height:42px}
 .btn-add-stb:active{border-color:var(--green);color:var(--green)}
 
 /* ── WO WINNER SELECT ── */
@@ -144,7 +147,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .wo-winner-btns{display:flex;flex-direction:column;gap:8px}
 .wo-winner-btn{
   width:100%;padding:14px 16px;background:var(--card2);border:2px solid var(--border);
-  color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;
+  color:var(--muted);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;
   cursor:pointer;transition:all 0.2s;text-align:left;min-height:52px;
 }
 .wo-winner-btn.selected{border-color:var(--clay);color:var(--white);background:rgba(193,125,75,0.1)}
@@ -157,16 +160,16 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
   transition:all 0.25s ease;border:2px solid transparent;
 }
 .auto-win-display.empty{background:var(--card2);border-color:var(--border);color:var(--muted2);font-weight:400;font-size:14px}
-.auto-win-display.detected{background:rgba(76,175,80,0.1);border-color:rgba(76,175,80,0.4);color:var(--green)}
+.auto-win-display.detected{background:rgba(245,237,227,0.1);border-color:rgba(245,237,227,0.4);color:var(--green)}
 
 /* ── SUBMIT BUTTON ── */
 .submit-btn{
   width:100%;padding:18px;background:var(--green);color:#000;
-  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;
+  font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;
   border:none;cursor:pointer;transition:all 0.2s;min-height:58px;
   position:relative;overflow:hidden;
 }
-.submit-btn:active{background:#43A047;transform:scale(0.99)}
+.submit-btn:active{background:#F5EDE3;transform:scale(0.99)}
 .submit-btn:disabled{background:var(--card2);color:var(--muted2);cursor:not-allowed;transform:none}
 
 /* ── RIPPLE ── */
@@ -175,23 +178,23 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 
 /* ── CONFIRM ── */
 .confirm-card{background:var(--card);border:1px solid var(--border2);padding:20px 16px;animation:fadeUp 0.3s ease}
-.confirm-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
+.confirm-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
 .confirm-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
 .confirm-score{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700;letter-spacing:1px;margin-bottom:4px}
 .confirm-btns{display:flex;gap:8px;margin-top:16px}
-.btn-confirm{flex:1;padding:16px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;min-height:52px}
-.btn-dispute{flex:1;padding:16px;background:none;color:var(--red);font-family:'Inter',sans-serif;font-weight:600;font-size:15px;border:2px solid var(--red);cursor:pointer;min-height:52px}
+.btn-confirm{flex:1;padding:16px;background:var(--green);color:#000;font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;min-height:52px}
+.btn-dispute{flex:1;padding:16px;background:none;color:var(--red);font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;border:2px solid var(--red);cursor:pointer;min-height:52px}
 
 /* ── SUCCESS ── */
-.success-box{background:rgba(76,175,80,0.07);border:1px solid rgba(76,175,80,0.25);padding:28px 20px;text-align:center;animation:successPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+.success-box{background:rgba(245,237,227,0.07);border:1px solid rgba(245,237,227,0.25);padding:28px 20px;text-align:center;animation:successPop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes successPop{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
 .success-icon{font-size:48px;margin-bottom:12px;display:block}
-.success-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--green);margin-bottom:6px}
+.success-title{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:2px;color:var(--green);margin-bottom:6px}
 .success-sub{font-size:15px;color:var(--muted);line-height:1.6}
 .success-score{font-family:'Space Mono',monospace;font-size:14px;color:var(--white);font-weight:700;margin-top:12px;letter-spacing:1px;padding:8px;background:var(--card2);display:inline-block}
 .status-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:100px;margin-top:12px}
-.status-tag.pending{background:rgba(212,225,87,0.1);border:1px solid rgba(212,225,87,0.3);color:var(--yellow)}
-.status-tag.confirmed{background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.3);color:var(--green)}
+.status-tag.pending{background:rgba(245,237,227,0.1);border:1px solid rgba(245,237,227,0.3);color:var(--yellow)}
+.status-tag.confirmed{background:rgba(245,237,227,0.1);border:1px solid rgba(245,237,227,0.3);color:var(--green)}
 
 /* ── PROFILE FORM ── */
 .profile-form{background:var(--card);border:1px solid var(--border);padding:20px 16px}
@@ -199,22 +202,22 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .form-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;display:block}
 .form-input,.form-select{
   width:100%;padding:13px 14px;background:var(--card2);border:1px solid var(--border2);
-  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  color:var(--white);font-family:'Outfit',sans-serif;font-size:16px;outline:none;
   transition:border-color 0.2s;border-radius:0;-webkit-appearance:none;
 }
 .form-input:focus,.form-select:focus{border-color:var(--green)}
 .form-textarea{
   width:100%;padding:13px 14px;background:var(--card2);border:1px solid var(--border2);
-  color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  color:var(--white);font-family:'Outfit',sans-serif;font-size:16px;outline:none;
   resize:none;min-height:80px;line-height:1.5;transition:border-color 0.2s;border-radius:0;
 }
 .form-textarea:focus{border-color:var(--green)}
 .save-btn{
-  background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;
+  background:var(--green);color:#000;border:none;font-family:'Outfit',sans-serif;
   font-size:15px;font-weight:700;padding:14px 24px;cursor:pointer;
   letter-spacing:0.5px;transition:all 0.2s;margin-top:6px;min-height:48px;
 }
-.save-btn:active{background:#43A047}
+.save-btn:active{background:#F5EDE3}
 .pin-row{display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);align-items:flex-end}
 
 .hidden{display:none!important}
@@ -231,27 +234,18 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-logo-wrap">
-      <svg viewBox="0 0 233.1 171.3" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="lclay" cx="113.6356" cy="164.2249" r="73.4464" gradientTransform="matrix(0.9952 0 0 1.2602 0.9847 -124.8108)" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#C68D64"/>
-            <stop offset="1" stop-color="#9D603B"/>
-          </radialGradient>
-        </defs>
-        <rect x="43.1" y="56.5" fill="url(#lclay)" stroke="#FFF" stroke-miterlimit="10" width="142" height="51.3"/>
-        <rect x="113.7" y="54.5" fill="#FFF" width="1.1" height="55.7"/>
-        <rect x="43.6" y="101.4" fill="#FFF" width="141.5" height="0.4"/>
-        <rect x="43.6" y="62.8" fill="#FFF" width="141.5" height="0.4"/>
-        <polygon fill="#FFF" points="149.5,82.2 149.5,82.6 79.1,82.6 79.1,82.1"/>
-        <g opacity="0.4"><polygon fill="#888" points="114.8,54.4 114.8,110.1 117.8,111.2 117.8,55.5"/></g>
-        <rect x="78.8" y="62.8" fill="#FFF" width="0.6" height="39"/>
-        <rect x="149.1" y="62.8" fill="#FFF" width="0.5" height="39"/>
-        <polygon fill="#FFF" points="44.4,82.2 44.4,82.6 42.7,82.6 42.7,82.2"/>
-        <polygon fill="#FFF" points="185.2,82.2 185.2,82.6 183.6,82.6 183.6,82.2"/>
-        <text transform="matrix(1 0 0 1 51.0092 90.4508)" fill="#FFF" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="29.75">TENNIS</text>
-        <text transform="matrix(1 0 0 1 51.6933 44.3829)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.33">BÅSTAD</text>
-        <text transform="matrix(0.9837 0 0 1 51.6933 140.4015)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.48">STEGEN</text>
-      </svg>
+      <div class="bts-lockup" style="width:100%;max-width:240px;margin:0 auto">
+        <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+          <g class="bl-trail"></g>
+          <g class="bl-words">
+            <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#FF8C42">BÅSTAD</text>
+            <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
+          </g>
+          <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
+            <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/></g>
+        </svg>
+      </div>
     </div>
     <div class="login-sub">Min sida</div>
     <label class="login-label" for="login-name">Ditt namn</label>
@@ -273,7 +267,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
   <div class="header-inner">
     <a class="header-logo" href="stegen.html">
       <div class="header-logo-img">
-        <img src="bts-logo.svg" alt="BTS" onerror="this.outerHTML='<span style=font-size:24px>🎾</span>'">
+        <img src="bts-crest.png" alt="Båstad TS" style="height:38px;width:auto;object-fit:contain" onerror="this.outerHTML='<span style=font-size:24px>🎾</span>'">
       </div>
       <div class="header-info">
         <div class="header-title">BTS Stegen</div>
@@ -733,7 +727,7 @@ function renderApp(){
         </div>
 
         <!-- RETIRED (AVBRUTEN) SECTION -->
-        <div class="wo-section hidden" id="retired-section" style="background:rgba(212,225,87,0.06);border-color:rgba(212,225,87,0.3)">
+        <div class="wo-section hidden" id="retired-section" style="background:rgba(245,237,227,0.06);border-color:rgba(245,237,227,0.3)">
           <div class="wo-section-title" style="color:var(--yellow);font-size:15px;letter-spacing:1px;margin-bottom:14px">Vem bröt matchen?</div>
           <div class="wo-winner-btns">
             <button class="wo-winner-btn" data-ret="${me.name}" onclick="selectRetiredBy('${me.name}')">
@@ -858,7 +852,7 @@ function showConfirmModal(){
   const ps=pendingSubmit; if(!ps)return;
   closeConfirmModal();
   const typeLabel=ps.isWO?'WALKOVER':ps.isRet?'AVBRUTEN – SKADA':'FÄRDIGSPELAD';
-  const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#4CAF50';
+  const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#FF8C42';
   const scoreDisp=ps.isWO?'WO':(setsToStr(ps.sets)||'—');
   const breaker=ps.retiredById===me.id?me.name:ps.match.opp.name;
   const extra=ps.isRet?`<div style="font-size:13px;color:var(--muted);margin-top:8px">${breaker} bröt${ps.note?(' · '+ps.note):''}</div>`:'';
@@ -866,16 +860,16 @@ function showConfirmModal(){
   ov.id='confirm-overlay';
   ov.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.62);display:flex;align-items:center;justify-content:center;padding:20px';
   ov.onclick=e=>{ if(e.target===ov) closeConfirmModal(); };
-  ov.innerHTML=`<div style="width:340px;max-width:100%;background:#101d12;border:1px solid rgba(193,125,75,0.35);border-radius:18px;overflow:hidden;color:var(--white)">
+  ov.innerHTML=`<div style="width:340px;max-width:100%;background:#0D2A1D;border:1px solid rgba(193,125,75,0.35);border-radius:18px;overflow:hidden;color:var(--white)">
     <div style="background:var(--card);padding:16px;text-align:center;border-bottom:1px solid rgba(193,125,75,0.15)">
       <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay)">Innan du skickar</div>
       <div style="font-size:19px;font-weight:700;margin-top:4px">Stämmer det här?</div>
     </div>
     <div style="padding:20px">
       <div style="text-align:center;margin-bottom:14px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${typeColor};border:1px solid ${typeColor};padding:4px 10px;border-radius:6px">${typeLabel}</span></div>
-      <div style="background:#0C1E0E;border:1px solid rgba(76,175,80,0.35);border-radius:13px;padding:18px;text-align:center;margin-bottom:16px">
+      <div style="background:#0D2E20;border:1px solid rgba(245,237,227,0.35);border-radius:13px;padding:18px;text-align:center;margin-bottom:16px">
         <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:6px">Vinnare</div>
-        <div style="font-size:21px;font-weight:700;color:#4CAF50">${ps.winnerName}</div>
+        <div style="font-size:21px;font-weight:700;color:#FF8C42">${ps.winnerName}</div>
         <div style="font-family:'Space Mono',monospace;font-size:16px;letter-spacing:1px;margin-top:8px">${scoreDisp}</div>
         ${extra}
       </div>
@@ -974,7 +968,7 @@ function undoReport(){
 function launchConfetti(){
   const wrap=document.getElementById('confetti-wrap');
   wrap.classList.remove('hidden');wrap.innerHTML='';
-  const colors=['#4CAF50','#D4E157','#42A5F5','#C17D4B','#F0F5F0'];
+  const colors=['#FF8C42','#F5EDE3','#FF8C42','#FF8C42','#F5EDE3'];
   for(let i=0;i<40;i++){
     const p=document.createElement('div');p.className='confetti-piece';
     p.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${Math.random()*0.5}s;animation-duration:${0.9+Math.random()*0.6}s`;
@@ -1050,6 +1044,31 @@ function savePin(){
     await refreshDBC().catch(()=>{});
     if(JSON.stringify([getPendingForMe(),myReportStatus()])!==before) renderApp();
   },60000);
+})();
+</script>
+<script>
+/* Stegens logotyp-animation (identisk överallt): serve-båge ritas, bollen blir kvar, BÅSTAD STEGEN tonas in. */
+(function(){
+  document.querySelectorAll('.bts-lockup').forEach(function(box){
+    var svg=box.querySelector('svg'), ball=box.querySelector('.bl-ball'),
+        trail=box.querySelector('.bl-trail'), words=box.querySelector('.bl-words');
+    if(!svg||!ball||!words) return;
+    var ns='http://www.w3.org/2000/svg';
+    var p=document.createElementNS(ns,'path'); p.setAttribute('d','M-26 26 Q 158 -245 312 26'); p.setAttribute('fill','none'); svg.appendChild(p);
+    var L=p.getTotalLength(), N=14, dots=[];
+    for(var i=1;i<=N;i++){ var pt=p.getPointAtLength((i/(N+1))*L); var c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y); c.setAttribute('r',2.6); c.setAttribute('fill','rgba(255,255,255,.9)'); c.setAttribute('opacity','0'); trail.appendChild(c); dots.push({el:c,at:i/(N+1)}); }
+    words.style.opacity=0; words.style.transition='opacity .55s ease';
+    function setBall(x,y){ ball.setAttribute('transform','translate('+x+' '+y+')'); }
+    var ease=function(t){return 1-Math.pow(1-t,3);};
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){ var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.opacity=1; return; }
+    var t0=null;
+    function fr(ts){ if(!t0)t0=ts; var t=(ts-t0)/1000;
+      if(t<1.2){ var a=ease(Math.min(t/1.2,1)); var pt=p.getPointAtLength(a*L); setBall(pt.x,pt.y); dots.forEach(function(d){ d.el.setAttribute('opacity', a>=d.at?'.9':'0'); }); if(t>0.55) words.style.opacity=1; requestAnimationFrame(fr); }
+      else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.opacity=1; }
+    }
+    setBall(-22,22); requestAnimationFrame(fr);
+  });
 })();
 </script>
 </body>

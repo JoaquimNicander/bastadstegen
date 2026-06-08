@@ -1,9 +1,7 @@
-.DS_Store
-Thumbs.db
-*.log
-
-# Lokala setup-/databasfiler — ska INTE publiceras (innehåller
-# telefonnummer, adminlösenord och annan känslig setup)
+design-forhandsvisning/
 supabase/
-db-test.html
-BESLUT.md
+.fuse_hidden*
+*.bak
+BASTADSTEGEN 1000x1000.png
+_logo_preview.png
+.DS_Store

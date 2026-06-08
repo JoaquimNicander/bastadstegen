@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS — databastest</title>
+<style>
+  body{font-family:-apple-system,'Segoe UI',sans-serif;background:#0C1409;color:#EDEAE0;
+       max-width:640px;margin:0 auto;padding:32px 20px;line-height:1.5}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:#8a917f;font-size:13px;margin-bottom:24px}
+  .status{padding:14px 16px;border-radius:8px;font-weight:600;margin-bottom:24px}
+  .ok{background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.4);color:#7BD389}
+  .err{background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.4);color:#EF8A87}
+  .wait{background:rgba(212,225,87,.1);border:1px solid rgba(212,225,87,.3);color:#D4E157}
+  .row{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid #1e2a1a;
+       border-radius:6px;margin-bottom:6px;background:#111b0e}
+  .pos{font-family:monospace;color:#C17849;width:28px;font-weight:700}
+  .name{flex:1}
+  .meta{color:#6f7766;font-size:12px}
+  pre{background:#111b0e;border:1px solid #1e2a1a;padding:12px;border-radius:6px;
+      font-size:12px;overflow:auto;color:#EF8A87;white-space:pre-wrap}
+</style>
+</head>
+<body>
+  <h1>🎾 BTS — databastest</h1>
+  <div class="sub">Läser spelare och stege direkt från Supabase. Den här sidan är bara för verifiering — den rör inte den riktiga sajten.</div>
+
+  <div id="status" class="status wait">Ansluter till databasen…</div>
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/bts-data.js"></script>
+  <script>
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+
+    function setStatus(cls, msg){ statusEl.className = 'status ' + cls; statusEl.textContent = msg; }
+
+    (async () => {
+      if (!window.BTS || !BTS.ready()) {
+        setStatus('err', '✕ Supabase är inte konfigurerad i js/bts-data.js');
+        return;
+      }
+      try {
+        const players = await BTS.getPlayers();
+        const ladder  = await BTS.getLadder('VT2026');
+        const matches = await BTS.getMatches('VT2026');
+
+        // Räkna vinster/förluster ur matcherna (bevis: statistik kan byggas ur DB)
+        const wl = {};
+        matches.forEach(m => {
+          if (!m.winner_id) return;
+          const loser = m.winner_id === m.player_a_id ? m.player_b_id : m.player_a_id;
+          wl[m.winner_id] = wl[m.winner_id] || {w:0,l:0}; wl[m.winner_id].w++;
+          wl[loser]       = wl[loser]       || {w:0,l:0}; wl[loser].l++;
+        });
+        const played = matches.filter(m => m.winner_id).length;
+
+        setStatus('ok', `✓ Anslutning lyckades! ${players.length} spelare, ${ladder.length} stege-positioner, ${matches.length} matcher (${played} spelade) — allt live från databasen.`);
+
+        resultEl.innerHTML =
+          '<h2 style="font-size:16px;margin:24px 0 10px">Stege VT2026 (live, med statistik ur matcherna)</h2>' +
+          ladder.map(l => {
+            const s = wl[l.player_id] || {w:0,l:0};
+            return `
+            <div class="row">
+              <div class="pos">${l.position}</div>
+              <div class="name">${l.player ? l.player.name : '#' + l.player_id}</div>
+              <div class="meta">${s.w}V – ${s.l}F</div>
+            </div>`;
+          }).join('');
+      } catch (e) {
+        setStatus('err', '✕ Något gick fel vid läsning från databasen.');
+        resultEl.innerHTML = '<pre>' + (e && e.message ? e.message : String(e)) + '</pre>';
+      }
+    })();
+  </script>
+</body>
+</html>

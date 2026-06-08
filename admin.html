@@ -4,37 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BTS Stegen — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0A1A0C;--surface:#0F2212;--card:#142816;--card2:#1A3320;
-  --border:#1F4025;--border2:#2A5530;
-  --green:#4CAF50;--yellow:#D4E157;--clay:#C17D4B;
-  --white:#F0F5F0;--muted:rgba(240,245,240,0.45);--muted2:rgba(240,245,240,0.25);
-  --red:#EF5350;--blue:#42A5F5;
+  --bg:#0D2E20;--surface:#0D2A1D;--card:#0D2A1D;--card2:#133124;
+  --border:#1C3A2B;--border2:#2A5A42;
+  --green:#FF8C42;--yellow:#F5EDE3;--clay:#FF8C42;
+  --white:#F5EDE3;--muted:rgba(240,245,240,0.45);--muted2:rgba(240,245,240,0.25);
+  --red:#EF5350;--blue:#FF8C42;
 }
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased}
 
 /* LOGIN */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:48px 40px;width:100%;max-width:380px;text-align:center}
 .login-logo{font-size:40px;margin-bottom:16px}
-.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:6px}
+.login-title{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:6px}
 .login-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:36px}
-.login-input{width:100%;padding:14px 18px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:15px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.login-input{width:100%;padding:14px 18px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Outfit',sans-serif;font-size:15px;outline:none;margin-bottom:12px;transition:border-color 0.2s}
 .login-input:focus{border-color:var(--green)}
-.login-btn{width:100%;padding:14px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s}
-.login-btn:hover{background:#43A047}
+.login-btn{width:100%;padding:14px;background:var(--green);color:#000;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s}
+.login-btn:hover{background:#F5EDE3}
 .login-error{color:var(--red);font-size:12px;margin-top:10px;font-family:'Space Mono',monospace}
 
 /* HEADER */
-header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1px solid var(--border);padding:0 32px}
+header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1px solid var(--border);padding:0 32px}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .logo-icon{width:30px;height:30px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
-.logo-text{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white)}
+.logo-text{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white)}
 .logo-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--clay);background:rgba(193,125,75,0.12);border:1px solid rgba(193,125,75,0.3);padding:2px 8px;border-radius:100px}
 .header-actions{display:flex;align-items:center;gap:8px}
 .btn-sm{background:none;border:1px solid var(--border2);color:var(--muted);font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px;padding:5px 12px;cursor:pointer;text-decoration:none;transition:all 0.2s}
@@ -45,14 +48,14 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .season-bar-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;height:42px;overflow-x:auto}
 .season-chip{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;background:none}
 .season-chip:hover{border-color:var(--muted);color:var(--white)}
-.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(76,175,80,0.08)}
-.season-chip.upcoming{border-color:var(--yellow);color:var(--yellow);background:rgba(212,225,87,0.06)}
+.season-chip.active{border-color:var(--green);color:var(--green);background:rgba(245,237,227,0.08)}
+.season-chip.upcoming{border-color:var(--yellow);color:var(--yellow);background:rgba(245,237,227,0.06)}
 .btn-new-season{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);border:1px dashed var(--border2);padding:5px 12px;cursor:pointer;background:none;white-space:nowrap;transition:all 0.2s}
 .btn-new-season:hover{color:var(--green);border-color:var(--green)}
 
 /* MASTER ADMIN */
-.master-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--yellow);background:rgba(212,225,87,0.08);border:1px solid rgba(212,225,87,0.3);padding:2px 8px;border-radius:100px;cursor:pointer;transition:all 0.2s}
-.master-badge:hover{background:rgba(212,225,87,0.15)}
+.master-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--yellow);background:rgba(245,237,227,0.08);border:1px solid rgba(245,237,227,0.3);padding:2px 8px;border-radius:100px;cursor:pointer;transition:all 0.2s}
+.master-badge:hover{background:rgba(245,237,227,0.15)}
 .master-badge.unlocked{color:#000;background:var(--yellow);border-color:var(--yellow)}
 
 /* PLAYER MANAGEMENT TABLE */
@@ -61,8 +64,8 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .player-mgmt-table td{padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 .player-mgmt-table tr:last-child td{border-bottom:none}
 .player-mgmt-table tr:hover td{background:rgba(255,255,255,0.02)}
-.rank-cell{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);width:40px}
-.player-edit-input{background:var(--card2);border:1px solid var(--green);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;padding:4px 8px;outline:none;width:100%}
+.rank-cell{font-family:'Anton',sans-serif;font-size:18px;color:var(--muted2);width:40px}
+.player-edit-input{background:var(--card2);border:1px solid var(--green);color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;padding:4px 8px;outline:none;width:100%}
 .move-btns{display:flex;gap:3px}
 .move-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-size:11px;width:26px;height:26px;cursor:pointer;transition:all 0.2s;flex-shrink:0}
 .move-btn:hover{border-color:var(--white);color:var(--white)}
@@ -70,15 +73,15 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .action-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:4px 9px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .action-btn.edit:hover{border-color:var(--blue);color:var(--blue)}
 .action-btn.save{border-color:var(--green);color:var(--green)}
-.action-btn.save:hover{background:rgba(76,175,80,0.1)}
+.action-btn.save:hover{background:rgba(245,237,227,0.1)}
 .action-btn.del:hover{border-color:var(--red);color:var(--red)}
 .add-player-form{background:var(--card);border:1px solid var(--border2);padding:16px 20px;display:flex;gap:10px;align-items:flex-end;margin-top:8px;flex-wrap:wrap}
 .add-player-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:120px}
 .add-player-label{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase}
-.add-player-input{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color 0.2s}
+.add-player-input{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border-color 0.2s}
 .add-player-input:focus{border-color:var(--green)}
-.add-player-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;white-space:nowrap;transition:background 0.2s}
-.add-player-btn:hover{background:#43A047}
+.add-player-btn{background:var(--green);color:#000;border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;white-space:nowrap;transition:background 0.2s}
+.add-player-btn:hover{background:#F5EDE3}
 
 /* RESULT OVERRIDE TABLE */
 .result-table{width:100%;border-collapse:collapse}
@@ -88,7 +91,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 
 /* MAIN */
 .main{max-width:1200px;margin:0 auto;padding:28px 32px 80px}
-.page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
+.page-title{font-family:'Anton',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
 .page-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:28px}
 
 /* SECTION */
@@ -98,7 +101,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 /* ROUND BAR */
 .round-bar{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
 .round-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase}
-.round-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow);line-height:1}
+.round-num{font-family:'Anton',sans-serif;font-size:28px;color:var(--yellow);line-height:1}
 .btn-round{background:var(--card);border:1px solid var(--border2);color:var(--white);width:30px;height:30px;font-size:16px;cursor:pointer;transition:background 0.2s}
 .btn-round:hover{background:var(--card2)}
 
@@ -118,10 +121,10 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .sets-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
 .set-block{display:flex;align-items:center;gap:3px;background:var(--card2);border:1px solid var(--border2);padding:3px 7px}
 .set-block-label{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-right:2px}
-.set-score-input{width:36px;height:28px;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:17px;text-align:center;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
+.set-score-input{width:36px;height:28px;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'Anton',sans-serif;font-size:17px;text-align:center;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
 .set-score-input::-webkit-inner-spin-button,.set-score-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .set-score-input:focus{border-color:var(--green)}
-.set-sep{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--muted2)}
+.set-sep{font-family:'Anton',sans-serif;font-size:14px;color:var(--muted2)}
 .btn-add-stb{background:none;border:1px dashed var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:3px 9px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .btn-add-stb:hover{border-color:var(--green);color:var(--green)}
 .stb-block{border-color:var(--clay) !important}
@@ -130,13 +133,13 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 /* MATCH FOOTER */
 .match-card-footer{display:flex;align-items:center;gap:8px;padding:0 14px 10px;flex-wrap:wrap}
 .auto-winner-hint{font-family:'Space Mono',monospace;font-size:8px;color:var(--green);letter-spacing:1px;margin-left:auto}
-.winner-select{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:12px;padding:6px 10px;outline:none;cursor:pointer;flex:1;min-width:140px;max-width:220px}
+.winner-select{background:var(--card2);border:1px solid var(--border2);color:var(--white);font-family:'Outfit',sans-serif;font-size:12px;padding:6px 10px;outline:none;cursor:pointer;flex:1;min-width:140px;max-width:220px}
 .winner-select:focus{border-color:var(--green)}
 .wo-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:6px 10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .wo-btn:hover{border-color:var(--clay);color:var(--clay)}
 .wo-btn.active{border-color:var(--clay);color:var(--clay);background:rgba(193,125,75,0.1)}
-.save-match-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;cursor:pointer;letter-spacing:0.5px;transition:background 0.2s;white-space:nowrap;margin-left:auto}
-.save-match-btn:hover{background:#43A047}
+.save-match-btn{background:var(--green);color:#000;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:7px 16px;cursor:pointer;letter-spacing:0.5px;transition:background 0.2s;white-space:nowrap;margin-left:auto}
+.save-match-btn:hover{background:#F5EDE3}
 .saved-badge{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin-left:auto;display:flex;align-items:center;gap:6px}
 .edit-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1px;padding:3px 9px;cursor:pointer;transition:all 0.2s}
 .edit-btn:hover{color:var(--white);border-color:var(--muted)}
@@ -145,35 +148,35 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 /* STATS */
 .stats-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
 .stat-box{background:var(--card);border:1px solid var(--border);padding:12px;text-align:center}
-.stat-box-val{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--yellow);line-height:1}
+.stat-box-val{font-family:'Anton',sans-serif;font-size:26px;color:var(--yellow);line-height:1}
 .stat-box-lbl{font-family:'Space Mono',monospace;font-size:7px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:3px}
 
 /* PUBLISH */
 .publish-box{background:var(--card);border:1px solid var(--border2);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .publish-info h3{font-size:15px;font-weight:600;margin-bottom:5px}
 .publish-info p{font-size:12px;color:var(--muted);line-height:1.6}
-.publish-btn{background:var(--yellow);color:#000;border:none;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;cursor:pointer;transition:background 0.2s;white-space:nowrap;flex-shrink:0}
-.publish-btn:hover{background:#C6D115}
+.publish-btn{background:var(--yellow);color:#000;border:none;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:2px;padding:12px 28px;cursor:pointer;transition:background 0.2s;white-space:nowrap;flex-shrink:0}
+.publish-btn:hover{background:#F5EDE3}
 
 /* LADDER MINI */
 .ladder-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .ladder-mini-row{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:8px 12px}
-.ladder-mini-rank{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted2);width:24px;flex-shrink:0;line-height:1}
+.ladder-mini-rank{font-family:'Anton',sans-serif;font-size:18px;color:var(--muted2);width:24px;flex-shrink:0;line-height:1}
 .ladder-mini-name{font-size:12px;font-weight:500}
 
 /* NEW SEASON MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
 .overlay-box{background:var(--surface);border:1px solid var(--border2);padding:36px;width:100%;max-width:440px}
-.overlay-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:6px}
+.overlay-title{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:6px}
 .overlay-sub{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
 .form-row{margin-bottom:14px}
 .form-label{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:6px}
-.form-input,.form-select{width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s}
+.form-input,.form-select{width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border2);color:var(--white);font-family:'Outfit',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s}
 .form-input:focus,.form-select:focus{border-color:var(--green)}
 .form-checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 0}
 .form-btns{display:flex;gap:8px;margin-top:20px}
-.btn-primary{flex:1;padding:11px;background:var(--green);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;border:none;cursor:pointer}
-.btn-cancel{padding:11px 20px;background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer}
+.btn-primary{flex:1;padding:11px;background:var(--green);color:#000;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.btn-cancel{padding:11px 20px;background:none;border:1px solid var(--border2);color:var(--muted);font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer}
 
 /* TOAST */
 .toast{position:fixed;bottom:28px;right:28px;background:var(--green);color:#000;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;font-weight:700;padding:12px 22px;z-index:999;transform:translateY(80px);opacity:0;transition:transform 0.3s,opacity 0.3s}
@@ -186,8 +189,8 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 .pending-name{font-size:14px;font-weight:600;margin-bottom:5px}
 .pending-meta{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:1px;line-height:1.8}
 .pending-actions{display:flex;gap:6px;flex-shrink:0}
-.approve-btn{background:var(--green);color:#000;border:none;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:8px 16px;cursor:pointer;transition:background 0.2s;white-space:nowrap}
-.approve-btn:hover{background:#43A047}
+.approve-btn{background:var(--green);color:#000;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:8px 16px;cursor:pointer;transition:background 0.2s;white-space:nowrap}
+.approve-btn:hover{background:#F5EDE3}
 .reject-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;padding:8px 12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
 .reject-btn:hover{border-color:var(--red);color:var(--red)}
 .pending-count-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:#000;background:var(--clay);padding:2px 8px;display:inline-block;vertical-align:middle;margin-left:8px}
@@ -204,14 +207,14 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 /* ── SKICKA MEDDELANDE ── */
 .sms-ch{font-family:'Space Mono',monospace;font-size:12px;padding:7px 16px;background:transparent;color:var(--muted);border:none;border-right:1px solid var(--border2);cursor:pointer}
 .sms-ch:last-child{border-right:none}
-.sms-ch.active{background:var(--clay);color:#0C0A06}
+.sms-ch.active{background:var(--clay);color:#061712}
 .sms-card{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--clay);padding:12px 14px;margin-bottom:8px}
 .sms-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:14px;font-weight:600;color:var(--white)}
 .sms-cnt{font-family:'Space Mono',monospace;font-size:11px;font-weight:400;color:var(--clay)}
-.sms-send{font-family:'Space Mono',monospace;font-size:11px;color:#0C0A06;background:var(--clay);border:none;padding:7px 16px;cursor:pointer;white-space:nowrap}
-.sms-send:hover{background:#a5663a}
+.sms-send{font-family:'Space Mono',monospace;font-size:11px;color:#061712;background:var(--clay);border:none;padding:7px 16px;cursor:pointer;white-space:nowrap}
+.sms-send:hover{background:#C43E00}
 .sms-send:disabled{opacity:0.5;cursor:default}
-.sms-ta{width:100%;background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;line-height:1.5;padding:9px 11px;resize:vertical;min-height:52px;box-sizing:border-box}
+.sms-ta{width:100%;background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;line-height:1.5;padding:9px 11px;resize:vertical;min-height:52px;box-sizing:border-box}
 .sms-ta:focus{outline:none;border-color:var(--clay)}
 .sms-meta{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);margin-top:4px}
 </style>
@@ -221,9 +224,19 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 <!-- LOGIN -->
 <div class="login-screen" id="login-screen">
   <div class="login-box">
-    <div class="login-logo">🎾</div>
-    <div class="login-title">BTS Admin</div>
-    <div class="login-sub">Båstad Tennissällskap</div>
+    <div class="bts-lockup" style="width:100%;max-width:240px;margin:0 auto 14px">
+      <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+        <g class="bl-trail"></g>
+        <g class="bl-words">
+          <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#FF8C42">BÅSTAD</text>
+          <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
+        </g>
+        <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
+          <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/></g>
+      </svg>
+    </div>
+    <div class="login-sub">Admin · Båstad Tennissällskap</div>
     <input type="password" class="login-input" id="pw-input" placeholder="Lösenord" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Logga in</button>
     <div class="login-error hidden" id="login-error">Fel lösenord.</div>
@@ -236,7 +249,7 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
 <header>
   <div class="header-inner">
     <a class="logo" href="#">
-      <div class="logo-icon">🎾</div>
+      <img src="bts-crest.png" alt="Båstad TS" style="height:36px;width:auto;object-fit:contain" onerror="this.outerHTML='<div class=logo-icon>🎾</div>'">
       <div class="logo-text">BTS Admin</div>
     </a>
     <div class="logo-badge">ADMIN</div>
@@ -274,16 +287,61 @@ header{background:linear-gradient(180deg,#071209,var(--surface));border-bottom:1
     <div class="match-input-grid" id="match-input-grid"></div>
   </div>
 
-  <!-- PUBLISH -->
+  <!-- AVSLUTA OMGÅNG & NY OMGÅNG (tvåstegs-flöde) -->
   <div class="section">
-    <div class="section-title">Publicera stege</div>
-    <div class="publish-box">
-      <div class="publish-info">
-        <h3>Stäng omgång och uppdatera stegen</h3>
-        <p>Vinnare klättrar upp, förlorare åker ned.<br>Games- och set-statistik uppdateras automatiskt.</p>
+    <div class="section-title">Avsluta omgång &amp; ny omgång</div>
+
+    <!-- Färsk säsong: inga matcher än → starta omgång 1 -->
+    <div id="flow-fresh" class="hidden">
+      <div class="publish-box">
+        <div class="publish-info">
+          <h3>Ny säsong — starta omgång 1</h3>
+          <p>Stegen är klar (gamla i sin ordning, nya anmälda nederst).<br>Skapa omgång 1:s matcher när alla är på plats.</p>
+        </div>
+        <button class="publish-btn" onclick="startFirstRound()">Starta omgång 1 →</button>
       </div>
-      <button class="publish-btn" onclick="publishRound()">Publicera →</button>
+    </div>
+
+    <!-- Steg 1 (normalt: avsluta pågående omgång) -->
+    <div id="flow-normal" class="publish-box">
+      <div class="publish-info">
+        <h3>Steg 1 — Avsluta omgång <span id="flow-round">—</span></h3>
+        <p>Resultaten tillämpas: vinnare klättrar, förlorare sjunker.<br>Stegen uppdateras — men ingen ny omgång genereras än.</p>
+      </div>
+      <button class="publish-btn" onclick="closeRound()">Avsluta omgång →</button>
       <button class="publish-btn" style="background:transparent;border:1px solid var(--border2);color:var(--muted)" onclick="resetRound()">Nollställ omgång</button>
+    </div>
+
+    <!-- Steg 2 + 3 (visas efter steg 1) -->
+    <div id="flow-after" class="hidden" style="margin-top:18px;background:var(--card);border:1px solid var(--border);padding:16px">
+      <!-- bekräftelse efter generering (visas i stället för stegen nedan) -->
+      <p id="flow-generated" class="hidden" style="font-size:14px;color:var(--white);margin-bottom:14px">✓ Ny omgång genererad. Ändrat dig? Backa nedan så tas den bort och placeringarna återställs.</p>
+
+      <div id="flow-steps">
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin-bottom:10px">Steg 2 — Justera ordningen (valfritt)</div>
+        <div id="flow-ladder"></div>
+        <button class="publish-btn" style="margin-top:8px" onclick="saveOrder()">Spara ordning</button>
+
+        <div style="border-top:1px solid var(--border2);margin:18px 0 14px"></div>
+
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin-bottom:10px">Steg 3 — Generera ny omgång</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Skapar omgång <span id="flow-next">—</span> ur den (ev. justerade) stegen — grannar möts (#1 vs #2, #3 vs #4 …).</p>
+        <button class="publish-btn" onclick="generateRound()">Generera omgång <span id="flow-next2">—</span> →</button>
+
+        <div style="border-top:1px solid var(--border2);margin:18px 0 14px"></div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:8px">Eller — avsluta säsongen</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Lås slutställningen och arkivera säsongen. Nya säsongen skapas med <strong style="color:var(--white)">ordningen medtagen</strong>. Nya spelare anmäler sig sen och hamnar nederst — därefter startar du omgång 1.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:360px">
+          <input id="ns-id" placeholder="Ny säsongs-ID (t.ex. HT2026)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;padding:9px 11px">
+          <input id="ns-name" placeholder="Namn (t.ex. Höststegen 2026)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;padding:9px 11px">
+          <input id="ns-short" placeholder="Kort (t.ex. HT26)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:inherit;font-size:13px;padding:9px 11px">
+          <button class="publish-btn" onclick="closeSeason()">Avsluta säsong &amp; skapa nästa →</button>
+        </div>
+
+        <div style="border-top:1px solid var(--border2);margin:18px 0 14px"></div>
+      </div>
+
+      <button class="publish-btn" style="background:transparent;border:1px solid var(--yellow);color:var(--yellow)" onclick="undoRound()">↩ Backa (ångra avslut)</button>
     </div>
   </div>
 
@@ -345,8 +403,8 @@ En knapptryckning kvar, sen slipper du fler pip från mig :) [länk]</textarea>
 
     <div style="display:flex;align-items:center;gap:8px;margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;flex-wrap:wrap">
       <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase">Testa till dig själv</span>
-      <input id="sms-test-num" type="tel" placeholder="07XXXXXXXX (SMS)" style="background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:160px">
-      <input id="sms-test-email" type="email" placeholder="din@mejl.se (e-post)" style="background:#0C1E0E;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:190px">
+      <input id="sms-test-num" type="tel" placeholder="07XXXXXXXX (SMS)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:160px">
+      <input id="sms-test-email" type="email" placeholder="din@mejl.se (e-post)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:190px">
       <button class="sms-send" onclick="doTest()" style="background:var(--border2);color:var(--white)">Skicka test →</button>
       <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2)">vald kanal + texten i "alla i stegen"</span>
     </div>
@@ -508,6 +566,7 @@ let basePlayers = [
 // ── STATE ──────────────────────────────────────────────────────
 let currentSeason = 'VT2026';
 let currentRound = 1;
+let hasAnyMatches = false;   // färsk säsong (inga matcher) → visa "starta omgång 1"
 let ladder = [];
 let roundResults = {};
 let woState = {};
@@ -536,6 +595,7 @@ async function loadState(){
         basePlayers = allPlayers.map(p=>({id:p.id,name:p.name}));
         const nameById={}; allPlayers.forEach(p=>nameById[p.id]=p.name);
         ladder = ladderRows.slice().sort((a,b)=>a.position-b.position).map(l=>l.player_id);
+        hasAnyMatches = matchRows.length>0;
         currentRound = matchRows.length?Math.max(...matchRows.map(m=>m.round)):1;
         roundResults={}; const idByRoundKey={};
         matchRows.forEach(m=>{
@@ -664,9 +724,9 @@ function renderSetInputs(key, saved){
     <div class="match-card-body">
       <span class="saved-score">${saved.wo?'WO':setsToScoreString(saved.sets)}</span>
       <div class="saved-badge" style="margin-left:auto">
-        ${saved.status==='reported'?'<span style="color:#D4E157">⏳ Väntar på bekräftelse</span>'
+        ${saved.status==='reported'?'<span style="color:#F5EDE3">⏳ Väntar på bekräftelse</span>'
           :saved.status==='disputed'?'<span style="color:#EF5350">⚠️ Bestridd</span>'
-          :'<span style="color:#4CAF50">✓ Bekräftad</span>'}
+          :'<span style="color:#FF8C42">✓ Bekräftad</span>'}
         <button class="edit-btn" onclick="editMatch('${key}')">Ändra</button>
         <button class="edit-btn" onclick="resetMatch('${key}')">Nollställ</button>
       </div>
@@ -737,7 +797,7 @@ function renderMatchInput(){
     sumEl.innerHTML=`
       <div class="stat-box"><div class="stat-box-val">${saved_count}</div><div class="stat-box-lbl">Sparade</div></div>
       <div class="stat-box"><div class="stat-box-val">${pairs.length}</div><div class="stat-box-lbl">Totalt</div></div>
-      <div class="stat-box"><div class="stat-box-val" style="color:#D4E157">${waiting}</div><div class="stat-box-lbl">Väntar på bekräftelse</div></div>
+      <div class="stat-box"><div class="stat-box-val" style="color:#F5EDE3">${waiting}</div><div class="stat-box-lbl">Väntar på bekräftelse</div></div>
       <div class="stat-box"><div class="stat-box-val" style="color:${disputed?'#EF5350':'inherit'}">${disputed}</div><div class="stat-box-lbl">Bestridda</div></div>`;
   } else { sumEl.classList.add('hidden'); }
 
@@ -941,6 +1001,117 @@ function publishRound(){
   saveState();
   renderAll();
   showToast(`Omgång ${currentRound-1} publicerad! ✓`);
+}
+
+// ── TVÅSTEGS OMGÅNGS-FLÖDE (avsluta → justera → generera) + backa ──
+let flowOrder = []; // [{id,name}] aktuell ordning efter "avsluta omgång"
+
+function updateFlowRoundLabels(){
+  const sb=id=>document.getElementById(id);
+  if(sb('flow-round')) sb('flow-round').textContent=currentRound;
+  if(sb('flow-next')) sb('flow-next').textContent=currentRound+1;
+  if(sb('flow-next2')) sb('flow-next2').textContent=currentRound+1;
+  // Färsk säsong (inga matcher än) → visa "Starta omgång 1", dölj avsluta-flödet
+  if(sb('flow-fresh')) sb('flow-fresh').classList.toggle('hidden', hasAnyMatches);
+  if(sb('flow-normal')) sb('flow-normal').classList.toggle('hidden', !hasAnyMatches);
+  if(!hasAnyMatches && sb('flow-after')) sb('flow-after').classList.add('hidden');
+}
+function renderFlowLadder(){
+  const el=document.getElementById('flow-ladder'); if(!el)return;
+  el.innerHTML = flowOrder.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);margin-bottom:4px">
+      <span style="font-family:'Space Mono',monospace;color:var(--clay);width:30px">#${i+1}</span>
+      <span style="flex:1;font-size:14px">${p.name}</span>
+      <button class="edit-btn" onclick="moveFlow(${i},-1)"${i===0?' disabled style="opacity:.3"':''}>↑</button>
+      <button class="edit-btn" onclick="moveFlow(${i},1)"${i===flowOrder.length-1?' disabled style="opacity:.3"':''}>↓</button>
+    </div>`).join('');
+}
+function moveFlow(i,dir){
+  const j=i+dir; if(j<0||j>=flowOrder.length)return;
+  [flowOrder[i],flowOrder[j]]=[flowOrder[j],flowOrder[i]];
+  renderFlowLadder();
+}
+function closeRound(){
+  if(!ADB){ showToast('Kräver databasanslutning.','error'); return; }
+  if(!confirm(`Avsluta omgång ${currentRound}? Resultaten tillämpas och stegen uppdateras.`)) return;
+  (async()=>{
+    try{
+      await BTS.adminCloseRound(adminPw,currentSeason,currentRound);
+      await loadState();
+      flowOrder = ladder.map(id=>({id, name:(basePlayers.find(p=>p.id===id)||{}).name||('#'+id)}));
+      document.getElementById('flow-after')?.classList.remove('hidden');
+      document.getElementById('flow-steps')?.classList.remove('hidden');
+      document.getElementById('flow-generated')?.classList.add('hidden');
+      renderFlowLadder();
+      renderAll();
+      showToast(`Omgång ${currentRound} avslutad — stegen uppdaterad ✓`);
+    }catch(err){ showToast('Kunde inte avsluta: '+(err?.message||err),'error'); }
+  })();
+}
+function saveOrder(){
+  (async()=>{
+    try{
+      await BTS.adminSetPositions(adminPw,currentSeason,flowOrder.map(p=>p.id));
+      await loadState();
+      renderAll();
+      showToast('Ny ordning sparad ✓');
+    }catch(err){ showToast('Kunde inte spara ordning: '+(err?.message||err),'error'); }
+  })();
+}
+function generateRound(){
+  const next=currentRound+1;
+  if(!confirm(`Generera omgång ${next}? Nya matcher skapas (grannar möts) ur stegen.`)) return;
+  (async()=>{
+    try{
+      const n=await BTS.adminGenerateRound(adminPw,currentSeason,next);
+      await loadState();
+      // behåll rutan öppen men visa bara Backa + bekräftelse (göm steg 2/3)
+      document.getElementById('flow-after')?.classList.remove('hidden');
+      document.getElementById('flow-steps')?.classList.add('hidden');
+      document.getElementById('flow-generated')?.classList.remove('hidden');
+      renderAll();
+      showToast(`${n} matcher skapade för omgång ${next} ✓`);
+    }catch(err){ showToast('Kunde inte generera: '+(err?.message||err),'error'); }
+  })();
+}
+function undoRound(){
+  if(!confirm('Backa? Placeringarna återställs och en ev. genererad ny omgång tas bort.')) return;
+  (async()=>{
+    try{
+      await BTS.adminUndoRound(adminPw,currentSeason);
+      await loadState();
+      document.getElementById('flow-after')?.classList.add('hidden');
+      renderAll();
+      showToast('Återställt ✓');
+    }catch(err){ showToast('Kunde inte backa: '+(err?.message||err),'error'); }
+  })();
+}
+function closeSeason(){
+  if(!ADB){ showToast('Kräver databasanslutning.','error'); return; }
+  const id=(document.getElementById('ns-id')?.value||'').trim();
+  const name=(document.getElementById('ns-name')?.value||'').trim();
+  const short=(document.getElementById('ns-short')?.value||'').trim();
+  if(!id||!name){ showToast('Fyll i nya säsongens ID och namn','error'); return; }
+  if(!confirm(`Avsluta ${currentSeason} och skapa "${name}" (${id})?\nOrdningen tas med. Nya spelare anmäler sig och hamnar nederst — sen startar du omgång 1.`)) return;
+  (async()=>{
+    try{
+      await BTS.adminCloseSeason(adminPw, currentSeason, {id, name, short});
+      switchSeason(id);  // växla admin till nya säsongen (ingen omgång 1 än)
+      showToast(`Säsong avslutad — "${name}" skapad. Öppna anmälan, sen starta omgång 1 ✓`);
+    }catch(err){ showToast('Kunde inte avsluta säsong: '+(err?.message||err),'error'); }
+  })();
+}
+function startFirstRound(){
+  if(!ADB){ showToast('Kräver databasanslutning.','error'); return; }
+  if(!confirm('Starta omgång 1? Matcherna skapas ur stegen (grannar möts).')) return;
+  (async()=>{
+    try{
+      const n=await BTS.adminGenerateRound(adminPw,currentSeason,1);
+      await loadState();
+      renderAll();
+      showToast(`${n} matcher skapade — omgång 1 igång ✓`);
+    }catch(err){ showToast('Kunde inte starta omgång 1: '+(err?.message||err),'error'); }
+  })();
 }
 
 // ── CALCULATE STATS ────────────────────────────────────────────
@@ -1223,33 +1394,38 @@ function getPendingSignups(){
 }
 function savePendingSignups(arr){ localStorage.setItem('bts_pending_signups',JSON.stringify(arr)); }
 
-function renderPendingSignups(){
+let pendingJoins = []; // cache av databasens väntande anmälningar
+
+async function renderPendingSignups(){
   if(!masterUnlocked) return;
-  const pending = getPendingSignups();
   const listEl = document.getElementById('pending-signups-list');
   const badgeEl = document.getElementById('pending-count-badge');
   if(!listEl) return;
 
-  // Badge
+  // Hämta ALLA väntande anmälningar från databasen (oavsett tävling)
+  if(window.BTS && BTS.ready() && adminPw){
+    try{ pendingJoins = await BTS.adminListJoinsAll(adminPw); }
+    catch(e){ pendingJoins = []; console.warn('Kunde inte läsa anmälningar:',e); }
+  } else { pendingJoins = []; }
+  const pending = pendingJoins;
+
   if(badgeEl){
     badgeEl.innerHTML = pending.length > 0
       ? `<span class="pending-count-badge">${pending.length} ny${pending.length>1?'a':''}</span>`
       : '';
   }
-
   if(!pending.length){
     listEl.innerHTML = '<div class="pending-empty">Inga väntande anmälningar.</div>';
     return;
   }
 
   listEl.innerHTML = pending.map(s=>{
-    const date = new Date(s.submittedAt);
-    const dateStr = date.toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'});
-    const metaParts = [`📱 ${s.phone}`];
-    if(s.born) metaParts.push(`🎂 ${s.born}`);
-    if(s.hand) metaParts.push(`✋ ${s.hand}hänt`);
-    if(s.hometown) metaParts.push(`📍 ${s.hometown}`);
-    if(s.season) metaParts.push(`📅 ${s.season}`);
+    const date = new Date(s.created_at);
+    const dateStr = isNaN(date.getTime()) ? '' : date.toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'});
+    const metaParts = [];
+    if(s.phone) metaParts.push(`📱 ${s.phone}`);
+    if(s.email) metaParts.push(`✉ ${s.email}`);
+    if(s.competition_id) metaParts.push(`📅 ${s.competition_id}`);
     return `
     <div class="pending-card">
       <div>
@@ -1258,71 +1434,52 @@ function renderPendingSignups(){
         <div class="pending-meta" style="color:rgba(240,245,240,0.18);margin-top:2px">Anmält: ${dateStr}</div>
       </div>
       <div class="pending-actions">
-        <button class="approve-btn" onclick="approveSignup(${s.id})">✓ Godkänn</button>
-        <button class="reject-btn" onclick="rejectSignup(${s.id})">✕ Avvisa</button>
+        <button class="approve-btn" onclick="approveSignup('${s.id}')">✓ Godkänn</button>
+        <button class="reject-btn" onclick="rejectSignup('${s.id}')">✕ Avvisa</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function approveSignup(signupId){
-  const pending = getPendingSignups();
-  const s = pending.find(x=>x.id===signupId);
-  if(!s) return;
-
-  // Add to player list
-  const players = loadPlayers();
-  if(players.find(p=>p.name===s.name)){
-    showToast(`${s.name} finns redan på stegen!`,'error');
-    return;
-  }
-  const newId = Math.max(...players.map(p=>p.id), 0) + 1;
-  players.push({id:newId, name:s.name, phone:s.phone});
-  savePlayers(players);
-
-  // Add last on ladder
-  ladder.push(newId);
-  saveState();
-
-  // Set PIN (last 4 digits of phone)
-  const digits = s.phone.replace(/\D/g,'');
-  const pin = digits.length>=4 ? digits.slice(-4) : digits;
-  if(pin) localStorage.setItem('bts_pin_'+s.name, pin);
-
-  // Save profile fields
-  const prof = {};
-  if(s.born) prof.born = s.born;
-  if(s.hand) prof.hand = s.hand;
-  if(s.hometown) prof.hometown = s.hometown;
-  if(Object.keys(prof).length) localStorage.setItem('bts_profile_'+s.name, JSON.stringify(prof));
-
-  // Remove from pending
-  savePendingSignups(pending.filter(x=>x.id!==signupId));
-  renderPendingSignups();
-  renderPlayerMgmt();
-  renderLadderMini();
-  showToast(`${s.name} tillagd på stegen som #${ladder.length} ✓`);
+async function approveSignup(id){
+  const s = pendingJoins.find(x=>x.id===id); if(!s) return;
+  try{
+    await BTS.adminApproveJoin(adminPw, id);   // skapar spelare + placerar sist (DB)
+    await loadState();                          // ladda om stege + spelare från databasen
+    renderAll();
+    showToast(`${s.name} godkänd och tillagd på stegen ✓`);
+  }catch(e){ showToast('Kunde inte godkänna: '+(e.message||e),'error'); }
 }
 
-function rejectSignup(signupId){
-  const pending = getPendingSignups();
-  const s = pending.find(x=>x.id===signupId);
-  if(!s) return;
+async function rejectSignup(id){
+  const s = pendingJoins.find(x=>x.id===id); if(!s) return;
   if(!confirm(`Avvisa ${s.name}s anmälan? Det går inte att ångra.`)) return;
-  savePendingSignups(pending.filter(x=>x.id!==signupId));
-  renderPendingSignups();
-  showToast(`Anmälan från ${s.name} avvisad`);
+  try{
+    await BTS.adminRejectJoin(adminPw, id);
+    renderPendingSignups();
+    showToast(`Anmälan från ${s.name} avvisad`);
+  }catch(e){ showToast('Kunde inte avvisa: '+(e.message||e),'error'); }
 }
 
 // Override renderAll to also update master view
 function renderAll(){
   renderMatchInput();
   renderLadderMini();
+  try{ updateFlowRoundLabels(); }catch(e){}
   try{ renderSms(); }catch(e){}
   if(masterUnlocked){ renderPendingSignups(); renderPlayerMgmt(); renderResultOverride(); }
 }
 
 document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!document.getElementById('login-screen').classList.contains('hidden'))doLogin(); });
+
+// Lokal test-växlare — visas BARA lokalt (file://), aldrig på live-sajten (https)
+if(location.protocol==='file:'){
+  const bar=document.createElement('div');
+  bar.style.cssText='position:fixed;bottom:14px;right:14px;z-index:9999;display:flex;gap:6px;background:#0D2A1D;border:1px solid var(--clay);border-radius:8px;padding:8px;box-shadow:0 4px 16px rgba(0,0,0,0.5)';
+  bar.innerHTML='<button onclick="switchSeason(\'TEST\')" style="font-family:monospace;font-size:12px;font-weight:700;background:var(--yellow);color:#0D2E20;border:none;padding:8px 13px;border-radius:5px;cursor:pointer">🧪 TEST</button>'+
+    '<button onclick="switchSeason(\'VT2026\')" style="font-family:monospace;font-size:12px;background:transparent;color:#bbb;border:1px solid #2A5A42;padding:8px 13px;border-radius:5px;cursor:pointer">↩ VT2026</button>';
+  document.body.appendChild(bar);
+}
 </script>
 
 <script>
@@ -1423,6 +1580,31 @@ async function doTest(){
       (res.errors&&res.errors.length?('<br><span style="color:var(--yellow)">'+res.errors.join('<br>')+'</span>'):'');
   }catch(e){ alert('Test misslyckades: '+(e.message||e)); }
 }
+</script>
+<script>
+/* Stegens logotyp-animation (identisk överallt): serve-båge ritas, bollen blir kvar, BÅSTAD STEGEN tonas in. */
+(function(){
+  document.querySelectorAll('.bts-lockup').forEach(function(box){
+    var svg=box.querySelector('svg'), ball=box.querySelector('.bl-ball'),
+        trail=box.querySelector('.bl-trail'), words=box.querySelector('.bl-words');
+    if(!svg||!ball||!words) return;
+    var ns='http://www.w3.org/2000/svg';
+    var p=document.createElementNS(ns,'path'); p.setAttribute('d','M-26 26 Q 158 -245 312 26'); p.setAttribute('fill','none'); svg.appendChild(p);
+    var L=p.getTotalLength(), N=14, dots=[];
+    for(var i=1;i<=N;i++){ var pt=p.getPointAtLength((i/(N+1))*L); var c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y); c.setAttribute('r',2.6); c.setAttribute('fill','rgba(255,255,255,.9)'); c.setAttribute('opacity','0'); trail.appendChild(c); dots.push({el:c,at:i/(N+1)}); }
+    words.style.opacity=0; words.style.transition='opacity .55s ease';
+    function setBall(x,y){ ball.setAttribute('transform','translate('+x+' '+y+')'); }
+    var ease=function(t){return 1-Math.pow(1-t,3);};
+    if(matchMedia('(prefers-reduced-motion:reduce)').matches){ var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.opacity=1; return; }
+    var t0=null;
+    function fr(ts){ if(!t0)t0=ts; var t=(ts-t0)/1000;
+      if(t<1.2){ var a=ease(Math.min(t/1.2,1)); var pt=p.getPointAtLength(a*L); setBall(pt.x,pt.y); dots.forEach(function(d){ d.el.setAttribute('opacity', a>=d.at?'.9':'0'); }); if(t>0.55) words.style.opacity=1; requestAnimationFrame(fr); }
+      else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','.9');}); words.style.opacity=1; }
+    }
+    setBall(-22,22); requestAnimationFrame(fr);
+  });
+})();
 </script>
 </body>
 </html>

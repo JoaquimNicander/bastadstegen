@@ -1,865 +1,431 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>BTS Stegen — Båstad Tennissällskap</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="brand.css" />
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --clay:#C17849;--clay2:#8B3A1E;--clay3:#5E2410;
-  --green:#1B3A1E;--green2:#2A5530;--green3:#4CAF50;
-  --yellow:#D4E157;--cream:#F5ECD7;--cream2:#EAD9BC;
-  --white:#FAFAF5;--muted:rgba(245,236,215,0.58);--muted2:rgba(245,236,215,0.3);
-  --bg:#0C1E0E;--surface:#111F13;--card:#162118;
-}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;font-size:16px;-webkit-font-smoothing:antialiased}
+  /* ---------------- NAV ---------------- */
+  .nav{ position:fixed; top:0; left:0; right:0; z-index:50;
+    background:var(--navy-deep);
+    border-bottom:1px solid rgba(255,255,255,.08); }
+  .nav-in{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .mark{ width:auto; height:46px; flex-shrink:0; display:block; }
+  .brand .bt-name{ font-weight:800; font-size:16px; letter-spacing:.5px; line-height:1.1; }
+  .brand .bt-sub{ font-family:var(--font-mono); font-size:9px; letter-spacing:3px; color:var(--muted2); text-transform:uppercase; }
+  .nav-links{ display:flex; align-items:center; gap:30px; }
+  .nav-links a{ font-size:14px; font-weight:500; color:var(--muted2); transition:color .15s; }
+  .nav-links a:hover{ color:var(--white); }
+  .nav-cta{ font-family:var(--font-mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--o1); border:1px solid var(--o1); padding:9px 16px; }
+  .nav-cta:hover{ background:var(--o1); color:#0C140B; }
 
-/* ─── NAV ────────────────────────────────────────────────────── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:0 48px;height:70px;
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(180deg,rgba(12,30,14,0.95) 0%,rgba(12,30,14,0) 100%);
-  backdrop-filter:blur(8px);
-  border-bottom:1px solid rgba(193,120,73,0.12);
-  transition:background 0.3s,border-color 0.3s;
-}
-nav.scrolled{background:rgba(12,30,14,0.97);border-bottom-color:rgba(193,120,73,0.28)}
-.nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none}
-.nav-logo img{width:40px;height:40px;object-fit:contain}
-.nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
-.nav-logo-sub{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:1px}
-.nav-links{display:flex;align-items:center;gap:6px}
-.nav-link{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 14px;border:1px solid transparent;transition:all 0.2s}
-.nav-link:hover{color:var(--white);border-color:rgba(255,255,255,0.12)}
-.nav-cta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#0C0A06;background:var(--clay);text-decoration:none;padding:10px 20px;transition:background 0.2s}
-.nav-cta:hover{background:var(--clay2)}
+  /* ---------------- HERO ---------------- */
+  .hero{ min-height:100vh; position:relative; overflow:hidden; display:flex; align-items:center;
+    background:linear-gradient(150deg, var(--o1) 0%, var(--o2) 46%, var(--o3) 100%); }
+  .hero .lines{ position:absolute; inset:0; transform-origin:60% 72%; }
+  .hero .persp{ position:absolute; inset:0; transform:perspective(1000px) rotateX(40deg) rotateZ(-6deg); transform-origin:58% 80%; }
+  .hero #h-base{ left:-12%; right:-26%; top:72%; height:60px; }
+  .hero #h-side{ left:58%; top:44%; bottom:28%; width:60px; }
+  .hero-content{ position:relative; z-index:3; }
+  .hero .eyebrow{ color:var(--navy); margin-bottom:26px; display:flex; align-items:center; gap:12px; }
+  .hero .eyebrow .dot{ width:9px; height:9px; border-radius:50%; background:var(--navy); }
+  .hero .wm1{ font-size:clamp(64px,11vw,150px); color:var(--navy); }
+  .hero .wm2{ font-size:clamp(64px,11vw,150px); color:#fff; }
+  .hero-sub{ font-weight:300; font-size:clamp(18px,2vw,22px); line-height:1.55; color:var(--navy);
+    max-width:520px; margin:30px 0 0; opacity:.92; }
+  .hero-cta{ display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; }
+  .hero .serve{ position:absolute; z-index:2; }
+  .scroll-hint{ position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:4;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--navy);
+    display:flex; flex-direction:column; align-items:center; gap:8px; opacity:.7; }
+  .scroll-hint .bar{ width:1px; height:30px; background:var(--navy); animation:scr 1.8s ease-in-out infinite; }
+  @keyframes scr{ 0%,100%{ transform:scaleY(.4); transform-origin:top; opacity:.4 } 50%{ transform:scaleY(1); opacity:1 } }
 
-/* ─── HERO ───────────────────────────────────────────────────── */
-.hero{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;padding:100px 24px 100px;text-align:center;
-}
-.hero-bg{
-  position:absolute;inset:0;z-index:0;
-  background:
-    repeating-linear-gradient(135deg,transparent,transparent 60px,rgba(193,120,73,0.022) 60px,rgba(193,120,73,0.022) 61px),
-    linear-gradient(180deg,#0C1E0E 0%,#0F1F10 50%,#121A0C 100%);
-}
-.hero-glow{
-  position:absolute;top:15%;left:50%;transform:translateX(-50%);
-  width:700px;height:600px;
-  background:radial-gradient(ellipse,rgba(193,120,73,0.17) 0%,transparent 68%);
-  pointer-events:none;z-index:0;
-  animation:glow-pulse 4s ease-in-out infinite;
-}
-@keyframes glow-pulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:0.7;transform:translateX(-50%) scale(1.07)}}
-.hero-lines{position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(90deg,transparent calc(50% - 0.5px),rgba(193,120,73,0.07) calc(50% - 0.5px),rgba(193,120,73,0.07) calc(50% + 0.5px),transparent calc(50% + 0.5px))}
+  /* ---------------- STATS ---------------- */
+  .stats{ background:var(--navy-deep); border-bottom:1px solid rgba(255,255,255,.07); }
+  .stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); }
+  .stat{ padding:54px 30px; text-align:center; border-left:1px solid rgba(255,255,255,.07); }
+  .stat:first-child{ border-left:0; }
+  .stat .num{ font-family:'Anton',sans-serif; font-size:64px; line-height:1; color:var(--o1); }
+  .stat .lbl{ font-family:var(--font-mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted2); margin-top:12px; }
 
-.hero-content{position:relative;z-index:1;max-width:960px}
-.hero-eyebrow{
-  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--clay);margin-bottom:48px;display:inline-flex;align-items:center;gap:12px;
-  animation:fade-up 0.8s both;
-}
-.hero-eyebrow::before,.hero-eyebrow::after{content:'';height:1px;width:36px;background:var(--clay);opacity:0.5}
+  /* ---------------- SOMMAR PROMO ---------------- */
+  .sommar{ background:linear-gradient(168deg,#fff 0%,#EDD8C4 100%); color:var(--navy); overflow:hidden; }
+  .sommar-in{ display:grid; grid-template-columns:1.1fr .9fr; gap:50px; align-items:center; }
+  .badge-new{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:11px;
+    letter-spacing:2px; text-transform:uppercase; color:var(--o2); border:1px solid var(--o2); padding:7px 14px; margin-bottom:22px; }
+  .sommar h2{ font-weight:800; font-size:clamp(32px,4.4vw,50px); letter-spacing:-1.5px; line-height:1.05; margin:0; }
+  .sommar p{ font-weight:300; font-size:18px; line-height:1.65; color:rgba(13,8,4,.62); margin:18px 0 30px; max-width:480px; }
+  .sommar-card{ position:relative; aspect-ratio:4/5; min-height:540px; border-radius:0; overflow:hidden; background:#F4861E; }
+  .sommar-card .rays{ position:absolute; inset:-20%; background:repeating-conic-gradient(from -8deg at 90% 7%, #FFC559 0deg 9deg, #F0791A 9deg 18deg); opacity:.96; }
+  .sommar-card .vig{ position:absolute; inset:0; background:radial-gradient(120% 110% at 90% 7%, transparent 40%, rgba(120,40,0,.42) 100%); }
+  .sommar-card .suns{ position:absolute; left:90%; top:7%; width:104px; height:104px; transform:translate(-50%,-50%); border-radius:50%;
+    background:radial-gradient(circle at 50% 45%, #FFF4CE 0%, #FFE48A 60%, #FFD45E 100%); z-index:2; animation:sunGlow 4s ease-in-out infinite; }
+  @keyframes sunGlow{ 0%,100%{ box-shadow:0 0 0 5px rgba(255,244,206,.3), 0 0 46px rgba(255,228,138,.55); } 50%{ box-shadow:0 0 0 7px rgba(255,244,206,.4), 0 0 62px rgba(255,228,138,.72); } }
+  .sommar-card .frame{ position:absolute; inset:16px; border:1.5px solid rgba(255,247,226,.5); pointer-events:none; z-index:4; }
+  .sommar-card .court-plane{ position:absolute; inset:0; transform:perspective(780px) rotateX(42deg) rotateZ(-5deg); transform-origin:56% 82%; z-index:1; pointer-events:none; }
+  .sommar-card .court-plane .base{ left:-16%; right:-22%; top:72%; height:34px; }
+  .sommar-card .court-plane .side{ left:55%; top:54%; bottom:28%; width:34px; }
+  .sommar-burst{ position:absolute; left:50%; top:42%; transform:translate(-50%,-50%) rotate(-6deg); z-index:5; width:188px; height:188px;
+    background:var(--navy); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    clip-path:polygon(50% 0%,61% 13%,79% 8%,79% 27%,96% 30%,86% 46%,100% 59%,83% 65%,87% 83%,69% 79%,60% 96%,50% 82%,40% 96%,31% 79%,13% 83%,17% 65%,0% 59%,14% 46%,4% 30%,21% 27%,21% 8%,39% 13%); }
+  .sommar-burst .s1{ font-family:var(--font-mono); font-size:10px; letter-spacing:3px; text-transform:uppercase; color:#FFE07A; }
+  .sommar-burst .s2{ font-family:'Anton',sans-serif; font-size:29px; line-height:.86; text-transform:uppercase; text-align:center; color:#fff; }
+  .sommar-burst .s3{ font-family:var(--font-mono); font-size:9px; letter-spacing:2px; margin-top:3px; color:rgba(255,247,226,.7); }
+  .sommar-logo{ position:absolute; right:30px; bottom:28px; z-index:6; text-align:right; }
+  .sommar-logo .line{ font-family:'Anton',sans-serif; text-transform:uppercase; line-height:.82; transform:skewX(-8deg); display:block; font-size:30px; }
+  @media (prefers-reduced-motion:reduce){ .sommar-card .suns{ animation:none } }
 
-.hero-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(76px,14vw,168px);
-  line-height:0.88;letter-spacing:-1px;
-  margin-bottom:6px;
-  animation:fade-up 0.8s 0.1s both;
-}
-.hero-title .clay-word{color:var(--clay)}
-.hero-title .white-word{color:var(--white)}
+  /* ---------------- HUR FUNKAR (stepper) ---------------- */
+  .hur{ background:var(--navy); }
+  .stepper{ display:grid; grid-template-columns:300px 1fr; gap:50px; margin-top:50px; }
+  .step-nav{ display:flex; flex-direction:column; gap:4px; }
+  .step-tab{ text-align:left; background:transparent; border:0; cursor:pointer; padding:20px 22px;
+    border-left:2px solid rgba(255,255,255,.12); transition:all .2s; }
+  .step-tab .st-n{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; color:var(--muted); }
+  .step-tab .st-t{ font-weight:700; font-size:17px; color:var(--muted2); margin-top:6px; }
+  .step-tab.active{ border-left-color:var(--o1); background:rgba(255,255,255,.03); }
+  .step-tab.active .st-t{ color:var(--white); }
+  .step-tab.active .st-n{ color:var(--o1); }
+  .step-panel{ background:var(--navy-surface); border:1px solid rgba(255,255,255,.08); padding:44px; min-height:380px; position:relative; overflow:hidden; }
+  .step-panel h3{ font-weight:800; font-size:clamp(26px,3vw,38px); letter-spacing:-1px; margin:0 0 14px; line-height:1.05; }
+  .step-panel p{ font-weight:300; font-size:17px; line-height:1.65; color:var(--muted2); max-width:460px; }
+  .panel-visual{ margin-top:30px; }
+  /* ladder mini rows */
+  .lrow{ display:flex; align-items:center; gap:14px; padding:11px 16px; background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07); margin-bottom:6px; }
+  .lrow .rk{ font-family:'Anton',sans-serif; font-size:20px; color:var(--o1); width:34px; }
+  .lrow .nm{ font-weight:600; font-size:15px; }
+  .lrow.top{ border-color:var(--o1); background:rgba(232,82,10,.1); }
+  .vs-row{ display:flex; align-items:center; gap:16px; margin-bottom:10px; }
+  .vs-chip{ flex:1; display:flex; align-items:center; gap:10px; padding:12px 16px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); }
+  .vs-chip .rk{ font-family:'Anton',sans-serif; color:var(--o1); font-size:18px; }
+  .vs-lbl{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; color:var(--muted); }
+  .swap{ display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; }
+  .swap-col .h{ font-family:var(--font-mono); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  .swap-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); margin-bottom:6px; font-size:14px; font-weight:600; }
+  .swap-row .rk{ font-family:'Anton',sans-serif; color:var(--o1); font-size:16px; }
+  .swap-row.win{ border-color:var(--o1); background:rgba(232,82,10,.12); }
+  .swap-arrow{ font-size:24px; color:var(--o1); }
+  .repsteps{ display:flex; flex-direction:column; gap:12px; }
+  .repstep{ display:flex; align-items:center; gap:14px; }
+  .repstep .n{ width:30px; height:30px; flex-shrink:0; border-radius:50%; background:var(--o2); color:#0C140B;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; }
+  .repstep .t{ font-size:15px; font-weight:500; color:var(--muted2); }
+  .step-ghostnum{ position:absolute; right:24px; bottom:-30px; font-family:'Anton',sans-serif; font-size:200px; line-height:1; color:rgba(255,255,255,.035); pointer-events:none; }
 
-.hero-logo-wrap{margin-bottom:-16px;margin-top:-24px}
-.hero-logo{width:clamp(400px,88vw,980px);height:auto;display:block;margin:0 auto}
-@keyframes logoIn{
-  from{opacity:0;transform:scale(0.78) translateY(12px)}
-  to{opacity:1;transform:scale(1) translateY(0)}
-}
+  /* ---------------- VARFOR ---------------- */
+  .varfor{ background:linear-gradient(150deg,var(--o1),var(--o2) 50%,var(--o3)); color:var(--navy); overflow:hidden; }
+  .varfor .tex-hair{ opacity:.6; }
+  .quote{ font-weight:300; font-size:clamp(22px,2.8vw,32px); line-height:1.4; letter-spacing:-.5px; max-width:760px; margin:30px 0 0; }
+  .quote b{ font-weight:700; }
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; margin-top:38px; }
+  .chip{ font-family:var(--font-mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    border:1px solid rgba(18,58,40,.3); padding:9px 16px; color:var(--navy); }
+  .chip.solid{ background:var(--navy); color:#fff; border-color:var(--navy); }
 
-.hero-subtitle{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(26px,4.5vw,52px);
-  letter-spacing:5px;color:var(--cream2);
-  margin-bottom:36px;animation:fade-up 0.8s 0.2s both;
-}
-.hero-desc{
-  font-size:clamp(15px,3.8vw,18px);font-weight:400;color:var(--muted);
-  max-width:min(460px,88vw);margin:0 auto 52px;line-height:1.7;
-  overflow-wrap:break-word;word-break:break-word;hyphens:auto;
-  animation:fade-up 0.8s 0.3s both;
-}
-.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fade-up 0.8s 0.4s both}
-.btn-primary{
-  background:var(--clay);color:#0C0A06;font-family:'Inter',sans-serif;font-weight:700;
-  font-size:14px;letter-spacing:0.5px;padding:17px 38px;text-decoration:none;display:inline-block;
-  border:2px solid var(--clay);transition:all 0.2s;
-  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
-}
-.btn-primary:hover{background:var(--clay2);border-color:var(--clay2);transform:translateY(-2px)}
-.btn-secondary{
-  color:var(--cream);font-family:'Inter',sans-serif;font-weight:600;font-size:14px;letter-spacing:0.5px;
-  padding:16px 38px;text-decoration:none;display:inline-block;
-  border:1.5px solid rgba(193,120,73,0.4);transition:all 0.2s;background:rgba(193,120,73,0.06);
-  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
-}
-.btn-secondary:hover{border-color:var(--clay);background:rgba(193,120,73,0.13);transform:translateY(-2px)}
+  /* ---------------- CTA ---------------- */
+  .cta{ background:var(--navy-deep); text-align:center; }
+  .cta h2{ font-weight:800; font-size:clamp(34px,5vw,58px); letter-spacing:-1.5px; margin:0 auto; max-width:640px; line-height:1.04; }
+  .cta p{ font-weight:300; font-size:19px; color:var(--muted2); max-width:520px; margin:20px auto 36px; line-height:1.6; }
+  .cta-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
 
-.hero-scroll{
-  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);
-  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted2);
-  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px;
-  animation:fade-up 1s 0.9s both;
-}
-.hero-scroll-line{width:1px;height:36px;background:linear-gradient(180deg,var(--clay) 0%,transparent 100%);animation:scroll-line 2s ease-in-out infinite}
-@keyframes scroll-line{0%,100%{opacity:0.3}50%{opacity:1}}
+  /* ---------------- FOOTER ---------------- */
+  footer{ background:var(--navy-deep); border-top:1px solid rgba(255,255,255,.08); padding:64px 0 30px; }
+  .foot-grid{ display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:40px; }
+  .foot-brand .wordmark{ font-size:46px; margin-bottom:0; }
+  .foot-brand p{ font-weight:300; font-size:15px; line-height:1.6; color:var(--muted2); max-width:300px; }
+  .foot-col h4{ font-family:var(--font-mono); font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin:0 0 16px; }
+  .foot-col a, .foot-col p{ display:block; font-size:15px; color:var(--muted2); margin-bottom:10px; font-weight:300; }
+  .foot-col a:hover{ color:var(--o1); }
+  .foot-contact a{ display:flex; align-items:center; gap:11px; }
+  .foot-contact svg{ width:17px; height:17px; flex-shrink:0; stroke:currentColor; fill:none; }
+  .foot-bottom{ margin-top:50px; padding-top:24px; border-top:1px solid rgba(255,255,255,.07);
+    display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:11px; letter-spacing:1px; color:var(--muted); flex-wrap:wrap; gap:10px; }
+  .foot-admin{ color:var(--muted); text-transform:uppercase; }
+  .foot-admin:hover{ color:var(--o1); }
 
-/* ─── HERO INTRO-ANIMATION (tennisbollar reveal:ar loggan) ────── */
-.hero-anim-canvas{position:absolute;inset:0;z-index:1;pointer-events:none}
-.hero .hero-content{z-index:2}
-.hero-logo .lg-top,.hero-logo .lg-mid,.hero-logo .lg-bot{transform-box:fill-box;transform-origin:center}
-/* Utgångsläget sätts först när JS lagt på .bts-animate → utan JS syns loggan ändå */
-.hero-logo-wrap.bts-animate .lg-top,
-.hero-logo-wrap.bts-animate .lg-mid,
-.hero-logo-wrap.bts-animate .lg-bot{opacity:0}
-@media(prefers-reduced-motion:reduce){
-  .hero-logo-wrap.bts-animate .lg-top,
-  .hero-logo-wrap.bts-animate .lg-mid,
-  .hero-logo-wrap.bts-animate .lg-bot{opacity:1}
-}
-
-/* ─── STATS STRIP ────────────────────────────────────────────── */
-.stats-strip{
-  background:var(--clay);padding:22px 48px;
-  display:flex;align-items:center;justify-content:center;gap:0;
-  position:relative;z-index:1;overflow:hidden;
-}
-.stats-strip::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 120px,rgba(0,0,0,0.05) 120px,rgba(0,0,0,0.05) 121px)}
-.stat-item{text-align:center;padding:0 52px;position:relative;z-index:1;flex:1;max-width:240px;border-right:1px solid rgba(0,0,0,0.14)}
-.stat-item:last-child{border-right:none}
-.stat-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:#0C0A06;line-height:1}
-.stat-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(0,0,0,0.5);text-transform:uppercase;margin-top:2px}
-
-/* ─── SHARED SECTION ─────────────────────────────────────────── */
-.section-inner{max-width:1100px;margin:0 auto;padding:100px 48px}
-.section-eyebrow{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--clay);margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.section-eyebrow::after{content:'';height:1px;width:32px;background:var(--clay);opacity:0.5}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:1px;line-height:0.95;margin-bottom:20px}
-.section-desc{font-size:17px;color:var(--muted);max-width:540px;line-height:1.75}
-
-/* ─── WHY SECTION (Tennis hela säsongen) ─────────────────────── */
-.why-section{background:linear-gradient(180deg,var(--bg) 0%,#0E1A10 100%)}
-.why-inner{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
-.why-quote{border-left:3px solid var(--clay);padding:18px 22px;background:rgba(193,120,73,0.05);margin-top:32px}
-.why-quote p{font-size:15px;color:var(--muted);line-height:1.75;font-style:italic}
-.why-quote cite{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-top:10px;display:block}
-.why-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:36px}
-.why-pill{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border:1px solid rgba(193,120,73,0.25);color:var(--muted2);background:rgba(193,120,73,0.04)}
-.why-visual{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-.why-vis-card{background:var(--card);border:1px solid rgba(193,120,73,0.1);padding:28px 22px;display:flex;flex-direction:column;gap:10px;transition:border-color 0.2s,transform 0.2s}
-.why-vis-card:hover{border-color:rgba(193,120,73,0.3);transform:translateY(-2px)}
-.why-vis-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--clay);line-height:1}
-.why-vis-lbl{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
-.why-vis-card.span2{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;gap:20px}
-.why-vis-card.span2 .why-vis-num{font-size:36px}
-
-/* ─── HOW CAROUSEL ───────────────────────────────────────────── */
-.how-section{background:linear-gradient(180deg,#0E1A10 0%,#0A1508 100%)}
-.how-carousel{margin-top:56px;background:var(--card);border:1px solid rgba(193,120,73,0.15);overflow:hidden;position:relative}
-.how-track{display:flex;transition:transform 0.5s cubic-bezier(0.22,1,0.36,1)}
-.how-slide{min-width:100%;display:grid;grid-template-columns:1fr 1fr;min-height:360px}
-.how-slide-text{padding:52px 48px;display:flex;flex-direction:column;justify-content:center;gap:16px;border-right:1px solid rgba(193,120,73,0.1)}
-.how-step-label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--clay);text-transform:uppercase}
-.how-slide-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,3.8vw,50px);line-height:0.95;letter-spacing:1px;color:var(--white)}
-.how-slide-desc{font-size:15px;color:var(--muted);line-height:1.75;max-width:380px}
-.how-slide-visual{padding:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.18)}
-.how-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-top:1px solid rgba(193,120,73,0.1);background:rgba(0,0,0,0.1)}
-.how-btn{background:none;border:1px solid rgba(193,120,73,0.3);color:var(--clay);font-family:'Space Mono',monospace;font-size:15px;width:44px;height:44px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center}
-.how-btn:hover:not(:disabled){background:rgba(193,120,73,0.1);border-color:var(--clay)}
-.how-btn:disabled{opacity:0.3;cursor:not-allowed}
-.how-dots{display:flex;gap:10px;align-items:center}
-.how-dot{width:8px;height:8px;border-radius:0;background:rgba(193,120,73,0.25);border:none;cursor:pointer;transition:all 0.25s;padding:0}
-.how-dot.active{background:var(--clay);width:28px}
-/* Vis: Ladder */
-.vis-ladder{display:flex;flex-direction:column;gap:4px;width:100%;max-width:280px}
-.vis-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid rgba(193,120,73,0.12);background:var(--surface)}
-.vis-row-1{background:rgba(212,225,87,0.9);border-color:transparent}
-.vis-row-1 .vis-rank,.vis-row-1 .vis-name{color:#0C1E0E !important;font-weight:700}
-.vis-row-2{background:var(--clay);border-color:transparent}
-.vis-row-2 .vis-rank,.vis-row-2 .vis-name{color:#0C1E0E !important;font-weight:700}
-.vis-row-3{background:var(--clay2);border-color:transparent}
-.vis-row-3 .vis-rank,.vis-row-3 .vis-name{color:var(--cream)}
-.vis-rank{font-family:'Space Mono',monospace;font-size:11px;color:var(--clay);min-width:30px}
-.vis-name{font-size:14px;color:var(--muted)}
-.vis-dots{text-align:center;color:var(--muted);padding:4px 0;font-size:18px}
-/* Vis: Pairs */
-.vis-pairs{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px}
-.vis-pair{display:flex;align-items:center}
-.vis-pair-player{flex:1;text-align:center;padding:13px 8px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;background:var(--clay2);border:1px solid var(--clay);color:var(--white)}
-.vis-pair-player.dim{background:var(--surface);border-color:rgba(193,120,73,0.15);color:var(--muted);font-size:18px}
-.vis-pair-vs{padding:0 12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--clay);letter-spacing:2px;flex-shrink:0}
-.vis-pair-vs.dim{color:rgba(193,120,73,0.3)}
-.vis-pair-dots{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;padding-top:4px}
-/* Vis: Swap */
-.vis-swap{display:flex;align-items:center;gap:14px;width:100%;max-width:320px}
-.vis-swap-col{flex:1;display:flex;flex-direction:column;gap:6px}
-.vis-swap-label{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;text-align:center}
-.vis-swap-row{padding:10px 12px;font-size:13px;border:1px solid rgba(193,120,73,0.12);background:var(--surface);color:var(--muted);text-align:center;line-height:1.4}
-.vis-swap-row.clay-win{background:var(--clay2);border-color:var(--clay);color:var(--cream);font-weight:600}
-.vis-swap-arrow{font-family:'Space Mono',monospace;font-size:18px;color:var(--clay);flex-shrink:0}
-/* Vis: Steps */
-.vis-steps{display:flex;flex-direction:column;width:100%;max-width:280px}
-.vis-step{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(193,120,73,0.08)}
-.vis-step:last-child{border-bottom:none}
-.vis-step-num{width:36px;height:36px;border-radius:50%;background:var(--clay2);border:1px solid var(--clay);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.vis-step-text{font-size:14px;color:var(--muted);line-height:1.45}
-@media(max-width:768px){
-  .how-slide{grid-template-columns:1fr;min-height:auto}
-  .how-slide-visual{display:none}
-  .how-slide-text{padding:36px 28px;border-right:none}
-  .how-nav{padding:16px 20px}
-}
-
-/* ─── TENNISBOLL-SOL (delad) ─────────────────────────────────── */
-.tennisboll{position:absolute;top:-46px;right:-30px;width:172px;height:172px;border-radius:50%;overflow:hidden;z-index:0;
-  background:radial-gradient(circle at 36% 30%,#f4fa84 0%,#dcec55 45%,#c0d23a 74%,#9fb22d 100%);
-  box-shadow:0 0 46px 16px rgba(212,225,87,.40),inset -15px -17px 36px rgba(58,68,16,.5),inset 10px 10px 24px rgba(255,255,255,.42)}
-.tennisboll::before,.tennisboll::after{content:'';position:absolute;left:50%;width:172px;height:172px;border-radius:50%;border:12px solid #fcfdf2;box-sizing:border-box;transform:translateX(-50%)}
-.tennisboll::before{top:-92px}
-.tennisboll::after{bottom:-92px}
-
-/* ─── SOMMARSTEGEN ───────────────────────────────────────────── */
-.summer-section{
-  background:linear-gradient(135deg,#0A1508 0%,#0C1E0E 100%);
-  position:relative;overflow:hidden;
-}
-.summer-section::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 60% 50%,rgba(193,120,73,0.12) 0%,transparent 65%);
-  pointer-events:none;
-}
-.summer-inner{max-width:1100px;margin:0 auto;padding:100px 48px;position:relative;z-index:1}
-.summer-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-
-.summer-badge{
-  display:inline-flex;align-items:center;gap:10px;
-  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--clay);margin-bottom:20px;
-}
-.summer-badge::before{content:'';width:8px;height:8px;background:var(--clay);border-radius:50%;animation:badge-pulse 1.8s ease-in-out infinite}
-@keyframes badge-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
-
-.summer-title{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,100px);
-  line-height:0.88;letter-spacing:1px;margin-bottom:24px;
-}
-.summer-title span{color:var(--clay)}
-
-.summer-date{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,3vw,36px);
-  letter-spacing:3px;color:var(--cream2);margin-bottom:32px;
-}
-.summer-desc{font-size:17px;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:440px}
-
-.summer-facts{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
-.summer-fact{
-  display:flex;align-items:center;gap:14px;font-size:15px;color:var(--muted);
-  padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);
-}
-.summer-fact:last-child{border-bottom:none}
-.summer-fact-icon{
-  width:32px;height:32px;flex-shrink:0;background:rgba(193,120,73,0.1);border:1px solid rgba(193,120,73,0.2);
-  display:flex;align-items:center;justify-content:center;color:var(--clay);
-}
-.summer-fact-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
-
-.summer-form-card{
-  background:var(--card);border:1px solid rgba(193,120,73,0.18);padding:40px;
-  position:relative;overflow:hidden;
-}
-.summer-form-card::before{
-  content:'SOMMARSTEGEN';font-family:'Bebas Neue',sans-serif;font-size:80px;
-  color:rgba(193,120,73,0.05);position:absolute;bottom:-10px;right:-10px;line-height:1;
-  letter-spacing:2px;pointer-events:none;
-}
-.summer-form-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-bottom:6px;color:var(--cream)}
-.summer-form-sub{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-bottom:28px}
-.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.form-label{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2)}
-.form-input{
-  background:rgba(255,255,255,0.04);border:1px solid rgba(193,120,73,0.2);
-  color:var(--white);font-family:'Inter',sans-serif;font-size:15px;
-  padding:13px 16px;outline:none;transition:border-color 0.2s;width:100%;
-}
-.form-input:focus{border-color:var(--clay)}
-.form-input::placeholder{color:var(--muted2)}
-.form-submit{
-  width:100%;background:var(--clay);color:#0C0A06;border:none;
-  font-family:'Inter',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;
-  padding:16px;cursor:pointer;margin-top:8px;transition:background 0.2s;
-  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px));
-}
-.form-submit:hover{background:var(--clay2)}
-.form-note{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted2);text-align:center;margin-top:12px}
-
-/* ─── CTA ────────────────────────────────────────────────────── */
-.cta-section{
-  background:linear-gradient(135deg,var(--clay2) 0%,var(--clay3) 100%);
-  position:relative;overflow:hidden;
-}
-.cta-section::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 40px,rgba(0,0,0,0.05) 40px,rgba(0,0,0,0.05) 41px)}
-.cta-inner{max-width:800px;margin:0 auto;padding:100px 48px;text-align:center;position:relative;z-index:1}
-.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(50px,9vw,100px);line-height:0.9;letter-spacing:1px;margin-bottom:20px;color:var(--cream)}
-.cta-desc{font-size:18px;color:rgba(245,236,215,0.65);margin-bottom:48px;line-height:1.65;max-width:440px;margin-left:auto;margin-right:auto}
-.cta-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-.btn-white{background:var(--cream);color:var(--clay3);font-family:'Inter',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;padding:18px 40px;text-decoration:none;display:inline-block;border:2px solid var(--cream);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
-.btn-white:hover{background:transparent;color:var(--cream);transform:translateY(-2px)}
-.btn-ghost{color:var(--cream);font-family:'Inter',sans-serif;font-weight:600;font-size:15px;letter-spacing:0.5px;padding:17px 40px;text-decoration:none;display:inline-block;border:1.5px solid rgba(245,236,215,0.4);transition:all 0.2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
-.btn-ghost:hover{border-color:var(--cream);background:rgba(245,236,215,0.1);transform:translateY(-2px)}
-
-/* ─── FOOTER ─────────────────────────────────────────────────── */
-footer{background:#070F08;border-top:1px solid rgba(193,120,73,0.1);padding:60px 48px 40px}
-.footer-inner{max-width:1100px;margin:0 auto}
-.footer-top{display:grid;grid-template-columns:1fr auto 1fr;gap:48px;align-items:start;margin-bottom:48px}
-.footer-logo img{width:50px;height:50px;object-fit:contain;margin-bottom:10px}
-.footer-brand{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
-.footer-brand-sub{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;color:var(--muted2);text-transform:uppercase;margin-bottom:14px}
-.footer-desc{font-size:13px;color:var(--muted2);line-height:1.75;max-width:220px}
-.footer-nav{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
-.footer-nav-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--clay);margin-bottom:10px}
-.footer-nav a{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted2);text-decoration:none;text-transform:uppercase;padding:4px 0;transition:color 0.2s}
-.footer-nav a:hover{color:var(--clay)}
-.footer-contact{text-align:right}
-.footer-contact-title{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--clay);margin-bottom:14px}
-.footer-contact p{font-size:13px;color:var(--muted2);line-height:1.85}
-.footer-contact a{color:var(--muted);text-decoration:none;transition:color 0.2s}
-.footer-contact a:hover{color:var(--clay)}
-.footer-bottom{border-top:1px solid rgba(255,255,255,0.05);padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.footer-bottom p{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase}
-.footer-est{font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(193,120,73,0.22);letter-spacing:4px}
-
-/* ─── ANIMATIONS ─────────────────────────────────────────────── */
-@keyframes fade-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-/* Scroll reveals */
-.reveal{opacity:0;transform:translateY(36px);transition:opacity 0.7s cubic-bezier(0.22,1,0.36,1),transform 0.7s cubic-bezier(0.22,1,0.36,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-left{opacity:0;transform:translateX(-48px);transition:opacity 0.75s cubic-bezier(0.22,1,0.36,1),transform 0.75s cubic-bezier(0.22,1,0.36,1)}
-.reveal-left.visible{opacity:1;transform:translateX(0)}
-.reveal-right{opacity:0;transform:translateX(48px);transition:opacity 0.75s cubic-bezier(0.22,1,0.36,1),transform 0.75s cubic-bezier(0.22,1,0.36,1)}
-.reveal-right.visible{opacity:1;transform:translateX(0)}
-.reveal-scale{opacity:0;transform:scale(0.93);transition:opacity 0.65s cubic-bezier(0.22,1,0.36,1),transform 0.65s cubic-bezier(0.22,1,0.36,1)}
-.reveal-scale.visible{opacity:1;transform:scale(1)}
-
-.reveal-delay-1{transition-delay:0.1s}
-.reveal-delay-2{transition-delay:0.2s}
-.reveal-delay-3{transition-delay:0.3s}
-.reveal-delay-4{transition-delay:0.4s}
-
-/* Line wipe for eyebrows */
-.reveal-line{display:inline-block;overflow:hidden}
-.reveal-line span{display:block;transform:translateY(100%);transition:transform 0.6s cubic-bezier(0.22,1,0.36,1)}
-.reveal-line.visible span{transform:translateY(0)}
-
-/* ─── MOBILE ─────────────────────────────────────────────────── */
-@media(max-width:900px){
-  nav{padding:0 20px}
-  .section-inner,.summer-inner{padding:72px 24px}
-  .why-inner,.summer-grid{grid-template-columns:1fr;gap:48px}
-  .why-visual{grid-template-columns:1fr 1fr}
-  .steps-grid{grid-template-columns:1fr;gap:2px}
-  .footer-top{grid-template-columns:1fr;gap:32px}
-  .footer-contact{text-align:left}
-  .footer-bottom{flex-direction:column;align-items:flex-start}
-  .cta-inner{padding:72px 24px}
-}
-@media(max-width:600px){
-  nav{padding:0 16px;height:60px}
-  .nav-link{display:none}
-  .hero{padding:90px 16px 80px}
-  .hero-eyebrow{margin-bottom:36px}
-  .stats-strip{padding:18px 12px}
-  .stat-item{padding:0 20px}
-  .stat-num{font-size:40px}
-  .section-inner,.summer-inner{padding:56px 16px}
-  .step{padding:28px 20px}
-  .why-visual{grid-template-columns:1fr}
-  .summer-form-card{padding:28px 20px}
-  .cta-inner{padding:56px 16px}
-  footer{padding:48px 20px 32px}
-}
+  @media (max-width:900px){
+    .nav-links a:not(.nav-cta){ display:none; }
+    .wrap{ padding:0 22px; }
+    .sec-pad{ padding:84px 0; }
+    .stats-grid{ grid-template-columns:repeat(3,1fr); }
+    .stat{ padding:36px 8px; border-left:1px solid rgba(255,255,255,.08); }
+    .stat:first-child{ border-left:0; }
+    .stat .num{ font-size:clamp(34px,11vw,52px); }
+    .stat .lbl{ font-size:10px; letter-spacing:1px; }
+    .sommar-in{ grid-template-columns:1fr; }
+    .stepper{ grid-template-columns:1fr; }
+    .step-nav{ flex-direction:row; overflow-x:auto; }
+    .step-tab{ border-left:0; border-bottom:2px solid rgba(255,255,255,.12); flex-shrink:0; }
+    .step-tab.active{ border-left:0; border-bottom-color:var(--o1); }
+    .step-tab .st-t{ font-size:15px; }
+    .swap{ grid-template-columns:1fr; }
+    .foot-grid{ grid-template-columns:1fr; gap:34px; }
+    .hero-sub{ font-size:18px; }
+    .sec-lead{ font-size:17px; }
+    .nav-cta{ font-size:11px; padding:8px 13px; }
+    .foot-bottom{ font-size:11px; }
+  }
+  @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; } .scroll-hint .bar{ animation:none; } }
 </style>
 </head>
 <body>
 
-<!-- ─── NAV ──────────────────────────────────────────────────── -->
-<nav id="main-nav">
-  <a class="nav-logo" href="#">
-    <img src="bts-logo.svg" alt="BTS" onerror="this.style.display='none'">
-    <div>
-      <div class="nav-logo-text">BTS Stegen</div>
-      <div class="nav-logo-sub">Båstad Tennissällskap</div>
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="brand">
+      <img class="mark" src="bts-crest.png" alt="Båstad Tennissällskap" />
+      <span><span class="bt-name">BTS Stegen</span><br/><span class="bt-sub">Båstad Tennissällskap</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#hur">Hur det funkar</a>
+      <a href="#varfor">Varför stegen</a>
+      <a href="#sommar">Sommarstegen</a>
+      <a href="stegen.html" class="nav-cta">Till stegen →</a>
     </div>
-  </a>
-  <div class="nav-links">
-    <a href="#hur" class="nav-link">Hur det funkar</a>
-    <a href="#varfor" class="nav-link">Varför stegen</a>
-    <a href="stegen.html" class="nav-cta">Till stegen →</a>
   </div>
 </nav>
 
-<!-- ─── HERO ──────────────────────────────────────────────────── -->
-<section class="hero" id="top">
-  <div class="hero-bg"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-lines"></div>
-  <canvas class="hero-anim-canvas" id="heroAnimCanvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-logo-wrap" id="heroLogoWrap">
-      <svg class="hero-logo" viewBox="0 0 233.1 171.3" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="hrclay" cx="113.6356" cy="164.2249" r="73.4464" gradientTransform="matrix(0.9952 0 0 1.2602 0.9847 -124.8108)" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#C68D64"/>
-            <stop offset="1" stop-color="#9D603B"/>
-          </radialGradient>
-        </defs>
-        <g class="lg-mid" id="lgMid">
-          <rect x="43.1" y="56.5" fill="url(#hrclay)" stroke="#FFF" stroke-miterlimit="10" width="142" height="51.3"/>
-          <rect x="113.7" y="54.5" fill="#FFF" width="1.1" height="55.7"/>
-          <rect x="43.6" y="101.4" fill="#FFF" width="141.5" height="0.4"/>
-          <rect x="43.6" y="62.8" fill="#FFF" width="141.5" height="0.4"/>
-          <polygon fill="#FFF" points="149.5,82.2 149.5,82.6 79.1,82.6 79.1,82.1"/>
-          <g opacity="0.4"><polygon fill="#888" points="114.8,54.4 114.8,110.1 117.8,111.2 117.8,55.5"/></g>
-          <rect x="78.8" y="62.8" fill="#FFF" width="0.6" height="39"/>
-          <rect x="149.1" y="62.8" fill="#FFF" width="0.5" height="39"/>
-          <polygon fill="#FFF" points="44.4,82.2 44.4,82.6 42.7,82.6 42.7,82.2"/>
-          <polygon fill="#FFF" points="185.2,82.2 185.2,82.6 183.6,82.6 183.6,82.2"/>
-          <text transform="matrix(1 0 0 1 51.0092 90.4508)" fill="#FFF" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="29.75">TENNIS</text>
-        </g>
-        <g class="lg-top" id="lgTop">
-          <text transform="matrix(1 0 0 1 51.6933 44.3829)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.33">BÅSTAD</text>
-        </g>
-        <g class="lg-bot" id="lgBot">
-          <text transform="matrix(0.9837 0 0 1 51.6933 140.4015)" fill="#B77C52" font-family="'Archivo Black','Arial Black',Impact,sans-serif" font-size="28.48">STEGEN</text>
-        </g>
-      </svg>
-    </div>
-    <div class="hero-subtitle">Säsongen 2026</div>
-    <p class="hero-desc">Tävla om rankingen, klättra stegen och möt motståndet vecka för vecka. Vem tar toppen i slutet?</p>
-    <div class="hero-btns">
-      <a href="stegen.html" class="btn-primary">Se aktuell stege</a>
-      <a href="#hur" class="btn-secondary">Hur det funkar</a>
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="tex-hair"></div>
+  <div class="lines" id="heroLines">
+    <div class="persp">
+      <div class="pline" id="h-base"></div>
+      <div class="pline" id="h-side"></div>
     </div>
   </div>
-  <div class="hero-scroll">
-    <div class="hero-scroll-line"></div>
-    <span>Scrolla</span>
+  <div class="wrap hero-content">
+    <div style="display:inline-block">
+      <div class="eyebrow" style="display:block;text-align:right;margin-right:2px">SÄSONGEN 2026</div>
+      <div class="bts-lockup" style="width:100%;max-width:540px">
+        <svg viewBox="0 -150 470 400" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;overflow:visible;display:block">
+          <g class="bl-trail"></g>
+          <g class="bl-words">
+            <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#0D2E20">BÅSTAD</text>
+            <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
+          </g>
+          <g class="bl-ball"><circle r="13" fill="#D7F23C"/>
+            <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/>
+            <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#0D2E20" stroke-width="2" stroke-linecap="round"/></g>
+        </svg>
+      </div>
+    </div>
+    <p class="hero-sub">Tävla om rankingen, klättra stegen och möt motståndet vecka för vecka. Vem tar toppen i slutet?</p>
+    <div class="hero-cta">
+      <a href="stegen.html" class="btn btn-navy">Se aktuell stege →</a>
+      <a href="#hur" class="btn btn-ghost-dark">Hur det funkar</a>
+    </div>
+  </div>
+  <div class="scroll-hint">Scrolla<span class="bar"></span></div>
+  <div class="tex-grain"></div>
+</header>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat reveal"><div class="num" data-count="30">30</div><div class="lbl">Spelare</div></div>
+      <div class="stat reveal"><div class="num" data-count="238">238</div><div class="lbl">Matcher spelade</div></div>
+      <div class="stat reveal"><div class="num" data-count="18">18</div><div class="lbl">Omgångar per säsong</div></div>
+    </div>
   </div>
 </section>
 
-<!-- ─── STATS STRIP ───────────────────────────────────────────── -->
-<div class="stats-strip">
-  <div class="stat-item">
-    <div class="stat-num">30</div>
-    <div class="stat-lbl">Spelare</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">238</div>
-    <div class="stat-lbl">Matcher spelade</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">18</div>
-    <div class="stat-lbl">Omgångar per säsong</div>
-  </div>
-</div>
-
-<!-- ─── SOMMARSTEGE-CTA ───────────────────────────────────────── -->
-<section style="position:relative;overflow:hidden;background:linear-gradient(165deg,#E9A864 0%,#C17849 42%,#6b5230 70%,#0C1409 100%);padding:56px 20px;text-align:center;border-top:1px solid #1e2a1a;border-bottom:1px solid #1e2a1a;">
-  <div class="tennisboll"></div>
-  <div style="position:relative;z-index:1;max-width:640px;margin:0 auto;">
-    <div style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2a1c0e;margin-bottom:10px;">Nyhet · spel söndagar från 21 juni</div>
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#fff;margin:0 0 12px;letter-spacing:1px;">Sommarstegen 2026</h2>
-    <p style="color:#3a2c1a;font-size:16px;line-height:1.65;margin:0 0 26px;">Spontan drop-in-stege på söndagar — anmäl dig vecka för vecka, vi lottar matcherna. Inte med förut? Skicka en intresseanmälan så godkänner vi dig.</p>
-    <a href="sommarstege.html" style="display:inline-block;background:#0C1409;color:#EDEAE0;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;padding:14px 34px;border-radius:8px;text-decoration:none;">Anmäl dig till sommarstegen →</a>
-  </div>
-</section>
-
-<!-- ─── HUR DET FUNKAR ────────────────────────────────────────── -->
-<section class="how-section" id="hur">
-  <div class="section-inner">
+<!-- SOMMAR -->
+<section class="sommar sec-pad" id="sommar">
+  <div class="wrap sommar-in">
     <div class="reveal">
-      <div class="section-eyebrow">Systemet</div>
-      <h2 class="section-title">Hur stegen funkar</h2>
-      <p class="section-desc">Enkel, rättvis, kul. Klicka dig igenom förklaringen nedan.</p>
+      <div class="badge-new"><span style="width:7px;height:7px;border-radius:50%;background:var(--o2);display:inline-block"></span>Nyhet · spel söndagar från 21 juni</div>
+      <h2>Sommarstegen 2026</h2>
+      <p>Spontan drop-in-stege på söndagar — anmäl dig vecka för vecka, vi lottar matcherna. Inte med förut? Skicka en intresseanmälan så godkänner vi dig.</p>
+      <a href="sommarstege.html" class="btn btn-primary">Anmäl dig till sommarstegen →</a>
     </div>
-
-    <div class="how-carousel reveal reveal-delay-1" id="howCarousel">
-      <div class="how-track" id="howTrack">
-
-        <!-- SLIDE 1 -->
-        <div class="how-slide">
-          <div class="how-slide-text">
-            <div class="how-step-label">01 / 04</div>
-            <h3 class="how-slide-title">Flera spelare.<br>En stege.</h3>
-            <p class="how-slide-desc">Alla spelare tilldelas en placering på stegen — #1 är toppen. Nya spelare som tillkommer under säsongen börjar alltid längst ner, oavsett nivå.</p>
-          </div>
-          <div class="how-slide-visual">
-            <div class="vis-ladder">
-              <div class="vis-row vis-row-1"><span class="vis-rank">#1</span><span class="vis-name">Emma S</span></div>
-              <div class="vis-row vis-row-2"><span class="vis-rank">#2</span><span class="vis-name">Jonas L</span></div>
-              <div class="vis-row vis-row-3"><span class="vis-rank">#3</span><span class="vis-name">Maria K</span></div>
-              <div class="vis-row"><span class="vis-rank">#4</span><span class="vis-name">Peter B</span></div>
-              <div class="vis-row"><span class="vis-rank">#5</span><span class="vis-name">Anna W</span></div>
-              <div class="vis-dots">⋮</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SLIDE 2 -->
-        <div class="how-slide">
-          <div class="how-slide-text">
-            <div class="how-step-label">02 / 04</div>
-            <h3 class="how-slide-title">Grannar möts.<br>Varje omgång.</h3>
-            <p class="how-slide-desc">Varje omgång paras spelare mot sin närmaste granne på stegen: #1 mot #2, #3 mot #4, #5 mot #6 ... Ingen slipper undan — alla spelar varje omgång.</p>
-          </div>
-          <div class="how-slide-visual">
-            <div class="vis-pairs">
-              <div class="vis-pair">
-                <div class="vis-pair-player">#1</div>
-                <div class="vis-pair-vs">vs</div>
-                <div class="vis-pair-player">#2</div>
-              </div>
-              <div class="vis-pair">
-                <div class="vis-pair-player dim">#3</div>
-                <div class="vis-pair-vs dim">vs</div>
-                <div class="vis-pair-player dim">#4</div>
-              </div>
-              <div class="vis-pair">
-                <div class="vis-pair-player dim">#5</div>
-                <div class="vis-pair-vs dim">vs</div>
-                <div class="vis-pair-player dim">#6</div>
-              </div>
-              <div class="vis-pair-dots">⋮ och så vidare</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SLIDE 3 -->
-        <div class="how-slide">
-          <div class="how-slide-text">
-            <div class="how-step-label">03 / 04</div>
-            <h3 class="how-slide-title">Vinnaren klättrar.<br>Förloraren sjunker.</h3>
-            <p class="how-slide-desc">Det händer alltid något — du rör dig alltid upp eller ner. Vinnaren tar den bättre platsen, förloraren tar den sämre. Enkel regel, varje match.</p>
-          </div>
-          <div class="how-slide-visual">
-            <div class="vis-swap">
-              <div class="vis-swap-col">
-                <div class="vis-swap-label">Innan</div>
-                <div class="vis-swap-row">#4 Anna</div>
-                <div class="vis-swap-row clay-win">#5 Erik ← vinner</div>
-              </div>
-              <div class="vis-swap-arrow">→</div>
-              <div class="vis-swap-col">
-                <div class="vis-swap-label">Efter</div>
-                <div class="vis-swap-row clay-win">#4 Erik</div>
-                <div class="vis-swap-row">#5 Anna</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SLIDE 4 -->
-        <div class="how-slide">
-          <div class="how-slide-text">
-            <div class="how-step-label">04 / 04</div>
-            <h3 class="how-slide-title">Rapportera direkt<br>i appen.</h3>
-            <p class="how-slide-desc">Vinnaren — eller förloraren — rapporterar resultatet direkt i BTS-appen efter matchen. Ange vem som vann, och om det var en WO. Det tar 30 sekunder.</p>
-          </div>
-          <div class="how-slide-visual">
-            <div class="vis-steps">
-              <div class="vis-step"><div class="vis-step-num">1</div><div class="vis-step-text">Öppna rapportera-sidan på bastadstegen.se</div></div>
-              <div class="vis-step"><div class="vis-step-num">2</div><div class="vis-step-text">Välj rätt match — visas automatiskt</div></div>
-              <div class="vis-step"><div class="vis-step-num">3</div><div class="vis-step-text">Markera vinnaren, eller välj WO</div></div>
-              <div class="vis-step"><div class="vis-step-num">4</div><div class="vis-step-text">Skicka in — stegen uppdateras direkt!</div></div>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /how-track -->
-
-      <div class="how-nav">
-        <button class="how-btn how-prev" id="howPrev" aria-label="Föregående">←</button>
-        <div class="how-dots">
-          <button class="how-dot active" data-idx="0"></button>
-          <button class="how-dot" data-idx="1"></button>
-          <button class="how-dot" data-idx="2"></button>
-          <button class="how-dot" data-idx="3"></button>
-        </div>
-        <button class="how-btn how-next" id="howNext" aria-label="Nästa">→</button>
+    <div class="sommar-card reveal">
+      <div class="rays"></div>
+      <div class="vig"></div>
+      <div class="suns"></div>
+      <div class="court-plane">
+        <div class="pline base"></div>
+        <div class="pline side"></div>
       </div>
-    </div><!-- /how-carousel -->
-  </div>
-</section>
-
-<!-- ─── TENNIS HELA SÄSONGEN ──────────────────────────────────── -->
-<section class="why-section" id="varfor">
-  <div class="section-inner">
-    <div class="why-inner">
-      <div class="reveal-left">
-        <div class="section-eyebrow">Varför stegen?</div>
-        <h2 class="section-title">Tennis hela säsongen</h2>
-        <p class="section-desc">Stegen ger alla — oavsett nivå — en motståndare som matchar dem, en anledning att boka banan och något att kämpa för varje vecka.</p>
-        <div class="why-quote">
-          <p>"Stegen är det bästa sättet att hålla igång och tävla under hela säsongen, oavsett om man siktar på toppen eller bara vill ha roliga matcher varje vecka."</p>
-          <cite>Båstad Tennissällskap · Grundat 1929</cite>
-        </div>
-        <div class="why-pills">
-          <div class="why-pill">Grusunderlag</div>
-          <div class="why-pill">Vår &amp; sommar</div>
-          <div class="why-pill">Alla nivåer</div>
-          <div class="why-pill">Båstad</div>
-        </div>
-      </div>
-      <div class="why-visual reveal-right">
-        <div class="why-vis-card reveal-scale reveal-delay-1">
-          <div class="why-vis-num">VT</div>
-          <div class="why-vis-lbl">Vårtermin 2026</div>
-        </div>
-        <div class="why-vis-card reveal-scale reveal-delay-2">
-          <div class="why-vis-num">ST</div>
-          <div class="why-vis-lbl">Sommartermin 2026</div>
-        </div>
-        <div class="why-vis-card span2 reveal-scale reveal-delay-3">
-          <div>
-            <div class="why-vis-num">30</div>
-          </div>
-          <div>
-            <div class="why-vis-lbl">Spelare på stegen</div>
-            <p style="font-size:13px;color:var(--muted2);margin-top:4px;line-height:1.5">Båstads bästa tennisspelare samlade i ett system.</p>
-          </div>
-        </div>
-      </div>
+      <div class="sommar-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">SÄSONG 2026</span></div>
+      <div class="sommar-logo"><span class="line" style="color:var(--navy)">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
+      <div class="frame"></div>
+      <div class="tex-grain"></div>
     </div>
   </div>
 </section>
 
-<!-- ─── CTA ───────────────────────────────────────────────────── -->
-<section class="cta-section">
-  <div class="cta-inner">
-    <h2 class="cta-title reveal">Redo att klättra?</h2>
-    <p class="cta-desc reveal">Logga in med ditt namn och PIN-kod, rapportera din senaste match och följ din resa uppåt på stegen.</p>
-    <div class="cta-btns reveal">
-      <a href="stegen.html" class="btn-white">Se stegen</a>
-      <a href="rapportera.html" class="btn-ghost">Rapportera match</a>
+<!-- HUR FUNKAR -->
+<section class="hur sec-pad" id="hur">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow sec-eyebrow">Systemet</div>
+      <h2 class="sec-title">Hur stegen funkar</h2>
+      <p class="sec-lead">Enkel, rättvis, kul. Klicka dig igenom förklaringen nedan.</p>
+    </div>
+    <div class="stepper reveal">
+      <div class="step-nav" id="stepNav">
+        <button class="step-tab active" data-step="0"><div class="st-n">01 / 04</div><div class="st-t">Flera spelare. En stege.</div></button>
+        <button class="step-tab" data-step="1"><div class="st-n">02 / 04</div><div class="st-t">Grannar möts. Varje omgång.</div></button>
+        <button class="step-tab" data-step="2"><div class="st-n">03 / 04</div><div class="st-t">Vinnaren klättrar. Förloraren sjunker.</div></button>
+        <button class="step-tab" data-step="3"><div class="st-n">04 / 04</div><div class="st-t">Rapportera direkt i appen.</div></button>
+      </div>
+      <div class="step-panel" id="stepPanel"></div>
     </div>
   </div>
 </section>
 
-<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<!-- VARFOR -->
+<section class="varfor sec-pad" id="varfor">
+  <div class="tex-hair"></div>
+  <div class="wrap" style="position:relative;z-index:2">
+    <div class="reveal">
+      <div class="eyebrow" style="color:var(--navy);margin-bottom:20px">Varför stegen?</div>
+      <h2 class="sec-title" style="color:var(--navy)">Tennis hela säsongen</h2>
+      <p class="quote">Stegen ger alla — oavsett nivå — en motståndare som matchar dem, en anledning att boka banan och <b>något att kämpa för varje vecka.</b></p>
+      <div class="chips">
+        <span class="chip solid">Båstad Tennissällskap</span>
+        <span class="chip">Grusunderlag</span>
+        <span class="chip">Vår &amp; sommar</span>
+        <span class="chip">Alla nivåer</span>
+        <span class="chip">Båstad</span>
+      </div>
+    </div>
+  </div>
+  <div class="tex-grain"></div>
+</section>
+
+<!-- CTA -->
+<section class="cta sec-pad">
+  <div class="wrap reveal">
+    <div class="eyebrow sec-eyebrow" style="text-align:center">30 spelare på stegen</div>
+    <h2>Redo att klättra?</h2>
+    <p>Logga in med ditt namn och PIN-kod, rapportera din senaste match och följ din resa uppåt på stegen.</p>
+    <div class="cta-row">
+      <a href="stegen.html" class="btn btn-primary">Se stegen →</a>
+      <a href="rapportera.html" class="btn btn-ghost">Rapportera match</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div>
-        <img src="bts-logo.svg" alt="BTS" class="footer-logo" onerror="this.style.display='none'" style="width:50px;height:50px;object-fit:contain;display:block;margin-bottom:10px">
-        <div class="footer-brand">BTS Stegen</div>
-        <div class="footer-brand-sub">Båstad Tennissällskap</div>
-        <p class="footer-desc">Tennisklubben i Båstad med anor sedan 1929. Välkommen till stegen!</p>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="wordmark"><span style="font-family:'Anton';color:var(--o1)">BÅSTAD</span><span style="font-family:'Anton';color:#fff">STEGEN</span></div>
       </div>
-      <div class="footer-nav">
-        <div class="footer-nav-title">Sidor</div>
-        <a href="stegen.html">Stegen</a>
-        <a href="stegen.html">Matcher</a>
-        <a href="stegen.html">Spelare</a>
-        <a href="rapportera.html">Rapportera</a>
-        <a href="#sommar">Sommarstegen</a>
-        <a href="admin.html">Admin</a>
+      <div class="foot-col">
+        <h4>Sidor</h4>
+        <a href="stegen.html">Stegen</a><a href="stegen.html">Matcher</a><a href="stegen.html">Spelare</a>
+        <a href="rapportera.html">Rapportera</a><a href="#sommar">Sommarstegen</a><a href="admin.html">Admin</a>
       </div>
-      <div class="footer-contact">
-        <div class="footer-contact-title">Kontakt</div>
-        <p>
-          Båstad Tennissällskap<br>
-          Båstad, Sverige<br>
-          Est. 1929<br><br>
-          <a href="mailto:info@bastadstegen.se">info@bastadstegen.se</a>
-        </p>
+      <div class="foot-col foot-contact">
+        <h4>Kontakt</h4>
+        <a href="mailto:info@bastadstegen.se"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>info@bastadstegen.se</a>
+        <a href="tel:0720787845"><svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>0720-787845</a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p>© 2026 Båstad Tennissällskap · bastadstegen.se</p>
-      <div class="footer-est">1929</div>
+    <div class="foot-bottom">
+      <span>© 2026 Båstad Tennissällskap · bastadstegen.se</span>
+      <span>KLÄTTRA · UTMANA · VINN</span>
     </div>
   </div>
 </footer>
 
 <script>
-// NAV scroll
-window.addEventListener('scroll',()=>{
-  document.getElementById('main-nav').classList.toggle('scrolled',window.scrollY>60);
-});
+  // ---------- scroll reveal (with safety fallback) ----------
+  const reveals=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }}), {threshold:.15});
+    reveals.forEach(el=>io.observe(el));
+    // guarantee nothing stays hidden if IO never fires (e.g. non-scrolling host)
+    setTimeout(()=>reveals.forEach(el=>{ const r=el.getBoundingClientRect(); if(r.top<innerHeight+40) el.classList.add('in'); }), 400);
+  } else { reveals.forEach(el=>el.classList.add('in')); }
 
-// Reveal on scroll — alla reveal-varianter
-const revealObserver=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      e.target.classList.add('visible');
-      revealObserver.unobserve(e.target);
-    }
-  });
-},{threshold:0.08,rootMargin:'0px 0px -48px 0px'});
-document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-line').forEach(el=>revealObserver.observe(el));
+  // ---------- count up ----------
+  const cio = new IntersectionObserver((es)=>es.forEach(e=>{
+    if(!e.isIntersecting) return; cio.unobserve(e.target);
+    const el=e.target, end=+el.dataset.count; let t0=null;
+    function step(ts){ if(!t0)t0=ts; const p=Math.min((ts-t0)/1100,1); el.textContent=Math.round(end*(1-Math.pow(1-p,3))); if(p<1)requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }), {threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
 
-// Stats counter animation
-function animateCount(el,target,duration=1200){
-  const start=performance.now();
-  const isNum=/^\d+$/.test(target);
-  if(!isNum){el.textContent=target;return;}
-  const end=parseInt(target);
-  function step(now){
-    const p=Math.min((now-start)/duration,1);
-    const ease=1-Math.pow(1-p,3);
-    el.textContent=Math.round(ease*end);
-    if(p<1)requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-const statsObserver=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const num=e.target.querySelector('.stat-num');
-      if(num){animateCount(num,num.textContent.trim());}
-      statsObserver.unobserve(e.target);
-    }
-  });
-},{threshold:0.5});
-document.querySelectorAll('.stat-item').forEach(el=>statsObserver.observe(el));
+  // ---------- stepper ----------
+  const PANELS = [
+    `<h3>Flera spelare.<br>En stege.</h3><p>Alla spelare tilldelas en placering på stegen — #1 är toppen. Nya spelare börjar alltid längst ner, oavsett nivå.</p>
+     <div class="panel-visual">
+       <div class="lrow top"><span class="rk">1</span><span class="nm">Emma S</span></div>
+       <div class="lrow"><span class="rk">2</span><span class="nm">Jonas L</span></div>
+       <div class="lrow"><span class="rk">3</span><span class="nm">Maria K</span></div>
+       <div class="lrow"><span class="rk">4</span><span class="nm">Peter B</span></div>
+       <div class="lrow"><span class="rk">5</span><span class="nm">Anna W</span></div>
+     </div><div class="step-ghostnum">1</div>`,
+    `<h3>Grannar möts.<br>Varje omgång.</h3><p>Varje omgång paras spelare mot sin närmaste granne: #1 mot #2, #3 mot #4 ... Ingen slipper undan — alla spelar varje omgång.</p>
+     <div class="panel-visual">
+       <div class="vs-row"><div class="vs-chip"><span class="rk">1</span></div><span class="vs-lbl">VS</span><div class="vs-chip"><span class="rk">2</span></div></div>
+       <div class="vs-row"><div class="vs-chip"><span class="rk">3</span></div><span class="vs-lbl">VS</span><div class="vs-chip"><span class="rk">4</span></div></div>
+       <div class="vs-row"><div class="vs-chip"><span class="rk">5</span></div><span class="vs-lbl">VS</span><div class="vs-chip"><span class="rk">6</span></div></div>
+     </div><div class="step-ghostnum">2</div>`,
+    `<h3>Vinnaren klättrar.<br>Förloraren sjunker.</h3><p>Det händer alltid något — du rör dig alltid upp eller ner. Vinnaren tar den bättre platsen, förloraren den sämre.</p>
+     <div class="panel-visual swap">
+       <div class="swap-col"><div class="h">Innan</div>
+         <div class="swap-row"><span class="rk">4</span> Anna</div>
+         <div class="swap-row win"><span class="rk">5</span> Erik ← vinner</div>
+       </div>
+       <div class="swap-arrow">→</div>
+       <div class="swap-col"><div class="h">Efter</div>
+         <div class="swap-row win"><span class="rk">4</span> Erik</div>
+         <div class="swap-row"><span class="rk">5</span> Anna</div>
+       </div>
+     </div><div class="step-ghostnum">3</div>`,
+    `<h3>Rapportera direkt<br>i appen.</h3><p>Vinnaren — eller förloraren — rapporterar resultatet direkt efter matchen. Ange vem som vann, och om det var en WO. Det tar 30 sekunder.</p>
+     <div class="panel-visual repsteps">
+       <div class="repstep"><span class="n">1</span><span class="t">Öppna rapportera-sidan på bastadstegen.se</span></div>
+       <div class="repstep"><span class="n">2</span><span class="t">Välj rätt match — visas automatiskt</span></div>
+       <div class="repstep"><span class="n">3</span><span class="t">Markera vinnaren, eller välj WO</span></div>
+       <div class="repstep"><span class="n">4</span><span class="t">Skicka in — stegen uppdateras direkt!</span></div>
+     </div><div class="step-ghostnum">4</div>`
+  ];
+  const panel=document.getElementById('stepPanel'), tabs=[...document.querySelectorAll('.step-tab')];
+  function showStep(i){ panel.innerHTML=PANELS[i]; tabs.forEach((t,j)=>t.classList.toggle('active',j===i)); }
+  tabs.forEach(t=>t.addEventListener('click',()=>showStep(+t.dataset.step)));
+  showStep(0);
 
-// ── How-carousel ──
-(function(){
-  var track=document.getElementById('howTrack');
-  if(!track)return;
-  var dots=document.querySelectorAll('.how-dot');
-  var current=0, total=4;
-  function goTo(idx){
-    current=Math.max(0,Math.min(total-1,idx));
-    track.style.transform='translateX(-'+current*100+'%)';
-    dots.forEach(function(d,i){d.classList.toggle('active',i===current);});
-    document.getElementById('howPrev').disabled=current===0;
-    document.getElementById('howNext').disabled=current===total-1;
-  }
-  document.getElementById('howPrev').addEventListener('click',function(){goTo(current-1);});
-  document.getElementById('howNext').addEventListener('click',function(){goTo(current+1);});
-  dots.forEach(function(d){d.addEventListener('click',function(){goTo(+d.dataset.idx);});});
-  goTo(0);
-  // Swipe
-  var sx=0;
-  track.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
-  track.addEventListener('touchend',function(e){
-    var diff=sx-e.changedTouches[0].clientX;
-    if(Math.abs(diff)>50)goTo(current+(diff>0?1:-1));
-  },{passive:true});
-})();
-
-// ── HERO INTRO-ANIMATION (tennisbollar + logga) ──
-(function(){
-  var hero=document.getElementById('top');
-  var canvas=document.getElementById('heroAnimCanvas');
-  var wrap=document.getElementById('heroLogoWrap');
-  var lgTop=document.getElementById('lgTop');
-  var lgMid=document.getElementById('lgMid');
-  var lgBot=document.getElementById('lgBot');
-  if(!hero||!canvas||!wrap||!lgTop||!lgMid||!lgBot)return;
-  var ctx=canvas.getContext('2d');
-  function sizeCanvas(){var r=hero.getBoundingClientRect();canvas.width=Math.max(1,r.width);canvas.height=Math.max(1,r.height);}
-  sizeCanvas();
-
-  function revealAll(){[lgTop,lgMid,lgBot].forEach(function(el){el.style.opacity=1;el.style.transform='none';});}
-  var safety=setTimeout(revealAll,4000); // fallback om något krånglar
-
-  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce){revealAll();return;}
-
-  wrap.classList.add('bts-animate');
-
-  var particles=[];
-  var BURST_COLORS=['#C4743A','#A05A28','#F0E8D8','#E8960A','#ffffff'];
-  function drawBall(x,y,r,rot){
-    ctx.save();ctx.translate(x,y);ctx.rotate(rot);
-    var g=ctx.createRadialGradient(-r*0.3,-r*0.3,r*0.1,0,0,r);
-    g.addColorStop(0,'#d4e83a');g.addColorStop(0.5,'#b8cc1e');g.addColorStop(1,'#8fa014');
-    ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.75)';ctx.lineWidth=r*0.18;ctx.lineCap='round';
-    ctx.beginPath();ctx.arc(0,0,r*0.55,Math.PI*0.1,Math.PI*0.9,false);ctx.stroke();
-    ctx.beginPath();ctx.arc(0,0,r*0.55,Math.PI*1.1,Math.PI*1.9,false);ctx.stroke();
-    ctx.restore();
-  }
-  function spawnBalls(n){for(var i=0;i<n;i++){var s=Math.random()>0.5?-1:1,sp=10+Math.random()*7;
-    particles.push({type:'ball',x:s===-1?-30:canvas.width+30,y:canvas.height*(0.15+Math.random()*0.7),
-      vx:s*-sp,vy:(Math.random()-0.5)*3,r:10+Math.random()*8,rotation:Math.random()*Math.PI*2,
-      spin:(Math.random()-0.5)*0.25,life:1,decay:0.014+Math.random()*0.01,trail:[]});}}
-  function spawnBurst(x,y,n,sp){for(var i=0;i<n;i++){var a=(Math.PI*2/n)*i+Math.random()*0.5,v=sp*(0.5+Math.random());
-    particles.push({type:'dot',x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:1,
-      decay:0.014+Math.random()*0.018,size:2+Math.random()*4,
-      color:BURST_COLORS[Math.floor(Math.random()*BURST_COLORS.length)],trail:[]});}}
-  var running=true;
-  function loop(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    for(var i=particles.length-1;i>=0;i--){
-      var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life-=p.decay;
-      if(p.life<=0){particles.splice(i,1);continue;}
-      if(p.type==='ball'){p.rotation+=p.spin;p.trail.push({x:p.x,y:p.y});if(p.trail.length>7)p.trail.shift();
-        for(var t=0;t<p.trail.length-1;t++){var a=(t/p.trail.length)*p.life*0.3;
-          ctx.beginPath();ctx.arc(p.trail[t].x,p.trail[t].y,p.r*0.55,0,Math.PI*2);ctx.fillStyle='rgba(184,204,30,'+a+')';ctx.fill();}
-        ctx.globalAlpha=p.life;drawBall(p.x,p.y,p.r,p.rotation);ctx.globalAlpha=1;
-      }else{p.trail.push({x:p.x,y:p.y});if(p.trail.length>6)p.trail.shift();
-        if(p.trail.length>1){ctx.beginPath();ctx.moveTo(p.trail[0].x,p.trail[0].y);
-          for(var t2=1;t2<p.trail.length;t2++)ctx.lineTo(p.trail[t2].x,p.trail[t2].y);
-          ctx.strokeStyle=p.color;ctx.globalAlpha=p.life*0.3;ctx.lineWidth=p.size*0.5;ctx.stroke();}
-        ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fillStyle=p.color;ctx.globalAlpha=p.life*0.85;ctx.fill();ctx.globalAlpha=1;}
-    }
-    if(running||particles.length)requestAnimationFrame(loop);
-  }
-  loop();
-
-  function easeOutBack(t){var c=2.70158;return 1+c*Math.pow(t-1,3)+1.70158*Math.pow(t-1,2);}
-  function easeOutElastic(t){var c4=(2*Math.PI)/3;return t===0?0:t===1?1:Math.pow(2,-10*t)*Math.sin((t*10-0.75)*c4)+1;}
-  var cx=canvas.width/2, cy=canvas.height/2;
-
-  setTimeout(function(){spawnBalls(3);},0);
-  setTimeout(function(){spawnBalls(3);},250);
-  setTimeout(function(){spawnBalls(3);},500);
-  setTimeout(function(){
-    spawnBurst(cx*0.45,cy*0.55,14,5);var s=performance.now();
-    (function a(now){var t=Math.min((now-s)/700,1),e=easeOutBack(t);
-      lgTop.style.transform='translateX('+(-45*(1-e))+'px) skewX('+(-8*(1-e))+'deg)';
-      lgTop.style.opacity=Math.min(t*2.5,1);if(t<1)requestAnimationFrame(a);})(performance.now());
-  },600);
-  setTimeout(function(){spawnBalls(3);},900);
-  setTimeout(function(){
-    spawnBurst(cx,cy,20,7);var s=performance.now();
-    (function a(now){var t=Math.min((now-s)/750,1),e=easeOutElastic(t);
-      lgMid.style.transform='scaleX('+e+') skewX('+(-4*(1-t))+'deg)';
-      lgMid.style.opacity=Math.min(t*2,1);if(t<1)requestAnimationFrame(a);})(performance.now());
-  },1200);
-  setTimeout(function(){
-    spawnBurst(cx*1.55,cy*1.45,14,5);var s=performance.now();
-    (function a(now){var t=Math.min((now-s)/700,1),e=easeOutBack(t);
-      lgBot.style.transform='translateX('+(45*(1-e))+'px) skewX('+(8*(1-e))+'deg)';
-      lgBot.style.opacity=Math.min(t*2.5,1);if(t<1)requestAnimationFrame(a);})(performance.now());
-  },1650);
-  setTimeout(function(){spawnBurst(cx,cy,32,9);spawnBurst(cx,cy*0.6,16,6);spawnBurst(cx,cy*1.4,16,6);spawnBalls(4);},2200);
-  setTimeout(function(){spawnBurst(cx,cy,12,4);spawnBalls(2);},3200);
-  setTimeout(function(){running=false;clearTimeout(safety);revealAll();},4200);
-
-  window.addEventListener('resize',sizeCanvas);
-})();
+  // ---------- Stegens logotyp-animation (identisk överallt) ----------
+  (function(){
+    document.querySelectorAll('.bts-lockup').forEach(function(box){
+      var svg=box.querySelector('svg'), ball=box.querySelector('.bl-ball'),
+          trail=box.querySelector('.bl-trail'), words=box.querySelector('.bl-words');
+      if(!svg||!ball||!words) return;
+      var ns='http://www.w3.org/2000/svg';
+      var p=document.createElementNS(ns,'path'); p.setAttribute('d','M-26 26 Q 158 -245 312 26'); p.setAttribute('fill','none'); svg.appendChild(p);
+      var L=p.getTotalLength(), N=14, dots=[];
+      for(var i=1;i<=N;i++){ var pt=p.getPointAtLength((i/(N+1))*L); var c=document.createElementNS(ns,'circle');
+        c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y); c.setAttribute('r',2.6); c.setAttribute('fill','rgba(255,255,255,0.9)'); c.setAttribute('opacity','0'); trail.appendChild(c); dots.push({el:c,at:i/(N+1)}); }
+      words.style.opacity=0; words.style.transition='opacity .55s ease';
+      function setBall(x,y){ ball.setAttribute('transform','translate('+x+' '+y+')'); }
+      var ease=function(t){return 1-Math.pow(1-t,3);};
+      if(matchMedia('(prefers-reduced-motion:reduce)').matches){ var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','0.9');}); words.style.opacity=1; return; }
+      var t0=null;
+      function fr(ts){ if(!t0)t0=ts; var t=(ts-t0)/1000;
+        if(t<1.2){ var a=ease(Math.min(t/1.2,1)); var pt=p.getPointAtLength(a*L); setBall(pt.x,pt.y); dots.forEach(function(d){ d.el.setAttribute('opacity', a>=d.at?'0.9':'0'); }); if(t>0.55) words.style.opacity=1; requestAnimationFrame(fr); }
+        else { var e=p.getPointAtLength(L); setBall(e.x,e.y); dots.forEach(function(d){d.el.setAttribute('opacity','0.9');}); words.style.opacity=1; }
+      }
+      setBall(-22,22); requestAnimationFrame(fr);
+    });
+  })();
 </script>
 </body>
 </html>

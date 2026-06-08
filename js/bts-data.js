@@ -202,6 +202,43 @@ const BTS = {
     if (error) throw error;
   },
 
+  // ── TVÅSTEGS OMGÅNGS-FLÖDE (avsluta → justera → generera) + backa ──
+  // Steg 1: avsluta omgång (snapshot + omflyttning, ingen ny omgång)
+  async adminCloseRound(adminPw, competitionId, round) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_close_round', { p_admin_pw: adminPw, p_comp: competitionId, p_round: round });
+    if (error) throw error;
+  },
+  // Steg 2: sätt ny ordning (playerIds i önskad ordning, HELA stegen)
+  async adminSetPositions(adminPw, competitionId, playerIds) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_set_positions', { p_admin_pw: adminPw, p_comp: competitionId, p_player_ids: playerIds });
+    if (error) throw error;
+  },
+  // Steg 3: generera nästa omgångs matcher (grannar möts) + sätt current_round
+  async adminGenerateRound(adminPw, competitionId, round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_generate_round', { p_admin_pw: adminPw, p_comp: competitionId, p_round: round });
+    if (error) throw error;
+    return data; // antal matcher skapade
+  },
+  // Backa: återställ placeringar från snapshot + ta bort genererad ny omgång
+  async adminUndoRound(adminPw, competitionId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_undo_round', { p_admin_pw: adminPw, p_comp: competitionId });
+    if (error) throw error;
+  },
+  // Avsluta säsong: arkivera gamla + skapa ny med ärvd ordning (ingen omgång 1 än)
+  async adminCloseSeason(adminPw, oldComp, { id, name, short, start, end } = {}) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_close_season', {
+      p_admin_pw: adminPw, p_old_comp: oldComp,
+      p_id: id, p_name: name, p_short: short || '',
+      p_start: start || null, p_end: end || null,
+    });
+    if (error) throw error;
+  },
+
   // Nollställ en omgångs resultat → matcherna blir 'scheduled' igen
   async adminResetRound(adminPw, competitionId, round) {
     _assert();
@@ -270,6 +307,13 @@ const BTS = {
   async adminListJoins(adminPw, competitionId) {
     _assert();
     const { data, error } = await _sb.rpc('bts_admin_list_joins', { p_admin_pw: adminPw, p_comp: competitionId });
+    if (error) throw error;
+    return data || [];
+  },
+  // Alla väntande anmälningar oavsett tävling (för admins samlade vy)
+  async adminListJoinsAll(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_list_joins_all', { p_admin_pw: adminPw });
     if (error) throw error;
     return data || [];
   },

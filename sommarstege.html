@@ -4,30 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BTS Sommarstege 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
 <style>
   :root{
-    --bg:#0C1409; --surface:#0F1A0C; --card:#13200F; --card2:#182810;
-    --border:#1e2a1a; --border2:#2a3a22; --cream:#EDEAE0; --white:#fff;
-    --muted:#9aa78c; --muted2:#6f7766; --green:#4CAF50; --clay:#C17849;
-    --yellow:#D4E157; --down:#EF5350; --sun:#F4B740;
+    --bg:#0D2E20; --surface:#0D2E20; --card:#0D2A1D; --card2:#0D2A1D;
+    --border:#133124; --border2:#1C3A2B; --cream:#F5EDE3; --white:#fff;
+    --muted:#9A8F86; --muted2:#9A8F86; --green:#FF8C42; --clay:#FF8C42;
+    --yellow:#F5EDE3; --down:#EF5350; --sun:#F4B740;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
   .topbar{display:flex;justify-content:flex-end;padding:12px 18px}
   .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
-  .hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 32px;background:linear-gradient(165deg,#E9A864 0%,#C17849 42%,#6b5230 70%,var(--bg) 100%)}
-  .hero .sun{position:absolute;top:-34px;right:-20px;width:150px;height:150px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 36% 30%,#f4fa84 0%,#dcec55 45%,#c0d23a 74%,#9fb22d 100%);box-shadow:0 0 42px 14px rgba(212,225,87,.42),inset -13px -15px 32px rgba(58,68,16,.5),inset 9px 9px 22px rgba(255,255,255,.42)}
-  .hero .sun::before,.hero .sun::after{content:'';position:absolute;left:50%;width:150px;height:150px;border-radius:50%;border:11px solid #fcfdf2;box-sizing:border-box;transform:translateX(-50%)}
+  .hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 32px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 70%,var(--bg) 100%)}
+  .hero .sun{position:absolute;top:-34px;right:-20px;width:150px;height:150px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 36% 30%,#F5EDE3 0%,#F5EDE3 45%,#F5EDE3 74%,#F5EDE3 100%);box-shadow:0 0 42px 14px rgba(245,237,227,.42),inset -13px -15px 32px rgba(58,68,16,.5),inset 9px 9px 22px rgba(255,255,255,.42)}
+  .hero .sun::before,.hero .sun::after{content:'';position:absolute;left:50%;width:150px;height:150px;border-radius:50%;border:11px solid #F5EDE3;box-sizing:border-box;transform:translateX(-50%)}
   .hero .sun::before{top:-80px}
   .hero .sun::after{bottom:-80px}
-  .hero h1{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;margin:0;color:#fff;position:relative}
-  .hero .tag{position:relative;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#2a1c0e;margin-top:8px}
+  .hero h1{font-family:'Anton',sans-serif;font-size:46px;letter-spacing:3px;margin:0;color:#fff;position:relative}
+  .hero .tag{position:relative;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:8px}
   .wrap{max-width:680px;margin:0 auto;padding:20px}
   .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
   .tab{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent}
   .tab.active{color:var(--cream);border-color:var(--clay)}
   .ev{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:12px}
-  .ev-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--sun)}
+  .ev-name{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;color:var(--sun)}
   .ev-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin:2px 0 10px}
   .row{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--card2)}
   .rank{font-family:'Space Mono',monospace;color:var(--clay);width:26px;font-weight:700;text-align:center}
@@ -38,7 +42,7 @@
   .vs .x{color:var(--muted2);font-family:'Space Mono',monospace;font-size:11px}
   .winner{color:var(--green);font-weight:700}
   .court{text-align:center;color:var(--sun);font-size:12px;font-family:'Space Mono',monospace;margin-bottom:8px}
-  .btn{background:var(--clay);color:#0C0A06;border:none;font-weight:700;padding:12px 16px;border-radius:8px;cursor:pointer;font-size:14px;width:100%;margin-top:6px}
+  .btn{background:var(--clay);color:#061712;border:none;font-weight:700;padding:12px 16px;border-radius:8px;cursor:pointer;font-size:14px;width:100%;margin-top:6px}
   .btn.alt{background:var(--card2);color:var(--cream);border:1px solid var(--border2)}
   .btn.green{background:var(--green);color:#063}
   .btn.sm{width:auto;margin:0;padding:8px 12px;font-size:13px}
@@ -47,7 +51,7 @@
   input,select{width:100%;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--white);font-size:15px;margin-bottom:8px}
   .muted{color:var(--muted2);font-size:13px;line-height:1.6}
   .pill{font-size:10px;font-family:'Space Mono',monospace;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:100px;border:1px solid var(--border2);color:var(--muted)}
-  .pill.drawn{color:var(--green);border-color:rgba(76,175,80,.4)}
+  .pill.drawn{color:var(--green);border-color:rgba(245,237,227,.4)}
   .hidden{display:none}
   .admin-toggle{font-size:11px;color:var(--muted2);text-align:center;margin-top:30px;cursor:pointer}
   .err{color:var(--down);font-size:13px;margin-top:4px}
