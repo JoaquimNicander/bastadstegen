@@ -71,10 +71,3 @@ section{ position:relative; }
   .sec-pad{ padding:80px 0; }
 }
 
-/* ---------- Stegens logotyp: tvinga egen ritlager så texten inte
-   försvinner under bollen vid ommålning (iOS Safari-bug) ---------- */
-.bts-lockup svg text{
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  will-change: transform;
-}
