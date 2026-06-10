@@ -248,6 +248,15 @@ const BTS = {
     if (error) throw error;
   },
 
+  // Admin bekräftar ett rapporterat/bestritt resultat åt spelarna → 'confirmed'
+  async adminConfirmMatch(adminPw, matchId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_confirm_match', {
+      p_admin_pw: adminPw, p_match_id: matchId,
+    });
+    if (error) throw error;
+  },
+
   // Nollställ EN match → tillbaka till 'scheduled'
   async adminResetMatch(adminPw, matchId) {
     _assert();
@@ -272,6 +281,22 @@ const BTS = {
     _assert();
     const { error } = await _sb.rpc('bts_signup', {
       p_player_id: playerId, p_pin: pin, p_comp: competitionId, p_play_date: playDate });
+    if (error) throw error;
+  },
+
+  // Admin anmäler en spelare till en speldag (utan PIN)
+  async adminAddSignup(adminPw, competitionId, playDate, playerId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_add_signup', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate, p_player_id: playerId });
+    if (error) throw error;
+  },
+
+  // Admin avanmäler en spelare från en speldag
+  async adminRemoveSignup(adminPw, competitionId, playDate, playerId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_remove_signup', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate, p_player_id: playerId });
     if (error) throw error;
   },
 
@@ -369,12 +394,27 @@ const BTS = {
     if (error) throw error;
   },
   // Lotta en speldag (banor/tid hämtas från eventet). Returnerar antal matcher.
-  async adminDrawWeek(adminPw, competitionId, playDate) {
+  async adminDrawWeek(adminPw, competitionId, playDate, courts) {
     _assert();
     const { data, error } = await _sb.rpc('bts_admin_draw_week', {
+      p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate, p_courts: courts || null });
+    if (error) throw error;
+    return data;
+  },
+  // Publicera ett lottnings-utkast (draft -> scheduled, synligt för spelarna)
+  async adminPublishDraw(adminPw, competitionId, playDate) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_publish_draw', {
       p_admin_pw: adminPw, p_comp: competitionId, p_play_date: playDate });
     if (error) throw error;
     return data;
+  },
+  // Justera en utkast-match manuellt (byt spelare / ändra bana)
+  async adminUpdateDropinMatch(adminPw, matchId, playerAId, playerBId, court) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_update_dropin_match', {
+      p_admin_pw: adminPw, p_match_id: matchId, p_player_a: playerAId, p_player_b: playerBId, p_court: court || null });
+    if (error) throw error;
   },
 
   // ── ADMIN: publicera omgång (flyttar stegen) ──────────────────────────

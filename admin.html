@@ -519,6 +519,10 @@ En knapptryckning kvar, sen slipper du fler pip från mig :) [länk]</textarea>
   </div>
 </div>
 
+<div style="text-align:center;padding:30px 16px 44px;border-top:1px solid var(--border);margin-top:24px">
+  <a href="sommarstege.html" style="color:var(--clay);text-decoration:none;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase">⚙︎ Admin · Sommarstegen →</a>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -727,6 +731,7 @@ function renderSetInputs(key, saved){
         ${saved.status==='reported'?'<span style="color:#F5EDE3">⏳ Väntar på bekräftelse</span>'
           :saved.status==='disputed'?'<span style="color:#EF5350">⚠️ Bestridd</span>'
           :'<span style="color:#FF8C42">✓ Bekräftad</span>'}
+        ${(saved.status==='reported'||saved.status==='disputed')?`<button class="edit-btn" onclick="confirmMatchAdmin('${key}')">Bekräfta</button>`:''}
         <button class="edit-btn" onclick="editMatch('${key}')">Ändra</button>
         <button class="edit-btn" onclick="resetMatch('${key}')">Nollställ</button>
       </div>
@@ -946,6 +951,21 @@ function saveMatch(key,posA,posB){
 }
 
 // ── PUBLISH ────────────────────────────────────────────────────
+function confirmMatchAdmin(key){
+  if(!ADB){ showToast('Bekräftelse kräver databasanslutning','error'); return; }
+  const id=matchIdFor(currentRound,key);
+  if(!id){ showToast('Hittar inte matchen','error'); return; }
+  if(!confirm('Bekräfta det rapporterade resultatet åt spelarna? Matchen räknas då som klar och omgången kan stängas.')) return;
+  (async()=>{
+    try{
+      await BTS.adminConfirmMatch(adminPw,id);
+      await loadState();
+      renderMatchInput();
+      showToast('Match bekräftad ✓');
+    }catch(err){ showToast(err?.message||String(err),'error'); }
+  })();
+}
+
 function resetMatch(key){
   if(!ADB){ showToast('Nollställning kräver databasanslutning','error'); return; }
   const id=matchIdFor(currentRound,key);

@@ -84,9 +84,9 @@
     <div class="label" style="margin-top:14px">Skapa speldag</div>
     <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
     <input type="date" id="ev-date">
-    <input type="text" id="ev-courts" placeholder="Banor, t.ex. 1, 2, 3" value="1, 2, 3">
+    <input type="text" id="ev-courts" placeholder="Banor (valfritt – sätts annars vid lottningen)">
     <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
-    <button class="btn alt" onclick="createEvent()">Skapa / uppdatera speldag</button>
+    <button class="btn alt" onclick="skapaSpeldag()">Skapa / uppdatera speldag</button>
     <div id="ev-msg" class="muted" style="margin-top:8px"></div>
 
     <div class="label" style="margin-top:20px">Speldagar</div>
@@ -143,8 +143,8 @@ function renderAnmalan(){
     html+=`<div class="muted" style="margin-bottom:14px">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
   }
 
-  const upcoming=events.filter(e=>e.status!=='drawn');
-  if(!upcoming.length){ html+='<div class="muted">Inga kommande speldagar upplagda än.</div>'; }
+  const upcoming=events.filter(e=>e.status==='open');
+  if(!upcoming.length){ html+='<div class="muted">Inga kommande speldagar öppna för anmälan just nu.</div>'; }
   else html+=upcoming.map(e=>{
     const su=signupsFor(e.play_date);
     const mine=iAmSignedUp(e.play_date);
@@ -170,7 +170,7 @@ function renderAnmalan(){
 // ── MATCHER ──
 function renderMatcher(){
   const el=document.getElementById('view-matcher');
-  const drawn=events.filter(e=>matchesFor(e.play_date).length);
+  const drawn=events.filter(e=>e.status==='published' && matchesFor(e.play_date).length);
   if(!drawn.length){ el.innerHTML=''; return; }
   el.innerHTML=drawn.map(e=>{
     const ms=matchesFor(e.play_date);
@@ -194,17 +194,20 @@ function renderMatcher(){
 // ── STÄLLNING ──
 function renderStallning(){
   const el=document.getElementById('view-stallning');
-  // Visa ingen ställning förrän sommarstegen dragit igång (första speldagen upplagd).
-  if(!events.length){
-    el.innerHTML=`<div class="label">Sommarställning</div>
-      <div class="muted" style="padding:20px 4px;line-height:1.6">Sommarstegen har inte börjat än.<br>Ställningen visas så fort första speldagen är upplagd.</div>`;
-    return;
-  }
+  // Drop-in: ställningen byggs upp av dem som faktiskt spelat i sommar.
+  // Ingen är med automatiskt — man måste anmäla sig och spela.
   const wl={};
   matches.forEach(m=>{ if(!m.winner_id)return; const lo=m.winner_id===m.player_a_id?m.player_b_id:m.player_a_id;
     wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0}; wl[m.winner_id].w++; wl[lo]=wl[lo]||{w:0,l:0}; wl[lo].l++; });
-  el.innerHTML=`<div class="label">Sommarställning (seedad från ordinarie ranking)</div>`+
-    ladder.map(l=>{ const s=wl[l.player_id]||{w:0,l:0}; return `<div class="row"><div class="rank">${l.position}</div><div class="nm">${l.player?l.player.name:nameById(l.player_id)}</div><div class="meta">${s.w}V – ${s.l}F</div></div>`;}).join('');
+  const ids=Object.keys(wl).map(Number);
+  if(!ids.length){
+    el.innerHTML=`<div class="label">Sommarställning</div>
+      <div class="muted" style="padding:20px 4px;line-height:1.6">Ställningen byggs upp efterhand som matcher spelas.<br>Anmäl dig till en speldag för att vara med!</div>`;
+    return;
+  }
+  ids.sort((a,b)=> (wl[b].w-wl[a].w) || (wl[a].l-wl[b].l) || nameById(a).localeCompare(nameById(b)));
+  el.innerHTML=`<div class="label">Sommarställning</div>`+
+    ids.map((id,i)=>{ const s=wl[id]; return `<div class="row"><div class="rank">${i+1}</div><div class="nm">${nameById(id)}</div><div class="meta">${s.w}V – ${s.l}F</div></div>`;}).join('');
 }
 
 // ── ADMIN: speldagslista ──
@@ -213,11 +216,39 @@ function renderAdminEvents(){
   if(!events.length){ box.innerHTML='<div class="muted">Inga speldagar än.</div>'; return; }
   box.innerHTML=events.map(e=>{
     const cnt=signupsFor(e.play_date).length;
-    return `<div class="row" style="flex-wrap:wrap">
-      <div class="nm">${e.name}<div class="meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts} · ${cnt} anmälda ${e.status==='drawn'?'<span class="pill drawn">lottad</span>':''}</div></div>
-      ${e.status!=='drawn'?`<button class="btn sm" onclick="drawEvent('${e.play_date}')">Lotta</button>`:''}
-      <button class="btn sm alt" onclick="deleteEvent('${e.id}')">Ta bort</button>
-    </div>`;
+    const isDraft=e.status==='drawn', isPub=e.status==='published';
+    const pill=isDraft?'<span class="pill">utkast – ej publicerad</span>':isPub?'<span class="pill drawn">publicerad</span>':'';
+    let out=`<div class="ev">
+      <div class="ev-name">${e.name}</div>
+      <div class="ev-meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts||'—'} · ${cnt} anmälda ${pill}</div>`;
+    if(!isDraft && !isPub){
+      const ids=signupsFor(e.play_date).map(s=>s.player_id);
+      const avail=players.filter(p=>p.active!==false && !ids.includes(p.id));
+      out+=`<div class="label" style="margin:12px 0 6px">Anmälda (${ids.length})</div>`;
+      out+=ids.length?ids.map(id=>`<div class="row" style="align-items:center"><div class="nm">${nameById(id)}</div><button class="btn sm alt" onclick="adminUnsign('${e.play_date}',${id})">✕</button></div>`).join(''):'<div class="muted">Inga anmälda än.</div>';
+      out+=`<div class="row" style="gap:6px;margin-top:6px"><select id="addsign-${e.play_date}" style="flex:1"><option value="">Anmäl spelare…</option>${avail.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select><button class="btn sm" onclick="adminSign('${e.play_date}')">Anmäl</button></div>`;
+      out+=`<button class="btn sm" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta</button>`;
+    }
+    if(isDraft){
+      const ms=matchesFor(e.play_date);
+      const ids=signupsFor(e.play_date).map(s=>s.player_id);
+      const optsFor=cur=>ids.map(id=>`<option value="${id}" ${id===cur?'selected':''}>${nameById(id)}</option>`).join('');
+      out+=`<div class="label" style="margin:12px 0 6px">Lottning (utkast) – justera vid behov</div>`;
+      out+=ms.map(m=>`<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
+          <select id="ma-${m.id}" style="flex:1;min-width:110px">${optsFor(m.player_a_id)}</select>
+          <span class="x">vs</span>
+          <select id="mb-${m.id}" style="flex:1;min-width:110px">${optsFor(m.player_b_id)}</select>
+          <input id="mc-${m.id}" value="${m.court||''}" placeholder="bana" style="width:64px">
+        </div>`).join('');
+      out+=`<button class="btn sm" onclick="saveDraft('${e.play_date}')">Spara justeringar</button>
+        <button class="btn sm alt" onclick="drawEvent('${e.play_date}')">Lotta om</button>
+        <button class="btn sm green" onclick="publishDraw('${e.play_date}')">Publicera</button>`;
+    }
+    if(isPub){
+      out+=`<button class="btn sm alt" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
+    }
+    out+=`<button class="btn sm alt" onclick="deleteEvent('${e.id}')">Ta bort</button></div>`;
+    return out;
   }).join('');
 }
 
@@ -248,19 +279,55 @@ async function requestJoin(){
     document.getElementById('join-name').value='';document.getElementById('join-phone').value='';document.getElementById('join-email').value=''; }
   catch(e){ msg.textContent='Fel: '+(e.message||e); }
 }
-async function createEvent(){
+async function skapaSpeldag(){
   const pw=document.getElementById('admin-pw').value, name=document.getElementById('ev-name').value.trim(),
     date=document.getElementById('ev-date').value, courts=document.getElementById('ev-courts').value.trim(),
     time=document.getElementById('ev-time').value.trim(), msg=document.getElementById('ev-msg');
-  if(!name||!date||!courts){ msg.textContent='Fyll i namn, datum och banor.'; return; }
+  if(!name||!date){ msg.textContent='Fyll i namn och datum (banor kan sättas vid lottningen).'; return; }
   try{ await BTS.adminCreateEvent(pw,{competitionId:COMP,playDate:date,name,courts,startTime:time});
     msg.textContent=`Speldag "${name}" sparad.`; document.getElementById('ev-name').value=''; await load(); }
   catch(e){ msg.textContent='Fel: '+(e.message||e); }
 }
 async function drawEvent(date){
   const pw=document.getElementById('admin-pw').value;
-  if(!confirm('Lotta matcher för denna speldag? Tidigare lottning för dagen ersätts.')) return;
-  try{ const n=await BTS.adminDrawWeek(pw,COMP,date); alert(`Lottning klar — ${n} matcher skapade.`); await load(); }
+  const ev=events.find(e=>e.play_date===date);
+  const antal=signupsFor(date).length;
+  const courts=prompt(`${antal} spelare anmälda till ${ev?ev.name:'speldagen'}.\n\nVilka banor ska användas? (t.ex. 8, 9, 10)\nVarje bana = en match (2 spelare). Tidigare lottning för dagen ersätts.`, (ev&&ev.courts)?ev.courts:'');
+  if(courts===null) return;
+  if(!courts.trim()){ alert('Ange minst en bana.'); return; }
+  try{ const n=await BTS.adminDrawWeek(pw,COMP,date,courts.trim()); alert(`Utkast skapat — ${n} matcher på banor ${courts.trim()}.\nGranska, justera vid behov och klicka Publicera.`); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function saveDraft(date){
+  const pw=document.getElementById('admin-pw').value;
+  const ms=matchesFor(date);
+  try{
+    for(const m of ms){
+      const a=parseInt(document.getElementById('ma-'+m.id).value);
+      const b=parseInt(document.getElementById('mb-'+m.id).value);
+      const c=document.getElementById('mc-'+m.id).value;
+      if(a===b){ alert('En match kan inte ha samma spelare på båda sidor.'); return; }
+      await BTS.adminUpdateDropinMatch(pw,m.id,a,b,c);
+    }
+    alert('Justeringar sparade.'); await load();
+  }catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function publishDraw(date){
+  const pw=document.getElementById('admin-pw').value;
+  if(!confirm('Publicera lottningen? Matcherna blir synliga för spelarna och går att rapportera.')) return;
+  try{ const n=await BTS.adminPublishDraw(pw,COMP,date); alert(`Publicerad! ${n} matcher är nu synliga för spelarna.`); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function adminSign(date){
+  const pw=document.getElementById('admin-pw').value;
+  const sel=document.getElementById('addsign-'+date); const pid=parseInt(sel&&sel.value);
+  if(!pid){ return; }
+  try{ await BTS.adminAddSignup(pw,COMP,date,pid); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function adminUnsign(date,pid){
+  const pw=document.getElementById('admin-pw').value;
+  try{ await BTS.adminRemoveSignup(pw,COMP,date,pid); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function deleteEvent(id){
