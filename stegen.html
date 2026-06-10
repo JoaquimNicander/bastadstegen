@@ -1213,7 +1213,7 @@ function renderMatchRow(m){
       </div>
     </div>
     <div class="match-center">
-      ${m.wo?`<div class="wo-badge">WO</div><div class="match-vs">vs</div>`:isPending?`<div class="match-score pending">· · ·</div><div class="match-vs">vs</div>`:`<div class="match-score">${m.score.replace(/ /g,'<br>')}</div>${m.awaitingConfirm?'<div class="wo-badge" style="color:var(--clay);border-color:rgba(232,82,10,0.35);margin-top:2px">VÄN</div>':''}`}
+      ${m.wo?`<div class="wo-badge">WO</div><div class="match-vs">vs</div>`:isPending?(m.deferred?`<div class="match-vs" style="color:var(--clay);font-size:10px;letter-spacing:1px;line-height:1.5">⏳ SPELAS<br>SENARE${m.planned?'<br>'+m.planned:''}</div>`:`<div class="match-score pending">· · ·</div><div class="match-vs">vs</div>`):`<div class="match-score">${m.score.replace(/ /g,'<br>')}</div>${m.awaitingConfirm?'<div class="wo-badge" style="color:var(--clay);border-color:rgba(232,82,10,0.35);margin-top:2px">VÄN</div>':''}`}
     </div>
     <div class="match-player right ${sideB}">
       <div class="match-player-avatar">${avatarHtml(m.b,34)}</div>
@@ -1718,6 +1718,8 @@ async function reloadLadderFromDB(){
         winner: m.winner_id ? (nameById[m.winner_id] || null) : null,
         score: m.score || null,
         wo: !!m.wo,
+        deferred: !!m.deferred,
+        planned: m.planned_date || null,
       });
     });
     allRounds = grouped;
