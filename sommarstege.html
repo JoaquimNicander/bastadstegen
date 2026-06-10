@@ -275,7 +275,7 @@ async function reportDropin(id){
 async function requestJoin(){
   const name=document.getElementById('join-name').value.trim(), phone=document.getElementById('join-phone').value.trim(), email=document.getElementById('join-email').value.trim(), msg=document.getElementById('join-msg');
   if(!name){ msg.textContent='Ange ditt namn.'; return; }
-  try{ await BTS.requestJoin(COMP,name,phone,email); msg.textContent='Tack! Din intresseanmälan är skickad — admin godkänner den.';
+  try{ await BTS.requestJoin(COMP,name,phone,email); msg.innerHTML='<div style="background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.45);border-radius:10px;padding:14px 16px;color:var(--cream);line-height:1.65;font-size:14px"><strong style="color:var(--green);font-size:15px">🎾 Grattis – sommaren är räddad, det blir tennis!</strong><br>Admin behöver godkänna dig innan du dyker upp som anmäld, men det går snabbt. Så… <strong>du är med!</strong> 🎉</div>';
     document.getElementById('join-name').value='';document.getElementById('join-phone').value='';document.getElementById('join-email').value=''; }
   catch(e){ msg.textContent='Fel: '+(e.message||e); }
 }
