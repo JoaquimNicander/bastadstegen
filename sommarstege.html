@@ -223,7 +223,7 @@ function renderMatcher(){
         ${(m.court||m.start_time)?`<div class="court">${m.court?`Bana ${m.court}`:''}${m.court&&m.start_time?' · ':''}${m.start_time?`kl ${m.start_time}`:''}</div>`:''}
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
         ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · ${m.status==='confirmed'?'bekräftad':'rapporterad'}</div>`:''}
-        ${(!m.winner_id && m.deferred)?`<div class="court" style="color:var(--clay);margin-top:6px">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
+        ${(!m.winner_id && m.deferred)?`<div style="text-align:center;margin-top:8px;background:rgba(193,120,73,.16);border:1px solid var(--clay);border-radius:8px;padding:9px;color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
         ${(!m.winner_id && (canReport||isAdmin()))?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>`:''}
         ${canReport?`<div style="margin-top:10px">
           <select id="win-${m.id}"><option value="">Vinnare…</option><option value="${m.player_a_id}">${nameById(m.player_a_id)}</option><option value="${m.player_b_id}">${nameById(m.player_b_id)}</option></select>

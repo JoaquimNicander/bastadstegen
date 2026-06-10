@@ -675,10 +675,10 @@ function renderApp(){
             <div class="match-versus-rank">#${match.posA===match.myPos?match.posB:match.posA}</div>
           </div>
         </div>
-        ${match.id?`<div style="text-align:center;margin:4px 0 10px;font-size:13px">
+        ${match.id?`<div style="margin:6px 0 12px">
           ${match.deferred
-            ? `<span style="color:var(--clay)">⏳ Spelas senare${match.planned_date?' · '+match.planned_date:''}</span> · <a href="#" onclick="deferMatch(false);return false" style="color:var(--muted2)">ångra</a>`
-            : `<a href="#" onclick="deferMatch(true);return false" style="color:var(--clay)">⏳ Markera "spelas senare"</a>`}
+            ? `<div style="text-align:center;background:rgba(193,125,75,.16);border:1px solid var(--clay);border-radius:10px;padding:11px;color:var(--clay);font-family:'Space Mono',monospace;font-size:13px;letter-spacing:1px">⏳ SPELAS SENARE${match.planned_date?' · '+match.planned_date:''}<br><a href="#" onclick="deferMatch(false);return false" style="color:var(--muted2);font-size:11px;letter-spacing:0">ångra</a></div>`
+            : `<div style="text-align:center"><a href="#" onclick="deferMatch(true);return false" style="color:var(--clay);font-size:13px">⏳ Markera "spelas senare"</a></div>`}
         </div>`:''}
 
         <!-- SCORE SECTION -->

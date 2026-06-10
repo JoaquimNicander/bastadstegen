@@ -757,7 +757,7 @@ function renderSetInputs(key, saved){
 
   return `
   <div class="match-card-body" id="body-${key}">
-    ${!saved?`<div style="width:100%;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${deferredByKey[currentRound+'|'+key]?`<span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px">⏳ SPELAS SENARE${deferredByKey[currentRound+'|'+key].planned?' · '+deferredByKey[currentRound+'|'+key].planned:''}</span><button class="edit-btn" onclick="adminDeferMatch('${key}',false)">Ångra</button>`:`<button class="edit-btn" onclick="adminDeferMatch('${key}',true)">⏳ Spelas senare</button>`}</div>`:''}
+    ${!saved?`<div style="width:100%;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${deferredByKey[currentRound+'|'+key]?`<span style="background:rgba(193,125,75,.16);border:1px solid var(--clay);border-radius:6px;padding:5px 11px;color:var(--clay);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px">⏳ SPELAS SENARE${deferredByKey[currentRound+'|'+key].planned?' · '+deferredByKey[currentRound+'|'+key].planned:''}</span><button class="edit-btn" onclick="adminDeferMatch('${key}',false)">Ångra</button>`:`<button class="edit-btn" onclick="adminDeferMatch('${key}',true)">⏳ Spelas senare</button>`}</div>`:''}
     <div class="sets-group">
       <div class="set-block">
         <span class="set-block-label">S1</span>
