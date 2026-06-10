@@ -509,7 +509,7 @@ async function deferMatch(on){
   const m=getMyMatch();
   if(!m||!m.id){ alert('Kräver databasanslutning.'); return; }
   let planned=null;
-  if(on){ const d=prompt('Spelas senare. Ange planerat datum om du vet (ÅÅÅÅ-MM-DD), annars lämna tomt:',''); if(d===null) return; planned=d.trim()||null; }
+  if(on){ const d=prompt('Spelas senare. Planerat datum (ÅÅÅÅ-MM-DD), t.ex. 2026-06-28 — lämna tomt om du inte vet:',''); if(d===null) return; const t=d.trim(); if(t && !/^\d{4}-\d{2}-\d{2}$/.test(t)){ alert('Ogiltigt datum. Skriv som ÅÅÅÅ-MM-DD (t.ex. 2026-06-28) eller lämna tomt.'); return; } planned=t||null; }
   try{ await BTS.setDeferred(m.id, me.id, me._pin, on, planned); await refreshDBC(); renderApp(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }

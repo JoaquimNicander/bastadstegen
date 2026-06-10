@@ -962,7 +962,7 @@ async function adminDeferMatch(key,on){
   const id=matchIdFor(currentRound,key);
   if(!id){ showToast('Hittar inte matchen','error'); return; }
   let planned=null;
-  if(on){ const d=prompt('Spelas senare. Planerat datum (ÅÅÅÅ-MM-DD), valfritt:',''); if(d===null) return; planned=d.trim()||null; }
+  if(on){ const d=prompt('Spelas senare. Planerat datum (ÅÅÅÅ-MM-DD), t.ex. 2026-06-28 — lämna tomt om du inte vet:',''); if(d===null) return; const t=d.trim(); if(t && !/^\d{4}-\d{2}-\d{2}$/.test(t)){ showToast('Ogiltigt datum. Skriv ÅÅÅÅ-MM-DD (t.ex. 2026-06-28) eller lämna tomt.','error'); return; } planned=t||null; }
   try{ await BTS.adminSetDeferred(adminPw,id,on,planned); await loadState(); renderMatchInput(); showToast(on?'Markerad: spelas senare ✓':'Ångrad ✓'); }
   catch(err){ showToast(err?.message||String(err),'error'); }
 }

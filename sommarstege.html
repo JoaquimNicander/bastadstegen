@@ -312,7 +312,7 @@ async function toggleSignup(date,on){
 function isAdmin(){ const el=document.getElementById('admin-pw'); return !!(el && el.value.trim()); }
 async function deferMatch(id,on){
   let planned=null;
-  if(on){ const d=prompt('Spelas senare. Ange planerat datum om du vet (ÅÅÅÅ-MM-DD), annars lämna tomt:',''); if(d===null) return; planned=d.trim()||null; }
+  if(on){ const d=prompt('Spelas senare. Planerat datum (ÅÅÅÅ-MM-DD), t.ex. 2026-06-28 — lämna tomt om du inte vet:',''); if(d===null) return; const t=d.trim(); if(t && !/^\d{4}-\d{2}-\d{2}$/.test(t)){ alert('Ogiltigt datum. Skriv som ÅÅÅÅ-MM-DD (t.ex. 2026-06-28) eller lämna tomt.'); return; } planned=t||null; }
   const m=matches.find(x=>x.id===id);
   const iAmIn = m && me && (m.player_a_id===me.id || m.player_b_id===me.id);
   try{
