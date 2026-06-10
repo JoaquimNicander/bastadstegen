@@ -170,6 +170,14 @@ const BTS = {
     if (error) throw error;
   },
 
+  // Admin markerar "spelas senare" (lösenordsskyddat)
+  async adminSetDeferred(adminPw, matchId, deferred, plannedDate) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_set_deferred', {
+      p_admin_pw: adminPw, p_match_id: matchId, p_deferred: deferred, p_planned: plannedDate || null });
+    if (error) throw error;
+  },
+
   // Motståndaren bekräftar (true) eller bestrider (false) (PIN-skyddat).
   async confirmMatch(matchId, { playerId, pin, agree }) {
     _assert();

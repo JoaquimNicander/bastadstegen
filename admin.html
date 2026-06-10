@@ -757,7 +757,7 @@ function renderSetInputs(key, saved){
 
   return `
   <div class="match-card-body" id="body-${key}">
-    ${deferredByKey[currentRound+'|'+key]?`<div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px;margin-bottom:8px;width:100%">⏳ SPELAS SENARE${deferredByKey[currentRound+'|'+key].planned?' · '+deferredByKey[currentRound+'|'+key].planned:''}</div>`:''}
+    ${!saved?`<div style="width:100%;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">${deferredByKey[currentRound+'|'+key]?`<span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px">⏳ SPELAS SENARE${deferredByKey[currentRound+'|'+key].planned?' · '+deferredByKey[currentRound+'|'+key].planned:''}</span><button class="edit-btn" onclick="adminDeferMatch('${key}',false)">Ångra</button>`:`<button class="edit-btn" onclick="adminDeferMatch('${key}',true)">⏳ Spelas senare</button>`}</div>`:''}
     <div class="sets-group">
       <div class="set-block">
         <span class="set-block-label">S1</span>
@@ -957,6 +957,16 @@ function saveMatch(key,posA,posB){
 }
 
 // ── PUBLISH ────────────────────────────────────────────────────
+async function adminDeferMatch(key,on){
+  if(!ADB){ showToast('Kräver databasanslutning','error'); return; }
+  const id=matchIdFor(currentRound,key);
+  if(!id){ showToast('Hittar inte matchen','error'); return; }
+  let planned=null;
+  if(on){ const d=prompt('Spelas senare. Planerat datum (ÅÅÅÅ-MM-DD), valfritt:',''); if(d===null) return; planned=d.trim()||null; }
+  try{ await BTS.adminSetDeferred(adminPw,id,on,planned); await loadState(); renderMatchInput(); showToast(on?'Markerad: spelas senare ✓':'Ångrad ✓'); }
+  catch(err){ showToast(err?.message||String(err),'error'); }
+}
+
 function confirmMatchAdmin(key){
   if(!ADB){ showToast('Bekräftelse kräver databasanslutning','error'); return; }
   const id=matchIdFor(currentRound,key);

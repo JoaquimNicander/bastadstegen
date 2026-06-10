@@ -224,8 +224,8 @@ function renderMatcher(){
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
         ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · ${m.status==='confirmed'?'bekräftad':'rapporterad'}</div>`:''}
         ${(!m.winner_id && m.deferred)?`<div class="court" style="color:var(--clay);margin-top:6px">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
-        ${canReport?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>
-          <div style="margin-top:10px">
+        ${(!m.winner_id && (canReport||isAdmin()))?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>`:''}
+        ${canReport?`<div style="margin-top:10px">
           <select id="win-${m.id}"><option value="">Vinnare…</option><option value="${m.player_a_id}">${nameById(m.player_a_id)}</option><option value="${m.player_b_id}">${nameById(m.player_b_id)}</option></select>
           <input id="sc-${m.id}" placeholder="Resultat, t.ex. 6-4 6-3 (valfritt)">
           <button class="btn" onclick="reportDropin('${m.id}')">Rapportera</button></div>`:''}
@@ -309,11 +309,17 @@ async function toggleSignup(date,on){
   try{ if(on) await BTS.addSignup(COMP,date,me.id,me._pin); else await BTS.removeSignup(COMP,date,me.id,me._pin); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
+function isAdmin(){ const el=document.getElementById('admin-pw'); return !!(el && el.value.trim()); }
 async function deferMatch(id,on){
   let planned=null;
   if(on){ const d=prompt('Spelas senare. Ange planerat datum om du vet (ÅÅÅÅ-MM-DD), annars lämna tomt:',''); if(d===null) return; planned=d.trim()||null; }
-  try{ await BTS.setDeferred(id, me.id, me._pin, on, planned); await load(); }
-  catch(e){ alert('Fel: '+(e.message||e)); }
+  const m=matches.find(x=>x.id===id);
+  const iAmIn = m && me && (m.player_a_id===me.id || m.player_b_id===me.id);
+  try{
+    if(iAmIn){ await BTS.setDeferred(id, me.id, me._pin, on, planned); }
+    else { await BTS.adminSetDeferred((document.getElementById('admin-pw')||{}).value||'', id, on, planned); }
+    await load();
+  }catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function reportDropin(id){
   const winnerId=parseInt(document.getElementById('win-'+id).value)||null, score=document.getElementById('sc-'+id).value;
