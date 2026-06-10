@@ -572,6 +572,8 @@ let currentSeason = 'VT2026';
 let currentRound = 1;
 let hasAnyMatches = false;   // färsk säsong (inga matcher) → visa "starta omgång 1"
 let ladder = [];
+let dbPlayers = [];   // full spelarlista från DB (id,name,phone,…)
+let deferredByKey = {};  // 'round|key' -> {planned} för matcher markerade "spelas senare"
 let roundResults = {};
 let woState = {};
 
@@ -597,14 +599,16 @@ async function loadState(){
       ]);
       if(allPlayers.length && ladderRows.length){
         basePlayers = allPlayers.map(p=>({id:p.id,name:p.name}));
+        dbPlayers = allPlayers.slice();
         const nameById={}; allPlayers.forEach(p=>nameById[p.id]=p.name);
         ladder = ladderRows.slice().sort((a,b)=>a.position-b.position).map(l=>l.player_id);
         hasAnyMatches = matchRows.length>0;
         currentRound = matchRows.length?Math.max(...matchRows.map(m=>m.round)):1;
-        roundResults={}; const idByRoundKey={};
+        roundResults={}; const idByRoundKey={}; deferredByKey={};
         matchRows.forEach(m=>{
           const key=`${m.pos_a}v${m.pos_b}`;
           idByRoundKey[m.round+'|'+key]=m.id;
+          if(m.deferred && !m.winner_id) deferredByKey[m.round+'|'+key]={planned:m.planned_date};
           if(!m.winner_id)return; // bara faktiska resultat i roundResults
           (roundResults[m.round]=roundResults[m.round]||{})[key]={
             posA:m.pos_a,posB:m.pos_b,
@@ -625,6 +629,7 @@ async function loadState(){
   const r=localStorage.getItem(sk('bts_results'));
   const rnd=localStorage.getItem(sk('bts_round'));
   ladder = l ? JSON.parse(l) : basePlayers.map(p=>p.id);
+  dbPlayers = loadPlayers();
   roundResults = r ? JSON.parse(r) : {};
   currentRound = rnd ? parseInt(rnd) : 1;
 }
@@ -752,6 +757,7 @@ function renderSetInputs(key, saved){
 
   return `
   <div class="match-card-body" id="body-${key}">
+    ${deferredByKey[currentRound+'|'+key]?`<div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px;margin-bottom:8px;width:100%">⏳ SPELAS SENARE${deferredByKey[currentRound+'|'+key].planned?' · '+deferredByKey[currentRound+'|'+key].planned:''}</div>`:''}
     <div class="sets-group">
       <div class="set-block">
         <span class="set-block-label">S1</span>
@@ -1225,7 +1231,7 @@ function savePlayers(p){ localStorage.setItem('bts_players',JSON.stringify(p)); 
 // ── RENDER PLAYER MANAGEMENT ──────────────────────────────────
 function renderPlayerMgmt(){
   if(!masterUnlocked)return;
-  const currentPlayers=loadPlayers();
+  const currentPlayers = ADB ? dbPlayers : loadPlayers();
   const table=document.getElementById('player-mgmt-table');
   if(!table)return;
 
@@ -1281,74 +1287,71 @@ function renderPlayerMgmt(){
 function startEdit(id){ editingPlayerId=id; renderPlayerMgmt(); }
 function cancelEdit(){ editingPlayerId=null; renderPlayerMgmt(); }
 
-function savePlayerEdit(id){
-  const players=loadPlayers();
-  const p=players.find(x=>x.id===id);
-  if(!p)return;
+async function savePlayerEdit(id){
   const nameEl=document.getElementById('edit-name-'+id);
   const phoneEl=document.getElementById('edit-phone-'+id);
-  if(nameEl) p.name=nameEl.value.trim()||p.name;
-  if(phoneEl) p.phone=phoneEl.value.trim();
-  savePlayers(players);
-  editingPlayerId=null;
-  renderPlayerMgmt();
-  renderAll();
-  showToast('Spelare uppdaterad ✓');
+  const name=nameEl?nameEl.value.trim():'';
+  const phone=phoneEl?phoneEl.value.trim():'';
+  if(ADB){
+    try{ await BTS.adminUpdatePlayer(adminPw,id,name,phone); await loadState(); editingPlayerId=null; renderPlayerMgmt(); renderAll(); showToast('Spelare uppdaterad ✓'); }
+    catch(err){ showToast(err?.message||String(err),'error'); }
+    return;
+  }
+  const players=loadPlayers(); const p=players.find(x=>x.id===id); if(!p)return;
+  if(name) p.name=name; p.phone=phone; savePlayers(players);
+  editingPlayerId=null; renderPlayerMgmt(); renderAll(); showToast('Spelare uppdaterad ✓');
 }
 
-function movePlayer(id, dir){
-  const idx=ladder.indexOf(id);
-  if(idx<0)return;
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=ladder.length)return;
-  [ladder[idx],ladder[newIdx]]=[ladder[newIdx],ladder[idx]];
-  saveState();
-  renderPlayerMgmt();
-  renderLadderMini();
-  showToast('Position uppdaterad ✓');
+async function movePlayer(id, dir){
+  const idx=ladder.indexOf(id); if(idx<0)return;
+  const newIdx=idx+dir; if(newIdx<0||newIdx>=ladder.length)return;
+  const newLadder=ladder.slice(); [newLadder[idx],newLadder[newIdx]]=[newLadder[newIdx],newLadder[idx]];
+  if(ADB){
+    try{ await BTS.adminSetPositions(adminPw,currentSeason,newLadder); await loadState(); renderPlayerMgmt(); renderLadderMini(); showToast('Position uppdaterad ✓'); }
+    catch(err){ showToast(err?.message||String(err),'error'); }
+    return;
+  }
+  ladder=newLadder; saveState(); renderPlayerMgmt(); renderLadderMini(); showToast('Position uppdaterad ✓');
 }
 
-function addPlayer(){
+async function addPlayer(){
   const name=document.getElementById('new-player-name').value.trim();
   const phone=document.getElementById('new-player-phone').value.trim();
   const posInput=document.getElementById('new-player-pos').value;
   if(!name){showToast('Ange spelarens namn','error');return;}
-
+  const clear=()=>{document.getElementById('new-player-name').value='';document.getElementById('new-player-phone').value='';document.getElementById('new-player-pos').value='';};
+  if(ADB){
+    try{
+      await BTS.adminAddPlayer(adminPw,{name,phone,email:'',competitionId:currentSeason});
+      await loadState();
+      const pos=parseInt(posInput);
+      if(pos>0 && pos<=ladder.length){
+        const newId=ladder[ladder.length-1]; // nytillagd hamnar sist
+        const arr=ladder.filter(x=>x!==newId); arr.splice(pos-1,0,newId);
+        await BTS.adminSetPositions(adminPw,currentSeason,arr); await loadState();
+      }
+      clear(); renderPlayerMgmt(); renderAll(); showToast(`${name} tillagd ✓`);
+    }catch(err){ showToast(err?.message||String(err),'error'); }
+    return;
+  }
   const players=loadPlayers();
   const newId=Math.max(...players.map(p=>p.id),0)+1;
-  const newPlayer={id:newId, name, phone};
-  players.push(newPlayer);
-  savePlayers(players);
-
-  // Insert in ladder
+  players.push({id:newId, name, phone}); savePlayers(players);
   const pos=parseInt(posInput);
-  if(pos>0&&pos<=ladder.length){
-    ladder.splice(pos-1,0,newId);
-  } else {
-    ladder.push(newId);
-  }
-  saveState();
-
-  document.getElementById('new-player-name').value='';
-  document.getElementById('new-player-phone').value='';
-  document.getElementById('new-player-pos').value='';
-  renderPlayerMgmt();
-  renderAll();
-  showToast(`${name} tillagd ✓`);
+  if(pos>0&&pos<=ladder.length){ ladder.splice(pos-1,0,newId); } else { ladder.push(newId); }
+  saveState(); clear(); renderPlayerMgmt(); renderAll(); showToast(`${name} tillagd ✓`);
 }
 
-function removePlayer(id){
-  const players=loadPlayers();
-  const p=players.find(x=>x.id===id);
-  if(!p)return;
-  if(!confirm(`Ta bort ${p.name} från stegen? Det går inte att ångra.`))return;
-  const newPlayers=players.filter(x=>x.id!==id);
-  savePlayers(newPlayers);
-  ladder=ladder.filter(x=>x!==id);
-  saveState();
-  renderPlayerMgmt();
-  renderAll();
-  showToast(`${p.name} borttagen`);
+async function removePlayer(id){
+  const src=ADB?dbPlayers:loadPlayers();
+  const p=src.find(x=>x.id===id);
+  if(!confirm(`Ta bort ${p?p.name:'spelaren'} ur stegen? Matchhistoriken behålls och hen kan läggas tillbaka senare.`))return;
+  if(ADB){
+    try{ await BTS.adminRemoveFromLadder(adminPw,currentSeason,id); await loadState(); renderPlayerMgmt(); renderAll(); showToast('Spelare borttagen ur stegen'); }
+    catch(err){ showToast(err?.message||String(err),'error'); }
+    return;
+  }
+  const players=loadPlayers(); savePlayers(players.filter(x=>x.id!==id)); ladder=ladder.filter(x=>x!==id); saveState(); renderPlayerMgmt(); renderAll(); showToast(`${p?p.name:'Spelaren'} borttagen`);
 }
 
 // ── RESULT OVERRIDE ───────────────────────────────────────────

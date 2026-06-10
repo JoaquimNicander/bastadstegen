@@ -493,7 +493,7 @@ function getMyMatch(){
     const oppId=dbm.player_a_id===me.id?dbm.player_b_id:dbm.player_a_id;
     const opp=getPlayers().find(p=>p.id===oppId);
     const myPos=dbm.player_a_id===me.id?dbm.pos_a:dbm.pos_b;
-    return{posA:dbm.pos_a,posB:dbm.pos_b,key:`${dbm.pos_a}v${dbm.pos_b}`,opp,myPos};
+    return{posA:dbm.pos_a,posB:dbm.pos_b,key:`${dbm.pos_a}v${dbm.pos_b}`,opp,myPos,id:dbm.id,deferred:dbm.deferred,planned_date:dbm.planned_date,status:dbm.status};
   }
   const ladder=getLadder();
   const myRank=ladder.indexOf(me.id)+1;
@@ -504,6 +504,14 @@ function getMyMatch(){
   const oppId=ladder[posA===myRank?posB-1:posA-1];
   const opp=getPlayers().find(p=>p.id===oppId);
   return{posA,posB,key:`${posA}v${posB}`,opp,myPos:myRank};
+}
+async function deferMatch(on){
+  const m=getMyMatch();
+  if(!m||!m.id){ alert('Kräver databasanslutning.'); return; }
+  let planned=null;
+  if(on){ const d=prompt('Spelas senare. Ange planerat datum om du vet (ÅÅÅÅ-MM-DD), annars lämna tomt:',''); if(d===null) return; planned=d.trim()||null; }
+  try{ await BTS.setDeferred(m.id, me.id, me._pin, on, planned); await refreshDBC(); renderApp(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
 }
 function getPendingForMe(){
   const pending=getPending();const round=getCurrentRound();const match=getMyMatch();if(!match)return null;
@@ -667,6 +675,11 @@ function renderApp(){
             <div class="match-versus-rank">#${match.posA===match.myPos?match.posB:match.posA}</div>
           </div>
         </div>
+        ${match.id?`<div style="text-align:center;margin:4px 0 10px;font-size:13px">
+          ${match.deferred
+            ? `<span style="color:var(--clay)">⏳ Spelas senare${match.planned_date?' · '+match.planned_date:''}</span> · <a href="#" onclick="deferMatch(false);return false" style="color:var(--muted2)">ångra</a>`
+            : `<a href="#" onclick="deferMatch(true);return false" style="color:var(--clay)">⏳ Markera "spelas senare"</a>`}
+        </div>`:''}
 
         <!-- SCORE SECTION -->
         <div id="score-section">

@@ -161,6 +161,15 @@ const BTS = {
     if (error) throw error;
   },
 
+  // Markera (eller ångra) "spelas senare" på en match, ev. med planerat datum (PIN-skyddat)
+  async setDeferred(matchId, playerId, pin, deferred, plannedDate) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_deferred', {
+      p_match_id: matchId, p_player_id: playerId, p_pin: pin,
+      p_deferred: deferred, p_planned: plannedDate || null });
+    if (error) throw error;
+  },
+
   // Motståndaren bekräftar (true) eller bestrider (false) (PIN-skyddat).
   async confirmMatch(matchId, { playerId, pin, agree }) {
     _assert();
@@ -213,6 +222,18 @@ const BTS = {
   async adminSetPositions(adminPw, competitionId, playerIds) {
     _assert();
     const { error } = await _sb.rpc('bts_admin_set_positions', { p_admin_pw: adminPw, p_comp: competitionId, p_player_ids: playerIds });
+    if (error) throw error;
+  },
+  // Redigera en spelares namn/telefon (gäller överallt)
+  async adminUpdatePlayer(adminPw, playerId, name, phone) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_update_player', { p_admin_pw: adminPw, p_player_id: playerId, p_name: name, p_phone: phone || '' });
+    if (error) throw error;
+  },
+  // Ta bort spelare ur EN steges ranking (behåll spelare + historik)
+  async adminRemoveFromLadder(adminPw, competitionId, playerId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_remove_from_ladder', { p_admin_pw: adminPw, p_comp: competitionId, p_player_id: playerId });
     if (error) throw error;
   },
   // Steg 3: generera nästa omgångs matcher (grannar möts) + sätt current_round

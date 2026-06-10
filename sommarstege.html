@@ -99,6 +99,9 @@
     <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
     <div id="np-msg" class="muted" style="margin-top:8px"></div>
 
+    <div class="label" style="margin-top:20px">Deltagare (ranking)</div>
+    <div id="admin-players"></div>
+
     <div class="label" style="margin-top:20px">Väntande intresseanmälningar</div>
     <button class="btn alt" onclick="loadJoins()">Visa ansökningar</button>
     <div id="joins-list" style="margin-top:10px"></div>
@@ -127,7 +130,45 @@ async function load(){
   }catch(e){ console.warn(e); }
   render();
 }
-function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderAdminEvents(); }
+function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderAdminEvents(); renderAdminPlayers(); }
+let spEditId=null;
+function renderAdminPlayers(){
+  const box=document.getElementById('admin-players'); if(!box) return;
+  if(!ladder.length){ box.innerHTML='<div class="muted">Inga deltagare i sommarstegen än.</div>'; return; }
+  box.innerHTML=ladder.map((l,i)=>{
+    const id=l.player_id, nm=l.player?l.player.name:nameById(id), ph=(l.player&&l.player.phone)||'';
+    const ed=spEditId===id;
+    return `<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
+      <div class="rank">${i+1}</div>
+      ${ed?`<input id="sp-name-${id}" value="${nm}" style="flex:1;min-width:90px"><input id="sp-phone-${id}" value="${ph}" placeholder="telefon" style="width:108px">`:`<div class="nm">${nm}</div>`}
+      <button class="btn sm alt" onclick="spMove(${id},-1)" title="Upp">▲</button>
+      <button class="btn sm alt" onclick="spMove(${id},1)" title="Ner">▼</button>
+      ${ed?`<button class="btn sm" onclick="spSave(${id})">Spara</button><button class="btn sm alt" onclick="spCancel()">✕</button>`:`<button class="btn sm alt" onclick="spEdit(${id})">Redigera</button><button class="btn sm alt" onclick="spRemove(${id})">Ta bort</button>`}
+    </div>`;
+  }).join('');
+}
+function spEdit(id){ spEditId=id; renderAdminPlayers(); }
+function spCancel(){ spEditId=null; renderAdminPlayers(); }
+async function spSave(id){
+  const pw=document.getElementById('admin-pw').value;
+  const name=document.getElementById('sp-name-'+id).value.trim(), phone=document.getElementById('sp-phone-'+id).value.trim();
+  try{ await BTS.adminUpdatePlayer(pw,id,name,phone); spEditId=null; await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function spMove(id,dir){
+  const pw=document.getElementById('admin-pw').value;
+  const ids=ladder.map(l=>l.player_id); const idx=ids.indexOf(id); if(idx<0)return;
+  const ni=idx+dir; if(ni<0||ni>=ids.length)return;
+  [ids[idx],ids[ni]]=[ids[ni],ids[idx]];
+  try{ await BTS.adminSetPositions(pw,COMP,ids); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function spRemove(id){
+  const pw=document.getElementById('admin-pw').value;
+  if(!confirm('Ta bort deltagaren ur sommarstegen? Matchhistoriken behålls.')) return;
+  try{ await BTS.adminRemoveFromLadder(pw,COMP,id); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
 
 // ── ANMÄLAN ──
 function renderAnmalan(){
@@ -182,7 +223,9 @@ function renderMatcher(){
         ${(m.court||m.start_time)?`<div class="court">${m.court?`Bana ${m.court}`:''}${m.court&&m.start_time?' · ':''}${m.start_time?`kl ${m.start_time}`:''}</div>`:''}
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
         ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · ${m.status==='confirmed'?'bekräftad':'rapporterad'}</div>`:''}
-        ${canReport?`<div style="margin-top:10px">
+        ${(!m.winner_id && m.deferred)?`<div class="court" style="color:var(--clay);margin-top:6px">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
+        ${canReport?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>
+          <div style="margin-top:10px">
           <select id="win-${m.id}"><option value="">Vinnare…</option><option value="${m.player_a_id}">${nameById(m.player_a_id)}</option><option value="${m.player_b_id}">${nameById(m.player_b_id)}</option></select>
           <input id="sc-${m.id}" placeholder="Resultat, t.ex. 6-4 6-3 (valfritt)">
           <button class="btn" onclick="reportDropin('${m.id}')">Rapportera</button></div>`:''}
@@ -264,6 +307,12 @@ async function login(){
 function logout(){ me=null; render(); }
 async function toggleSignup(date,on){
   try{ if(on) await BTS.addSignup(COMP,date,me.id,me._pin); else await BTS.removeSignup(COMP,date,me.id,me._pin); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function deferMatch(id,on){
+  let planned=null;
+  if(on){ const d=prompt('Spelas senare. Ange planerat datum om du vet (ÅÅÅÅ-MM-DD), annars lämna tomt:',''); if(d===null) return; planned=d.trim()||null; }
+  try{ await BTS.setDeferred(id, me.id, me._pin, on, planned); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function reportDropin(id){
