@@ -1747,8 +1747,8 @@ function applySeasonState(rec){
   const badge=document.getElementById('season-round-badge');
   if(rec && rec.finished && players.length){
     const champ=players.slice().sort((a,b)=>a.rank-b.rank)[0];
-    if(t) t.innerHTML='<span style="color:var(--navy)">VINNARE</span> <span style="color:#fff">'+((rec.name||'Stegen').toUpperCase())+'</span>';
-    if(sub) sub.innerHTML='🏆 '+(champ?champ.name:'');
+    if(t) t.innerHTML='<span style="color:var(--navy)">VINNARE</span> <span style="color:#fff">'+((champ?champ.name:'').toUpperCase())+'</span>';
+    if(sub) sub.innerHTML='🏆 '+(rec.name||'');
     if(badge) badge.textContent='Avslutad';
   } else {
     if(t) t.innerHTML='<span style="color:var(--navy)">AKTUELL</span> <span style="color:#fff">STEGE</span>';
