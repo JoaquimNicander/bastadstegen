@@ -257,6 +257,12 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_undo_round', { p_admin_pw: adminPw, p_comp: competitionId });
     if (error) throw error;
   },
+  // Markera en säsong som avslutad/återöppnad (visar vinnaren på stegen)
+  async adminFinishSeason(adminPw, comp, finished) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_finish_season', { p_admin_pw: adminPw, p_comp: comp, p_finished: finished });
+    if (error) throw error;
+  },
   // Avsluta säsong: arkivera gamla + skapa ny med ärvd ordning (ingen omgång 1 än)
   async adminCloseSeason(adminPw, oldComp, { id, name, short, start, end } = {}) {
     _assert();

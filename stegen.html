@@ -629,7 +629,7 @@ header{
   <div class="tex-hair"></div>
   <div class="persp"><div class="pline base"></div><div class="pline side"></div></div>
   <div class="wrap" style="position:relative;z-index:3;padding-top:34px;padding-bottom:74px">
-    <div style="font-family:'Anton',sans-serif;font-size:clamp(42px,7.5vw,88px);line-height:.84;text-transform:uppercase;letter-spacing:.5px"><span style="color:var(--navy)">AKTUELL</span> <span style="color:#fff">STEGE</span></div>
+    <div id="hero-title" style="font-family:'Anton',sans-serif;font-size:clamp(42px,7.5vw,88px);line-height:.84;text-transform:uppercase;letter-spacing:.5px"><span style="color:var(--navy)">AKTUELL</span> <span style="color:#fff">STEGE</span></div>
     <div id="hero-sub-round" style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--navy);opacity:.82;margin-top:9px">Vårterminen 2026</div>
   </div>
   <div class="tex-grain"></div>
@@ -1669,10 +1669,11 @@ async function reloadLadderFromDB(){
   try {
     if(!window.BTS || !BTS.ready()) return;        // ej konfigurerad → behåll fallback
     const comp = currentSeason || 'VT2026';
-    const [allPlayers, ladderRows, matchRows] = await Promise.all([
+    const [allPlayers, ladderRows, matchRows, comps] = await Promise.all([
       BTS.getPlayers(),
       BTS.getLadder(comp),
       BTS.getMatches(comp),
+      BTS.getCompetitions().catch(()=>[]),
     ]);
     if(!ladderRows || !ladderRows.length) return;  // tom databas → behåll fallback
 
@@ -1735,8 +1736,23 @@ async function reloadLadderFromDB(){
     renderLadder();
     renderMatches();
     renderPlayers();
+    applySeasonState((comps||[]).find(c=>c.id===comp));
   } catch(e){
     console.warn('Kunde inte läsa från databasen, använder fallback-data:', e);
+  }
+}
+function applySeasonState(rec){
+  const t=document.getElementById('hero-title');
+  const sub=document.getElementById('hero-sub-round');
+  const badge=document.getElementById('season-round-badge');
+  if(rec && rec.finished && players.length){
+    const champ=players.slice().sort((a,b)=>a.rank-b.rank)[0];
+    if(t) t.innerHTML='<span style="color:var(--navy)">VINNARE</span> <span style="color:#fff">'+((rec.name||'Stegen').toUpperCase())+'</span>';
+    if(sub) sub.innerHTML='🏆 '+(champ?champ.name:'');
+    if(badge) badge.textContent='Avslutad';
+  } else {
+    if(t) t.innerHTML='<span style="color:var(--navy)">AKTUELL</span> <span style="color:#fff">STEGE</span>';
+    if(sub && rec && rec.name) sub.textContent=rec.name;
   }
 }
 reloadLadderFromDB();
