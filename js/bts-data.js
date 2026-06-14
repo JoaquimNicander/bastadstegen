@@ -244,6 +244,50 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_remove_from_ladder', { p_admin_pw: adminPw, p_comp: competitionId, p_player_id: playerId });
     if (error) throw error;
   },
+
+  // ── ÖPPEN OMRÖSTNING (anonym, en röst per enhet) ─────────────────────
+  async voteAnon(pollKey, choice, name) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_vote_anon', { p_poll_key: pollKey, p_choice: choice, p_name: name || '' });
+    if (error) throw error;
+    return data; // röstens id (spara i webbläsaren)
+  },
+  async adminListVotes(adminPw, pollKey) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_list_votes', { p_admin_pw: adminPw, p_poll_key: pollKey });
+    if (error) throw error;
+    return data || [];
+  },
+  async updateVoteAnon(id, pollKey, choice) {
+    _assert();
+    const { error } = await _sb.rpc('bts_update_vote_anon', { p_id: id, p_poll_key: pollKey, p_choice: choice });
+    if (error) throw error;
+  },
+  async pollResults(pollKey) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_results', { p_poll_key: pollKey });
+    if (error) throw error;
+    return data || []; // [{choice, antal}]
+  },
+  // "Vill vara med oavsett format"-intresse
+  async registerInterest(name, contact) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_register_interest', { p_name: name, p_contact: contact || '' });
+    if (error) throw error;
+    return data;
+  },
+  async interestCount() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_interest_count');
+    if (error) throw error;
+    return Number(data) || 0;
+  },
+  async adminListInterest(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_list_interest', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
   // Steg 3: generera nästa omgångs matcher (grannar möts) + sätt current_round
   async adminGenerateRound(adminPw, competitionId, round) {
     _assert();
