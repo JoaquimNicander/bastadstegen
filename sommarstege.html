@@ -78,33 +78,46 @@
 
   <div class="admin-toggle" onclick="document.getElementById('admin-panel').classList.toggle('hidden')">⚙︎ Admin</div>
   <div id="admin-panel" class="panel hidden" style="margin-top:12px">
-    <div class="label">Admin</div>
-    <input type="password" id="admin-pw" placeholder="Adminlösenord">
+    <!-- Steg 1: logga in -->
+    <div id="admin-login">
+      <div class="label">Admin – logga in</div>
+      <input type="password" id="admin-pw" placeholder="Adminlösenord" onkeydown="if(event.key==='Enter')adminLogin()">
+      <button class="btn alt" style="margin-top:8px" onclick="adminLogin()">Logga in</button>
+      <div id="admin-login-err" class="muted" style="margin-top:8px"></div>
+    </div>
 
-    <div class="label" style="margin-top:14px">Skapa speldag</div>
-    <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
-    <input type="date" id="ev-date">
-    <input type="text" id="ev-courts" placeholder="Banor (valfritt – sätts annars vid lottningen)">
-    <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
-    <button class="btn alt" onclick="skapaSpeldag()">Skapa / uppdatera speldag</button>
-    <div id="ev-msg" class="muted" style="margin-top:8px"></div>
+    <!-- Steg 2: adminverktyg (visas först efter inloggning) -->
+    <div id="admin-body" class="hidden">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="label" style="margin:0">✓ Inloggad som admin</div>
+        <button class="btn sm alt" onclick="adminLogout()">Logga ut</button>
+      </div>
 
-    <div class="label" style="margin-top:20px">Speldagar</div>
-    <div id="admin-events"></div>
+      <div class="label" style="margin-top:14px">Skapa speldag</div>
+      <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
+      <input type="date" id="ev-date">
+      <input type="text" id="ev-courts" placeholder="Banor (valfritt – sätts annars vid lottningen)">
+      <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
+      <button class="btn alt" onclick="skapaSpeldag()">Skapa / uppdatera speldag</button>
+      <div id="ev-msg" class="muted" style="margin-top:8px"></div>
 
-    <div class="label" style="margin-top:20px">Lägg till spelare</div>
-    <input type="text" id="np-name" placeholder="Namn">
-    <input type="text" id="np-phone" placeholder="Telefon (PIN = 4 sista)">
-    <input type="text" id="np-email" placeholder="E-post (valfritt)">
-    <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
-    <div id="np-msg" class="muted" style="margin-top:8px"></div>
+      <div class="label" style="margin-top:20px">Speldagar</div>
+      <div id="admin-events"></div>
 
-    <div class="label" style="margin-top:20px">Deltagare (ranking)</div>
-    <div id="admin-players"></div>
+      <div class="label" style="margin-top:20px">Lägg till spelare</div>
+      <input type="text" id="np-name" placeholder="Namn">
+      <input type="text" id="np-phone" placeholder="Telefon (PIN = 4 sista)">
+      <input type="text" id="np-email" placeholder="E-post (valfritt)">
+      <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
+      <div id="np-msg" class="muted" style="margin-top:8px"></div>
 
-    <div class="label" style="margin-top:20px">Väntande intresseanmälningar</div>
-    <button class="btn alt" onclick="loadJoins()">Visa ansökningar</button>
-    <div id="joins-list" style="margin-top:10px"></div>
+      <div class="label" style="margin-top:20px">Deltagare (ranking)</div>
+      <div id="admin-players"></div>
+
+      <div class="label" style="margin-top:20px">Väntande intresseanmälningar</div>
+      <button class="btn alt" onclick="loadJoins()">Visa ansökningar</button>
+      <div id="joins-list" style="margin-top:10px"></div>
+    </div>
   </div>
 </div>
 
@@ -314,6 +327,22 @@ async function login(){
   catch(e){ err.textContent='Fel: '+(e.message||e); err.classList.remove('hidden'); }
 }
 function logout(){ me=null; render(); }
+async function adminLogin(){
+  const pw=document.getElementById('admin-pw').value.trim();
+  const err=document.getElementById('admin-login-err');
+  if(!pw){ err.textContent='Ange adminlösenord.'; return; }
+  err.textContent='Kontrollerar…';
+  try{
+    const ok=await BTS.adminCheck(pw);
+    if(ok){ document.getElementById('admin-login').classList.add('hidden'); document.getElementById('admin-body').classList.remove('hidden'); err.textContent=''; }
+    else { err.textContent='Fel adminlösenord.'; }
+  }catch(e){ err.textContent='Fel: '+(e.message||e); }
+}
+function adminLogout(){
+  document.getElementById('admin-body').classList.add('hidden');
+  document.getElementById('admin-login').classList.remove('hidden');
+  const pw=document.getElementById('admin-pw'); if(pw) pw.value='';
+}
 async function toggleSignup(date,on){
   try{ if(on) await BTS.addSignup(COMP,date,me.id,me._pin); else await BTS.removeSignup(COMP,date,me.id,me._pin); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
