@@ -419,6 +419,18 @@ function showTab(name,el){
 
 load();
 setInterval(()=>{ if(window.BTS&&BTS.ready()) load(); }, 60000);
+
+// Direktlänk till sommarstege-admin: #admin öppnar panelen och fokuserar lösenordsfältet
+function openAdminFromHash(){
+  if(location.hash!=='#admin') return;
+  const p=document.getElementById('admin-panel');
+  if(!p) return;
+  p.classList.remove('hidden');
+  const pw=document.getElementById('admin-pw');
+  if(pw){ setTimeout(()=>{ try{ pw.scrollIntoView({behavior:'smooth',block:'center'}); }catch(e){} pw.focus(); }, 250); }
+}
+openAdminFromHash();
+window.addEventListener('hashchange', openAdminFromHash);
 </script>
 </body>
 </html>
