@@ -672,26 +672,7 @@ function renderApp(){
 
   // Current match
   if(seasonDone){
-    html+=`
-    <div class="section">
-      <div class="section-label">Säsongen är avslutad</div>
-      <div class="ss-wrap">
-        <div class="ss-card">
-          <div class="rays"></div>
-          <div class="vig"></div>
-          <div class="suns"></div>
-          <div class="court"><div class="pline base"></div><div class="pline side"></div></div>
-          <div class="ss-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">SÄSONG 2026</span></div>
-          <div class="ss-logo"><span class="line" style="color:var(--navy)">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
-          <div class="frame"></div>
-        </div>
-        <div class="ss-text">
-          <h3>Sommarstegen 2026</h3>
-          <p>Vårstegen är spelad! 🎾 I sommar kör vi en stege på söndagar från 21 juni. Anmäl dig så är du med från start.</p>
-          <a href="sommarstege.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center">Anmäl dig till sommarstegen →</a>
-        </div>
-      </div>
-    </div>`;
+    /* Mellan säsonger: ingen rapportering. Sommarstege-CTA visas längst ned, efter profilen. */
   } else if(!match){
     html+=`<div class="section"><div style="color:var(--muted2);font-size:15px;padding:16px 0">Ingen match hittad för omgång ${round}.</div></div>`;
   } else if(myReport&&myReport.status!=='disputed'){
@@ -858,6 +839,30 @@ function renderApp(){
       </div>
     </div>
   </div>`;
+
+  // Mellan säsonger: sommarstege-anmälan längst ned
+  if(seasonDone){
+    html+=`
+    <div class="section">
+      <div class="section-label">Nästa: Sommarstegen</div>
+      <div class="ss-wrap">
+        <div class="ss-card">
+          <div class="rays"></div>
+          <div class="vig"></div>
+          <div class="suns"></div>
+          <div class="court"><div class="pline base"></div><div class="pline side"></div></div>
+          <div class="ss-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">SÄSONG 2026</span></div>
+          <div class="ss-logo"><span class="line" style="color:var(--navy)">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
+          <div class="frame"></div>
+        </div>
+        <div class="ss-text">
+          <h3>Sommarstegen 2026</h3>
+          <p>Vårstegen är spelad! 🎾 I sommar kör vi en stege på söndagar från 21 juni. Anmäl dig så är du med från start.</p>
+          <a href="sommarstege.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center">Anmäl dig till sommarstegen →</a>
+        </div>
+      </div>
+    </div>`;
+  }
 
   main.innerHTML=html;
 
