@@ -22,7 +22,7 @@
   .nav-links a{ font-size:14px; font-weight:500; color:var(--muted2); transition:color .15s; }
   .nav-links a:hover{ color:var(--white); }
   .nav-cta{ font-family:var(--font-mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
-    color:var(--o1); border:1px solid var(--o1); padding:9px 16px; }
+    color:var(--o1); border:1px solid var(--o1); padding:9px 16px; white-space:nowrap; }
   .nav-cta:hover{ background:var(--o1); color:#0C140B; }
 
   /* ---------------- HERO ---------------- */
@@ -180,8 +180,18 @@
     .foot-grid{ grid-template-columns:1fr; gap:34px; }
     .hero-sub{ font-size:18px; }
     .sec-lead{ font-size:17px; }
-    .nav-cta{ font-size:11px; padding:8px 13px; }
+    .nav-links{ gap:10px; }
+    .nav-cta{ font-size:11px; letter-spacing:1px; padding:8px 12px; }
     .foot-bottom{ font-size:11px; }
+  }
+  @media (max-width:520px){
+    .nav-in{ height:58px; }
+    .brand{ gap:9px; }
+    .brand .mark{ height:36px; }
+    .brand .bt-name{ font-size:14px; }
+    .brand .bt-sub{ display:none; }
+    .nav-links{ gap:6px; }
+    .nav-cta{ font-size:10px; letter-spacing:.5px; padding:6px 9px; }
   }
   @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; } .scroll-hint .bar{ animation:none; } }
 </style>
