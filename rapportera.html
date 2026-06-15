@@ -20,6 +20,38 @@
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px}
 
+/* ── SOMMARSTEGE-CTA (visas mellan säsonger när inget är lottat) ── */
+.ss-wrap{max-width:520px;margin:0 auto}
+.ss-card{position:relative;aspect-ratio:16/10;min-height:300px;overflow:hidden;background:#F4861E;border:1px solid var(--border)}
+.ss-card .rays{position:absolute;inset:-20%;background:repeating-conic-gradient(from -8deg at 90% 10%, #FFC559 0deg 9deg, #F0791A 9deg 18deg);opacity:.96}
+.ss-card .vig{position:absolute;inset:0;background:radial-gradient(120% 110% at 90% 10%, transparent 40%, rgba(120,40,0,.42) 100%)}
+.ss-card .suns{position:absolute;left:90%;top:10%;width:74px;height:74px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 50% 45%, #FFF4CE 0%, #FFE48A 60%, #FFD45E 100%);z-index:2;animation:ssSun 4s ease-in-out infinite}
+@keyframes ssSun{0%,100%{box-shadow:0 0 0 4px rgba(255,244,206,.3),0 0 34px rgba(255,228,138,.55)}50%{box-shadow:0 0 0 6px rgba(255,244,206,.4),0 0 48px rgba(255,228,138,.72)}}
+.ss-card .frame{position:absolute;inset:12px;border:1.5px solid rgba(255,247,226,.5);pointer-events:none;z-index:4}
+.ss-card .court{position:absolute;inset:0;transform:perspective(780px) rotateX(42deg) rotateZ(-5deg);transform-origin:56% 82%;z-index:1;pointer-events:none}
+.ss-card .court .pline{position:absolute;background:var(--court-line)}
+.ss-card .court .base{left:-16%;right:-22%;top:74%;height:24px}
+.ss-card .court .side{left:55%;top:54%;bottom:24%;width:24px}
+.ss-burst{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-6deg);z-index:5;width:150px;height:150px;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;clip-path:polygon(50% 0%,61% 13%,79% 8%,79% 27%,96% 30%,86% 46%,100% 59%,83% 65%,87% 83%,69% 79%,60% 96%,50% 82%,40% 96%,31% 79%,13% 83%,17% 65%,0% 59%,14% 46%,4% 30%,21% 27%,21% 8%,39% 13%)}
+.ss-burst .s1{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#FFE07A}
+.ss-burst .s2{font-family:'Anton',sans-serif;font-size:24px;line-height:.86;text-transform:uppercase;text-align:center;color:#fff}
+.ss-burst .s3{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;margin-top:3px;color:rgba(255,247,226,.7)}
+.ss-logo{position:absolute;right:18px;bottom:16px;z-index:6;text-align:right}
+.ss-logo .line{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:.82;transform:skewX(-8deg);display:block;font-size:22px}
+.ss-text{text-align:center;padding:22px 6px 4px}
+.ss-text h3{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1px;color:var(--white);margin-bottom:8px}
+.ss-text p{color:var(--muted);font-size:15px;line-height:1.6;max-width:420px;margin:0 auto 18px}
+@media (prefers-reduced-motion:reduce){.ss-card .suns{animation:none}}
+
+/* ── PROFIL-FÖRHANDSVISNING (liknar det publika spelarkortet) ── */
+.pf-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:22px 18px;margin-bottom:18px}
+.pf-avatar{width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--clay);box-shadow:0 0 0 4px rgba(255,140,66,.12)}
+.pf-avatar.empty{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border2);box-shadow:none;background:rgba(255,255,255,.03)}
+.pf-avatar.empty span{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.pf-name{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;color:var(--white);margin-top:14px}
+.pf-rank{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--clay);text-transform:uppercase;margin-top:2px}
+.pf-hint{font-size:12px;color:var(--muted);margin-top:8px}
+
 /* ── LOGIN ── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0D2A1D 0%,var(--bg) 70%)}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:36px 28px;width:100%;max-width:380px;text-align:center}
@@ -368,9 +400,10 @@ function savePending(d){if(DBC)return;localStorage.setItem(sk('bts_pending'),JSO
 async function refreshDBC(){
   if(!window.BTS||!BTS.ready())return false;
   const comp=currentSeason||'VT2026';
-  const [allPlayers,ladderRows,matchRows]=await Promise.all([
-    BTS.getPlayers(),BTS.getLadder(comp),BTS.getMatches(comp)
+  const [allPlayers,ladderRows,matchRows,comps]=await Promise.all([
+    BTS.getPlayers(),BTS.getLadder(comp),BTS.getMatches(comp),BTS.getCompetitions().catch(()=>[])
   ]);
+  const finished=!!((comps||[]).find(c=>c.id===comp)?.finished);
   if(!allPlayers.length||!ladderRows.length)return false;
   const nameById={}; allPlayers.forEach(p=>nameById[p.id]=p.name);
   const posByPid={}; ladderRows.forEach(l=>posByPid[l.player_id]=l.position);
@@ -393,7 +426,7 @@ async function refreshDBC(){
       status:m.status,
     };
   });
-  DBC={players,ladderIds,currentRound,matches:matchRows,pending,nameById,allPlayers};
+  DBC={players,ladderIds,currentRound,matches:matchRows,pending,nameById,allPlayers,finished};
   return true;
 }
 // Hitta databas-matchens id för en viss omgång+key
@@ -419,6 +452,7 @@ function dbProfileForMe(){
     since:row.since_year||local.since||'',
     bio:row.bio||local.bio||'',
     email:local.email||'',
+    photo:row.photo_url||local.photo||'',
   };
 }
 
@@ -599,6 +633,7 @@ function renderApp(){
   const isReadOnly=currentSeason!==activeSeason;
   const pending=isReadOnly?null:getPendingForMe();
   const myReport=isReadOnly?null:myReportStatus();
+  const seasonDone=!isReadOnly && !!(DBC&&DBC.finished);
   const main=document.getElementById('app-main');
   let html='';
 
@@ -615,7 +650,7 @@ function renderApp(){
   }
 
   // Pending confirmation
-  if(pending){
+  if(pending && !seasonDone){
     html+=`
     <div class="section">
       <div class="section-label">Bekräfta match</div>
@@ -636,7 +671,28 @@ function renderApp(){
   }
 
   // Current match
-  if(!match){
+  if(seasonDone){
+    html+=`
+    <div class="section">
+      <div class="section-label">Säsongen är avslutad</div>
+      <div class="ss-wrap">
+        <div class="ss-card">
+          <div class="rays"></div>
+          <div class="vig"></div>
+          <div class="suns"></div>
+          <div class="court"><div class="pline base"></div><div class="pline side"></div></div>
+          <div class="ss-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">SÄSONG 2026</span></div>
+          <div class="ss-logo"><span class="line" style="color:var(--navy)">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
+          <div class="frame"></div>
+        </div>
+        <div class="ss-text">
+          <h3>Sommarstegen 2026</h3>
+          <p>Vårstegen är spelad! 🎾 I sommar kör vi en stege på söndagar från 21 juni. Anmäl dig så är du med från start.</p>
+          <a href="sommarstege.html" class="submit-btn" style="display:block;text-decoration:none;text-align:center">Anmäl dig till sommarstegen →</a>
+        </div>
+      </div>
+    </div>`;
+  } else if(!match){
     html+=`<div class="section"><div style="color:var(--muted2);font-size:15px;padding:16px 0">Ingen match hittad för omgång ${round}.</div></div>`;
   } else if(myReport&&myReport.status!=='disputed'){
     html+=`
@@ -764,6 +820,13 @@ function renderApp(){
   html+=`
   <div class="section">
     <div class="section-label">Min profil</div>
+    ${(function(){const myRank=getLadder().indexOf(me.id)+1;return `
+    <div class="pf-card">
+      <div class="pf-avatar ${prof.photo?'':'empty'}" ${prof.photo?`style="background-image:url('${prof.photo}')"`:''}>${prof.photo?'':'<span>Ingen bild</span>'}</div>
+      <div class="pf-name">${me.name}</div>
+      ${myRank>0?`<div class="pf-rank">#${myRank} på stegen</div>`:''}
+      ${prof.photo?'':`<div class="pf-hint">Du har ingen profilbild än — ladda upp en nedan 👇</div>`}
+    </div>`;})()}
     <div class="profile-form">
       <div class="form-row"><label class="form-label">E-post (för notiser, hålls privat)</label><input class="form-input" id="p-email" type="email" value="${prof.email||''}" placeholder="namn@exempel.se"></div>
       <div class="form-row"><label class="form-label">Profilbild (syns för alla på stegen)</label><input class="form-input" id="p-photo" type="file" accept="image/*" onchange="uploadPhoto(this)"><div id="p-photo-status" class="form-label" style="margin-top:4px"></div></div>
@@ -1028,6 +1091,7 @@ async function uploadPhoto(input){
     const url=await BTS.uploadAvatar(me.id,f);
     await BTS.setPhoto(me.id,me._pin,url);
     if(st)st.textContent='✓ Bild sparad — syns för alla på stegen.';
+    await refreshDBC(); renderApp();
   }catch(e){ if(st)st.textContent='Fel: '+(e.message||e); }
 }
 function savePin(){
