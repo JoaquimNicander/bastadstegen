@@ -24,6 +24,8 @@
   .nav-cta{ font-family:var(--font-mono); font-size:12px; letter-spacing:2px; text-transform:uppercase;
     color:var(--o1); border:1px solid var(--o1); padding:9px 16px; white-space:nowrap; }
   .nav-cta:hover{ background:var(--o1); color:#0C140B; }
+  html,body{ overflow-x:hidden; max-width:100%; }
+  .nav-in{ max-width:100%; }
 
   /* ---------------- HERO ---------------- */
   .hero{ min-height:100vh; position:relative; overflow:hidden; display:flex; align-items:center;
@@ -186,12 +188,16 @@
   }
   @media (max-width:520px){
     .nav-in{ height:58px; }
-    .brand{ gap:9px; }
-    .brand .mark{ height:36px; }
-    .brand .bt-name{ font-size:14px; }
+    .brand{ gap:8px; }
+    .brand .mark{ height:34px; }
+    .brand .bt-name{ font-size:13px; }
     .brand .bt-sub{ display:none; }
     .nav-links{ gap:6px; }
-    .nav-cta{ font-size:10px; letter-spacing:.5px; padding:6px 9px; }
+    .nav-cta{ font-size:9px; letter-spacing:.3px; padding:6px 8px; }
+  }
+  @media (max-width:400px){
+    .brand .bt-name{ display:none; }
+    .nav-cta{ font-size:9px; padding:6px 7px; }
   }
   @media (prefers-reduced-motion:reduce){ .reveal{ opacity:1; transform:none; } .scroll-hint .bar{ animation:none; } }
 </style>
