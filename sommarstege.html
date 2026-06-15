@@ -263,7 +263,16 @@ function renderAdminEvents(){
     const pill=isDraft?'<span class="pill">utkast – ej publicerad</span>':isPub?'<span class="pill drawn">publicerad</span>':'';
     let out=`<div class="ev">
       <div class="ev-name">${e.name}</div>
-      <div class="ev-meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts||'—'} · ${cnt} anmälda ${pill}</div>`;
+      <div class="ev-meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts||'—'} · ${cnt} anmälda ${pill}</div>
+      <div style="margin-top:8px">
+        <button class="btn sm alt" onclick="var d=document.getElementById('ee-${e.id}');d.style.display=d.style.display==='flex'?'none':'flex';">✎ Ändra namn/tid/banor</button>
+        <div id="ee-${e.id}" style="display:none;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px">
+          <input id="ee-name-${e.id}" value="${(e.name||'').replace(/"/g,'&quot;')}" placeholder="Namn" style="flex:1;min-width:120px">
+          <input id="ee-time-${e.id}" value="${e.start_time||''}" placeholder="Tid t.ex. 10:00" style="width:120px">
+          <input id="ee-courts-${e.id}" value="${(e.courts||'').replace(/"/g,'&quot;')}" placeholder="Banor t.ex. 1,2,3" style="width:130px">
+          <button class="btn sm green" onclick="editEvent('${e.id}')">Spara</button>
+        </div>
+      </div>`;
     if(!isDraft && !isPub){
       const ids=signupsFor(e.play_date).map(s=>s.player_id);
       const avail=players.filter(p=>p.active!==false && !ids.includes(p.id));
@@ -389,6 +398,14 @@ async function deleteEvent(id){
   const pw=document.getElementById('admin-pw').value;
   if(!confirm('Ta bort speldagen?')) return;
   try{ await BTS.adminDeleteEvent(pw,id); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function editEvent(id){
+  const pw=document.getElementById('admin-pw').value;
+  const name=document.getElementById('ee-name-'+id)?.value||'';
+  const startTime=document.getElementById('ee-time-'+id)?.value||'';
+  const courts=document.getElementById('ee-courts-'+id)?.value||'';
+  try{ await BTS.adminUpdateEvent(pw,id,{name,courts,startTime}); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function addPlayer(){

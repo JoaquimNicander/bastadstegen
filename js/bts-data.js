@@ -478,6 +478,14 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_delete_event', { p_admin_pw: adminPw, p_event_id: eventId });
     if (error) throw error;
   },
+  // Redigera en speldag (namn/banor/tid) — funkar även efter publicering
+  async adminUpdateEvent(adminPw, eventId, { name, courts, startTime } = {}) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_update_event', {
+      p_admin_pw: adminPw, p_event_id: eventId,
+      p_name: name || '', p_courts: courts || '', p_start_time: startTime || '' });
+    if (error) throw error;
+  },
   // Lotta en speldag (banor/tid hämtas från eventet). Returnerar antal matcher.
   async adminDrawWeek(adminPw, competitionId, playDate, courts) {
     _assert();
