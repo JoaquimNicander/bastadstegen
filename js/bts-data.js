@@ -393,6 +393,12 @@ const BTS = {
     const { error } = await _sb.rpc('bts_set_email', { p_player_id: playerId, p_pin: pin, p_email: email || '' });
     if (error) throw error;
   },
+  // Spelare uppdaterar sitt eget mobilnummer (PIN-skyddat)
+  async setPhone(playerId, pin, phone) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_phone', { p_player_id: playerId, p_pin: pin, p_phone: phone || '' });
+    if (error) throw error;
+  },
 
   // Spelare läser sin egen mejladress (PIN-skyddat, hålls privat)
   async getEmail(playerId, pin) {

@@ -453,6 +453,7 @@ function dbProfileForMe(){
     bio:row.bio||local.bio||'',
     email:local.email||'',
     photo:row.photo_url||local.photo||'',
+    phone:row.phone||'',
   };
 }
 
@@ -810,6 +811,7 @@ function renderApp(){
     </div>`;})()}
     <div class="profile-form">
       <div class="form-row"><label class="form-label">E-post (för notiser, hålls privat)</label><input class="form-input" id="p-email" type="email" value="${prof.email||''}" placeholder="namn@exempel.se"></div>
+      <div class="form-row"><label class="form-label">Mobilnummer (för notiser, hålls privat)</label><input class="form-input" id="p-phone" type="tel" inputmode="tel" value="${prof.phone||''}" placeholder="07XX XXX XX XX"></div>
       <div class="form-row"><label class="form-label">Profilbild (syns för alla på stegen)</label><input class="form-input" id="p-photo" type="file" accept="image/*" onchange="uploadPhoto(this)"><div id="p-photo-status" class="form-label" style="margin-top:4px"></div></div>
       <div class="form-row"><label class="form-label">Född (åå-mm-dd)</label><input class="form-input" id="p-born" type="date" value="${prof.born||''}"></div>
       <div class="form-row"><label class="form-label">Spelhand</label>
@@ -1061,6 +1063,7 @@ function launchConfetti(){
 // ── PROFILE ───────────────────────────────────────────────────
 async function saveMyProfile(btn){
   const email=document.getElementById('p-email')?.value||'';
+  const phone=document.getElementById('p-phone')?.value||'';
   const data={
     born:document.getElementById('p-born')?.value||'',
     hand:document.getElementById('p-hand')?.value||'',
@@ -1080,6 +1083,8 @@ async function saveMyProfile(btn){
       await BTS.setProfile(me.id, me._pin, data);
       // Mejlen sparas separat (privat) om angiven
       if(email.trim()) await BTS.setEmail(me.id, me._pin, email.trim());
+      // Mobilnumret sparas separat (PIN-skyddat)
+      await BTS.setPhone(me.id, me._pin, phone.trim());
       await refreshDBC().catch(()=>{});
     }
     if(btn){btn.textContent='Sparad! ✓';setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2000);}
