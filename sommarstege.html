@@ -235,13 +235,25 @@ function renderMatcher(){
       return `<div class="ev" style="padding:14px 16px">
         ${(m.court||m.start_time)?`<div class="court">${m.court?`Bana ${m.court}`:''}${m.court&&m.start_time?' · ':''}${m.start_time?`kl ${m.start_time}`:''}</div>`:''}
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
-        ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · ${m.status==='confirmed'?'bekräftad':'rapporterad'}</div>`:''}
+        ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · klar</div>`:''}
         ${(!m.winner_id && m.deferred)?`<div style="text-align:center;margin-top:8px;background:rgba(193,120,73,.16);border:1px solid var(--clay);border-radius:8px;padding:9px;color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
         ${(!m.winner_id && (canReport||isAdmin()))?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>`:''}
-        ${canReport?`<div style="margin-top:10px">
-          <select id="win-${m.id}"><option value="">Vinnare…</option><option value="${m.player_a_id}">${nameById(m.player_a_id)}</option><option value="${m.player_b_id}">${nameById(m.player_b_id)}</option></select>
-          <input id="sc-${m.id}" placeholder="Resultat, t.ex. 6-4 6-3 (valfritt)">
-          <button class="btn" onclick="reportDropin('${m.id}')">Rapportera</button></div>`:''}
+        ${canReport?`<div style="margin-top:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;text-align:center;margin-bottom:8px">Set-resultat</div>
+          ${['s1','s2'].map(s=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);width:28px">${s.toUpperCase()}</span>
+            <input id="${s}a-${m.id}" type="number" min="0" max="7" inputmode="numeric" placeholder="0" oninput="autoWin('${m.id}','${m.player_a_id}','${m.player_b_id}')" style="flex:1;text-align:center;font-size:18px;font-weight:700">
+            <span style="color:var(--muted2)">–</span>
+            <input id="${s}b-${m.id}" type="number" min="0" max="7" inputmode="numeric" placeholder="0" oninput="autoWin('${m.id}','${m.player_a_id}','${m.player_b_id}')" style="flex:1;text-align:center;font-size:18px;font-weight:700"></div>`).join('')}
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--clay);width:28px">STB</span>
+            <input id="stba-${m.id}" type="number" min="0" max="20" inputmode="numeric" placeholder="–" oninput="autoWin('${m.id}','${m.player_a_id}','${m.player_b_id}')" style="flex:1;text-align:center;font-size:18px;font-weight:700;color:var(--clay)">
+            <span style="color:var(--muted2)">–</span>
+            <input id="stbb-${m.id}" type="number" min="0" max="20" inputmode="numeric" placeholder="–" oninput="autoWin('${m.id}','${m.player_a_id}','${m.player_b_id}')" style="flex:1;text-align:center;font-size:18px;font-weight:700;color:var(--clay)"></div>
+          <div id="aw-${m.id}" style="text-align:center;font-weight:700;font-size:14px;margin:8px 0;min-height:18px;color:var(--muted2)"></div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+            <button class="btn sm alt" onclick="reportDropinWO('${m.id}','${m.player_a_id}')">WO – ${nameById(m.player_a_id)}</button>
+            <button class="btn sm alt" onclick="reportDropinWO('${m.id}','${m.player_b_id}')">WO – ${nameById(m.player_b_id)}</button>
+          </div>
+          <button class="btn" style="width:100%" onclick="reportDropin('${m.id}','${m.player_a_id}','${m.player_b_id}')">Rapportera resultat →</button></div>`:''}
       </div>`;
     }).join('')+`</div>`;
   }).join('');
@@ -252,18 +264,24 @@ function renderStallning(){
   const el=document.getElementById('view-stallning');
   // Drop-in: ställningen byggs upp av dem som faktiskt spelat i sommar.
   // Ingen är med automatiskt — man måste anmäla sig och spela.
+  // Poängserie: vinst = 3 p, förlust = 1 p (spelad match). Missad vecka = 0 p, inget straff.
+  const WIN_P=3, LOSS_P=1;
   const wl={};
   matches.forEach(m=>{ if(!m.winner_id)return; const lo=m.winner_id===m.player_a_id?m.player_b_id:m.player_a_id;
-    wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0}; wl[m.winner_id].w++; wl[lo]=wl[lo]||{w:0,l:0}; wl[lo].l++; });
+    wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0,p:0}; wl[m.winner_id].w++; wl[m.winner_id].p+=WIN_P;
+    wl[lo]=wl[lo]||{w:0,l:0,p:0}; wl[lo].l++; wl[lo].p+=LOSS_P; });
   const ids=Object.keys(wl).map(Number);
   if(!ids.length){
-    el.innerHTML=`<div class="label">Sommarställning</div>
-      <div class="muted" style="padding:20px 4px;line-height:1.6">Ställningen byggs upp efterhand som matcher spelas.<br>Anmäl dig till en speldag för att vara med!</div>`;
+    el.innerHTML=`<div class="label">Sommarserien · ställning</div>
+      <div class="muted" style="padding:20px 4px;line-height:1.6">Ställningen byggs upp efterhand som matcher spelas.<br>Vinst ger 3 poäng, spelad match 1 poäng — dyk upp och spela för att klättra!</div>`;
     return;
   }
-  ids.sort((a,b)=> (wl[b].w-wl[a].w) || (wl[a].l-wl[b].l) || nameById(a).localeCompare(nameById(b)));
-  el.innerHTML=`<div class="label">Sommarställning</div>`+
-    ids.map((id,i)=>{ const s=wl[id]; return `<div class="row"><div class="rank">${i+1}</div><div class="nm">${nameById(id)}</div><div class="meta">${s.w}V – ${s.l}F</div></div>`;}).join('');
+  const pct=s=>{ const pl=s.w+s.l; return pl?Math.round(s.w/pl*100):0; };
+  ids.sort((a,b)=> (wl[b].p-wl[a].p) || (pct(wl[b])-pct(wl[a])) || (wl[b].w-wl[a].w) || nameById(a).localeCompare(nameById(b)));
+  el.innerHTML=`<div class="label">Sommarserien · ställning</div>`
+    +`<div class="row" style="opacity:.6"><div class="rank">#</div><div class="nm" style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase">Spelare</div><div class="meta" style="font-family:'Space Mono',monospace;font-size:11px;text-align:right">Vinst-%<br>Poäng</div></div>`
+    +ids.map((id,i)=>{ const s=wl[id]; const played=s.w+s.l;
+        return `<div class="row${i===0?' top':''}"><div class="rank">${i+1}</div><div class="nm">${nameById(id)}<div class="meta" style="font-size:11px;opacity:.7">${played} spelade · ${s.w}V–${s.l}F</div></div><div style="text-align:right"><div class="meta" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">${pct(s)}%</div><div class="meta" style="font-family:'Anton',sans-serif;font-size:22px;color:var(--clay)">${s.p}</div></div></div>`;}).join('');
 }
 
 // ── ADMIN: speldagslista ──
@@ -359,10 +377,30 @@ async function deferMatch(id,on){
     await load();
   }catch(e){ alert('Fel: '+(e.message||e)); }
 }
-async function reportDropin(id){
-  const winnerId=parseInt(document.getElementById('win-'+id).value)||null, score=document.getElementById('sc-'+id).value;
-  if(!winnerId){ alert('Välj vinnare'); return; }
-  try{ await BTS.reportResult(id,{playerId:me.id,pin:me._pin,winnerId,sets:[],wo:false,score}); await load(); }
+function dropinSets(id){
+  const g=k=>{const e=document.getElementById(k+'-'+id);return e&&e.value!==''?parseInt(e.value):null;};
+  const out=[];
+  if(g('s1a')!=null&&g('s1b')!=null) out.push({a:g('s1a'),b:g('s1b')});
+  if(g('s2a')!=null&&g('s2b')!=null) out.push({a:g('s2a'),b:g('s2b')});
+  if(g('stba')!=null&&g('stbb')!=null) out.push({a:g('stba'),b:g('stbb'),super:true});
+  return out;
+}
+function winnerFromSets(sets,aId,bId){ let a=0,b=0; sets.forEach(s=>{ if(s.a>s.b)a++; else if(s.b>s.a)b++; }); return a>b?aId:(b>a?bId:null); }
+function autoWin(id,aId,bId){
+  const sets=dropinSets(id), w=winnerFromSets(sets,aId,bId), el=document.getElementById('aw-'+id); if(!el)return;
+  if(w){ el.textContent='✓ Vinnare: '+nameById(w); el.style.color='#4CAF50'; }
+  else { el.textContent=sets.length?'Oavgjort – lägg till ett avgörande set/STB':''; el.style.color='var(--muted2)'; }
+}
+async function reportDropin(id,aId,bId){
+  const sets=dropinSets(id), w=winnerFromSets(sets,aId,bId);
+  if(!w){ alert('Fyll i set-resultaten så vinnaren blir tydlig (eller använd WO).'); return; }
+  const score=sets.map(s=>s.a+'-'+s.b).join(' ');
+  try{ await BTS.reportResult(id,{playerId:me.id,pin:me._pin,winnerId:w,sets,wo:false,score}); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function reportDropinWO(id,winnerId){
+  if(!confirm('Rapportera WO-vinst till '+nameById(winnerId)+'?')) return;
+  try{ await BTS.reportResult(id,{playerId:me.id,pin:me._pin,winnerId,sets:[],wo:true,score:'WO'}); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function requestJoin(){
