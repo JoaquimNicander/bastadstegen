@@ -142,7 +142,14 @@ async function load(){
     ]);
   }catch(e){ console.warn(e); }
   render();
+  // Första gången: landa direkt på Matcher om det finns en publicerad lottning
+  if(firstLoad){
+    firstLoad=false;
+    const hasPublished = events.some(e=>e.status==='published') && matches.some(m=>m.play_date);
+    if(hasPublished){ const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
+  }
 }
+let firstLoad=true;
 function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderAdminEvents(); renderAdminPlayers(); }
 let spEditId=null;
 function renderAdminPlayers(){
