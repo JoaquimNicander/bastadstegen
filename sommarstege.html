@@ -234,6 +234,7 @@ function renderMatcher(){
       const canReport=me&&(m.player_a_id===me.id||m.player_b_id===me.id)&&!m.winner_id;
       return `<div class="ev" style="padding:14px 16px">
         ${(m.court||m.start_time)?`<div class="court">${m.court?`Bana ${m.court}`:''}${m.court&&m.start_time?' · ':''}${m.start_time?`kl ${m.start_time}`:''}</div>`:''}
+        ${(!m.court && !m.winner_id)?`<div style="text-align:center;margin-bottom:8px"><span class="pill" style="color:var(--clay);border-color:var(--clay)">⏳ Väntar på ledig bana</span></div>`:''}
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
         ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · klar</div>`:''}
         ${(!m.winner_id && m.deferred)?`<div style="text-align:center;margin-top:8px;background:rgba(193,120,73,.16);border:1px solid var(--clay);border-radius:8px;padding:9px;color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
@@ -328,7 +329,19 @@ function renderAdminEvents(){
         <button class="btn sm green" onclick="publishDraw('${e.play_date}')">Publicera</button>`;
     }
     if(isPub){
-      out+=`<button class="btn sm alt" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
+      const ms=matchesFor(e.play_date);
+      const courtList=(e.courts||'').split(',').map(x=>x.trim()).filter(Boolean);
+      const onCourt=ms.filter(m=>m.court);
+      const waiting=ms.filter(m=>!m.court);
+      out+=`<div class="label" style="margin:12px 0 6px">Matcher</div>`;
+      out+=onCourt.map(m=>`<div class="row"><div class="rank">${m.court}</div><div class="nm">${nameById(m.player_a_id)} vs ${nameById(m.player_b_id)}</div><span class="pill ${m.winner_id?'drawn':''}">${m.winner_id?'✓ klar':'spelas'}</span></div>`).join('')||'<div class="muted">Inga.</div>';
+      if(waiting.length){
+        out+=`<div class="label" style="margin:14px 0 6px;color:var(--clay)">⏳ Väntande matcher — sätt in när en bana blir ledig</div>`;
+        out+=waiting.map(m=>`<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><div class="nm" style="min-width:120px">${nameById(m.player_a_id)} vs ${nameById(m.player_b_id)}</div>
+          <select id="ac-${m.id}" style="width:96px">${courtList.map(c=>`<option value="${c}">Bana ${c}</option>`).join('')}</select>
+          <button class="btn sm green" onclick="assignCourt('${m.id}')">Sätt in</button></div>`).join('');
+      }
+      out+=`<button class="btn sm alt" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
     }
     out+=`<button class="btn sm alt" onclick="deleteEvent('${e.id}')">Ta bort</button></div>`;
     return out;
@@ -473,6 +486,13 @@ async function editEvent(id){
   const startTime=document.getElementById('ee-time-'+id)?.value||'';
   const courts=document.getElementById('ee-courts-'+id)?.value||'';
   try{ await BTS.adminUpdateEvent(pw,id,{name,courts,startTime}); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function assignCourt(id){
+  const pw=document.getElementById('admin-pw').value;
+  const sel=document.getElementById('ac-'+id); const court=sel&&sel.value;
+  if(!court){ alert('Välj en bana.'); return; }
+  try{ await BTS.adminAssignCourt(pw,id,court); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function addPlayer(){

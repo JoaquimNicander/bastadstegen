@@ -509,6 +509,13 @@ const BTS = {
       p_admin_pw: adminPw, p_match_id: matchId, p_player_a: playerAId, p_player_b: playerBId, p_court: court || null });
     if (error) throw error;
   },
+  // Sätt in en väntande match på en (nu ledig) bana — funkar även efter publicering
+  async adminAssignCourt(adminPw, matchId, court, startTime) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_assign_court', {
+      p_admin_pw: adminPw, p_match_id: matchId, p_court: court || '', p_start_time: startTime || '' });
+    if (error) throw error;
+  },
 
   // ── ADMIN: publicera omgång (flyttar stegen) ──────────────────────────
   // OBS: kräver admin-behörighet. Under nuvarande RLS skrivs inte
