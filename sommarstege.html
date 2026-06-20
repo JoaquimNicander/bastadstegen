@@ -145,6 +145,8 @@
 <script src="js/bts-data.js"></script>
 <script>
 const COMP='ST2026';
+const SMS_FN = "https://fueggdqtgmvldjbhcdfn.supabase.co/functions/v1/send-message";
+const SMS_PUBKEY = "sb_publishable_vZCnLnp41c29DFN7MLpYsQ_AUBnxJPy";
 let me=null, players=[], ladder=[], events=[], signupsAll=[], matches=[], tab='anmalan';
 
 function nameById(id){ const p=players.find(x=>x.id===id); return p?p.name:'#'+id; }
@@ -395,7 +397,8 @@ function renderAdminEvents(){
           <select id="ac-${m.id}" style="width:96px">${courtList.map(c=>`<option value="${c}">Bana ${c}</option>`).join('')}</select>
           <button class="btn sm green" onclick="assignCourt('${m.id}')">Sätt in</button></div>`).join('');
       }
-      out+=`<button class="btn sm alt" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
+      out+=`<button class="btn sm" style="margin-top:10px;background:#FF8C42" onclick="sendBesked('${e.play_date}')">📣 Meddela spelarna (SMS + mail)</button>
+        <button class="btn sm alt" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
     }
     if(isDraft || isPub){
       const sIds=signupsFor(e.play_date).map(s=>s.player_id);
@@ -556,6 +559,22 @@ async function assignCourt(id){
   if(!court){ alert('Välj en bana.'); return; }
   try{ await BTS.adminAssignCourt(pw,id,court); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function sendBesked(date){
+  const pw=document.getElementById('admin-pw').value;
+  const ms=matchesFor(date); if(!ms.length){ alert('Inga matcher att meddela om — lotta först.'); return; }
+  const round=ms[0].round;
+  const template="Hej [förnamn]! Lottningen i sommarstegen är klar — se din match på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
+  const base={adminPw:pw, channel:'both', audience:'new_round', template, competition:COMP, round};
+  const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+  try{
+    const dry=await post({...base,dryRun:true});
+    if(dry.error) throw new Error(dry.error);
+    if(!confirm('Skicka SMS + mail till '+dry.recipients+' spelare: "lottningen är klar, se din match"?')) return;
+    const res=await post(base);
+    if(res.error) throw new Error(res.error);
+    alert('Skickat!\nSMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)\nMail: '+res.email.sent+' ✓ ('+res.email.failed+' miss)');
+  }catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function addLate(date){
   const pw=document.getElementById('admin-pw').value;
