@@ -391,18 +391,25 @@ function renderAdminEvents(){
         <button class="btn sm green" onclick="publishDraw('${e.play_date}')">Publicera</button>`;
     }
     if(isPub){
-      const ms=matchesFor(e.play_date);
-      const courtList=(e.courts||'').split(',').map(x=>x.trim()).filter(Boolean);
-      const onCourt=ms.filter(m=>m.court);
-      const waiting=ms.filter(m=>!m.court);
-      out+=`<div class="label" style="margin:12px 0 6px">Matcher</div>`;
-      out+=onCourt.map(m=>`<div class="row"><div class="rank">${m.court}</div><div class="nm">${nameById(m.player_a_id)} vs ${nameById(m.player_b_id)}</div><span class="pill ${m.winner_id?'drawn':''}">${m.winner_id?'✓ klar':'spelas'}</span></div>`).join('')||'<div class="muted">Inga.</div>';
-      if(waiting.length){
-        out+=`<div class="label" style="margin:14px 0 6px;color:var(--clay)">⏳ Väntande matcher — sätt in när en bana blir ledig</div>`;
-        out+=waiting.map(m=>`<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center"><div class="nm" style="min-width:120px">${nameById(m.player_a_id)} vs ${nameById(m.player_b_id)}</div>
-          <select id="ac-${m.id}" style="width:96px">${courtList.map(c=>`<option value="${c}">Bana ${c}</option>`).join('')}</select>
-          <button class="btn sm green" onclick="assignCourt('${m.id}')">Sätt in</button></div>`).join('');
-      }
+      const ms=matchesFor(e.play_date).slice().sort((a,b)=>{
+        const na=parseInt(a.court), nb=parseInt(b.court);
+        const aw=isNaN(na), bw=isNaN(nb);
+        if(aw!==bw) return aw?1:-1;
+        return aw?0:(na-nb);
+      });
+      out+=`<div class="label" style="margin:12px 0 6px">Matcher — ändra bana/tid eller ta bort</div>`;
+      out+=ms.map(m=>{
+        const nm=nameById(m.player_a_id)+' vs '+nameById(m.player_b_id);
+        const wait=!m.court;
+        const tag=m.winner_id?' <span class="pill drawn">✓ klar</span>':(wait?' <span class="pill" style="color:var(--clay)">väntar</span>':'');
+        return `<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
+          <div class="nm" style="flex:1;min-width:130px">${nm}${tag}</div>
+          <input id="mcourt-${m.id}" value="${m.court||''}" placeholder="bana" style="width:58px" title="Bana (tomt = väntar)">
+          <input id="mtime-${m.id}" value="${m.start_time||''}" placeholder="tid" style="width:72px" title="Starttid">
+          <button class="btn sm green" onclick="saveMatch('${m.id}')">Spara</button>
+          <button class="btn sm alt" title="Ta bort match" data-nm="${nm.replace(/"/g,'&quot;')}" onclick="deleteMatch('${m.id}',this)">🗑</button>
+        </div>`;
+      }).join('')||'<div class="muted">Inga matcher.</div>';
       const dft="Hej [förnamn]! Lottningen i sommarstegen är klar — du möter [motståndare]. Se din bana och tid på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
       const _pv=dft.replace(/\[förnamn\]/g,'Anna').replace(/\[motståndare\]/g,'Erik');
       const _len=_pv.length, _parts=_len<=160?1:Math.ceil(_len/153);
@@ -571,6 +578,20 @@ async function assignCourt(id){
   const sel=document.getElementById('ac-'+id); const court=sel&&sel.value;
   if(!court){ alert('Välj en bana.'); return; }
   try{ await BTS.adminAssignCourt(pw,id,court); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function saveMatch(id){
+  const pw=document.getElementById('admin-pw').value;
+  const court=(document.getElementById('mcourt-'+id)||{}).value||'';
+  const time=(document.getElementById('mtime-'+id)||{}).value||'';
+  try{ await BTS.adminUpdateMatch(pw,id,court.trim(),time.trim()); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function deleteMatch(id, btn){
+  const pw=document.getElementById('admin-pw').value;
+  const nm=(btn&&btn.dataset&&btn.dataset.nm)||'matchen';
+  if(!confirm('Ta bort matchen '+nm+'?\nDetta går inte att ångra.')) return;
+  try{ await BTS.adminDeleteMatch(pw,id); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 function beskedCount(date){

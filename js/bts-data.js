@@ -516,6 +516,19 @@ const BTS = {
       p_admin_pw: adminPw, p_match_id: matchId, p_court: court || '', p_start_time: startTime || '' });
     if (error) throw error;
   },
+  // Ändra bana och/eller tid på en match (även efter publicering). Tom bana = väntande.
+  async adminUpdateMatch(adminPw, matchId, court, startTime) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_update_match', {
+      p_admin_pw: adminPw, p_match_id: matchId, p_court: court || '', p_start_time: startTime || '' });
+    if (error) throw error;
+  },
+  // Ta bort en enskild match
+  async adminDeleteMatch(adminPw, matchId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_delete_match', { p_admin_pw: adminPw, p_match_id: matchId });
+    if (error) throw error;
+  },
   // ── BETALNING (sommarstege) ──────────────────────────────────────
   async getPayments(competitionId) {
     _assert();
