@@ -75,6 +75,17 @@
   .sp-when .t{display:block;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:#2a1c0e;margin-top:7px;text-transform:uppercase;font-weight:700}
   .sp-logo{position:absolute;right:16px;bottom:14px;text-align:right;z-index:6}
   .sp-logo .line{display:block;line-height:.82;transform:skewX(-8deg);font-size:23px;text-transform:uppercase}
+  /* ── Min profil ── */
+  .pf-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:22px 18px;margin-bottom:16px}
+  .pf-avatar{width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--clay);box-shadow:0 0 0 4px rgba(255,140,66,.12)}
+  .pf-avatar.empty{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border2);box-shadow:none;background:rgba(255,255,255,.03)}
+  .pf-avatar.empty span{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .pf-name{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px;color:var(--cream);margin-top:12px}
+  .pf-hint{font-size:12px;color:var(--muted2);margin-top:8px}
+  .form-row{margin-bottom:12px}
+  .form-label{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  textarea{width:100%;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--white);font-size:15px;margin-bottom:8px;font-family:inherit;min-height:84px;resize:vertical}
+  .pin-row{display:flex;gap:10px;align-items:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:14px}
 </style>
 </head>
 <body>
@@ -90,11 +101,13 @@
     <button class="tab active" data-tab="anmalan" onclick="showTab('anmalan',this)">Anmälan</button>
     <button class="tab" data-tab="matcher" onclick="showTab('matcher',this)">Matcher</button>
     <button class="tab" data-tab="stallning" onclick="showTab('stallning',this)">Ställning</button>
+    <button class="tab" data-tab="profil" onclick="showTab('profil',this)">Min profil</button>
   </div>
 
   <div id="view-anmalan"></div>
   <div id="view-matcher" class="hidden"></div>
   <div id="view-stallning" class="hidden"></div>
+  <div id="view-profil" class="hidden"></div>
 
   <div class="admin-toggle" onclick="document.getElementById('admin-panel').classList.toggle('hidden')">⚙︎ Admin</div>
   <div id="admin-panel" class="panel hidden" style="margin-top:12px">
@@ -173,7 +186,7 @@ async function load(){
   }
 }
 let firstLoad=true;
-function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderAdminEvents(); renderAdminPlayers(); }
+function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderProfil(); renderAdminEvents(); renderAdminPlayers(); }
 let spEditId=null;
 function renderAdminPlayers(){
   const box=document.getElementById('admin-players'); if(!box) return;
@@ -648,9 +661,117 @@ async function loadJoins(){
 async function approveJoin(id){ const pw=document.getElementById('admin-pw').value; try{ await BTS.adminApproveJoin(pw,id); await load(); loadJoins(); }catch(e){ alert('Fel: '+(e.message||e)); } }
 async function rejectJoin(id){ const pw=document.getElementById('admin-pw').value; try{ await BTS.adminRejectJoin(pw,id); loadJoins(); }catch(e){ alert('Fel: '+(e.message||e)); } }
 
+// ── MIN PROFIL (delas med ordinarie stegen) ──
+function renderProfil(){
+  const el=document.getElementById('view-profil'); if(!el) return;
+  if(!me){
+    const opts=players.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+    el.innerHTML=`<div class="panel"><div class="label">Min profil</div>
+      <div class="muted" style="margin-bottom:14px">Logga in för att se och redigera din profil. Den delas med ordinarie stegen — foto och uppgifter syns på båda ställena.</div>
+      <div class="form-row"><label class="form-label">Ditt namn</label><select id="pf-login-name"><option value="">Välj ditt namn…</option>${opts}</select></div>
+      <div class="form-row"><label class="form-label">PIN (4 sista i mobilnr)</label><input id="pf-login-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+      <button class="btn" onclick="profilLogin()">Logga in</button>
+      <div id="pf-login-err" class="err hidden"></div></div>`;
+    return;
+  }
+  const row=players.find(p=>p.id===me.id)||{};
+  const photo=row.photo_url||'';
+  el.innerHTML=`<div class="panel">
+    <div class="label">Min profil</div>
+    <div class="muted" style="margin-bottom:14px">Allt du fyller i här delas med ordinarie stegen — ett ställe för all din info.</div>
+    <div class="pf-card">
+      <div class="pf-avatar ${photo?'':'empty'}" ${photo?`style="background-image:url('${photo}')"`:''}>${photo?'':'<span>Ingen bild</span>'}</div>
+      <div class="pf-name">${me.name}</div>
+      ${photo?'':`<div class="pf-hint">Ingen profilbild än — ladda upp en nedan 👇</div>`}
+    </div>
+    <div class="form-row"><label class="form-label">E-post (för notiser, hålls privat)</label><input id="p-email" type="email" placeholder="namn@exempel.se"></div>
+    <div class="form-row"><label class="form-label">Mobilnummer (för notiser, hålls privat)</label><input id="p-phone" type="tel" inputmode="tel" value="${row.phone||''}" placeholder="07XX XXX XX XX"></div>
+    <div class="form-row"><label class="form-label">Profilbild (syns för alla på stegen)</label><input id="p-photo" type="file" accept="image/*" onchange="uploadPhoto(this)"><div id="p-photo-status" class="muted" style="margin-top:4px"></div></div>
+    <div class="form-row"><label class="form-label">Född (åå-mm-dd)</label><input id="p-born" type="date" value="${row.born||''}"></div>
+    <div class="form-row"><label class="form-label">Spelhand</label>
+      <select id="p-hand"><option value="">Välj…</option>
+        <option value="Höger" ${row.hand==='Höger'?'selected':''}>Höger</option>
+        <option value="Vänster" ${row.hand==='Vänster'?'selected':''}>Vänster</option></select></div>
+    <div class="form-row"><label class="form-label">Hemort</label><input id="p-hometown" type="text" value="${row.hometown||''}" placeholder="Båstad"></div>
+    <div class="form-row"><label class="form-label">Favoritslag</label><input id="p-favshot" type="text" value="${row.fav_shot||''}" placeholder="Serve, BH, FH…"></div>
+    <div class="form-row"><label class="form-label">Favoritunderlag</label>
+      <select id="p-surface"><option value="">Välj…</option>
+        <option value="Grus" ${row.fav_surface==='Grus'?'selected':''}>Grus</option>
+        <option value="Hard" ${row.fav_surface==='Hard'?'selected':''}>Hard</option>
+        <option value="Gräs" ${row.fav_surface==='Gräs'?'selected':''}>Gräs</option>
+        <option value="Inomhus" ${row.fav_surface==='Inomhus'?'selected':''}>Inomhus</option></select></div>
+    <div class="form-row"><label class="form-label">På stegen sedan</label><input id="p-since" type="text" value="${row.since_year||''}" placeholder="2020"></div>
+    <div class="form-row"><label class="form-label">Om mig</label><textarea id="p-bio" placeholder="Berätta något kul om dig själv…">${row.bio||''}</textarea></div>
+    <button class="btn" onclick="saveMyProfile(this)">Spara profil →</button>
+    <div class="pin-row">
+      <div style="flex:1"><label class="form-label">Byt PIN-kod</label><input id="p-newpin" type="password" maxlength="4" inputmode="numeric" placeholder="Ny 4-siffrig PIN" style="margin-bottom:0"></div>
+      <button class="btn sm" onclick="savePin()">Byt</button>
+    </div>
+    <div style="text-align:center;margin-top:14px"><a href="#" onclick="logout();return false" style="color:var(--clay);font-size:13px;text-decoration:none">Logga ut</a></div>
+  </div>`;
+  if(me._pin && window.BTS){
+    BTS.getEmail(me.id, me._pin).then(v=>{ const elx=document.getElementById('p-email'); if(elx && v && !elx.value) elx.value=v; }).catch(()=>{});
+  }
+}
+async function profilLogin(){
+  const name=(document.getElementById('pf-login-name')||{}).value;
+  const pin=(document.getElementById('pf-login-pin')||{}).value;
+  const err=document.getElementById('pf-login-err');
+  const p=players.find(x=>x.name===name);
+  if(!p){ if(err){ err.textContent='Välj ditt namn.'; err.classList.remove('hidden'); } return; }
+  try{
+    if(await BTS.verifyPin(p.id,pin)){ me=p; me._pin=pin; renderProfil(); renderAnmalan(); renderMatcher(); }
+    else if(err){ err.textContent='Fel PIN (4 sista i telefonnumret).'; err.classList.remove('hidden'); }
+  }catch(e){ if(err){ err.textContent='Fel: '+(e.message||e); err.classList.remove('hidden'); } }
+}
+async function saveMyProfile(btn){
+  if(!me){ alert('Logga in först.'); return; }
+  const email=(document.getElementById('p-email')||{}).value||'';
+  const phone=(document.getElementById('p-phone')||{}).value||'';
+  const data={
+    born:(document.getElementById('p-born')||{}).value||'',
+    hand:(document.getElementById('p-hand')||{}).value||'',
+    hometown:(document.getElementById('p-hometown')||{}).value||'',
+    favShot:(document.getElementById('p-favshot')||{}).value||'',
+    favSurface:(document.getElementById('p-surface')||{}).value||'',
+    since:(document.getElementById('p-since')||{}).value||'',
+    bio:(document.getElementById('p-bio')||{}).value||'',
+  };
+  const orig=btn?btn.textContent:'';
+  if(btn){ btn.textContent='Sparar…'; btn.disabled=true; }
+  try{
+    await BTS.setProfile(me.id, me._pin, data);
+    if(email.trim()) await BTS.setEmail(me.id, me._pin, email.trim());
+    await BTS.setPhone(me.id, me._pin, phone.trim());
+    const row=players.find(p=>p.id===me.id);
+    if(row){ row.born=data.born; row.hand=data.hand; row.hometown=data.hometown; row.fav_shot=data.favShot; row.fav_surface=data.favSurface; row.since_year=data.since; row.bio=data.bio; row.phone=phone.trim(); }
+    if(btn){ btn.textContent='Sparad! ✓'; setTimeout(()=>{ if(btn){ btn.textContent=orig; btn.disabled=false; } },2000); }
+  }catch(e){ if(btn){ btn.textContent=orig; btn.disabled=false; } alert('Kunde inte spara profilen: '+(e?.message||e)); }
+}
+async function uploadPhoto(input){
+  const f=input.files&&input.files[0]; if(!f||!me) return;
+  const st=document.getElementById('p-photo-status'); if(st) st.textContent='Laddar upp…';
+  try{
+    const url=await BTS.uploadAvatar(me.id,f);
+    await BTS.setPhoto(me.id,me._pin,url);
+    const row=players.find(p=>p.id===me.id); if(row) row.photo_url=url;
+    renderProfil();
+    const st2=document.getElementById('p-photo-status'); if(st2) st2.textContent='✓ Bild sparad — syns för alla på stegen.';
+  }catch(e){ if(st) st.textContent='Fel: '+(e.message||e); }
+}
+async function savePin(){
+  const p=(document.getElementById('p-newpin')||{}).value||'';
+  if(p.length!==4||!/^\d{4}$/.test(p)){ alert('PIN måste vara exakt 4 siffror'); return; }
+  try{
+    const ok=await BTS.setPin(me.id,me._pin,p);
+    if(ok){ me._pin=p; const el=document.getElementById('p-newpin'); if(el) el.value=''; alert('PIN ändrad! Kom ihåg den.'); }
+    else alert('Kunde inte byta PIN.');
+  }catch(err){ alert('Fel vid PIN-byte: '+(err?.message||err)); }
+}
 function showTab(name,el){
   tab=name;
-  ['anmalan','matcher','stallning'].forEach(t=>document.getElementById('view-'+t).classList.toggle('hidden',t!==name));
+  ['anmalan','matcher','stallning','profil'].forEach(t=>document.getElementById('view-'+t).classList.toggle('hidden',t!==name));
+  if(name==='profil') renderProfil();
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
 }
 
