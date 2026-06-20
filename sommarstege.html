@@ -275,9 +275,16 @@ function renderStallning(){
   // Poängserie: vinst = 3 p, förlust = 1 p (spelad match). Missad vecka = 0 p, inget straff.
   const WIN_P=3, LOSS_P=1;
   const wl={};
+  const ens=id=>{ wl[id]=wl[id]||{w:0,l:0,p:0,gw:0,gl:0}; return wl[id]; };
   matches.forEach(m=>{ if(!m.winner_id)return; const lo=m.winner_id===m.player_a_id?m.player_b_id:m.player_a_id;
-    wl[m.winner_id]=wl[m.winner_id]||{w:0,l:0,p:0}; wl[m.winner_id].w++; wl[m.winner_id].p+=WIN_P;
-    wl[lo]=wl[lo]||{w:0,l:0,p:0}; wl[lo].l++; wl[lo].p+=LOSS_P; });
+    ens(m.winner_id).w++; ens(m.winner_id).p+=WIN_P;
+    ens(lo).l++; ens(lo).p+=LOSS_P;
+    // gemskillnad: räkna vanliga set (ej supertiebreak)
+    (m.sets||[]).forEach(s=>{ if(s && !s.super && typeof s.a==='number' && typeof s.b==='number'){
+      ens(m.player_a_id).gw+=s.a; ens(m.player_a_id).gl+=s.b;
+      ens(m.player_b_id).gw+=s.b; ens(m.player_b_id).gl+=s.a;
+    }});
+  });
   const ids=Object.keys(wl).map(Number);
   if(!ids.length){
     el.innerHTML=`<div class="label">Sommarserien · ställning</div>
@@ -285,11 +292,13 @@ function renderStallning(){
     return;
   }
   const pct=s=>{ const pl=s.w+s.l; return pl?Math.round(s.w/pl*100):0; };
-  ids.sort((a,b)=> (wl[b].p-wl[a].p) || (pct(wl[b])-pct(wl[a])) || (wl[b].w-wl[a].w) || nameById(a).localeCompare(nameById(b)));
+  const gd=s=>s.gw-s.gl;
+  const gdStr=s=>{ const d=gd(s); return (d>=0?'+':'')+d; };
+  ids.sort((a,b)=> (wl[b].p-wl[a].p) || (gd(wl[b])-gd(wl[a])) || (pct(wl[b])-pct(wl[a])) || (wl[b].w-wl[a].w) || nameById(a).localeCompare(nameById(b)));
   el.innerHTML=`<div class="label">Sommarserien · ställning</div>`
     +`<div class="row" style="opacity:.6"><div class="rank">#</div><div class="nm" style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase">Spelare</div><div class="meta" style="font-family:'Space Mono',monospace;font-size:11px;text-align:right">Vinst-%<br>Poäng</div></div>`
     +ids.map((id,i)=>{ const s=wl[id]; const played=s.w+s.l;
-        return `<div class="row${i===0?' top':''}"><div class="rank">${i+1}</div><div class="nm">${nameById(id)}<div class="meta" style="font-size:11px;opacity:.7">${played} spelade · ${s.w}V–${s.l}F</div></div><div style="text-align:right"><div class="meta" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">${pct(s)}%</div><div class="meta" style="font-family:'Anton',sans-serif;font-size:22px;color:var(--clay)">${s.p}</div></div></div>`;}).join('');
+        return `<div class="row${i===0?' top':''}"><div class="rank">${i+1}</div><div class="nm">${nameById(id)}<div class="meta" style="font-size:11px;opacity:.7">${played} spelade · ${s.w}V–${s.l}F · gem ${gdStr(s)}</div></div><div style="text-align:right"><div class="meta" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">${pct(s)}%</div><div class="meta" style="font-family:'Anton',sans-serif;font-size:22px;color:var(--clay)">${s.p}</div></div></div>`;}).join('');
 }
 
 // ── ADMIN: speldagslista ──

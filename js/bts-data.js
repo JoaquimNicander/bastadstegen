@@ -516,6 +516,29 @@ const BTS = {
       p_admin_pw: adminPw, p_match_id: matchId, p_court: court || '', p_start_time: startTime || '' });
     if (error) throw error;
   },
+  // ── BETALNING (sommarstege) ──────────────────────────────────────
+  async getPayments(competitionId) {
+    _assert();
+    const { data, error } = await _sb.from('dropin_payments').select('*').eq('competition_id', competitionId);
+    if (error) throw error;
+    return data || [];
+  },
+  async setPaid(playerId, pin, comp, paid) {
+    _assert();
+    const { error } = await _sb.rpc('bts_set_paid', { p_player_id: playerId, p_pin: pin, p_comp: comp, p_paid: paid });
+    if (error) throw error;
+  },
+  async adminSetPaid(adminPw, comp, playerId, paid) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_set_paid', { p_admin_pw: adminPw, p_comp: comp, p_player_id: playerId, p_paid: paid });
+    if (error) throw error;
+  },
+  async adminSummerBilling(adminPw, comp, fee) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_summer_billing', { p_admin_pw: adminPw, p_comp: comp, p_fee: fee });
+    if (error) throw error;
+    return data || [];
+  },
 
   // ── ADMIN: publicera omgång (flyttar stegen) ──────────────────────────
   // OBS: kräver admin-behörighet. Under nuvarande RLS skrivs inte
