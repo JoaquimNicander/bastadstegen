@@ -529,6 +529,15 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_delete_match', { p_admin_pw: adminPw, p_match_id: matchId });
     if (error) throw error;
   },
+  // Sätt spelare + bana + tid på en match (även efter publicering). null spelare = oförändrad.
+  async adminSetMatch(adminPw, matchId, playerA, playerB, court, startTime) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_set_match', {
+      p_admin_pw: adminPw, p_match_id: matchId,
+      p_player_a: playerA || null, p_player_b: playerB || null,
+      p_court: court || '', p_start_time: startTime || '' });
+    if (error) throw error;
+  },
   // ── BETALNING (sommarstege) ──────────────────────────────────────
   async getPayments(competitionId) {
     _assert();

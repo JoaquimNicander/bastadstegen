@@ -417,17 +417,22 @@ function renderAdminEvents(){
         if(aw!==bw) return aw?1:-1;
         return aw?0:(na-nb);
       });
-      out+=`<div class="label" style="margin:12px 0 6px">Matcher — ändra bana/tid eller ta bort</div>`;
+      const partPlayers=[...spelareIds()].map(id=>players.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name,'sv'));
+      const optsFor=cur=>partPlayers.map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`).join('');
+      out+=`<div class="label" style="margin:12px 0 6px">Matcher — byt spelare, ändra bana/tid eller ta bort</div>`;
       out+=ms.map(m=>{
         const nm=nameById(m.player_a_id)+' vs '+nameById(m.player_b_id);
         const wait=!m.court;
-        const tag=m.winner_id?' <span class="pill drawn">✓ klar</span>':(wait?' <span class="pill" style="color:var(--clay)">väntar</span>':'');
+        const tag=m.winner_id?'<span class="pill drawn">✓ klar</span>':(wait?'<span class="pill" style="color:var(--clay)">väntar</span>':'');
         return `<div class="row" style="flex-wrap:wrap;gap:6px;align-items:center">
-          <div class="nm" style="flex:1;min-width:130px">${nm}${tag}</div>
-          <input id="mcourt-${m.id}" value="${m.court||''}" placeholder="bana" style="width:58px" title="Bana (tomt = väntar)">
-          <input id="mtime-${m.id}" value="${m.start_time||''}" placeholder="tid" style="width:72px" title="Starttid">
+          <select id="ma-${m.id}" style="flex:1;min-width:115px">${optsFor(m.player_a_id)}</select>
+          <span class="x" style="color:var(--muted2);font-size:11px">vs</span>
+          <select id="mb-${m.id}" style="flex:1;min-width:115px">${optsFor(m.player_b_id)}</select>
+          <input id="mcourt-${m.id}" value="${m.court||''}" placeholder="bana" style="width:54px" title="Bana (tomt = väntar)">
+          <input id="mtime-${m.id}" value="${m.start_time||''}" placeholder="tid" style="width:64px" title="Starttid">
           <button class="btn sm green" onclick="saveMatch('${m.id}')">Spara</button>
           <button class="btn sm alt" title="Ta bort match" data-nm="${nm.replace(/"/g,'&quot;')}" onclick="deleteMatch('${m.id}',this)">🗑</button>
+          ${tag?`<div style="flex-basis:100%;text-align:right">${tag}</div>`:''}
         </div>`;
       }).join('')||'<div class="muted">Inga matcher.</div>';
       const dft="Hej [förnamn]! Lottningen i sommarstegen är klar — du möter [motståndare]. Se din bana och tid på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
@@ -604,7 +609,10 @@ async function saveMatch(id){
   const pw=document.getElementById('admin-pw').value;
   const court=(document.getElementById('mcourt-'+id)||{}).value||'';
   const time=(document.getElementById('mtime-'+id)||{}).value||'';
-  try{ await BTS.adminUpdateMatch(pw,id,court.trim(),time.trim()); await load(); }
+  const a=parseInt((document.getElementById('ma-'+id)||{}).value)||null;
+  const b=parseInt((document.getElementById('mb-'+id)||{}).value)||null;
+  if(a&&b&&a===b){ alert('Spelare A och B kan inte vara samma person.'); return; }
+  try{ await BTS.adminSetMatch(pw,id,a,b,court.trim(),time.trim()); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function deleteMatch(id, btn){
