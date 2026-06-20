@@ -274,7 +274,12 @@ function renderMatcher(){
   if(!drawn.length){ el.innerHTML=''; return; }
   const topEv=drawn.slice().sort((a,b)=>a.play_date.localeCompare(b.play_date)).slice(-1)[0];
   el.innerHTML=posterHtml(topEv,'Matcher')+drawn.map(e=>{
-    const ms=matchesFor(e.play_date);
+    const ms=matchesFor(e.play_date).slice().sort((a,b)=>{
+      const na=parseInt(a.court), nb=parseInt(b.court);
+      const aw=isNaN(na), bw=isNaN(nb);          // väntande (ej numerisk bana) sist
+      if(aw!==bw) return aw?1:-1;
+      return aw?0:(na-nb);                         // numeriska banor i ordning
+    });
     return `<div style="margin-bottom:22px"><div class="ev-name">${e.name}</div><div class="ev-meta">${fmtDate(e.play_date)}</div>`
     + ms.map(m=>{
       const aWin=m.winner_id===m.player_a_id, bWin=m.winner_id===m.player_b_id;
