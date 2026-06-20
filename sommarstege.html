@@ -167,8 +167,9 @@ async function load(){
   // Första gången: landa direkt på Matcher om det finns en publicerad lottning
   if(firstLoad){
     firstLoad=false;
+    const wantMatcher = location.hash==='#matcher';
     const hasPublished = events.some(e=>e.status==='published') && matches.some(m=>m.play_date);
-    if(hasPublished){ const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
+    if(wantMatcher || hasPublished){ const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
   }
 }
 let firstLoad=true;
