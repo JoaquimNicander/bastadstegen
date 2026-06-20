@@ -211,16 +211,17 @@ async function spRemove(id){
 }
 
 // ── ANMÄLAN ──
-function posterHtml(ev){
+function posterHtml(ev, cta){
   if(!ev) return '';
   const d=fmtDate(ev.play_date);
   const t=ev.start_time?('kl '+ev.start_time):'';
+  cta=cta||'Anmäl dig nu';
   return `<div class="sp-poster">
     <div class="rays"></div><div class="vig"></div>
     <div class="suns"><svg viewBox="0 0 100 100"><defs><radialGradient id="tbsun" cx="40%" cy="36%" r="72%"><stop offset="0" stop-color="#FFFBE6"/><stop offset="50%" stop-color="#FFE27A"/><stop offset="100%" stop-color="#FAC83C"/></radialGradient></defs><circle cx="50" cy="50" r="48" fill="url(#tbsun)"/><path d="M16 20 C 42 40, 42 60, 16 80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/><path d="M84 20 C 58 40, 58 60, 84 80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/></svg></div>
     <div class="court"><div class="pl base"></div><div class="pl side"></div></div>
     <div class="sp-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">Säsong 2026</span></div>
-    <div class="sp-when"><span class="d">${d}</span><span class="t">${t}${t?' · ':''}Anmäl dig nu</span></div>
+    <div class="sp-when"><span class="d">${d}</span><span class="t">${t}${t?' · ':''}${cta}</span></div>
     <div class="sp-logo"><span class="line" style="color:#0D2E20">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
     <div class="frame"></div>
   </div>`;
@@ -269,7 +270,8 @@ function renderMatcher(){
   const el=document.getElementById('view-matcher');
   const drawn=events.filter(e=>e.status==='published' && matchesFor(e.play_date).length);
   if(!drawn.length){ el.innerHTML=''; return; }
-  el.innerHTML=drawn.map(e=>{
+  const topEv=drawn.slice().sort((a,b)=>a.play_date.localeCompare(b.play_date)).slice(-1)[0];
+  el.innerHTML=posterHtml(topEv,'Matcher')+drawn.map(e=>{
     const ms=matchesFor(e.play_date);
     return `<div style="margin-bottom:22px"><div class="ev-name">${e.name}</div><div class="ev-meta">${fmtDate(e.play_date)}</div>`
     + ms.map(m=>{
