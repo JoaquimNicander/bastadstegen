@@ -55,6 +55,26 @@
   .hidden{display:none}
   .admin-toggle{font-size:11px;color:var(--muted2);text-align:center;margin-top:30px;cursor:pointer}
   .err{color:var(--down);font-size:13px;margin-top:4px}
+  /* ── Summer Edition-poster (anmälan) ── */
+  .sp-poster{position:relative;width:min(92vw,420px);margin:0 auto 22px;aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:#F4861E;font-family:'Anton',sans-serif}
+  .sp-poster .rays{position:absolute;inset:-20%;background:repeating-conic-gradient(from -8deg at 86% 11%, #FFC559 0deg 9deg, #F0791A 9deg 18deg);opacity:.96}
+  .sp-poster .vig{position:absolute;inset:0;background:radial-gradient(120% 110% at 86% 11%, transparent 40%, rgba(120,40,0,.42) 100%)}
+  .sp-poster .suns{position:absolute;left:92%;top:4%;width:132px;height:132px;transform:translate(-50%,-50%);border-radius:50%;box-shadow:0 0 60px 22px rgba(255,221,120,.7)}
+  .sp-poster .suns svg{width:100%;height:100%;display:block;overflow:visible}
+  .sp-poster .frame{position:absolute;inset:14px;border:1.5px solid rgba(255,247,226,.5);pointer-events:none}
+  .sp-poster .court{position:absolute;inset:0;transform:perspective(780px) rotateX(42deg) rotateZ(-5deg);transform-origin:56% 82%}
+  .sp-poster .court .pl{position:absolute;background:#F6EFE2}
+  .sp-poster .court .base{left:-16%;right:-22%;top:68%;height:24px}
+  .sp-poster .court .side{left:55%;top:48%;bottom:26%;width:24px}
+  .sp-burst{position:absolute;left:50%;top:33%;transform:translate(-50%,-50%) rotate(-6deg);width:184px;height:184px;background:#0D2E20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;clip-path:polygon(50% 0%,61% 13%,79% 8%,79% 27%,96% 30%,86% 46%,100% 59%,83% 65%,87% 83%,69% 79%,60% 96%,50% 82%,40% 96%,31% 79%,13% 83%,17% 65%,0% 59%,14% 46%,4% 30%,21% 27%,21% 8%,39% 13%)}
+  .sp-burst .s1{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#FFE07A}
+  .sp-burst .s2{font-size:29px;line-height:.86;text-transform:uppercase;text-align:center;color:#fff}
+  .sp-burst .s3{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;margin-top:3px;color:rgba(255,247,226,.7)}
+  .sp-when{position:absolute;left:0;right:0;bottom:58px;text-align:center;z-index:5;padding:0 12px}
+  .sp-when .d{display:inline-block;background:#0D2E20;color:#fff;font-size:21px;letter-spacing:1px;padding:7px 18px;border-radius:7px;text-transform:uppercase}
+  .sp-when .t{display:block;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:#2a1c0e;margin-top:7px;text-transform:uppercase;font-weight:700}
+  .sp-logo{position:absolute;right:16px;bottom:14px;text-align:right;z-index:6}
+  .sp-logo .line{display:block;line-height:.82;transform:skewX(-8deg);font-size:23px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -191,9 +211,25 @@ async function spRemove(id){
 }
 
 // ── ANMÄLAN ──
+function posterHtml(ev){
+  if(!ev) return '';
+  const d=fmtDate(ev.play_date);
+  const t=ev.start_time?('kl '+ev.start_time):'';
+  return `<div class="sp-poster">
+    <div class="rays"></div><div class="vig"></div>
+    <div class="suns"><svg viewBox="0 0 100 100"><defs><radialGradient id="tbsun" cx="40%" cy="36%" r="72%"><stop offset="0" stop-color="#FFFBE6"/><stop offset="50%" stop-color="#FFE27A"/><stop offset="100%" stop-color="#FAC83C"/></radialGradient></defs><circle cx="50" cy="50" r="48" fill="url(#tbsun)"/><path d="M16 20 C 42 40, 42 60, 16 80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/><path d="M84 20 C 58 40, 58 60, 84 80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/></svg></div>
+    <div class="court"><div class="pl base"></div><div class="pl side"></div></div>
+    <div class="sp-burst"><span class="s1">★ Nyhet ★</span><span class="s2">SUMMER<br>EDITION</span><span class="s3">Säsong 2026</span></div>
+    <div class="sp-when"><span class="d">${d}</span><span class="t">${t}${t?' · ':''}Anmäl dig nu</span></div>
+    <div class="sp-logo"><span class="line" style="color:#0D2E20">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
+    <div class="frame"></div>
+  </div>`;
+}
 function renderAnmalan(){
   const el=document.getElementById('view-anmalan');
   let html='';
+  const openEvents=events.filter(e=>e.status==='open').sort((a,b)=>a.play_date.localeCompare(b.play_date));
+  if(openEvents.length) html+=posterHtml(openEvents[0]);
   if(!me){
     html+=`<div class="panel"><div class="label">Logga in för att anmäla dig</div>
       <select id="login-name"><option value="">Välj namn…</option>${players.filter(p=>p.active!==false).map(p=>`<option>${p.name}</option>`).join('')}</select>
