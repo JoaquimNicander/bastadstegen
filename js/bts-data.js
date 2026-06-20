@@ -533,6 +533,13 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_set_paid', { p_admin_pw: adminPw, p_comp: comp, p_player_id: playerId, p_paid: paid });
     if (error) throw error;
   },
+  // Para ihop sent tillagda spelare till väntande matcher (utan bana)
+  async adminMakeWaitingMatches(adminPw, comp, playDate) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_make_waiting_matches', { p_admin_pw: adminPw, p_comp: comp, p_play_date: playDate });
+    if (error) throw error;
+    return data;
+  },
   async adminSummerBilling(adminPw, comp, fee) {
     _assert();
     const { data, error } = await _sb.rpc('bts_admin_summer_billing', { p_admin_pw: adminPw, p_comp: comp, p_fee: fee });

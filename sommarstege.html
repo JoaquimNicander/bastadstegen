@@ -395,7 +395,15 @@ function renderAdminEvents(){
       }
       out+=`<button class="btn sm alt" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
     }
-    out+=`<button class="btn sm alt" onclick="deleteEvent('${e.id}')">Ta bort</button></div>`;
+    if(isDraft || isPub){
+      const sIds=signupsFor(e.play_date).map(s=>s.player_id);
+      const av=players.filter(p=>p.active!==false && !sIds.includes(p.id));
+      out+=`<div class="label" style="margin:14px 0 6px">Lägg till spelare efter lottning</div>
+        <div class="row" style="gap:6px"><select id="late-${e.play_date}" style="flex:1"><option value="">Välj spelare…</option>${av.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select>
+        <button class="btn sm green" onclick="addLate('${e.play_date}')">Lägg till (väntande)</button></div>
+        <div class="muted" style="font-size:11px;margin-top:5px">Sent tillagda paras ihop två och två till väntande matcher. Fler banor? Klicka "Ändra namn/tid/banor" ovan och lägg till dem — sätt sedan in väntande matcher på dem.</div>`;
+    }
+    out+=`<button class="btn sm alt" style="margin-top:10px" onclick="deleteEvent('${e.id}')">Ta bort</button></div>`;
     return out;
   }).join('');
 }
@@ -545,6 +553,14 @@ async function assignCourt(id){
   const sel=document.getElementById('ac-'+id); const court=sel&&sel.value;
   if(!court){ alert('Välj en bana.'); return; }
   try{ await BTS.adminAssignCourt(pw,id,court); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function addLate(date){
+  const pw=document.getElementById('admin-pw').value;
+  const sel=document.getElementById('late-'+date); const pid=parseInt(sel&&sel.value);
+  if(!pid){ alert('Välj en spelare.'); return; }
+  try{ await BTS.adminAddSignup(pw,COMP,date,pid); const n=await BTS.adminMakeWaitingMatches(pw,COMP,date); await load();
+    if(!n) alert('Tillagd! Väntar på en till spelare för att bilda en match.'); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function addPlayer(){
