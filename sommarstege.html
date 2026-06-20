@@ -87,12 +87,26 @@
   textarea{width:100%;padding:11px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--white);font-size:15px;margin-bottom:8px;font-family:inherit;min-height:84px;resize:vertical}
   .pin-row{display:flex;gap:10px;align-items:flex-end;margin-top:12px;border-top:1px solid var(--border);padding-top:14px}
   .sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px}
-  .sp-pcard{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 8px;text-align:center}
+  .sp-pcard{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:border-color .15s,transform .15s}
+  .sp-pcard:hover{border-color:var(--clay);transform:translateY(-2px)}
   .sp-pavatar{width:62px;height:62px;border-radius:50%;background-size:cover;background-position:center;border:2px solid var(--clay);margin:0 auto}
   .sp-pavatar.empty{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border2);background:rgba(255,255,255,.03)}
   .sp-pavatar.empty span{color:var(--muted);font-size:13px}
   .sp-pname{font-weight:600;font-size:13px;margin-top:8px;line-height:1.25}
   .sp-pmeta{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;margin-top:3px;line-height:1.3}
+  /* ── Spelarkort (modal) ── */
+  #player-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+  #player-modal.hidden{display:none}
+  .pm-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+  .pm-card{position:relative;z-index:1;background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:26px 22px;max-width:380px;width:100%;max-height:88vh;overflow:auto}
+  .pm-x{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;width:auto;margin:0;padding:4px 8px}
+  .pm-stats{display:flex;justify-content:center;gap:26px;margin:14px 0 16px}
+  .pm-stats .n{display:block;font-family:'Anton',sans-serif;font-size:26px;color:var(--sun);text-align:center;line-height:1}
+  .pm-stats .l{display:block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:center;margin-top:3px}
+  .pm-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border)}
+  .pm-row .k{color:var(--muted);font-size:13px}
+  .pm-row .v{color:var(--cream);font-size:13px;text-align:right}
+  .pm-bio{margin-top:14px;color:var(--cream);font-size:14px;line-height:1.6;font-style:italic;border-left:2px solid var(--clay);padding-left:12px}
 </style>
 </head>
 <body>
@@ -115,6 +129,7 @@
   <div id="view-matcher" class="hidden"></div>
   <div id="view-stallning" class="hidden"></div>
   <div id="view-spelare" class="hidden"></div>
+  <div id="player-modal" class="hidden"></div>
 
   <div class="admin-toggle" onclick="document.getElementById('admin-panel').classList.toggle('hidden')">⚙︎ Admin</div>
   <div id="admin-panel" class="panel hidden" style="margin-top:12px">
@@ -747,12 +762,11 @@ function renderSpelare(){
   }
 
   const grid=roster.length?`<div class="sp-grid">${roster.map(p=>{
-    const photo=p.photo_url||''; const meta=[p.hometown,p.fav_shot].filter(Boolean).join(' · ');
+    const photo=p.photo_url||'';
     const youTag=(me&&p.id===me.id)?' <span class="pill drawn">du</span>':'';
-    return `<div class="sp-pcard">
+    return `<div class="sp-pcard" onclick="openPlayerCard(${p.id})" title="Visa spelarkort">
       <div class="sp-pavatar ${photo?'':'empty'}" ${photo?`style="background-image:url('${photo}')"`:''}>${photo?'':'<span>—</span>'}</div>
       <div class="sp-pname">${p.name}${youTag}</div>
-      ${meta?`<div class="sp-pmeta">${meta}</div>`:''}
     </div>`;}).join('')}</div>`
     :'<div class="muted">Inga spelare har anmält sig till sommarstegen än.</div>';
 
@@ -762,6 +776,33 @@ function renderSpelare(){
     BTS.getEmail(me.id, me._pin).then(v=>{ const elx=document.getElementById('p-email'); if(elx && v && !elx.value) elx.value=v; }).catch(()=>{});
   }
 }
+function openPlayerCard(id){
+  const p=players.find(x=>x.id===id); if(!p) return;
+  const modal=document.getElementById('player-modal'); if(!modal) return;
+  const photo=p.photo_url||'';
+  const mine=(matches||[]).filter(m=>m.winner_id && (m.player_a_id===id||m.player_b_id===id));
+  const played=mine.length, wins=mine.filter(m=>m.winner_id===id).length, losses=played-wins;
+  const upcoming=(matches||[]).find(m=>!m.winner_id && (m.player_a_id===id||m.player_b_id===id));
+  const oppName=upcoming?nameById(upcoming.player_a_id===id?upcoming.player_b_id:upcoming.player_a_id):'';
+  const age=p.born?Math.floor((Date.now()-new Date(p.born).getTime())/3.15576e10):'';
+  const info=[['Ålder',age?age+' år':''],['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Favoritunderlag',p.fav_surface],['På stegen sedan',p.since_year]].filter(x=>x[1]);
+  modal.innerHTML=`<div class="pm-backdrop" onclick="closePlayerCard()"></div>
+    <div class="pm-card">
+      <button class="pm-x" onclick="closePlayerCard()">✕</button>
+      <div class="pf-avatar ${photo?'':'empty'}" style="width:120px;height:120px;margin:0 auto;${photo?`background-image:url('${photo}')`:''}">${photo?'':'<span>Ingen bild</span>'}</div>
+      <div class="pf-name" style="text-align:center">${p.name}</div>
+      <div class="pm-stats">
+        <div><span class="n">${played}</span><span class="l">Matcher</span></div>
+        <div><span class="n">${wins}</span><span class="l">Vinster</span></div>
+        <div><span class="n">${losses}</span><span class="l">Förluster</span></div>
+      </div>
+      ${upcoming?`<div class="muted" style="text-align:center;margin-bottom:14px">Nästa: <strong style="color:var(--cream)">${oppName}</strong>${upcoming.court?` · bana ${upcoming.court}`:''}${upcoming.start_time?` · kl ${upcoming.start_time}`:''}</div>`:''}
+      ${info.map(([k,v])=>`<div class="pm-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
+      ${p.bio?`<div class="pm-bio">${p.bio}</div>`:''}
+    </div>`;
+  modal.classList.remove('hidden');
+}
+function closePlayerCard(){ const m=document.getElementById('player-modal'); if(m){ m.classList.add('hidden'); m.innerHTML=''; } }
 async function matcherLogin(){
   const name=(document.getElementById('mt-login-name')||{}).value;
   const pin=(document.getElementById('mt-login-pin')||{}).value;
