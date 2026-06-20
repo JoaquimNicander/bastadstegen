@@ -294,7 +294,14 @@ function renderMatcher(){
   const drawn=events.filter(e=>e.status==='published' && matchesFor(e.play_date).length);
   if(!drawn.length){ el.innerHTML=''; return; }
   const topEv=drawn.slice().sort((a,b)=>a.play_date.localeCompare(b.play_date)).slice(-1)[0];
-  el.innerHTML=posterHtml(topEv,'Matcher')+drawn.map(e=>{
+  const loginBar = !me
+    ? `<div class="panel" style="margin-bottom:18px"><div class="label">🎾 Logga in för att rapportera ditt resultat</div>
+      <div class="form-row"><label class="form-label">Ditt namn</label><select id="mt-login-name"><option value="">Välj ditt namn…</option>${players.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.name}">${p.name}</option>`).join('')}</select></div>
+      <div class="form-row"><label class="form-label">PIN (4 sista i mobilnr)</label><input id="mt-login-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+      <button class="btn" onclick="matcherLogin()">Logga in</button>
+      <div id="mt-login-err" class="err hidden"></div></div>`
+    : `<div class="muted" style="margin:-4px 0 16px;text-align:right">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
+  el.innerHTML=posterHtml(topEv,'Matcher')+loginBar+drawn.map(e=>{
     const ms=matchesFor(e.play_date).slice().sort((a,b)=>{
       const na=parseInt(a.court), nb=parseInt(b.court);
       const aw=isNaN(na), bw=isNaN(nb);          // väntande (ej numerisk bana) sist
@@ -754,6 +761,17 @@ function renderSpelare(){
   if(me && me._pin && window.BTS){
     BTS.getEmail(me.id, me._pin).then(v=>{ const elx=document.getElementById('p-email'); if(elx && v && !elx.value) elx.value=v; }).catch(()=>{});
   }
+}
+async function matcherLogin(){
+  const name=(document.getElementById('mt-login-name')||{}).value;
+  const pin=(document.getElementById('mt-login-pin')||{}).value;
+  const err=document.getElementById('mt-login-err');
+  const p=players.find(x=>x.name===name);
+  if(!p){ if(err){ err.textContent='Välj ditt namn.'; err.classList.remove('hidden'); } return; }
+  try{
+    if(await BTS.verifyPin(p.id,pin)){ me=p; me._pin=pin; render(); const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
+    else if(err){ err.textContent='Fel PIN (4 sista i telefonnumret).'; err.classList.remove('hidden'); }
+  }catch(e){ if(err){ err.textContent='Fel: '+(e.message||e); err.classList.remove('hidden'); } }
 }
 async function profilLogin(){
   const name=(document.getElementById('pf-login-name')||{}).value;
