@@ -446,7 +446,7 @@ function renderAdminEvents(){
         if(aw!==bw) return aw?1:-1;
         return aw?0:(na-nb);
       });
-      const partPlayers=[...spelareIds()].map(id=>players.find(p=>p.id===id)).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name,'sv'));
+      const partPlayers=players.filter(p=>p.active!==false).slice().sort((a,b)=>a.name.localeCompare(b.name,'sv'));
       const optsFor=cur=>partPlayers.map(p=>`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`).join('');
       out+=`<div class="label" style="margin:12px 0 6px">Matcher — byt spelare, ändra bana/tid eller ta bort</div>`;
       out+=ms.map(m=>{
