@@ -107,6 +107,8 @@
   .pm-row .k{color:var(--muted);font-size:13px}
   .pm-row .v{color:var(--cream);font-size:13px;text-align:right}
   .pm-bio{margin-top:14px;color:var(--cream);font-size:14px;line-height:1.6;font-style:italic;border-left:2px solid var(--clay);padding-left:12px}
+  .pm-contact{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+  .pm-contact .pm-row{border-bottom:none;padding:4px 0}
 </style>
 </head>
 <body>
@@ -800,6 +802,8 @@ function openPlayerCard(id){
         <div><span class="n">${losses}</span><span class="l">Förluster</span></div>
       </div>
       ${upcoming?`<div class="muted" style="text-align:center;margin-bottom:14px">Nästa: <strong style="color:var(--cream)">${oppName}</strong>${upcoming.court?` · bana ${upcoming.court}`:''}${upcoming.start_time?` · kl ${upcoming.start_time}`:''}</div>`:''}
+      ${me?(function(){const tel=(p.phone||'').replace(/[^\d+]/g,'');return `<div class="pm-contact"><div class="label" style="margin-bottom:6px">📞 Kontakt — endast för inloggade</div>
+        <div class="pm-row"><span class="k">Telefon</span><span class="v">${p.phone?`<a href="tel:${tel}" style="color:var(--clay);text-decoration:none">${p.phone}</a> · <a href="sms:${tel}" style="color:var(--clay);text-decoration:none">SMS</a>`:'<span style="color:var(--muted)">—</span>'}</span></div></div>`;})():''}
       ${info.map(([k,v])=>`<div class="pm-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
       ${p.bio?`<div class="pm-bio">${p.bio}</div>`:''}
     </div>`;
