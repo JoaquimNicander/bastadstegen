@@ -30,6 +30,8 @@
   .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
   .tab{background:none;border:none;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent}
   .tab.active{color:var(--cream);border-color:var(--clay)}
+  @media(max-width:560px){ .tabs{gap:0} .tab{font-size:11px;padding:12px 8px;letter-spacing:.2px} }
+  @media(max-width:360px){ .tab{font-size:10px;padding:11px 6px} }
   .ev{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;margin-bottom:12px}
   .ev-name{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;color:var(--sun)}
   .ev-meta{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);margin:2px 0 10px}
