@@ -202,9 +202,12 @@ async function load(){
   // Första gången: landa direkt på Matcher om det finns en publicerad lottning
   if(firstLoad){
     firstLoad=false;
-    const wantMatcher = location.hash==='#matcher';
-    const hasPublished = events.some(e=>e.status==='published') && matches.some(m=>m.play_date);
-    if(wantMatcher || hasPublished){ const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
+    if(location.hash==='#anmalan'){ const b=document.querySelector('.tab[data-tab="anmalan"]'); if(b) showTab('anmalan',b); }
+    else {
+      const wantMatcher = location.hash==='#matcher';
+      const hasPublished = events.some(e=>e.status==='published') && matches.some(m=>m.play_date);
+      if(wantMatcher || hasPublished){ const b=document.querySelector('.tab[data-tab="matcher"]'); if(b) showTab('matcher',b); }
+    }
   }
 }
 let firstLoad=true;
