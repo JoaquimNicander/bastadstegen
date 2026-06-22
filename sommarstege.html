@@ -77,6 +77,20 @@
   .sp-when .t{display:block;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;color:#2a1c0e;margin-top:7px;text-transform:uppercase;font-weight:700}
   .sp-logo{position:absolute;right:16px;bottom:14px;text-align:right;z-index:6}
   .sp-logo .line{display:block;line-height:.82;transform:skewX(-8deg);font-size:23px;text-transform:uppercase}
+  /* ── Liten event-affisch (default) + event-kort ── */
+  .ev-card{background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:16px}
+  .ev-body{padding:16px}
+  .ev-poster-img{display:block;width:100%;height:auto}
+  .sp-banner{position:relative;overflow:hidden;background:#F4861E;min-height:128px;display:flex;align-items:center;padding:16px 18px;font-family:'Anton',sans-serif}
+  .sp-banner .rays{position:absolute;inset:-20%;background:repeating-conic-gradient(from -8deg at 88% 16%, #FFC559 0deg 9deg, #F0791A 9deg 18deg);opacity:.96}
+  .sp-banner .vig{position:absolute;inset:0;background:radial-gradient(120% 130% at 88% 16%, transparent 42%, rgba(120,40,0,.4) 100%)}
+  .sp-banner .bsun{position:absolute;right:18px;top:18px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#FFFBE6,#FFE27A 55%,#FAC83C);box-shadow:0 0 26px 9px rgba(255,221,120,.6)}
+  .sp-banner-in{position:relative;z-index:2}
+  .sp-banner .bb-tag{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#0D2E20;margin-bottom:7px}
+  .sp-banner .bb-date{display:inline-block;background:#0D2E20;color:#fff;font-size:23px;letter-spacing:1px;text-transform:uppercase;padding:6px 15px;border-radius:7px;line-height:1}
+  .sp-banner .bb-time{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;color:#3a1c08;font-weight:700;text-transform:uppercase;margin-top:8px}
+  .sp-banner .bb-logo{position:absolute;right:14px;bottom:10px;z-index:2;text-align:right;line-height:.78;transform:skewX(-8deg)}
+  .sp-banner .bb-logo span{display:block;font-size:15px;text-transform:uppercase}
   /* ── Min profil ── */
   .pf-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:22px 18px;margin-bottom:16px}
   .pf-avatar{width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--clay);box-shadow:0 0 0 4px rgba(255,140,66,.12)}
@@ -271,35 +285,50 @@ function posterHtml(ev, cta){
     <div class="frame"></div>
   </div>`;
 }
+function eventBanner(ev){
+  if(!ev) return '';
+  if(ev.poster_url) return `<img class="ev-poster-img" src="${ev.poster_url}" alt="Affisch ${fmtDate(ev.play_date)}">`;
+  const d=fmtDate(ev.play_date);
+  const t=ev.start_time?('kl '+ev.start_time):'';
+  return `<div class="sp-banner">
+    <div class="rays"></div><div class="vig"></div><div class="bsun"></div>
+    <div class="sp-banner-in">
+      <div class="bb-tag">★ Summer Edition ★</div>
+      <div class="bb-date">${d}</div>
+      ${t?`<div class="bb-time">${t}</div>`:''}
+    </div>
+    <div class="bb-logo"><span style="color:#0D2E20">BÅSTAD</span><span style="color:#fff">STEGEN</span></div>
+  </div>`;
+}
 function renderAnmalan(){
   const el=document.getElementById('view-anmalan');
   let html='';
-  const openEvents=events.filter(e=>e.status==='open').sort((a,b)=>a.play_date.localeCompare(b.play_date));
-  if(openEvents.length) html+=posterHtml(openEvents[0]);
+  // 1. Inloggning först, i egen ruta
   if(!me){
-    html+=`<div class="panel"><div class="label">Logga in för att anmäla dig</div>
-      <select id="login-name"><option value="">Välj namn…</option>${players.filter(p=>p.active!==false).map(p=>`<option>${p.name}</option>`).join('')}</select>
-      <input type="password" id="login-pin" placeholder="PIN (4 siffror)">
+    const opts=players.filter(p=>p.active!==false).slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option>${p.name}</option>`).join('');
+    html+=`<div class="panel"><div class="label">🎾 Logga in för att anmäla dig</div>
+      <select id="login-name"><option value="">Välj namn…</option>${opts}</select>
+      <input type="password" id="login-pin" inputmode="numeric" maxlength="4" placeholder="PIN (4 sista i mobilnr)">
       <button class="btn" onclick="login()">Logga in</button>
       <div id="login-err" class="err hidden"></div></div>`;
   } else {
-    html+=`<div class="muted" style="margin-bottom:14px">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
+    html+=`<div class="muted" style="margin:-2px 0 16px;text-align:right">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
   }
-
-  const upcoming=events.filter(e=>e.status==='open');
-  if(!upcoming.length){ html+='<div class="muted">Inga kommande speldagar öppna för anmälan just nu.</div>'; }
+  // 2. Kommande speldagar – varje med en egen liten affisch
+  const upcoming=events.filter(e=>e.status==='open').sort((a,b)=>a.play_date.localeCompare(b.play_date));
+  if(!upcoming.length){ html+='<div class="muted" style="margin-bottom:16px">Inga kommande speldagar öppna för anmälan just nu.</div>'; }
   else html+=upcoming.map(e=>{
     const su=signupsFor(e.play_date);
     const mine=iAmSignedUp(e.play_date);
-    return `<div class="ev">
-      <div class="ev-name">${e.name}</div>
-      <div class="ev-meta">${fmtDate(e.play_date)}${e.start_time?` · kl ${e.start_time}`:''} · banor ${e.courts}</div>
+    return `<div class="ev-card">${eventBanner(e)}<div class="ev-body">
+      <div class="ev-name" style="font-size:18px">${e.name}</div>
+      <div class="ev-meta">banor ${e.courts||'—'}</div>
       ${me?(mine
         ? `<button class="btn alt" onclick="toggleSignup('${e.play_date}',false)">✓ Du är anmäld — avanmäl</button>`
         : `<button class="btn green" onclick="toggleSignup('${e.play_date}',true)">Anmäl mig</button>`):''}
       <div class="label" style="margin:14px 0 8px">Anmälda (${su.length})</div>
       ${su.length?su.map((s,i)=>`<div class="row"><div class="rank">${i+1}</div><div class="nm">${s.player?s.player.name:nameById(s.player_id)}</div><div class="meta">#${posById(s.player_id)}</div></div>`).join(''):'<div class="muted">Inga anmälda än.</div>'}
-    </div>`;
+    </div></div>`;
   }).join('');
 
   html+=`<div class="panel" style="margin-top:18px"><div class="label">Inte med än? Anmäl intresse</div>
@@ -414,6 +443,12 @@ function renderAdminEvents(){
           <input id="ee-time-${e.id}" value="${e.start_time||''}" placeholder="Tid t.ex. 10:00" style="width:120px">
           <input id="ee-courts-${e.id}" value="${(e.courts||'').replace(/"/g,'&quot;')}" placeholder="Banor t.ex. 1,2,3" style="width:130px">
           <button class="btn sm green" onclick="editEvent('${e.id}')">Spara</button>
+        </div>
+        <div style="margin-top:8px">
+          <div class="label" style="margin:6px 0 4px">Affisch ${e.poster_url?'· egen bild uppladdad':'· standard (sol/datum) visas'}</div>
+          <input type="file" accept="image/*" onchange="adminUploadPoster('${e.id}','${e.play_date}',this)">
+          ${e.poster_url?`<button class="btn sm alt" style="margin-top:6px" onclick="clearEventPoster('${e.id}')">Ta bort egen affisch</button>`:''}
+          <div id="ep-status-${e.id}" class="muted" style="font-size:11px;margin-top:4px"></div>
         </div>
       </div>`;
     if(!isDraft && !isPub){
@@ -625,6 +660,22 @@ async function editEvent(id){
   const startTime=document.getElementById('ee-time-'+id)?.value||'';
   const courts=document.getElementById('ee-courts-'+id)?.value||'';
   try{ await BTS.adminUpdateEvent(pw,id,{name,courts,startTime}); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function adminUploadPoster(eventId, playDate, input){
+  const f=input.files&&input.files[0]; if(!f) return;
+  const pw=document.getElementById('admin-pw').value;
+  const st=document.getElementById('ep-status-'+eventId); if(st) st.textContent='Laddar upp…';
+  try{
+    const url=await BTS.uploadEventPoster(playDate,f);
+    await BTS.adminSetEventPoster(pw,eventId,url);
+    await load();
+  }catch(e){ if(st) st.textContent='Fel: '+(e.message||e); }
+}
+async function clearEventPoster(eventId){
+  const pw=document.getElementById('admin-pw').value;
+  if(!confirm('Ta bort egen affisch? Standardaffischen visas istället.')) return;
+  try{ await BTS.adminSetEventPoster(pw,eventId,''); await load(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function assignCourt(id){

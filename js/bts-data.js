@@ -478,6 +478,22 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_delete_event', { p_admin_pw: adminPw, p_event_id: eventId });
     if (error) throw error;
   },
+  // Ladda upp egen affisch-bild för en speldag (storage)
+  async uploadEventPoster(playDate, file) {
+    _assert();
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `event-${playDate}-${Date.now()}.${ext}`;
+    const { error } = await _sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    return _sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  },
+  // Spara/rensa affisch-url på en speldag (admin). Tom url = ta bort.
+  async adminSetEventPoster(adminPw, eventId, url) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_set_event_poster', {
+      p_admin_pw: adminPw, p_event_id: eventId, p_url: url || '' });
+    if (error) throw error;
+  },
   // Redigera en speldag (namn/banor/tid) — funkar även efter publicering
   async adminUpdateEvent(adminPw, eventId, { name, courts, startTime } = {}) {
     _assert();
