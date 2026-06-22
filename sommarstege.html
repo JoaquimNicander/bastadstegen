@@ -499,7 +499,7 @@ function renderAdminEvents(){
           ${tag?`<div style="flex-basis:100%;text-align:right">${tag}</div>`:''}
         </div>`;
       }).join('')||'<div class="muted">Inga matcher.</div>';
-      const dft="Hej [förnamn]! Lottningen i sommarstegen är klar — du möter [motståndare]. Se din bana och tid på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
+      const dft="Hej [förnamn]!\n\nLottningen i sommarstegen är klar — du möter [motståndare]. Se din bana och tid på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
       const _pv=dft.replace(/\[förnamn\]/g,'Anna').replace(/\[motståndare\]/g,'Erik');
       const _len=_pv.length, _parts=_len<=160?1:Math.ceil(_len/153);
       out+=`<div class="label" style="margin:16px 0 6px">📣 Meddela spelarna (SMS + mail)</div>
