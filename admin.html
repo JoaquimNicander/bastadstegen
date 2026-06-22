@@ -534,18 +534,24 @@ const ADMIN_PASSWORD = 'bts2026';
 // ── SEASONS ────────────────────────────────────────────────────
 const DEFAULT_SEASONS = [
   {id:'VT2026', name:'Vårtermin 2026', short:'VT 2026', start:'2026-01-01', end:'2026-06-20'},
-  {id:'ST2026', name:'Sommartermin 2026', short:'ST 2026', start:'2026-06-21', end:'2026-12-20'},
 ];
+// Sommarstegen (ST2026) är en egen drop-in-tävling som hanteras i sommarstege.html.
+// Den får INTE visas som en vanlig omgångs-säsong här (admin genererar då en felaktig lottning).
+const HIDDEN_COMP_IDS = ['ST2026'];
 
 function getSeasons(){
-  try{ const s=JSON.parse(localStorage.getItem('bts_seasons')||'null'); return s||DEFAULT_SEASONS; }
+  try{
+    const s=JSON.parse(localStorage.getItem('bts_seasons')||'null');
+    const list=(s||DEFAULT_SEASONS).filter(x=>!HIDDEN_COMP_IDS.includes(x.id));
+    return list.length?list:DEFAULT_SEASONS;
+  }
   catch(e){ return DEFAULT_SEASONS; }
 }
 function saveSeasons(seasons){ localStorage.setItem('bts_seasons',JSON.stringify(seasons)); }
 
 function getActiveSeason(){
   const override=localStorage.getItem('bts_active_season');
-  if(override) return override;
+  if(override && !HIDDEN_COMP_IDS.includes(override)) return override;
   const today=new Date().toISOString().slice(0,10);
   const seasons=getSeasons();
   for(const s of seasons){ if(today>=s.start&&today<=s.end) return s.id; }
