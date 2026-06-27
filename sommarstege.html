@@ -352,7 +352,19 @@ function renderMatcher(){
       <button class="btn" onclick="matcherLogin()">Logga in</button>
       <div id="mt-login-err" class="err hidden"></div></div>`
     : `<div class="muted" style="margin:-4px 0 16px;text-align:right">Inloggad som <strong style="color:var(--cream)">${me.name}</strong> · <a href="#" onclick="logout();return false" style="color:var(--clay)">logga ut</a></div>`;
-  el.innerHTML=posterHtml(topEv,'Matcher')+loginBar+drawn.map(e=>{
+  const sorted=drawn.slice().sort((a,b)=>a.play_date.localeCompare(b.play_date));
+  const latest=sorted[sorted.length-1];
+  const older=sorted.slice(0,-1).reverse();  // senast spelade först
+  let html=posterHtml(latest,'Matcher')+loginBar+matcherRoundHtml(latest);
+  if(older.length){
+    html+=`<div style="margin-top:8px">
+      <button class="btn alt" onclick="var d=document.getElementById('played-rounds');d.classList.toggle('hidden');this.textContent=(d.classList.contains('hidden')?'📂 Spelade omgångar (${older.length})':'📂 Dölj spelade omgångar');">📂 Spelade omgångar (${older.length})</button>
+      <div id="played-rounds" class="hidden" style="margin-top:16px">${older.map(matcherRoundHtml).join('')}</div>
+    </div>`;
+  }
+  el.innerHTML=html;
+}
+function matcherRoundHtml(e){
     const ms=matchesFor(e.play_date).slice().sort((a,b)=>{
       const na=parseInt(a.court), nb=parseInt(b.court);
       const aw=isNaN(na), bw=isNaN(nb);          // väntande (ej numerisk bana) sist
@@ -388,7 +400,6 @@ function renderMatcher(){
           <button class="btn" style="width:100%" onclick="reportDropin('${m.id}','${m.player_a_id}','${m.player_b_id}')">Rapportera resultat →</button></div>`:''}
       </div>`;
     }).join('')+`</div>`;
-  }).join('');
 }
 
 // ── STÄLLNING ──
