@@ -1127,6 +1127,8 @@ function savePin(){
   // Live: hämta nya resultat en gång per minut och rita om om MIN match ändrats
   setInterval(async()=>{
     if(!DBC||!me)return;
+    const ae=document.activeElement;
+    if(ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return; // användaren skriver – pausa
     const before=JSON.stringify([getPendingForMe(),myReportStatus()]);
     await refreshDBC().catch(()=>{});
     if(JSON.stringify([getPendingForMe(),myReportStatus()])!==before) renderApp();

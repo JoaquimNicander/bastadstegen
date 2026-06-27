@@ -938,7 +938,14 @@ function showTab(name,el){
 }
 
 load();
-setInterval(()=>{ if(window.BTS&&BTS.ready()) load(); }, 60000);
+setInterval(()=>{
+  if(!(window.BTS&&BTS.ready())) return;
+  const ab=document.getElementById('admin-body');
+  if(ab && !ab.classList.contains('hidden')) return;          // admin inloggad – pausa auto-uppdatering
+  const ae=document.activeElement;
+  if(ae && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return; // användaren skriver i ett fält
+  load();
+}, 60000);
 
 // Direktlänk till sommarstege-admin: #admin öppnar panelen och fokuserar lösenordsfältet
 function openAdminFromHash(){
