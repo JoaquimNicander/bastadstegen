@@ -125,6 +125,10 @@
   .pm-bio{margin-top:14px;color:var(--cream);font-size:14px;line-height:1.6;font-style:italic;border-left:2px solid var(--clay);padding-left:12px}
   .pm-contact{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px 12px;margin-bottom:14px}
   .pm-contact .pm-row{border-bottom:none;padding:4px 0}
+  /* ── Admin-underflikar ── */
+  .subtabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:12px 0 16px}
+  .subtab{background:none;border:none;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:10px 12px;cursor:pointer;border-bottom:2px solid transparent}
+  .subtab.active{color:var(--cream);border-color:var(--clay)}
 </style>
 </head>
 <body>
@@ -166,30 +170,43 @@
         <button class="btn sm alt" onclick="adminLogout()">Logga ut</button>
       </div>
 
-      <div class="label" style="margin-top:14px">Skapa speldag</div>
-      <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
-      <input type="date" id="ev-date">
-      <input type="text" id="ev-courts" placeholder="Banor (valfritt – sätts annars vid lottningen)">
-      <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
-      <button class="btn alt" onclick="skapaSpeldag()">Skapa / uppdatera speldag</button>
-      <div id="ev-msg" class="muted" style="margin-top:8px"></div>
+      <div class="subtabs">
+        <button class="subtab active" onclick="adminSubTab('speldagar',this)">Speldagar</button>
+        <button class="subtab" onclick="adminSubTab('spelare',this)">Spelare</button>
+        <button class="subtab" onclick="adminSubTab('ansokningar',this)">Ansökningar</button>
+      </div>
 
-      <div class="label" style="margin-top:20px">Speldagar</div>
-      <div id="admin-events"></div>
+      <!-- Flik: Speldagar -->
+      <div id="adm-speldagar">
+        <div class="label">Skapa speldag</div>
+        <input type="text" id="ev-name" placeholder="Namn, t.ex. Sommaröppning">
+        <input type="date" id="ev-date">
+        <input type="text" id="ev-courts" placeholder="Banor (valfritt – sätts annars vid lottningen)">
+        <input type="text" id="ev-time" placeholder="Starttid, t.ex. 17:00" value="17:00">
+        <button class="btn alt" onclick="skapaSpeldag()">Skapa / uppdatera speldag</button>
+        <div id="ev-msg" class="muted" style="margin-top:8px"></div>
+        <div class="label" style="margin-top:20px">Speldagar</div>
+        <div id="admin-events"></div>
+      </div>
 
-      <div class="label" style="margin-top:20px">Lägg till spelare</div>
-      <input type="text" id="np-name" placeholder="Namn">
-      <input type="text" id="np-phone" placeholder="Telefon (PIN = 4 sista)">
-      <input type="text" id="np-email" placeholder="E-post (valfritt)">
-      <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
-      <div id="np-msg" class="muted" style="margin-top:8px"></div>
+      <!-- Flik: Spelare -->
+      <div id="adm-spelare" class="hidden">
+        <div class="label">Lägg till spelare</div>
+        <input type="text" id="np-name" placeholder="Namn">
+        <input type="text" id="np-phone" placeholder="Telefon (PIN = 4 sista)">
+        <input type="text" id="np-email" placeholder="E-post (valfritt)">
+        <button class="btn alt" onclick="addPlayer()">Lägg till i sommarstegen</button>
+        <div id="np-msg" class="muted" style="margin-top:8px"></div>
+        <div class="label" style="margin-top:20px">Deltagare (ranking)</div>
+        <div id="admin-players"></div>
+      </div>
 
-      <div class="label" style="margin-top:20px">Deltagare (ranking)</div>
-      <div id="admin-players"></div>
-
-      <div class="label" style="margin-top:20px">Väntande intresseanmälningar</div>
-      <button class="btn alt" onclick="loadJoins()">Visa ansökningar</button>
-      <div id="joins-list" style="margin-top:10px"></div>
+      <!-- Flik: Ansökningar -->
+      <div id="adm-ansokningar" class="hidden">
+        <div class="label">Väntande intresseanmälningar</div>
+        <button class="btn alt" onclick="loadJoins()">Uppdatera lista</button>
+        <div id="joins-list" style="margin-top:10px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -558,6 +575,11 @@ function adminLogout(){
   document.getElementById('admin-body').classList.add('hidden');
   document.getElementById('admin-login').classList.remove('hidden');
   const pw=document.getElementById('admin-pw'); if(pw) pw.value='';
+}
+function adminSubTab(name, btn){
+  ['speldagar','spelare','ansokningar'].forEach(t=>{ const d=document.getElementById('adm-'+t); if(d) d.classList.toggle('hidden', t!==name); });
+  if(btn && btn.parentElement) btn.parentElement.querySelectorAll('.subtab').forEach(b=>b.classList.toggle('active', b===btn));
+  if(name==='ansokningar') loadJoins();
 }
 async function toggleSignup(date,on){
   try{ if(on) await BTS.addSignup(COMP,date,me.id,me._pin); else await BTS.removeSignup(COMP,date,me.id,me._pin); await load(); }
