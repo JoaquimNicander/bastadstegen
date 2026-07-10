@@ -555,10 +555,10 @@ const BTS = {
     if (error) throw error;
   },
   // ── SHOP (merch, ingen betalning i appen) ────────────────────────
-  async shopOrder(playerId, pin, item, size, qty) {
+  async shopOrder(playerId, pin, items) {
     _assert();
     const { data, error } = await _sb.rpc('bts_shop_order', {
-      p_player_id: playerId, p_pin: pin, p_item: item, p_size: size || null, p_qty: qty || 1 });
+      p_player_id: playerId, p_pin: pin, p_items: items });
     if (error) throw error;
     return data;
   },

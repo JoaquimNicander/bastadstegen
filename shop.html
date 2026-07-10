@@ -94,7 +94,7 @@ const NAMN = { keps: 'Keps', tshirt: 'T-shirt' };
 const CAP_SVG = '<svg viewBox="0 0 100 100" fill="none"><path d="M14 62 Q50 34 86 62 Q70 54 50 54 Q30 54 14 62Z" fill="#0D2E20"/><path d="M50 30 Q84 34 88 60 L74 62 Q72 44 50 42 Q28 44 26 62 L14 60 Q18 34 50 30Z" fill="#F5EDE3"/><ellipse cx="50" cy="30" rx="7" ry="5" fill="#0D2E20"/></svg>';
 const TEE_SVG = '<svg viewBox="0 0 100 100" fill="none"><path d="M35 22 L20 30 L12 46 L24 54 L28 48 L28 80 L72 80 L72 48 L76 54 L88 46 L80 30 L65 22 Q50 34 35 22Z" fill="#F5EDE3"/><path d="M35 22 Q50 34 65 22 Q58 30 50 30 Q42 30 35 22Z" fill="#0D2E20"/></svg>';
 
-let players=[], me=null, adminPw=null;
+let players=[], me=null, adminPw=null, cart=[];
 
 async function load(){
   if(!window.BTS||!BTS.ready()){ document.getElementById('app').innerHTML='<div class="muted">Databasen ej konfigurerad.</div>'; return; }
@@ -125,7 +125,7 @@ function render(){
           <div class="desc">Grå bomullskeps med broderad Båstad Stegen-logga och gul tennisboll. Justerbar bak – passar alla.</div>
           <label class="label" style="margin-bottom:5px">Antal</label>
           <select id="keps-qty">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select>
-          <button class="btn" onclick="placeOrder('keps')">Beställ keps →</button>
+          <button class="btn" onclick="addToCart('keps')">Lägg i kundkorg 🛒</button>
         </div>
       </div>
       <div class="prod">
@@ -138,13 +138,35 @@ function render(){
           <select id="tshirt-size"><option value="">Välj storlek…</option><option>M</option><option>L</option><option>XL</option></select>
           <label class="label" style="margin-bottom:5px">Antal</label>
           <select id="tshirt-qty">${[1,2,3,4,5].map(n=>`<option>${n}</option>`).join('')}</select>
-          <button class="btn" onclick="placeOrder('tshirt')">Beställ t-shirt →</button>
+          <button class="btn" onclick="addToCart('tshirt')">Lägg i kundkorg 🛒</button>
         </div>
       </div>
     </div>
+    <div id="cart-panel"></div>
     <div class="muted" style="text-align:center;margin:14px 0 6px">Ingen betalning i appen – Joaquim hör av sig om leverans & betalning.</div>
     <div class="panel" style="margin-top:16px"><div class="label">Mina beställningar</div><div id="my-orders"><div class="muted">Laddar…</div></div></div>`;
+  renderCart();
   refreshMine();
+}
+
+function addToCart(item){
+  const size = item==='tshirt' ? (document.getElementById('tshirt-size')||{}).value : null;
+  const qty = parseInt((document.getElementById(item+'-qty')||{}).value)||1;
+  if(item==='tshirt' && !size){ alert('Välj storlek (M/L/XL).'); return; }
+  cart.push({item, size:size||null, qty});
+  renderCart(); toast('Tillagd i kundkorgen 🛒');
+}
+function removeFromCart(i){ cart.splice(i,1); renderCart(); }
+function renderCart(){
+  const el=document.getElementById('cart-panel'); if(!el) return;
+  if(!cart.length){ el.innerHTML=''; return; }
+  const total=cart.reduce((s,c)=>s+PRIS[c.item]*c.qty,0);
+  el.innerHTML=`<div class="panel" style="border-color:var(--clay)"><div class="label">🛒 Kundkorg</div>
+    ${cart.map((c,i)=>`<div class="row"><div class="nm2">${NAMN[c.item]}${c.size?` · ${c.size}`:''} <span class="muted">×${c.qty}</span></div>
+      <span class="muted">${PRIS[c.item]*c.qty} kr</span>
+      <button class="btn sm alt" onclick="removeFromCart(${i})">Ta bort</button></div>`).join('')}
+    <div style="text-align:right;margin:8px 2px 12px;color:var(--cream);font-weight:700">Totalt: ${total} kr</div>
+    <button class="btn" onclick="placeOrder()">Lägg beställning (${cart.length} ${cart.length===1?'artikel':'artiklar'}) →</button></div>`;
 }
 
 async function doLogin(){
@@ -157,11 +179,9 @@ async function doLogin(){
 }
 function logout(){ me=null; render(); }
 
-async function placeOrder(item){
-  const size = item==='tshirt' ? (document.getElementById('tshirt-size')||{}).value : null;
-  const qty = parseInt((document.getElementById(item+'-qty')||{}).value)||1;
-  if(item==='tshirt' && !size){ alert('Välj storlek (M/L/XL).'); return; }
-  try{ await BTS.shopOrder(me.id, me._pin, item, size, qty); toast('Beställning lagd! 🎾'); await refreshMine(); }
+async function placeOrder(){
+  if(!cart.length){ alert('Kundkorgen är tom.'); return; }
+  try{ await BTS.shopOrder(me.id, me._pin, cart); cart=[]; renderCart(); toast('Beställning lagd! 🎾'); await refreshMine(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 
@@ -169,11 +189,12 @@ async function refreshMine(){
   const box=document.getElementById('my-orders'); if(!box) return;
   try{
     const list=await BTS.shopMyOrders(me.id, me._pin);
-    box.innerHTML = list.length ? list.map(o=>`<div class="row">
-      <div class="nm2">${NAMN[o.item]||o.item}${o.size?` · ${o.size}`:''} <span class="muted">×${o.qty}</span></div>
-      <span class="pill ${o.status==='levererad'?'done':''}">${o.status==='levererad'?'✓ levererad':'beställd'}</span>
-      ${o.status==='ny'?`<button class="btn sm alt" onclick="cancelOrder('${o.id}')">Avboka</button>`:''}
-    </div>`).join('') : '<div class="muted">Inga beställningar än.</div>';
+    box.innerHTML = list.length ? list.map(o=>{
+      const its=(o.items||[]).map(c=>`${NAMN[c.item]||c.item}${c.size?` · ${c.size}`:''} ×${c.qty}`).join(', ');
+      return `<div class="row"><div class="nm2">${its}</div>
+        <span class="pill ${o.status==='levererad'?'done':''}">${o.status==='levererad'?'✓ levererad':'beställd'}</span>
+        ${o.status==='ny'?`<button class="btn sm alt" onclick="cancelOrder('${o.id}')">Avboka</button>`:''}</div>`;
+    }).join('') : '<div class="muted">Inga beställningar än.</div>';
   }catch(e){ box.innerHTML='<div class="err">Fel: '+(e.message||e)+'</div>'; }
 }
 async function cancelOrder(id){
@@ -201,7 +222,7 @@ async function loadAdminOrders(){
     const list=await BTS.adminShopOrders(adminPw);
     if(!list.length){ box.innerHTML='<div class="muted">Inga beställningar än.</div>'; return; }
     box.innerHTML=list.map(o=>`<div class="row" style="flex-wrap:wrap">
-      <div class="nm2" style="min-width:150px">${o.name} — ${NAMN[o.item]||o.item}${o.size?` · ${o.size}`:''} ×${o.qty}
+      <div class="nm2" style="min-width:150px">${o.name} — ${(o.items||[]).map(c=>`${NAMN[c.item]||c.item}${c.size?` · ${c.size}`:''} ×${c.qty}`).join(', ')}
         <div class="muted" style="font-size:11px">${o.phone||'(ingen tel)'} · ${o.email||'(ingen mejl)'}</div></div>
       <span class="pill ${o.status==='levererad'?'done':''}">${o.status}</span>
       ${o.status==='ny'
