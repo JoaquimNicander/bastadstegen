@@ -16,9 +16,12 @@
   body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
   .topbar{display:flex;justify-content:flex-end;padding:12px 18px}
   .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
-  .hero{position:relative;overflow:hidden;text-align:center;padding:30px 20px 30px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 70%,var(--bg) 100%)}
-  .hero h1{font-family:'Anton',sans-serif;font-size:44px;letter-spacing:3px;margin:0;color:#fff}
-  .hero .tag{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:8px}
+  .hero{position:relative;overflow:hidden;text-align:center;padding:28px 16px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 70%,var(--bg) 100%)}
+  .hero .hero-lock{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+  .hero .hero-logo{height:50px;width:auto;display:block}
+  .hero h1{font-family:'Anton',sans-serif;font-size:clamp(28px,8vw,44px);letter-spacing:clamp(1px,1vw,3px);margin:0;color:#fff;line-height:1}
+  .hero .tag{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:10px}
+  @media(max-width:520px){ .hero{padding:20px 14px} .hero .hero-logo{height:38px} .hero .hero-lock{gap:10px} .hero .tag{font-size:11px;letter-spacing:1.2px} }
   .wrap{max-width:680px;margin:0 auto;padding:20px}
   .panel{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:18px;margin-bottom:16px}
   .label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
@@ -32,7 +35,7 @@
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:520px){.grid{grid-template-columns:1fr}}
   .prod{background:var(--card);border:1px solid var(--border2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-  .prod .art{position:relative;height:273px;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFC559,#F0791A 70%,#D9450A);overflow:hidden}
+  .prod .art{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#FFC559,#F0791A 70%,#D9450A);overflow:hidden}
   .prod .art svg{width:96px;height:96px;filter:drop-shadow(0 4px 8px rgba(90,24,0,.3))}
   .prod .art img{width:100%;height:100%;object-fit:cover;display:block}
   .prod .body{padding:14px 16px;display:flex;flex-direction:column;flex:1}
@@ -52,9 +55,9 @@
 <body>
 <div class="topbar"><a href="index.html">← Startsidan</a></div>
 <div class="hero">
-  <div style="display:flex;align-items:center;justify-content:center;gap:16px">
-    <img src="bts-crest.png" alt="Båstad TS" style="height:58px;width:auto;display:block">
-    <h1 style="margin:0">BTS SHOP</h1>
+  <div class="hero-lock">
+    <img src="mail-logga.png" alt="Båstad Stegen" class="hero-logo">
+    <h1>BTS SHOP</h1>
   </div>
   <div class="tag">🎾 Summer Edition · Merch</div>
 </div>
