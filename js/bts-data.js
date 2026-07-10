@@ -554,6 +554,36 @@ const BTS = {
       p_court: court || '', p_start_time: startTime || '' });
     if (error) throw error;
   },
+  // ── SHOP (merch, ingen betalning i appen) ────────────────────────
+  async shopOrder(playerId, pin, item, size, qty) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_shop_order', {
+      p_player_id: playerId, p_pin: pin, p_item: item, p_size: size || null, p_qty: qty || 1 });
+    if (error) throw error;
+    return data;
+  },
+  async shopMyOrders(playerId, pin) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_shop_my_orders', { p_player_id: playerId, p_pin: pin });
+    if (error) throw error;
+    return data || [];
+  },
+  async shopCancel(playerId, pin, orderId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_shop_cancel', { p_player_id: playerId, p_pin: pin, p_order_id: orderId });
+    if (error) throw error;
+  },
+  async adminShopOrders(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_admin_shop_orders', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
+  async adminShopSetStatus(adminPw, orderId, status) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_shop_set_status', { p_admin_pw: adminPw, p_order_id: orderId, p_status: status });
+    if (error) throw error;
+  },
   // ── BETALNING (sommarstege) ──────────────────────────────────────
   async getPayments(competitionId) {
     _assert();
