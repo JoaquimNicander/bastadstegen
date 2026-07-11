@@ -290,12 +290,22 @@
     <h2 class="sec-title" style="color:#F5EDE3">BTS Shop</h2>
     <p class="sec-lead" style="color:#cfc8bd">Bär färgerna på och utanför banan. Keps och t-shirt i Summer Edition-stil — logga in, beställ, så levererar vi. Ingen betalning i appen.</p>
     <style>
+      .shop-film{position:relative;width:100%;max-width:320px;margin:26px auto 0;aspect-ratio:9/16;
+        border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;background:#0D2A1D;
+        box-shadow:0 18px 40px rgba(0,0,0,.35)}
+      .shop-film iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:none}
+      @media(max-width:560px){ .shop-film{max-width:min(78vw,300px)} }
       .shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:26px auto;max-width:520px}
       .shop-grid .sc{background:#0D2A1D;border:1px solid #1C3A2B;border-radius:14px;overflow:hidden}
       .shop-grid .sc img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
       .shop-grid .sc .b{padding:12px 14px;text-align:left}
       @media(max-width:560px){ .shop-grid{grid-template-columns:1fr;max-width:none;gap:16px} }
     </style>
+    <div class="shop-film">
+      <iframe src="https://player.vimeo.com/video/1209031260?h=bf1e14544b&amp;autoplay=1&amp;loop=1&amp;muted=1&amp;autopause=0&amp;badge=0&amp;title=0&amp;byline=0&amp;portrait=0"
+        allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin"
+        title="BTS Merch"></iframe>
+    </div>
     <div class="shop-grid">
       <div class="sc">
         <img src="shop-keps.png" alt="Keps">
