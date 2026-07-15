@@ -248,6 +248,7 @@ async function load(){
 let firstLoad=true;
 function render(){ renderAnmalan(); renderMatcher(); renderStallning(); renderSpelare(); renderAdminEvents(); renderAdminPlayers(); }
 let spEditId=null;
+let admOpenEv={};
 function renderAdminPlayers(){
   const box=document.getElementById('admin-players'); if(!box) return;
   if(!ladder.length){ box.innerHTML='<div class="muted">Inga deltagare i sommarstegen än.</div>'; return; }
@@ -454,16 +455,33 @@ function renderStallning(){
 }
 
 // ── ADMIN: speldagslista ──
+function toggleEv(id){
+  const b=document.getElementById('body-'+id), c=document.getElementById('chev-'+id);
+  if(!b)return; const open=b.style.display==='none';
+  b.style.display=open?'block':'none'; if(c)c.textContent=open?'▾':'▸';
+  admOpenEv[id]=open;
+}
 function renderAdminEvents(){
   const box=document.getElementById('admin-events'); if(!box)return;
   if(!events.length){ box.innerHTML='<div class="muted">Inga speldagar än.</div>'; return; }
+  // Vilka fälls ut som standard: utkast + ej lottade + senaste publicerade. Äldre publicerade fälls ihop.
+  const latestPub=events.filter(e=>e.status==='published').slice()
+    .sort((a,b)=>(b.play_date>a.play_date?1:b.play_date<a.play_date?-1:0))[0];
   box.innerHTML=events.map(e=>{
     const cnt=signupsFor(e.play_date).length;
     const isDraft=e.status==='drawn', isPub=e.status==='published';
     const pill=isDraft?'<span class="pill">utkast – ej publicerad</span>':isPub?'<span class="pill drawn">publicerad</span>':'';
+    const defOpen=isDraft || (!isDraft && !isPub) || (latestPub && e.id===latestPub.id);
+    const open=(e.id in admOpenEv)?admOpenEv[e.id]:defOpen;
     let out=`<div class="ev">
-      <div class="ev-name">${e.name}</div>
-      <div class="ev-meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts||'—'} · ${cnt} anmälda ${pill}</div>
+      <div onclick="toggleEv('${e.id}')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+        <div style="flex:1">
+          <div class="ev-name">${e.name}</div>
+          <div class="ev-meta">${fmtDate(e.play_date)} · ${e.start_time||'—'} · banor ${e.courts||'—'} · ${cnt} anmälda ${pill}</div>
+        </div>
+        <span id="chev-${e.id}" style="font-size:16px;color:var(--muted2);line-height:1.4">${open?'▾':'▸'}</span>
+      </div>
+      <div class="ev-body" id="body-${e.id}" style="display:${open?'block':'none'}">
       <div style="margin-top:8px">
         <button class="btn sm alt" onclick="var d=document.getElementById('ee-${e.id}');d.style.display=d.style.display==='flex'?'none':'flex';">✎ Ändra namn/tid/banor</button>
         <div id="ee-${e.id}" style="display:none;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px">
@@ -545,7 +563,7 @@ function renderAdminEvents(){
         <button class="btn sm green" onclick="addLate('${e.play_date}')">Lägg till (väntande)</button></div>
         <div class="muted" style="font-size:11px;margin-top:5px">Sent tillagda paras ihop två och två till väntande matcher. Fler banor? Klicka "Ändra namn/tid/banor" ovan och lägg till dem — sätt sedan in väntande matcher på dem.</div>`;
     }
-    out+=`<button class="btn sm alt" style="margin-top:10px" onclick="deleteEvent('${e.id}')">Ta bort</button></div>`;
+    out+=`<button class="btn sm alt" style="margin-top:10px" onclick="deleteEvent('${e.id}')">Ta bort</button></div></div>`;
     return out;
   }).join('');
 }
