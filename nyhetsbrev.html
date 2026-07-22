@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS · Nyhetsbrev</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0D2E20; --card:#0D2A1D; --border:#1C3A2B; --cream:#F5EDE3;
+    --muted:#9A8F86; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  a{color:var(--sun)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .hero{text-align:center;padding:26px 20px 22px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 72%,var(--bg) 100%)}
+  .hero h1{font-family:'Anton',sans-serif;font-size:40px;letter-spacing:2px;margin:0;color:#fff}
+  .hero .tag{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:6px}
+  .wrap{max-width:1080px;margin:0 auto;padding:22px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  @media(max-width:880px){ .grid{grid-template-columns:1fr} }
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+  .label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+  .label:first-child{margin-top:0}
+  input[type=text],textarea{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none}
+  input[type=text]:focus,textarea:focus{border-color:var(--clay)}
+  textarea{min-height:150px;line-height:1.6;resize:vertical}
+  .hint{font-size:11px;color:var(--muted);margin-top:5px}
+  .btn{display:inline-block;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:12px 20px;cursor:pointer}
+  .btn.primary{background:var(--orange);color:#fff}
+  .btn.alt{background:transparent;color:var(--cream);border:1px solid var(--border)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .thumbs{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .thumb{position:relative;width:78px;height:78px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:12px;cursor:pointer;line-height:1}
+  .stack{position:sticky;top:16px}
+  .pv-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .status{font-size:13px;margin-top:12px;min-height:18px}
+  .login{max-width:360px;margin:60px auto;text-align:center}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html">← Startsida</a>
+  <a href="sommarstege.html">Sommarstegen</a>
+</div>
+<div class="hero">
+  <h1>NYHETSBREV</h1>
+  <div class="tag">Båstad Stegen · utskick</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="login">
+  <div class="panel">
+    <div class="label">Adminlösenord</div>
+    <input type="text" id="pw" placeholder="Lösenord" style="text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="height:12px"></div>
+    <button class="btn primary" style="width:100%" onclick="doLogin()">Logga in</button>
+    <div class="status" id="login-status"></div>
+  </div>
+</div>
+
+<!-- COMPOSER -->
+<div id="app" class="wrap hidden">
+  <div class="grid">
+    <div class="panel">
+      <div class="label">Etikett (valfri)</div>
+      <input type="text" id="kicker" placeholder="t.ex. Nyhet · 22 juli" oninput="render()">
+      <div class="hint">Liten orange text ovanför rubriken. Lämna tom om du vill.</div>
+
+      <div class="label">Rubrik</div>
+      <input type="text" id="headline" placeholder="t.ex. Stark helg för BTS i tävlingarna" oninput="render()">
+
+      <div class="label">Brödtext</div>
+      <textarea id="body" placeholder="Skriv din text här.&#10;&#10;Lämna en tom rad mellan styckena.&#10;&#10;Du kan skriva [förnamn] så fylls mottagarens namn i automatiskt." oninput="render()"></textarea>
+      <div class="hint">Tom rad = nytt stycke. [förnamn] fylls i per mottagare. Länkar blir klickbara.</div>
+
+      <div class="label">Bilder</div>
+      <input type="file" id="imgfile" accept="image/*" multiple onchange="addImages(this)">
+      <div class="hint" id="upstatus">Ladda upp en eller flera bilder — de visas under texten.</div>
+      <div class="thumbs" id="thumbs"></div>
+
+      <div class="label">Knapp (valfri)</div>
+      <div class="row">
+        <input type="text" id="cta-label" placeholder="Knapptext, t.ex. Läs mer" style="flex:1;min-width:130px" oninput="render()">
+        <input type="text" id="cta-url" placeholder="https://…" style="flex:2;min-width:170px" oninput="render()">
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
+      <div class="label">Skicka</div>
+      <div class="row">
+        <input type="text" id="test-email" placeholder="din@mejl.se" style="flex:1;min-width:170px">
+        <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn primary" id="btn-send" style="width:100%" onclick="sendAll()">Skicka till alla →</button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="stack">
+      <div class="pv-title">Förhandsvisning</div>
+      <div id="preview"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const SMS_FN = "https://fueggdqtgmvldjbhcdfn.supabase.co/functions/v1/send-message";
+const SMS_PUBKEY = "sb_publishable_vZCnLnp41c29DFN7MLpYsQ_AUBnxJPy";
+const HEADER_URL = "https://bastadstegen.se/mail-header.jpg";
+const FOOTER_URL = "https://bastadstegen.se/mail-footer.png";
+let adminPw = "";
+let images = [];   // publika url:er
+let busy = false;
+
+async function doLogin(){
+  const pw=document.getElementById('pw').value.trim();
+  const s=document.getElementById('login-status');
+  if(!pw){ s.textContent='Ange lösenord.'; return; }
+  s.textContent='Kontrollerar…';
+  try{
+    const ok=await BTS.adminCheck(pw);
+    if(!ok) throw new Error('Fel lösenord');
+    adminPw=pw;
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    render();
+  }catch(e){ s.textContent = (e.message||e); }
+}
+
+function esc(s){ return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function linkify(s){ return s.replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+|bastadstegen\.se\/[^\s<]+)/g,
+  u=>`<a href="${u.startsWith('http')?u:'https://'+u}" style="color:#C24E12;font-weight:700;text-decoration:underline">${u}</a>`); }
+
+function bodyToHtml(txt, name){
+  const t=String(txt||'').replace(/\[förnamn\]/g, name||'Anna');
+  return t.split(/\n{2,}/).map(p=>`<p style="margin:0 0 16px;">${linkify(esc(p)).replace(/\n/g,'<br>')}</p>`).join('');
+}
+
+function tmplHtml(){
+  const kicker=document.getElementById('kicker').value.trim();
+  const headline=document.getElementById('headline').value.trim()||'Din rubrik hamnar här';
+  const bodyHtml=bodyToHtml(document.getElementById('body').value || 'Din text visas här. Lämna en tom rad mellan styckena.', 'Anna');
+  const ctaLabel=document.getElementById('cta-label').value.trim();
+  const ctaUrl=document.getElementById('cta-url').value.trim();
+  const kickerHtml=kicker?`<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#C24E12;font-weight:700;">${esc(kicker)}</div>`:'';
+  const imgsHtml=images.length?`<div style="margin-top:22px;">${images.map(u=>`<img src="${u}" style="display:block;border:0;width:100%;max-width:484px;height:auto;border-radius:12px;margin:0 0 14px;">`).join('')}</div>`:'';
+  const ctaHtml=ctaUrl?`<div style="margin-top:26px;"><a href="${esc(ctaUrl)}" style="display:inline-block;background:#E8520A;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:700;text-decoration:none;font-size:15px;padding:15px 30px;border-radius:10px;">${esc(ctaLabel||'Läs mer')} →</a></div>`:'';
+  return `
+  <div style="background:#0D2E20;padding:14px;border-radius:14px;">
+    <div style="max-width:560px;margin:0 auto;background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;">
+      <div style="line-height:0;background:#E8520A;"><img src="${HEADER_URL}" style="display:block;width:100%;height:auto;border:0;"></div>
+      <div style="background:#FAF6EF;padding:34px 32px 32px;">
+        ${kickerHtml}
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0D2E20;font-weight:700;letter-spacing:-0.4px;margin-top:${kicker?'12px':'0'};">${esc(headline)}</div>
+        <div style="height:3px;width:52px;background:#E8520A;margin:18px 0 24px;border-radius:2px;"></div>
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.72;color:#2C2C28;">${bodyHtml}</div>
+        ${imgsHtml}${ctaHtml}
+      </div>
+      <div style="line-height:0;"><img src="${FOOTER_URL}" style="display:block;width:100%;height:auto;border:0;"></div>
+    </div>
+  </div>`;
+}
+function render(){ document.getElementById('preview').innerHTML=tmplHtml(); }
+
+async function addImages(input){
+  const files=[...input.files]; input.value='';
+  if(!files.length) return;
+  const st=document.getElementById('upstatus');
+  st.textContent='Laddar upp…';
+  for(const f of files){
+    try{ const url=await BTS.uploadImage(f,'news'); images.push(url); }
+    catch(e){ st.textContent='Fel vid uppladdning: '+(e.message||e); }
+  }
+  st.textContent=images.length+' bild(er) tillagda.';
+  renderThumbs(); render();
+}
+function renderThumbs(){
+  document.getElementById('thumbs').innerHTML=images.map((u,i)=>
+    `<div class="thumb"><img src="${u}"><button onclick="rmImage(${i})" title="Ta bort">✕</button></div>`).join('');
+}
+function rmImage(i){ images.splice(i,1); renderThumbs(); render(); }
+
+function payload(){
+  return {
+    kicker: document.getElementById('kicker').value.trim(),
+    headline: document.getElementById('headline').value.trim(),
+    body: document.getElementById('body').value.trim(),
+    images,
+    ctaLabel: document.getElementById('cta-label').value.trim(),
+    ctaUrl: document.getElementById('cta-url').value.trim()
+  };
+}
+const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+
+function validate(){
+  const n=payload();
+  if(!n.headline){ return 'Skriv en rubrik.'; }
+  if(!n.body){ return 'Skriv brödtext.'; }
+  return '';
+}
+
+async function sendTest(){
+  if(busy) return; const err=validate(); const s=document.getElementById('status');
+  if(err){ s.textContent=err; return; }
+  const email=document.getElementById('test-email').value.trim();
+  if(!email){ s.textContent='Ange en testadress.'; return; }
+  busy=true; document.getElementById('btn-test').disabled=true; s.textContent='Skickar testmail…';
+  try{
+    const res=await post({adminPw, mode:'newsletter', audience:'test', testEmail:email, newsletter:payload()});
+    if(res.error) throw new Error(res.error);
+    s.textContent='Testmail skickat till '+email+' ✓';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+  busy=false; document.getElementById('btn-test').disabled=false;
+}
+
+async function sendAll(){
+  if(busy) return; const err=validate(); const s=document.getElementById('status');
+  if(err){ s.textContent=err; return; }
+  busy=true; document.getElementById('btn-send').disabled=true; s.textContent='Räknar mottagare…';
+  try{
+    const dry=await post({adminPw, mode:'newsletter', dryRun:true, newsletter:payload()});
+    if(dry.error) throw new Error(dry.error);
+    if(!confirm('Skicka nyhetsbrevet till '+dry.recipients+' mottagare?')){ s.textContent='Avbrutet.'; busy=false; document.getElementById('btn-send').disabled=false; return; }
+    s.textContent='Skickar till '+dry.recipients+' mottagare…';
+    const res=await post({adminPw, mode:'newsletter', newsletter:payload()});
+    if(res.error) throw new Error(res.error);
+    s.textContent='Klart! Skickat: '+res.email.sent+' ✓  ('+res.email.failed+' miss)';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+  busy=false; document.getElementById('btn-send').disabled=false;
+}
+
+render();
+</script>
+</body>
+</html>

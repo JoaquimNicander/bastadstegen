@@ -48,6 +48,16 @@ const BTS = {
     return _sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
   },
 
+  // Ladda upp valfri bild (t.ex. nyhetsbrev) och returnera publik url
+  async uploadImage(file, folder = 'news') {
+    _assert();
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await _sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    return _sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  },
+
   // Spara bild-url på spelaren (PIN-skyddat)
   async setPhoto(playerId, pin, url) {
     _assert();
