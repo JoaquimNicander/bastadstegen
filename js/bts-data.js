@@ -652,12 +652,13 @@ const BTS = {
   },
 
   // ── NYHETER (artiklar + kommentarer + reaktioner) ─────────────────────
-  async newsSave(adminPw, { id, kicker, headline, blocks, ctaLabel, ctaUrl }) {
+  async newsSave(adminPw, { id, kicker, headline, blocks, ctaLabel, ctaUrl, headerUrl }) {
     _assert();
     const { data, error } = await _sb.rpc('bts_news_save', {
       p_admin_pw: adminPw, p_id: id ?? null, p_kicker: kicker || null,
       p_headline: headline || '', p_blocks: blocks || [],
-      p_cta_label: ctaLabel || null, p_cta_url: ctaUrl || null });
+      p_cta_label: ctaLabel || null, p_cta_url: ctaUrl || null,
+      p_header_url: headerUrl || null });
     if (error) throw error;
     return data; // id
   },

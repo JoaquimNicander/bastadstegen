@@ -74,6 +74,14 @@
 <div id="app" class="wrap hidden">
   <div class="grid">
     <div class="panel">
+      <div class="label">Header (valfri)</div>
+      <div class="hint">Standardheadern används om du inte laddar upp en egen.</div>
+      <div class="row" style="margin-top:6px">
+        <input type="file" id="headerfile" accept="image/*" onchange="uploadHeader(this)">
+        <button class="btn alt" type="button" id="btn-header-clear" onclick="clearHeader()" style="display:none">Använd standard</button>
+      </div>
+      <div class="hint" id="headerstatus">Standardheader vald.</div>
+
       <div class="label">Etikett (valfri)</div>
       <input type="text" id="kicker" placeholder="t.ex. Nyhet · 22 juli" oninput="render()">
       <div class="hint">Liten orange text ovanför rubriken. Lämna tom om du vill.</div>
@@ -141,6 +149,7 @@ let busy = false;
 let _bid = 1;
 let currentId = null;   // id på sparat brev (null = nytt)
 let currentNum = null;  // publikt artikelnummer (om publicerat)
+let headerUrl = '';     // egen header (tom = standard)
 const uid = () => 'b' + (_bid++);
 
 async function doLogin(){
@@ -232,7 +241,7 @@ function tmplHtml(){
   return `
   <div style="background:#0D2E20;padding:14px;border-radius:14px;">
     <div style="max-width:560px;margin:0 auto;background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;">
-      <div style="line-height:0;background:#E8520A;"><img src="${HEADER_URL}" style="display:block;width:100%;height:auto;border:0;"></div>
+      <div style="line-height:0;background:#E8520A;"><img src="${headerUrl||HEADER_URL}" style="display:block;width:100%;height:auto;border:0;"></div>
       <div style="background:#FAF6EF;padding:34px 32px 32px;">
         ${kickerHtml}
         <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0D2E20;font-weight:700;letter-spacing:-0.4px;margin-top:${kicker?'12px':'0'};">${esc(headline)}</div>
@@ -252,16 +261,35 @@ function payload(){
     headline: document.getElementById('headline').value.trim(),
     blocks: blocks.map(b=>({type:b.type, text:b.text||'', url:b.url||''})),
     ctaLabel: document.getElementById('cta-label').value.trim(),
-    ctaUrl: document.getElementById('cta-url').value.trim()
+    ctaUrl: document.getElementById('cta-url').value.trim(),
+    headerUrl: headerUrl || ''
   };
 }
 // Payload för mejlutskick: inkluderar id (öppningsspårning) + num (webblänk)
 function mailPayload(){ return { ...payload(), id: currentId, num: currentNum }; }
 
+// ── Header ──
+async function uploadHeader(input){
+  const f=input.files&&input.files[0]; input.value='';
+  if(!f) return;
+  const st=document.getElementById('headerstatus'); st.textContent='Laddar upp header…';
+  try{ headerUrl=await BTS.uploadImage(f,'news-header'); st.textContent='Egen header vald ✓'; document.getElementById('btn-header-clear').style.display=''; render(); }
+  catch(e){ st.textContent='Fel: '+(e.message||e); }
+}
+function clearHeader(){
+  headerUrl=''; document.getElementById('headerstatus').textContent='Standardheader vald.';
+  document.getElementById('btn-header-clear').style.display='none'; render();
+}
+function syncHeaderUI(){
+  const has=!!headerUrl;
+  document.getElementById('headerstatus').textContent=has?'Egen header vald ✓':'Standardheader vald.';
+  document.getElementById('btn-header-clear').style.display=has?'':'none';
+}
+
 // ── Spara / publicera / utkast ──
 function setField(id,val){ const el=document.getElementById(id); if(el) el.value=val||''; }
 function newDraft(){
-  currentId=null; currentNum=null; blocks=[];
+  currentId=null; currentNum=null; blocks=[]; headerUrl=''; syncHeaderUI();
   ['kicker','headline','cta-label','cta-url'].forEach(id=>setField(id,''));
   addBlock('text');
   document.getElementById('save-status').textContent='';
@@ -320,7 +348,7 @@ async function openDraft(id){
   try{
     const d=await BTS.newsGetAdmin(adminPw,id);
     if(!d){ s.textContent='Hittar inte brevet.'; return; }
-    currentId=d.id; currentNum=d.num||null;
+    currentId=d.id; currentNum=d.num||null; headerUrl=d.header_url||''; syncHeaderUI();
     setField('kicker',d.kicker); setField('headline',d.headline);
     setField('cta-label',d.cta_label); setField('cta-url',d.cta_url);
     blocks=(Array.isArray(d.blocks)?d.blocks:[]).map(b=>({id:uid(),type:b.type,text:b.text||'',url:b.url||''}));

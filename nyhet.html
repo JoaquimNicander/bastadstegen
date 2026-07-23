@@ -109,11 +109,12 @@ async function loadArticle(){
   try{ a=await BTS.newsGetPublic(NUM); }catch(e){ a=null; }
   if(!a){ document.getElementById('article').innerHTML='<div class="muted" style="text-align:center;padding:40px 0">Artikeln hittades inte.</div>'; return; }
   document.title='Båstad Stegen · '+(a.headline||'Nyhet');
+  const header=a.header_url||HEADER_URL;
   const kicker=a.kicker?`<div class="kicker">${esc(a.kicker)}</div>`:'';
   const cta=a.cta_url?`<a class="cta" href="${esc(a.cta_url)}">${esc(a.cta_label||'Läs mer')} →</a>`:'';
   document.getElementById('article').innerHTML=`
     <div class="article">
-      <div class="banner"><img src="${HEADER_URL}" alt="Båstad Stegen"></div>
+      <div class="banner"><img src="${header}" alt="Båstad Stegen"></div>
       <div class="body">
         ${kicker}
         <div class="headline">${esc(a.headline||'')}</div>
