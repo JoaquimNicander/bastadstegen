@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Båstad Stegen · Nyhet</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:#0D2E20;color:#F5EDE3;min-height:100vh}
+  a{color:#F4B740}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;max-width:660px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .wrap{max-width:600px;margin:0 auto;padding:14px 14px 60px}
+
+  .article{background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B}
+  .article .banner{line-height:0;background:#E8520A}
+  .article .banner img{display:block;width:100%;height:auto;border:0}
+  .article .body{background:#FAF6EF;padding:34px 32px 32px}
+  .kicker{font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#C24E12;font-weight:700}
+  .headline{font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0D2E20;font-weight:700;letter-spacing:-.4px;margin-top:12px}
+  .rule{height:3px;width:52px;background:#E8520A;margin:18px 0 24px;border-radius:2px}
+  .content{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.72;color:#2C2C28}
+  .content h2{font-size:21px;line-height:1.2;color:#0D2E20;font-weight:700;margin:28px 0 12px}
+  .content p{margin:0 0 16px}
+  .content img{display:block;width:100%;max-width:484px;height:auto;border-radius:12px;margin:18px 0}
+  .content a{color:#C24E12;font-weight:700}
+  .cta{display:inline-block;background:#E8520A;color:#fff;font-weight:700;text-decoration:none;font-size:15px;padding:15px 30px;border-radius:10px;margin-top:22px}
+  .footimg{line-height:0}
+  .footimg img{display:block;width:100%;height:auto;border:0}
+
+  .section{margin-top:24px}
+  .sec-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9A8F86;margin-bottom:12px}
+  .reactions{display:flex;flex-wrap:wrap;gap:8px}
+  .react{display:flex;align-items:center;gap:6px;background:#10231a;border:1px solid #1C3A2B;border-radius:22px;padding:8px 14px;cursor:pointer;font-size:17px;user-select:none;transition:all .12s}
+  .react .c{font-family:'Space Mono',monospace;font-size:13px;color:#9A8F86}
+  .react.on{background:rgba(255,140,66,.16);border-color:#FF8C42}
+  .react.on .c{color:#F4B740}
+
+  .cform input,.cform textarea{width:100%;background:#10231a;border:1px solid #1C3A2B;color:#F5EDE3;font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none;margin-bottom:8px}
+  .cform textarea{min-height:80px;line-height:1.5;resize:vertical}
+  .cform button{background:#E8520A;color:#fff;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:11px 20px;cursor:pointer}
+  .comment{background:#10231a;border:1px solid #1C3A2B;border-radius:11px;padding:12px 14px;margin-bottom:9px}
+  .comment .cn{font-weight:700;font-size:14px;color:#F5EDE3}
+  .comment .cd{font-size:11px;color:#9A8F86;margin-left:6px}
+  .comment .cb{font-size:14px;line-height:1.55;color:#DCD5CB;margin-top:5px;white-space:pre-wrap}
+  .muted{color:#9A8F86;font-size:13px}
+  .status{font-size:13px;margin-top:8px;min-height:16px;color:#9A8F86}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html">← Startsida</a>
+  <a href="sommarstege.html">Sommarstegen</a>
+</div>
+
+<div class="wrap">
+  <div id="article"><div class="muted" style="text-align:center;padding:40px 0">Laddar…</div></div>
+
+  <div id="engagement" style="display:none">
+    <div class="section">
+      <div class="sec-title">Reaktioner</div>
+      <div class="reactions" id="reactions"></div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Kommentarer</div>
+      <div id="comments"></div>
+      <div class="cform" style="margin-top:12px">
+        <input type="text" id="c-name" placeholder="Ditt namn" maxlength="60">
+        <textarea id="c-body" placeholder="Skriv en kommentar…" maxlength="1000"></textarea>
+        <button onclick="postComment()">Kommentera</button>
+        <div class="status" id="c-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const HEADER_URL="https://bastadstegen.se/mail-header.jpg";
+const FOOTER_URL="https://bastadstegen.se/mail-footer.png";
+const EMOJIS=['👍','❤️','🎾','🏆','🔥','😂','👏'];
+const NUM=parseInt(new URLSearchParams(location.search).get('n'));
+
+// stabilt klient-id per webbläsare (för toggle av reaktioner)
+let CLIENT=localStorage.getItem('bts_client');
+if(!CLIENT){ CLIENT='c'+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('bts_client',CLIENT); }
+// kom ihåg namn
+const savedName=localStorage.getItem('bts_cname')||'';
+
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function linkify(s){return s.replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+|bastadstegen\.se\/[^\s<]+)/g,u=>`<a href="${u.startsWith('http')?u:'https://'+u}">${u}</a>`);}
+function paras(t){return String(t||'').split(/\n{2,}/).map(p=>`<p>${linkify(esc(p)).replace(/\n/g,'<br>')}</p>`).join('');}
+function blocksHtml(blocks){
+  return (blocks||[]).map(b=>{
+    if(b.type==='heading') return `<h2>${esc(b.text||'')}</h2>`;
+    if(b.type==='image'&&b.url) return `<img src="${b.url}" alt="">`;
+    return paras(b.text||'');
+  }).join('');
+}
+function fmt(ts){ try{ return new Date(ts).toLocaleDateString('sv-SE',{day:'numeric',month:'long',year:'numeric'}); }catch(e){ return ''; } }
+function fmtDT(ts){ try{ return new Date(ts).toLocaleString('sv-SE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+
+async function loadArticle(){
+  if(!NUM){ document.getElementById('article').innerHTML='<div class="muted" style="text-align:center;padding:40px 0">Ingen artikel angiven.</div>'; return; }
+  let a;
+  try{ a=await BTS.newsGetPublic(NUM); }catch(e){ a=null; }
+  if(!a){ document.getElementById('article').innerHTML='<div class="muted" style="text-align:center;padding:40px 0">Artikeln hittades inte.</div>'; return; }
+  document.title='Båstad Stegen · '+(a.headline||'Nyhet');
+  const kicker=a.kicker?`<div class="kicker">${esc(a.kicker)}</div>`:'';
+  const cta=a.cta_url?`<a class="cta" href="${esc(a.cta_url)}">${esc(a.cta_label||'Läs mer')} →</a>`:'';
+  document.getElementById('article').innerHTML=`
+    <div class="article">
+      <div class="banner"><img src="${HEADER_URL}" alt="Båstad Stegen"></div>
+      <div class="body">
+        ${kicker}
+        <div class="headline">${esc(a.headline||'')}</div>
+        <div class="rule"></div>
+        <div class="content">${blocksHtml(a.blocks)}</div>
+        ${cta}
+      </div>
+      <div class="footimg"><img src="${FOOTER_URL}" alt="Båstad Tennissällskap"></div>
+    </div>`;
+  document.getElementById('engagement').style.display='block';
+  if(savedName) document.getElementById('c-name').value=savedName;
+  // registrera visning (källa: web eller mail)
+  const src=(new URLSearchParams(location.search).get('src')==='mail')?'mail':'web';
+  try{ BTS.newsView(NUM, CLIENT, src); }catch(e){}
+  loadReactions(); loadComments();
+}
+
+async function loadReactions(){
+  let rows=[];
+  try{ rows=await BTS.newsReactions(NUM,CLIENT); }catch(e){}
+  const map={}; rows.forEach(r=>map[r.emoji]={cnt:Number(r.cnt),mine:r.mine});
+  document.getElementById('reactions').innerHTML=EMOJIS.map(e=>{
+    const d=map[e]||{cnt:0,mine:false};
+    return `<div class="react ${d.mine?'on':''}" onclick="react('${e}')"><span>${e}</span>${d.cnt?`<span class="c">${d.cnt}</span>`:''}</div>`;
+  }).join('');
+}
+let reacting=false;
+async function react(e){
+  if(reacting) return; reacting=true;
+  try{ await BTS.newsReact(NUM,e,CLIENT); await loadReactions(); }catch(err){}
+  reacting=false;
+}
+
+async function loadComments(){
+  let list=[];
+  try{ list=await BTS.newsComments(NUM); }catch(e){}
+  const box=document.getElementById('comments');
+  box.innerHTML=list.length?list.map(c=>`
+    <div class="comment">
+      <span class="cn">${esc(c.name)}</span><span class="cd">${fmtDT(c.created_at)}</span>
+      <div class="cb">${esc(c.body)}</div>
+    </div>`).join(''):'<div class="muted">Bli först att kommentera!</div>';
+}
+async function postComment(){
+  const name=document.getElementById('c-name').value.trim();
+  const body=document.getElementById('c-body').value.trim();
+  const s=document.getElementById('c-status');
+  if(!name){ s.textContent='Ange ditt namn.'; return; }
+  if(!body){ s.textContent='Skriv en kommentar.'; return; }
+  s.textContent='Skickar…';
+  try{
+    await BTS.newsComment(NUM,name,body);
+    localStorage.setItem('bts_cname',name);
+    document.getElementById('c-body').value='';
+    s.textContent='Tack för din kommentar!';
+    loadComments();
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+loadArticle();
+</script>
+</body>
+</html>

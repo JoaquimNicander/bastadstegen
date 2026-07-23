@@ -52,7 +52,7 @@
 <body>
 <div class="topbar">
   <a href="index.html">← Startsida</a>
-  <a href="sommarstege.html">Sommarstegen</a>
+  <a href="statistik.html">📊 Statistik</a>
 </div>
 <div class="hero">
   <h1>NYHETSBREV</h1>
@@ -97,7 +97,17 @@
       </div>
 
       <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
-      <div class="label">Skicka</div>
+      <div class="label">Spara &amp; publicera på webben</div>
+      <div class="row">
+        <button class="btn alt" type="button" onclick="saveDraft()">💾 Spara utkast</button>
+        <button class="btn primary" type="button" onclick="publish()">Publicera →</button>
+        <button class="btn alt" type="button" onclick="newDraft()">+ Nytt brev</button>
+      </div>
+      <div class="status" id="save-status"></div>
+      <div id="pub-link" style="margin-top:6px"></div>
+
+      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
+      <div class="label">Skicka som mejl</div>
       <div class="row">
         <input type="text" id="test-email" placeholder="din@mejl.se" style="flex:1;min-width:170px">
         <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
@@ -105,6 +115,10 @@
       <div style="height:12px"></div>
       <button class="btn primary" id="btn-send" style="width:100%" onclick="sendAll()">Skicka till alla →</button>
       <div class="status" id="status"></div>
+
+      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
+      <div class="label">Sparade brev</div>
+      <div id="drafts"><div class="hint">Laddar…</div></div>
     </div>
 
     <div class="stack">
@@ -125,6 +139,8 @@ let adminPw = "";
 let blocks = [];   // [{id,type:'heading'|'text'|'image', text, url}]
 let busy = false;
 let _bid = 1;
+let currentId = null;   // id på sparat brev (null = nytt)
+let currentNum = null;  // publikt artikelnummer (om publicerat)
 const uid = () => 'b' + (_bid++);
 
 async function doLogin(){
@@ -139,7 +155,7 @@ async function doLogin(){
     document.getElementById('login').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     if(!blocks.length) addBlock('text');
-    renderBlocks(); render();
+    renderBlocks(); render(); loadDrafts();
   }catch(e){ s.textContent = (e.message||e); }
 }
 
@@ -239,6 +255,87 @@ function payload(){
     ctaUrl: document.getElementById('cta-url').value.trim()
   };
 }
+// Payload för mejlutskick: inkluderar id (öppningsspårning) + num (webblänk)
+function mailPayload(){ return { ...payload(), id: currentId, num: currentNum }; }
+
+// ── Spara / publicera / utkast ──
+function setField(id,val){ const el=document.getElementById(id); if(el) el.value=val||''; }
+function newDraft(){
+  currentId=null; currentNum=null; blocks=[];
+  ['kicker','headline','cta-label','cta-url'].forEach(id=>setField(id,''));
+  addBlock('text');
+  document.getElementById('save-status').textContent='';
+  document.getElementById('pub-link').innerHTML='';
+  renderBlocks(); render();
+}
+async function saveDraft(){
+  const s=document.getElementById('save-status');
+  const n=payload();
+  if(!n.headline){ s.textContent='Skriv en rubrik innan du sparar.'; return; }
+  s.textContent='Sparar…';
+  try{
+    currentId=await BTS.newsSave(adminPw,{id:currentId, ...n});
+    s.textContent='Sparat ✓';
+    loadDrafts();
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+async function publish(){
+  const s=document.getElementById('save-status');
+  const err=validate(); if(err){ s.textContent=err; return; }
+  s.textContent='Sparar & publicerar…';
+  try{
+    currentId=await BTS.newsSave(adminPw,{id:currentId, ...payload()});
+    const num=await BTS.newsPublish(adminPw,currentId);
+    currentNum=num;
+    const url='https://bastadstegen.se/nyhet.html?n='+num;
+    s.textContent='Publicerad ✓';
+    document.getElementById('pub-link').innerHTML=`<div class="hint">Publik länk: <a href="${url}" target="_blank">${url}</a></div>`;
+    loadDrafts();
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+async function loadDrafts(){
+  const box=document.getElementById('drafts');
+  try{
+    const list=await BTS.newsListAdmin(adminPw);
+    if(!list.length){ box.innerHTML='<div class="hint">Inga sparade brev än.</div>'; return; }
+    box.innerHTML=list.map(d=>{
+      const pub=d.status==='published';
+      const tag=pub?`<span style="color:#7BC67B">● publicerad (nyhet ${d.num})</span>`:'<span style="color:#F4B740">○ utkast</span>';
+      const link=pub?` · <a href="nyhet.html?n=${d.num}" target="_blank">öppna sida</a>`:'';
+      return `<div class="blk" style="margin-top:8px">
+        <div class="blk-head">
+          <span class="blk-type" style="text-transform:none;letter-spacing:0;color:#F5EDE3;font-family:'Outfit'">${(d.headline||'(utan rubrik)')}</span>
+          <div class="blk-tools">
+            <button onclick="openDraft(${d.id})" title="Öppna">✎</button>
+            <button onclick="delDraft(${d.id})" title="Ta bort">✕</button>
+          </div>
+        </div>
+        <div class="hint" style="margin:0">${tag}${link}</div>
+      </div>`;
+    }).join('');
+  }catch(e){ box.innerHTML='<div class="hint">Kunde inte ladda: '+(e.message||e)+'</div>'; }
+}
+async function openDraft(id){
+  const s=document.getElementById('save-status');
+  try{
+    const d=await BTS.newsGetAdmin(adminPw,id);
+    if(!d){ s.textContent='Hittar inte brevet.'; return; }
+    currentId=d.id; currentNum=d.num||null;
+    setField('kicker',d.kicker); setField('headline',d.headline);
+    setField('cta-label',d.cta_label); setField('cta-url',d.cta_url);
+    blocks=(Array.isArray(d.blocks)?d.blocks:[]).map(b=>({id:uid(),type:b.type,text:b.text||'',url:b.url||''}));
+    if(!blocks.length) addBlock('text');
+    renderBlocks(); render();
+    document.getElementById('pub-link').innerHTML = d.num?`<div class="hint">Publik länk: <a href="nyhet.html?n=${d.num}" target="_blank">bastadstegen.se/nyhet.html?n=${d.num}</a></div>`:'';
+    s.textContent='Öppnat "'+(d.headline||'')+'"';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+async function delDraft(id){
+  if(!confirm('Ta bort detta brev? Går inte att ångra.')) return;
+  try{ await BTS.newsDelete(adminPw,id); if(currentId===id) newDraft(); loadDrafts(); }
+  catch(e){ document.getElementById('save-status').textContent='Fel: '+(e.message||e); }
+}
 const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
 
 function validate(){
@@ -257,7 +354,7 @@ async function sendTest(){
   if(!email){ s.textContent='Ange en testadress.'; return; }
   busy=true; document.getElementById('btn-test').disabled=true; s.textContent='Skickar testmail…';
   try{
-    const res=await post({adminPw, mode:'newsletter', audience:'test', testEmail:email, newsletter:payload()});
+    const res=await post({adminPw, mode:'newsletter', audience:'test', testEmail:email, newsletter:mailPayload()});
     if(res.error) throw new Error(res.error);
     s.textContent='Testmail skickat till '+email+' ✓';
   }catch(e){ s.textContent='Fel: '+(e.message||e); }
@@ -269,11 +366,12 @@ async function sendAll(){
   if(err){ s.textContent=err; return; }
   busy=true; document.getElementById('btn-send').disabled=true; s.textContent='Räknar mottagare…';
   try{
-    const dry=await post({adminPw, mode:'newsletter', dryRun:true, newsletter:payload()});
+    const dry=await post({adminPw, mode:'newsletter', dryRun:true, newsletter:mailPayload()});
     if(dry.error) throw new Error(dry.error);
-    if(!confirm('Skicka nyhetsbrevet till '+dry.recipients+' mottagare?')){ s.textContent='Avbrutet.'; busy=false; document.getElementById('btn-send').disabled=false; return; }
+    const note = currentNum ? '' : '\n\nTips: publicera först så får du öppningsstatistik och webblänk i mejlet.';
+    if(!confirm('Skicka nyhetsbrevet till '+dry.recipients+' mottagare?'+note)){ s.textContent='Avbrutet.'; busy=false; document.getElementById('btn-send').disabled=false; return; }
     s.textContent='Skickar till '+dry.recipients+' mottagare…';
-    const res=await post({adminPw, mode:'newsletter', newsletter:payload()});
+    const res=await post({adminPw, mode:'newsletter', newsletter:mailPayload()});
     if(res.error) throw new Error(res.error);
     s.textContent='Klart! Skickat: '+res.email.sent+' ✓  ('+res.email.failed+' miss)';
   }catch(e){ s.textContent='Fel: '+(e.message||e); }

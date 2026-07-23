@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS · Nyhetsstatistik</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0D2E20; --card:#0D2A1D; --border:#1C3A2B; --cream:#F5EDE3; --muted:#9A8F86; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  a{color:var(--sun)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;max-width:1000px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .hero{text-align:center;padding:24px 20px 20px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 72%,var(--bg) 100%)}
+  .hero h1{font-family:'Anton',sans-serif;font-size:38px;letter-spacing:2px;margin:0;color:#fff}
+  .hero .tag{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:6px}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+  .label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  input[type=text]{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none}
+  .btn{border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:12px 20px;cursor:pointer;background:var(--orange);color:#fff}
+  .btn.alt{background:transparent;color:var(--cream);border:1px solid var(--border)}
+  .login{max-width:360px;margin:60px auto;text-align:center}
+  .hidden{display:none}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .kpi{background:#10231a;border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+  .kpi .v{font-family:'Anton',sans-serif;font-size:30px;color:var(--sun);line-height:1}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  tr.art{cursor:pointer}
+  tr.art:hover td{background:rgba(255,255,255,.03)}
+  .bar{height:6px;background:#10231a;border-radius:4px;overflow:hidden;margin-top:5px}
+  .bar>i{display:block;height:100%;background:var(--orange)}
+  .hl{color:var(--cream);font-weight:600}
+  .muted{color:var(--muted);font-size:13px}
+  .status{font-size:13px;margin-top:10px;color:var(--muted);min-height:16px}
+  .openers{background:#10231a;border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:6px}
+  .warn{background:rgba(244,183,64,.1);border:1px solid rgba(244,183,64,.35);color:#F4D98A;border-radius:10px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:18px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html">← Startsida</a>
+  <a href="nyhetsbrev.html">✉ Nyhetsbrev</a>
+</div>
+<div class="hero">
+  <h1>STATISTIK</h1>
+  <div class="tag">Nyhetsbrev &amp; artiklar</div>
+</div>
+
+<div id="login" class="login">
+  <div class="panel">
+    <div class="label">Adminlösenord</div>
+    <input type="text" id="pw" placeholder="Lösenord" style="text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+    <div style="height:12px"></div>
+    <button class="btn" style="width:100%" onclick="doLogin()">Logga in</button>
+    <div class="status" id="login-status"></div>
+  </div>
+</div>
+
+<div id="app" class="wrap hidden">
+  <div class="cards" id="kpis"></div>
+  <div class="warn">⚠️ <strong>Om e-postöppningar:</strong> siffran är ungefärlig. Många mejlappar (särskilt Apple Mail) förladdar bilder automatiskt, vilket kan räkna öppningar som inte skett — och bilder som blockeras kan missa riktiga öppningar. Visningar och klick på webben är mer pålitliga mått.</div>
+  <div class="panel">
+    <div class="label" style="margin-bottom:14px">Per artikel <span style="color:var(--muted);text-transform:none;letter-spacing:0"> · klicka en rad för att se vilka som öppnat</span></div>
+    <div style="overflow-x:auto">
+      <table id="tbl"><thead><tr>
+        <th>Artikel</th><th>Visningar</th><th>Unika</th><th>Klick&nbsp;(mejl)</th>
+        <th>Skickat</th><th>Öppnat</th><th>Öppn.grad</th><th>Reakt.</th><th>Komm.</th>
+      </tr></thead><tbody id="tbody"></tbody></table>
+    </div>
+    <div class="status" id="status"></div>
+    <div id="openers"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let adminPw="";
+let rows=[];
+
+async function doLogin(){
+  const pw=document.getElementById('pw').value.trim();
+  const s=document.getElementById('login-status');
+  if(!pw){ s.textContent='Ange lösenord.'; return; }
+  s.textContent='Kontrollerar…';
+  try{
+    if(!(await BTS.adminCheck(pw))) throw new Error('Fel lösenord');
+    adminPw=pw;
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    load();
+  }catch(e){ s.textContent=(e.message||e); }
+}
+
+function n(x){ return Number(x||0); }
+function pct(a,b){ return b>0?Math.round(100*a/b):0; }
+
+async function load(){
+  const s=document.getElementById('status'); s.textContent='Laddar…';
+  try{
+    rows=await BTS.newsStats(adminPw);
+    renderKpis(); renderTable();
+    s.textContent = rows.length?'':'Inga publicerade artiklar än.';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+function renderKpis(){
+  const sum=(k)=>rows.reduce((a,r)=>a+n(r[k]),0);
+  const views=sum('views_total'), uniq=sum('views_unique'), clicks=sum('mail_clicks');
+  const sent=sum('emails_sent'), opened=sum('emails_opened');
+  const reacts=sum('reactions'), comments=sum('comments');
+  const cards=[
+    ['Artiklar', rows.length],
+    ['Visningar', views],
+    ['Unika läsare', uniq],
+    ['Klick från mejl', clicks],
+    ['Öppningsgrad', pct(opened,sent)+'%'],
+    ['Reaktioner', reacts],
+    ['Kommentarer', comments],
+  ];
+  document.getElementById('kpis').innerHTML=cards.map(c=>`<div class="kpi"><div class="v">${c[1]}</div><div class="l">${c[0]}</div></div>`).join('');
+}
+
+function renderTable(){
+  const maxViews=Math.max(1,...rows.map(r=>n(r.views_total)));
+  document.getElementById('tbody').innerHTML=rows.map(r=>{
+    const open=pct(n(r.emails_opened),n(r.emails_sent));
+    return `<tr class="art" onclick="showOpeners(${r.num})">
+      <td><span class="hl">${r.headline||'(utan rubrik)'}</span><div class="muted" style="font-size:11px">nyhet ${r.num}</div>
+        <div class="bar"><i style="width:${Math.round(100*n(r.views_total)/maxViews)}%"></i></div></td>
+      <td>${n(r.views_total)}</td><td>${n(r.views_unique)}</td><td>${n(r.mail_clicks)}</td>
+      <td>${n(r.emails_sent)}</td><td>${n(r.emails_opened)}</td><td>${open}%</td>
+      <td>${n(r.reactions)}</td><td>${n(r.comments)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="9" class="muted">Inga artiklar.</td></tr>';
+}
+
+async function showOpeners(num){
+  const box=document.getElementById('openers');
+  box.innerHTML='<div class="openers muted">Laddar öppnare för nyhet '+num+'…</div>';
+  try{
+    const list=await BTS.newsOpeners(adminPw,num);
+    box.innerHTML='<div class="openers">'+
+      '<div class="label" style="margin-bottom:8px">Öppnat nyhet '+num+' ('+list.length+')</div>'+
+      (list.length?list.map(o=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span>${o.name}</span><span class="muted">${o.opens} ggr</span></div>`).join('')
+        :'<div class="muted">Ingen öppning loggad än (eller mejlet skickades utan spårning).</div>')+
+      '</div>';
+    box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){ box.innerHTML='<div class="openers muted">Fel: '+(e.message||e)+'</div>'; }
+}
+</script>
+</body>
+</html>

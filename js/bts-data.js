@@ -650,6 +650,102 @@ const BTS = {
       .update({ current_round: round + 1 }).eq('id', competitionId);
     if (e2) throw e2;
   },
+
+  // ── NYHETER (artiklar + kommentarer + reaktioner) ─────────────────────
+  async newsSave(adminPw, { id, kicker, headline, blocks, ctaLabel, ctaUrl }) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_save', {
+      p_admin_pw: adminPw, p_id: id ?? null, p_kicker: kicker || null,
+      p_headline: headline || '', p_blocks: blocks || [],
+      p_cta_label: ctaLabel || null, p_cta_url: ctaUrl || null });
+    if (error) throw error;
+    return data; // id
+  },
+  async newsListAdmin(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_list_admin', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
+  async newsGetAdmin(adminPw, id) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_get_admin', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+    return (data && data[0]) || null;
+  },
+  async newsPublish(adminPw, id) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_publish', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+    return data; // num
+  },
+  async newsUnpublish(adminPw, id) {
+    _assert();
+    const { error } = await _sb.rpc('bts_news_unpublish', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+  },
+  async newsDelete(adminPw, id) {
+    _assert();
+    const { error } = await _sb.rpc('bts_news_delete', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+  },
+  async newsGetPublic(num) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_get_public', { p_num: num });
+    if (error) throw error;
+    return (data && data[0]) || null;
+  },
+  async newsListPublic() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_list_public');
+    if (error) throw error;
+    return data || [];
+  },
+  async newsComment(num, name, body) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_comment', { p_num: num, p_name: name, p_body: body });
+    if (error) throw error;
+    return data;
+  },
+  async newsComments(num) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_comments', { p_num: num });
+    if (error) throw error;
+    return data || [];
+  },
+  async newsReact(num, emoji, client) {
+    _assert();
+    const { error } = await _sb.rpc('bts_news_react', { p_num: num, p_emoji: emoji, p_client: client });
+    if (error) throw error;
+  },
+  async newsReactions(num, client) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_reactions', { p_num: num, p_client: client });
+    if (error) throw error;
+    return data || [];
+  },
+  async newsDeleteComment(adminPw, commentId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_news_delete_comment', { p_admin_pw: adminPw, p_comment_id: commentId });
+    if (error) throw error;
+  },
+  async newsView(num, client, source) {
+    _assert();
+    const { error } = await _sb.rpc('bts_news_view', { p_num: num, p_client: client || 'anon', p_source: source || 'web' });
+    if (error) throw error;
+  },
+  async newsStats(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_stats', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
+  async newsOpeners(adminPw, num) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_news_openers', { p_admin_pw: adminPw, p_num: num });
+    if (error) throw error;
+    return data || [];
+  },
 };
 
 window.BTS = BTS;
