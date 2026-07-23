@@ -40,11 +40,23 @@
   .thumb{position:relative;width:78px;height:78px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:12px;cursor:pointer;line-height:1}
-  .blk{background:#10231a;border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-top:10px}
+  .blk{background:#10231a;border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-top:10px;transition:border-color .12s,box-shadow .12s}
+  .blk.dragging{opacity:.45}
+  .blk.dragover{border-color:var(--clay);box-shadow:0 -2px 0 var(--clay)}
   .blk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .blk-left{display:flex;align-items:center;gap:8px}
+  .blk-grip{cursor:grab;color:var(--muted);font-size:15px;line-height:1;user-select:none;padding:2px 2px}
+  .blk-grip:active{cursor:grabbing}
   .blk-type{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sun)}
   .blk-tools button{background:transparent;border:1px solid var(--border);color:var(--cream);border-radius:7px;width:28px;height:28px;font-size:13px;cursor:pointer;margin-left:4px}
   .blk-tools button:disabled{opacity:.35;cursor:not-allowed}
+  .statebar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#10231a;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;flex-wrap:wrap}
+  .statebar .chip{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .statebar .dot{width:9px;height:9px;border-radius:50%;background:var(--sun)}
+  .statebar .dot.pub{background:var(--green)}
+  .statebar .save{font-size:12px;color:var(--muted)}
+  .stephdr{display:flex;align-items:center;gap:8px;margin:0 0 4px}
+  .stepnum{width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .stack{position:sticky;top:16px}
   .pv-title{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
   .status{font-size:13px;margin-top:12px;min-height:18px}
@@ -77,6 +89,10 @@
 <div id="app" class="wrap hidden">
   <div class="grid">
     <div class="panel">
+      <div class="statebar">
+        <div class="chip"><span class="dot" id="state-dot"></span><span id="state-text">Nytt brev</span></div>
+        <div class="save" id="autosave">Autospar på</div>
+      </div>
       <div class="label">Header (valfri)</div>
       <div class="hint">Standardheadern används om du inte laddar upp en egen.</div>
       <div class="row" style="margin-top:6px">
@@ -86,11 +102,11 @@
       <div class="hint" id="headerstatus">Standardheader vald.</div>
 
       <div class="label">Etikett (valfri)</div>
-      <input type="text" id="kicker" placeholder="t.ex. Nyhet · 22 juli" oninput="render()">
+      <input type="text" id="kicker" placeholder="t.ex. Nyhet · 22 juli" oninput="touch()">
       <div class="hint">Liten orange text ovanför rubriken. Lämna tom om du vill.</div>
 
       <div class="label">Rubrik (överst i brevet)</div>
-      <input type="text" id="headline" placeholder="t.ex. Stark helg för BTS i tävlingarna" oninput="render()">
+      <input type="text" id="headline" placeholder="t.ex. Stark helg för BTS i tävlingarna" oninput="touch()">
 
       <div class="label">Innehåll</div>
       <div class="hint">Bygg brevet av block i valfri ordning. Tom rad = nytt stycke. [förnamn] fylls i per mottagare.</div>
@@ -102,19 +118,20 @@
         <button class="btn alt" type="button" onclick="addBlock('button')">+ Knapp</button>
       </div>
 
-      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
-      <div class="label">Spara &amp; publicera på webben</div>
-      <div class="row">
-        <button class="btn alt" type="button" onclick="saveDraft()">💾 Spara utkast</button>
+      <div style="border-top:1px solid var(--border);margin:24px 0 16px"></div>
+      <div class="stephdr"><span class="stepnum">1</span><span class="label" style="margin:0">Publicera på webben</span></div>
+      <div class="hint">Lägger artikeln på en egen sida med reaktioner och kommentarer. Utkastet auto-sparas medan du skriver.</div>
+      <div class="row" style="margin-top:8px">
         <button class="btn primary" type="button" onclick="publish()">Publicera →</button>
         <button class="btn alt" type="button" onclick="newDraft()">+ Nytt brev</button>
       </div>
       <div class="status" id="save-status"></div>
       <div id="pub-link" style="margin-top:6px"></div>
 
-      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
-      <div class="label">Skicka som mejl</div>
-      <div class="row">
+      <div style="border-top:1px solid var(--border);margin:24px 0 16px"></div>
+      <div class="stephdr"><span class="stepnum">2</span><span class="label" style="margin:0">Skicka som mejl</span></div>
+      <div class="hint">Tips: publicera först — då får mejlet en “Läs på webben”-länk och öppningsstatistik. Skicka alltid ett testmail till dig själv innan du mejlar alla.</div>
+      <div class="row" style="margin-top:8px">
         <input type="text" id="test-email" placeholder="din@mejl.se" style="flex:1;min-width:170px">
         <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
       </div>
@@ -122,7 +139,7 @@
       <button class="btn primary" id="btn-send" style="width:100%" onclick="sendAll()">Skicka till alla →</button>
       <div class="status" id="status"></div>
 
-      <div style="border-top:1px solid var(--border);margin:22px 0 16px"></div>
+      <div style="border-top:1px solid var(--border);margin:24px 0 16px"></div>
       <div class="label">Sparade brev</div>
       <div id="drafts"><div class="hint">Laddar…</div></div>
     </div>
@@ -161,8 +178,10 @@ async function doLogin(){
     adminPw=pw;
     document.getElementById('login').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
-    if(!blocks.length) addBlock('text');
-    renderBlocks(); render(); loadDrafts();
+    suppressAutosave=true;
+    if(!blocks.length) blocks=[{id:uid(),type:'text',text:'',url:''}];
+    renderBlocks(); render(); updateState(); loadDrafts();
+    suppressAutosave=false;
   }catch(e){ s.textContent = (e.message||e); }
 }
 
@@ -186,24 +205,24 @@ function blocksToHtml(name){
 // ── Blockeditor ──
 function addBlock(type){
   const b={id:uid(),type,text:'',url:''};
-  blocks.push(b); renderBlocks(); render();
+  blocks.push(b); renderBlocks(); render(); scheduleAutosave();
   if(type==='image'){ /* öppna filväljaren direkt */ setTimeout(()=>{const el=document.getElementById('file-'+b.id); if(el) el.click();},50); }
   else { setTimeout(()=>{const el=document.getElementById('ta-'+b.id); if(el) el.focus();},50); }
 }
 function moveBlock(id,dir){
   const i=blocks.findIndex(b=>b.id===id); const j=i+dir;
   if(i<0||j<0||j>=blocks.length) return;
-  [blocks[i],blocks[j]]=[blocks[j],blocks[i]]; renderBlocks(); render();
+  [blocks[i],blocks[j]]=[blocks[j],blocks[i]]; renderBlocks(); render(); scheduleAutosave();
 }
-function rmBlock(id){ blocks=blocks.filter(b=>b.id!==id); renderBlocks(); render(); }
-function setText(id,val){ const b=blocks.find(x=>x.id===id); if(b){ b.text=val; render(); } }
-function setUrl(id,val){ const b=blocks.find(x=>x.id===id); if(b){ b.url=val; render(); } }
+function rmBlock(id){ blocks=blocks.filter(b=>b.id!==id); renderBlocks(); render(); scheduleAutosave(); }
+function setText(id,val){ const b=blocks.find(x=>x.id===id); if(b){ b.text=val; render(); scheduleAutosave(); } }
+function setUrl(id,val){ const b=blocks.find(x=>x.id===id); if(b){ b.url=val; render(); scheduleAutosave(); } }
 async function uploadBlockImage(id,input){
   const f=input.files&&input.files[0]; input.value='';
   if(!f) return;
   const b=blocks.find(x=>x.id===id); if(!b) return;
   const st=document.getElementById('imgst-'+id); if(st) st.textContent='Laddar upp…';
-  try{ b.url=await BTS.uploadImage(f,'news'); renderBlocks(); render(); }
+  try{ b.url=await BTS.uploadImage(f,'news'); renderBlocks(); render(); scheduleAutosave(); }
   catch(e){ if(st) st.textContent='Fel: '+(e.message||e); }
 }
 function renderBlocks(){
@@ -216,6 +235,7 @@ function renderBlocks(){
       <button onclick="moveBlock('${b.id}',1)" ${i===blocks.length-1?'disabled':''} title="Ner">↓</button>
       <button onclick="rmBlock('${b.id}')" title="Ta bort">✕</button>
     </div>`;
+    const head=`<div class="blk-head"><div class="blk-left"><span class="blk-grip" draggable="true" ondragstart="blkDragStart(event,'${b.id}')" ondragend="blkDragEnd()" title="Dra för att flytta">⠿</span><span class="blk-type">${label}</span></div>${tools}</div>`;
     let inner='';
     if(b.type==='image'){
       inner=`${b.url?`<div class="thumb" style="width:110px;height:88px"><img src="${b.url}"></div>`:''}
@@ -229,7 +249,7 @@ function renderBlocks(){
     } else {
       inner=`<textarea id="ta-${b.id}" placeholder="Skriv text… (tom rad = nytt stycke, [förnamn] fylls i)" oninput="setText('${b.id}',this.value)">${esc(b.text||'')}</textarea>`;
     }
-    return `<div class="blk"><div class="blk-head"><span class="blk-type">${label}</span>${tools}</div>${inner}</div>`;
+    return `<div class="blk" ondragover="blkOver(event,'${b.id}')" ondragleave="blkLeave(event)" ondrop="blkDrop(event,'${b.id}')">${head}${inner}</div>`;
   }).join('');
 }
 
@@ -254,6 +274,47 @@ function tmplHtml(){
 }
 function render(){ document.getElementById('preview').innerHTML=tmplHtml(); }
 
+// ── Autospar ──
+let autosaveTimer=null, suppressAutosave=true;
+function touch(){ render(); scheduleAutosave(); }
+function setAutosave(t){ const el=document.getElementById('autosave'); if(el) el.textContent=t; }
+function scheduleAutosave(){
+  if(suppressAutosave) return;
+  setAutosave('Ändringar…');
+  clearTimeout(autosaveTimer); autosaveTimer=setTimeout(doAutosave,1500);
+}
+async function doAutosave(){
+  const n=payload();
+  if(!n.headline){ setAutosave('Autospar på (skriv en rubrik)'); return; }
+  try{
+    currentId=await BTS.newsSave(adminPw,{id:currentId, ...n});
+    setAutosave('Sparat '+new Date().toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'})+' ✓');
+    updateState(); loadDrafts();
+  }catch(e){ setAutosave('Kunde inte spara automatiskt'); }
+}
+function updateState(){
+  const dot=document.getElementById('state-dot'), txt=document.getElementById('state-text');
+  if(!dot) return;
+  if(currentNum){ dot.classList.add('pub'); txt.textContent='Publicerad · nyhet '+currentNum; }
+  else if(currentId){ dot.classList.remove('pub'); txt.textContent='Utkast'; }
+  else { dot.classList.remove('pub'); txt.textContent='Nytt brev'; }
+}
+
+// ── Dra & släpp block ──
+let dragId=null;
+function blkDragStart(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain',id);}catch(_){}
+  const el=e.target.closest('.blk'); if(el) el.classList.add('dragging'); }
+function blkDragEnd(){ dragId=null; document.querySelectorAll('.blk').forEach(x=>x.classList.remove('dragging','dragover')); }
+function blkOver(e,id){ if(dragId&&dragId!==id){ e.preventDefault(); e.currentTarget.classList.add('dragover'); } }
+function blkLeave(e){ e.currentTarget.classList.remove('dragover'); }
+function blkDrop(e,id){ e.preventDefault();
+  const from=blocks.findIndex(b=>b.id===dragId), to=blocks.findIndex(b=>b.id===id);
+  blkDragEnd();
+  if(from<0||to<0||from===to) return;
+  const [m]=blocks.splice(from,1); blocks.splice(to,0,m);
+  renderBlocks(); render(); scheduleAutosave();
+}
+
 function payload(){
   return {
     kicker: document.getElementById('kicker').value.trim(),
@@ -271,12 +332,12 @@ async function uploadHeader(input){
   const f=input.files&&input.files[0]; input.value='';
   if(!f) return;
   const st=document.getElementById('headerstatus'); st.textContent='Laddar upp header…';
-  try{ headerUrl=await BTS.uploadImage(f,'news-header'); st.textContent='Egen header vald ✓'; document.getElementById('btn-header-clear').style.display=''; render(); }
+  try{ headerUrl=await BTS.uploadImage(f,'news-header'); st.textContent='Egen header vald ✓'; document.getElementById('btn-header-clear').style.display=''; render(); scheduleAutosave(); }
   catch(e){ st.textContent='Fel: '+(e.message||e); }
 }
 function clearHeader(){
   headerUrl=''; document.getElementById('headerstatus').textContent='Standardheader vald.';
-  document.getElementById('btn-header-clear').style.display='none'; render();
+  document.getElementById('btn-header-clear').style.display='none'; render(); scheduleAutosave();
 }
 function syncHeaderUI(){
   const has=!!headerUrl;
@@ -287,12 +348,14 @@ function syncHeaderUI(){
 // ── Spara / publicera / utkast ──
 function setField(id,val){ const el=document.getElementById(id); if(el) el.value=val||''; }
 function newDraft(){
+  suppressAutosave=true;
   currentId=null; currentNum=null; blocks=[]; headerUrl=''; syncHeaderUI();
   ['kicker','headline'].forEach(id=>setField(id,''));
   addBlock('text');
   document.getElementById('save-status').textContent='';
   document.getElementById('pub-link').innerHTML='';
-  renderBlocks(); render();
+  renderBlocks(); render(); updateState(); setAutosave('Autospar på (skriv en rubrik)');
+  suppressAutosave=false;
 }
 async function saveDraft(){
   const s=document.getElementById('save-status');
@@ -316,7 +379,7 @@ async function publish(){
     const url='https://bastadstegen.se/nyhet.html?n='+num;
     s.textContent='Publicerad ✓';
     document.getElementById('pub-link').innerHTML=`<div class="hint">Publik länk: <a href="${url}" target="_blank">${url}</a></div>`;
-    loadDrafts();
+    updateState(); loadDrafts();
   }catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 async function loadDrafts(){
@@ -344,15 +407,18 @@ async function loadDrafts(){
 async function openDraft(id){
   const s=document.getElementById('save-status');
   try{
+    suppressAutosave=true;
     const d=await BTS.newsGetAdmin(adminPw,id);
-    if(!d){ s.textContent='Hittar inte brevet.'; return; }
+    if(!d){ s.textContent='Hittar inte brevet.'; suppressAutosave=false; return; }
     currentId=d.id; currentNum=d.num||null; headerUrl=d.header_url||''; syncHeaderUI();
     setField('kicker',d.kicker); setField('headline',d.headline);
     blocks=(Array.isArray(d.blocks)?d.blocks:[]).map(b=>({id:uid(),type:b.type,text:b.text||'',url:b.url||''}));
-    if(!blocks.length) addBlock('text');
-    renderBlocks(); render();
+    if(!blocks.length) blocks=[{id:uid(),type:'text',text:'',url:''}];
+    renderBlocks(); render(); updateState();
     document.getElementById('pub-link').innerHTML = d.num?`<div class="hint">Publik länk: <a href="nyhet.html?n=${d.num}" target="_blank">bastadstegen.se/nyhet.html?n=${d.num}</a></div>`:'';
     s.textContent='Öppnat "'+(d.headline||'')+'"';
+    setAutosave('Sparat ✓');
+    suppressAutosave=false;
     window.scrollTo({top:0,behavior:'smooth'});
   }catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
