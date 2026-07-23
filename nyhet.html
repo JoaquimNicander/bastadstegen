@@ -97,6 +97,7 @@ function blocksHtml(blocks){
   return (blocks||[]).map(b=>{
     if(b.type==='heading') return `<h2>${esc(b.text||'')}</h2>`;
     if(b.type==='image'&&b.url) return `<img src="${b.url}" alt="">`;
+    if(b.type==='button'&&b.url) return `<div style="margin:20px 0"><a class="cta" style="margin-top:0" href="${esc(b.url)}">${esc(b.text||'Läs mer')} →</a></div>`;
     return paras(b.text||'');
   }).join('');
 }
