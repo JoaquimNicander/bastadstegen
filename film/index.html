@@ -24,7 +24,7 @@
   .title{font-family:'Anton',sans-serif;font-size:40px;line-height:1;color:#F5EDE3;margin:10px 0 0;letter-spacing:1px}
   .lead{font-size:16px;line-height:1.6;color:#DCD5CB;margin:14px 0 0}
 
-  .player{position:relative;margin:22px auto 0;max-width:340px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;background:#000}
+  .player{position:relative;margin:24px auto 0;width:100%;max-width:430px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;background:#000}
   .player video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
   .playbtn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.15);transition:background .15s}
   .playbtn:hover{background:rgba(0,0,0,.05)}
@@ -74,7 +74,7 @@
       <p class="lead">Häng med i det senaste från stegen — resultat, höjdpunkter och lite skoj på köpet. Tryck på play! 🎾</p>
 
       <div class="player" id="player">
-        <video id="vid" src="../bts-news.mp4" poster="../bts-news-poster.jpg" playsinline preload="metadata"></video>
+        <video id="vid" src="../bts-news.mp4?v=2" poster="../bts-news-poster.jpg?v=2" playsinline preload="metadata"></video>
         <div class="playbtn" id="playbtn" onclick="playVideo()"><div class="circle"><div class="tri"></div></div></div>
       </div>
     </div>
