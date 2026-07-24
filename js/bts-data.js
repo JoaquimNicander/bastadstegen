@@ -730,6 +730,35 @@ const BTS = {
     const { error } = await _sb.rpc('bts_news_delete_comment', { p_admin_pw: adminPw, p_comment_id: commentId });
     if (error) throw error;
   },
+  // ── Generiska landningssidor (slug) ──
+  async pageView(slug, client) {
+    _assert();
+    const { error } = await _sb.rpc('bts_page_view', { p_slug: slug, p_client: client || 'anon' });
+    if (error) throw error;
+  },
+  async pageReact(slug, emoji, client) {
+    _assert();
+    const { error } = await _sb.rpc('bts_page_react', { p_slug: slug, p_emoji: emoji, p_client: client });
+    if (error) throw error;
+  },
+  async pageReactions(slug, client) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_page_reactions', { p_slug: slug, p_client: client });
+    if (error) throw error;
+    return data || [];
+  },
+  async pageComment(slug, name, body) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_page_comment', { p_slug: slug, p_name: name, p_body: body });
+    if (error) throw error;
+    return data;
+  },
+  async pageComments(slug) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_page_comments', { p_slug: slug });
+    if (error) throw error;
+    return data || [];
+  },
   async newsView(num, client, source) {
     _assert();
     const { error } = await _sb.rpc('bts_news_view', { p_num: num, p_client: client || 'anon', p_source: source || 'web' });

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTS NEWS · Båstad Stegen</title>
+<meta property="og:title" content="BTS NEWS – Båstad Stegen">
+<meta property="og:description" content="Veckans nyhetssändning från stegen 🎾">
+<meta property="og:image" content="https://bastadstegen.se/mail-header.png">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:#0D2E20;color:#F5EDE3;min-height:100vh}
+  a{color:#F4B740}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;max-width:640px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .wrap{max-width:560px;margin:0 auto;padding:14px 14px 60px}
+
+  .card{background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B}
+  .banner{line-height:0;background:#E8520A}
+  .banner img{display:block;width:100%;height:auto;border:0}
+  .body{padding:26px 28px 30px}
+  .kicker{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#FF8C42;font-weight:700}
+  .title{font-family:'Anton',sans-serif;font-size:40px;line-height:1;color:#F5EDE3;margin:10px 0 0;letter-spacing:1px}
+  .lead{font-size:16px;line-height:1.6;color:#DCD5CB;margin:14px 0 0}
+
+  .player{position:relative;margin:22px auto 0;max-width:340px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;background:#000}
+  .player video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+  .playbtn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:rgba(0,0,0,.15);transition:background .15s}
+  .playbtn:hover{background:rgba(0,0,0,.05)}
+  .playbtn .circle{width:74px;height:74px;border-radius:50%;background:rgba(232,82,10,.92);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .playbtn .tri{width:0;height:0;border-style:solid;border-width:15px 0 15px 26px;border-color:transparent transparent transparent #fff;margin-left:6px}
+
+  .section{margin-top:24px}
+  .sec-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9A8F86;margin-bottom:12px}
+  .reactions{display:flex;flex-wrap:wrap;gap:8px}
+  .react{display:flex;align-items:center;gap:6px;background:#10231a;border:1px solid #1C3A2B;border-radius:22px;padding:8px 14px;cursor:pointer;font-size:17px;user-select:none;transition:all .12s}
+  .react .c{font-family:'Space Mono',monospace;font-size:13px;color:#9A8F86}
+  .react.on{background:rgba(255,140,66,.16);border-color:#FF8C42}
+  .react.on .c{color:#F4B740}
+
+  .cform input,.cform textarea{width:100%;background:#10231a;border:1px solid #1C3A2B;color:#F5EDE3;font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none;margin-bottom:8px}
+  .cform textarea{min-height:80px;line-height:1.5;resize:vertical}
+  .cform button{background:#E8520A;color:#fff;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:11px 20px;cursor:pointer}
+  .comment{background:#10231a;border:1px solid #1C3A2B;border-radius:11px;padding:12px 14px;margin-bottom:9px}
+  .comment .cn{font-weight:700;font-size:14px;color:#F5EDE3}
+  .comment .cd{font-size:11px;color:#9A8F86;margin-left:6px}
+  .comment .cb{font-size:14px;line-height:1.55;color:#DCD5CB;margin-top:5px;white-space:pre-wrap}
+  .muted{color:#9A8F86;font-size:13px}
+  .status{font-size:13px;margin-top:8px;min-height:16px;color:#9A8F86}
+  .footimg{line-height:0}
+  .footimg img{display:block;width:100%;height:auto;border:0}
+
+  .admin{margin-top:34px;border-top:1px solid #1C3A2B;padding-top:14px}
+  .admin summary{cursor:pointer;color:#9A8F86;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px}
+  .admin .box{margin-top:12px;background:#10231a;border:1px solid #1C3A2B;border-radius:11px;padding:14px}
+  .admin input,.admin textarea{width:100%;background:#0D2A1D;border:1px solid #1C3A2B;color:#F5EDE3;font:inherit;font-size:14px;padding:10px 12px;border-radius:9px;outline:none;margin-bottom:8px}
+  .admin textarea{min-height:70px;line-height:1.5;resize:vertical}
+  .admin button{background:#FF8C42;color:#0D2E20;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:11px 18px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../index.html">← Startsida</a>
+  <a href="../sommarstege.html">Sommarstegen</a>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="banner"><img src="../mail-header.png" alt="Båstad Stegen"></div>
+    <div class="body">
+      <div class="kicker">BTS News · Summer Edition</div>
+      <h1 class="title">VECKANS SÄNDNING</h1>
+      <p class="lead">Häng med i det senaste från stegen — resultat, höjdpunkter och lite skoj på köpet. Tryck på play! 🎾</p>
+
+      <div class="player" id="player">
+        <video id="vid" src="../bts-news.mp4" poster="../bts-news-poster.jpg" playsinline preload="metadata"></video>
+        <div class="playbtn" id="playbtn" onclick="playVideo()"><div class="circle"><div class="tri"></div></div></div>
+      </div>
+    </div>
+    <div class="footimg"><img src="../mail-footer.png" alt="Båstad Tennissällskap"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">Reaktioner</div>
+    <div class="reactions" id="reactions"></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">Kommentarer</div>
+    <div id="comments"></div>
+    <div class="cform" style="margin-top:12px">
+      <input type="text" id="c-name" placeholder="Ditt namn" maxlength="60">
+      <textarea id="c-body" placeholder="Skriv en kommentar…" maxlength="1000"></textarea>
+      <button onclick="postComment()">Kommentera</button>
+      <div class="status" id="c-status"></div>
+    </div>
+  </div>
+
+  <details class="admin">
+    <summary>Admin · skicka SMS till alla</summary>
+    <div class="box">
+      <input type="text" id="adm-pw" placeholder="Adminlösenord">
+      <textarea id="adm-msg">🎾 BTS NEWS är ute! Kolla veckans sändning här: bastadstegen.se/film</textarea>
+      <button onclick="sendSms()">Skicka SMS till alla →</button>
+      <div class="status" id="adm-status"></div>
+    </div>
+  </details>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/bts-data.js"></script>
+<script>
+const SLUG='news-jul25';
+const EMOJIS=['👍','❤️','🎾','🏆','🔥','😂','👏'];
+const SMS_FN="https://fueggdqtgmvldjbhcdfn.supabase.co/functions/v1/send-message";
+const SMS_PUBKEY="sb_publishable_vZCnLnp41c29DFN7MLpYsQ_AUBnxJPy";
+let CLIENT=localStorage.getItem('bts_client');
+if(!CLIENT){ CLIENT='c'+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('bts_client',CLIENT); }
+const savedName=localStorage.getItem('bts_cname')||'';
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function fmtDT(ts){ try{ return new Date(ts).toLocaleString('sv-SE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return ''; } }
+
+function playVideo(){
+  const v=document.getElementById('vid');
+  document.getElementById('playbtn').style.display='none';
+  v.setAttribute('controls','');
+  v.play();
+}
+
+async function loadReactions(){
+  let rows=[]; try{ rows=await BTS.pageReactions(SLUG,CLIENT); }catch(e){}
+  const map={}; rows.forEach(r=>map[r.emoji]={cnt:Number(r.cnt),mine:r.mine});
+  document.getElementById('reactions').innerHTML=EMOJIS.map(e=>{
+    const d=map[e]||{cnt:0,mine:false};
+    return `<div class="react ${d.mine?'on':''}" onclick="react('${e}')"><span>${e}</span>${d.cnt?`<span class="c">${d.cnt}</span>`:''}</div>`;
+  }).join('');
+}
+let reacting=false;
+async function react(e){ if(reacting)return; reacting=true; try{ await BTS.pageReact(SLUG,e,CLIENT); await loadReactions(); }catch(err){} reacting=false; }
+
+async function loadComments(){
+  let list=[]; try{ list=await BTS.pageComments(SLUG); }catch(e){}
+  document.getElementById('comments').innerHTML=list.length?list.map(c=>`
+    <div class="comment"><span class="cn">${esc(c.name)}</span><span class="cd">${fmtDT(c.created_at)}</span>
+      <div class="cb">${esc(c.body)}</div></div>`).join(''):'<div class="muted">Bli först att kommentera!</div>';
+}
+async function postComment(){
+  const name=document.getElementById('c-name').value.trim(), body=document.getElementById('c-body').value.trim();
+  const s=document.getElementById('c-status');
+  if(!name){ s.textContent='Ange ditt namn.'; return; }
+  if(!body){ s.textContent='Skriv en kommentar.'; return; }
+  s.textContent='Skickar…';
+  try{ await BTS.pageComment(SLUG,name,body); localStorage.setItem('bts_cname',name);
+    document.getElementById('c-body').value=''; s.textContent='Tack för din kommentar!'; loadComments(); }
+  catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+async function sendSms(){
+  const pw=document.getElementById('adm-pw').value.trim();
+  const msg=document.getElementById('adm-msg').value.trim();
+  const s=document.getElementById('adm-status');
+  if(!pw){ s.textContent='Ange adminlösenord.'; return; }
+  if(!msg){ s.textContent='Skriv ett meddelande.'; return; }
+  const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+  const base={adminPw:pw, channel:'sms', audience:'all_active', template:msg};
+  s.textContent='Räknar mottagare…';
+  try{
+    const dry=await post({...base,dryRun:true});
+    if(dry.error) throw new Error(dry.error);
+    if(!confirm('Skicka SMS till '+dry.recipients+' spelare?')){ s.textContent='Avbrutet.'; return; }
+    s.textContent='Skickar…';
+    const res=await post(base);
+    if(res.error) throw new Error(res.error);
+    s.textContent='Klart! SMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+// init
+try{ BTS.pageView(SLUG,CLIENT); }catch(e){}
+if(savedName) document.getElementById('c-name').value=savedName;
+loadReactions(); loadComments();
+</script>
+</body>
+</html>
