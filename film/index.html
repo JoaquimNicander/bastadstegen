@@ -102,6 +102,10 @@
     <div class="box">
       <input type="text" id="adm-pw" placeholder="Adminlösenord">
       <textarea id="adm-msg">🎾 BTS NEWS är ute! Kolla veckans sändning här: bastadstegen.se/film</textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+        <input type="text" id="adm-testnr" placeholder="Ditt mobilnr (prov)" value="0720787845" style="flex:1;min-width:150px;margin:0">
+        <button onclick="sendTestSms()" style="background:transparent;color:#F5EDE3;border:1px solid #1C3A2B">Testa till mig</button>
+      </div>
       <button onclick="sendSms()">Skicka SMS till alla →</button>
       <div class="status" id="adm-status"></div>
     </div>
@@ -156,13 +160,29 @@ async function postComment(){
   catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 
+const smsPost=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+async function sendTestSms(){
+  const pw=document.getElementById('adm-pw').value.trim();
+  const msg=document.getElementById('adm-msg').value.trim();
+  const nr=document.getElementById('adm-testnr').value.trim();
+  const s=document.getElementById('adm-status');
+  if(!pw){ s.textContent='Ange adminlösenord.'; return; }
+  if(!msg){ s.textContent='Skriv ett meddelande.'; return; }
+  if(!nr){ s.textContent='Ange ditt mobilnummer.'; return; }
+  s.textContent='Skickar testmeddelande…';
+  try{
+    const res=await smsPost({adminPw:pw, channel:'sms', audience:'test', testNumber:nr, template:msg});
+    if(res.error) throw new Error(res.error);
+    s.textContent='Test-SMS skickat till '+nr+' ✓ ('+res.sms.sent+' skickat, '+res.sms.failed+' miss)';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
 async function sendSms(){
   const pw=document.getElementById('adm-pw').value.trim();
   const msg=document.getElementById('adm-msg').value.trim();
   const s=document.getElementById('adm-status');
   if(!pw){ s.textContent='Ange adminlösenord.'; return; }
   if(!msg){ s.textContent='Skriv ett meddelande.'; return; }
-  const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+  const post=smsPost;
   const base={adminPw:pw, channel:'sms', audience:'all_active', template:msg};
   s.textContent='Räknar mottagare…';
   try{
