@@ -558,11 +558,19 @@ function renderAdminEvents(){
       const dft="Hej [förnamn]!\n\nLottningen i sommarstegen är klar — du möter [motståndare]. Se din bana och tid på bastadstegen.se/sommarstege. Vissa matcher börjar ca 18:30. Vi ses på banan!";
       const _pv=dft.replace(/\[förnamn\]/g,'Anna').replace(/\[motståndare\]/g,'Erik');
       const _len=_pv.length, _parts=_len<=160?1:Math.ceil(_len/153);
-      out+=`<div class="label" style="margin:16px 0 6px">📣 Meddela spelarna (SMS + mail)</div>
+      out+=`<div class="label" style="margin:16px 0 6px">📣 Meddela spelarna</div>
         <div class="muted" style="font-size:11px;margin-bottom:6px">[förnamn] och [motståndare] fylls i automatiskt för varje spelare. Redigera fritt nedan innan du skickar.</div>
         <textarea id="besked-${e.play_date}" oninput="beskedCount('${e.play_date}')" style="width:100%;min-height:96px;background:var(--card,#10231a);color:var(--cream,#f5f0e6);border:1px solid var(--border,#2d4a3a);border-radius:8px;padding:10px;font:inherit;font-size:13px;line-height:1.5;box-sizing:border-box">${dft}</textarea>
         <div class="muted" style="font-size:11px;margin:5px 0 9px" id="beskcnt-${e.play_date}">${_len} tecken · ~${_parts} SMS/spelare</div>
-        <button class="btn sm" style="background:#FF8C42" onclick="sendBesked('${e.play_date}')">Skicka SMS + mail →</button>
+        <div class="row" style="gap:6px;align-items:center;margin-bottom:8px">
+          <span class="muted" style="font-size:11px">Skicka via:</span>
+          <select id="beskch-${e.play_date}" style="flex:0 0 auto">
+            <option value="both">SMS + mail</option>
+            <option value="sms">Bara SMS</option>
+            <option value="email">Bara mail</option>
+          </select>
+        </div>
+        <button class="btn sm" style="background:#FF8C42" onclick="sendBesked('${e.play_date}')">Skicka →</button>
         <button class="btn sm alt" onclick="drawEvent('${e.play_date}')">Lotta om</button>`;
     }
     if(isDraft || isPub){
@@ -785,15 +793,21 @@ async function sendBesked(date){
   const template=(ta?ta.value:'').trim();
   if(!template){ alert('Skriv ett meddelande först.'); return; }
   const preview=template.replace(/\[förnamn\]/g,'Anna').replace(/\[motståndare\]/g,'Erik');
-  const base={adminPw:pw, channel:'both', audience:'new_round', template, competition:COMP, round};
+  const chSel=document.getElementById('beskch-'+date);
+  const channel=(chSel&&chSel.value)||'both';
+  const chTxt=channel==='sms'?'SMS':channel==='email'?'mail':'SMS + mail';
+  const base={adminPw:pw, channel, audience:'new_round', template, competition:COMP, round};
   const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
   try{
     const dry=await post({...base,dryRun:true});
     if(dry.error) throw new Error(dry.error);
-    if(!confirm('Skicka SMS + mail till '+dry.recipients+' spelare?\n\nSå här ser det ut (exempel):\n\n'+preview)) return;
+    if(!confirm('Skicka '+chTxt+' till '+dry.recipients+' spelare?\n\nSå här ser det ut (exempel):\n\n'+preview)) return;
     const res=await post(base);
     if(res.error) throw new Error(res.error);
-    alert('Skickat!\nSMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)\nMail: '+res.email.sent+' ✓ ('+res.email.failed+' miss)');
+    let msg='Skickat!';
+    if(channel==='sms'||channel==='both') msg+='\nSMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)';
+    if(channel==='email'||channel==='both') msg+='\nMail: '+res.email.sent+' ✓ ('+res.email.failed+' miss)';
+    alert(msg);
   }catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function sendUnsignedSms(date){
