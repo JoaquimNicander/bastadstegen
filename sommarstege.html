@@ -507,6 +507,13 @@ function renderAdminEvents(){
       out+=ids.length?ids.map(id=>`<div class="row" style="align-items:center"><div class="nm">${nameById(id)}</div><button class="btn sm alt" onclick="adminUnsign('${e.play_date}',${id})">✕</button></div>`).join(''):'<div class="muted">Inga anmälda än.</div>';
       out+=`<div class="row" style="gap:6px;margin-top:6px"><select id="addsign-${e.play_date}" style="flex:1"><option value="">Anmäl spelare…</option>${avail.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select><button class="btn sm" onclick="adminSign('${e.play_date}')">Anmäl</button></div>`;
       out+=`<button class="btn sm" style="margin-top:10px" onclick="drawEvent('${e.play_date}')">Lotta</button>`;
+      // ── SMS till ej anmälda deltagare ──
+      const unsignedIds=[...spelareIds()].filter(pid=>!ids.includes(pid) && (players.find(p=>p.id===pid)||{}).active!==false);
+      const dft2=`Hej [förnamn]! Vi lottar snart sommarstegen ${fmtDate(e.play_date)}. Vill du vara med? Anmäl dig på bastadstegen.se/sommarstege så snart du kan. Vi ses på banan!`;
+      out+=`<div class="label" style="margin:16px 0 6px">📣 SMS till ej anmälda (${unsignedIds.length} st)</div>
+        <div class="muted" style="font-size:11px;margin-bottom:6px">Går till deltagare i sommarstegen som ännu inte anmält sig till denna speldag. [förnamn] fylls i automatiskt.</div>
+        <textarea id="unsign-msg-${e.play_date}" style="width:100%;min-height:80px;background:var(--card,#10231a);color:var(--cream,#f5f0e6);border:1px solid var(--border,#2d4a3a);border-radius:8px;padding:10px;font:inherit;font-size:13px;line-height:1.5;box-sizing:border-box">${dft2}</textarea>
+        <button class="btn sm" style="margin-top:8px;background:#FF8C42" onclick="sendUnsignedSms('${e.play_date}')" ${unsignedIds.length?'':'disabled'}>Skicka SMS till ej anmälda →</button>`;
     }
     if(isDraft){
       const ms=matchesFor(e.play_date);
@@ -780,6 +787,26 @@ async function sendBesked(date){
     const res=await post(base);
     if(res.error) throw new Error(res.error);
     alert('Skickat!\nSMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)\nMail: '+res.email.sent+' ✓ ('+res.email.failed+' miss)');
+  }catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function sendUnsignedSms(date){
+  const pw=document.getElementById('admin-pw').value;
+  const ta=document.getElementById('unsign-msg-'+date);
+  const template=(ta?ta.value:'').trim();
+  if(!template){ alert('Skriv ett meddelande först.'); return; }
+  const signed=signupsFor(date).map(s=>s.player_id);
+  const unsignedIds=[...spelareIds()].filter(pid=>!signed.includes(pid) && (players.find(p=>p.id===pid)||{}).active!==false);
+  if(!unsignedIds.length){ alert('Alla deltagare är redan anmälda.'); return; }
+  const preview=template.replace(/\[förnamn\]/g,'Anna');
+  const post=b=>fetch(SMS_FN,{method:'POST',headers:{'Content-Type':'application/json','apikey':SMS_PUBKEY,'Authorization':'Bearer '+SMS_PUBKEY},body:JSON.stringify(b)}).then(r=>r.json());
+  const base={adminPw:pw, channel:'sms', audience:'ids', playerIds:unsignedIds, template};
+  try{
+    const dry=await post({...base,dryRun:true});
+    if(dry.error) throw new Error(dry.error);
+    if(!confirm('Skicka SMS till '+dry.recipients+' ej anmälda spelare?\n\nSå här ser det ut (exempel):\n\n'+preview)) return;
+    const res=await post(base);
+    if(res.error) throw new Error(res.error);
+    alert('Skickat!\nSMS: '+res.sms.sent+' ✓ ('+res.sms.failed+' miss)');
   }catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function addLate(date){
