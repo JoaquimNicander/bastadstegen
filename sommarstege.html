@@ -572,6 +572,13 @@ function renderAdminEvents(){
         <div class="row" style="gap:6px"><select id="late-${e.play_date}" style="flex:1"><option value="">Välj spelare…</option>${av.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select>
         <button class="btn sm green" onclick="addLate('${e.play_date}')">Lägg till (väntande)</button></div>
         <div class="muted" style="font-size:11px;margin-top:5px">Sent tillagda paras ihop två och två till väntande matcher. Fler banor? Klicka "Ändra namn/tid/banor" ovan och lägg till dem — sätt sedan in väntande matcher på dem.</div>`;
+      // SMS till ej anmälda — även efter lottning (t.ex. om någon hoppat av)
+      const unsignedIds2=[...spelareIds()].filter(pid=>!sIds.includes(pid) && (players.find(p=>p.id===pid)||{}).active!==false);
+      const dft3=`Hej [förnamn]! Vi behöver en spelare till i sommarstegen ${fmtDate(e.play_date)}. Vill du hoppa in? Anmäl dig på bastadstegen.se/sommarstege så hör vi av oss. Vi ses!`;
+      out+=`<div class="label" style="margin:16px 0 6px">📣 SMS till ej anmälda (${unsignedIds2.length} st)</div>
+        <div class="muted" style="font-size:11px;margin-bottom:6px">Nå deltagare som inte är med denna speldag — t.ex. för att fylla en lucka. [förnamn] fylls i automatiskt.</div>
+        <textarea id="unsign-msg-${e.play_date}" style="width:100%;min-height:80px;background:var(--card,#10231a);color:var(--cream,#f5f0e6);border:1px solid var(--border,#2d4a3a);border-radius:8px;padding:10px;font:inherit;font-size:13px;line-height:1.5;box-sizing:border-box">${dft3}</textarea>
+        <button class="btn sm" style="margin-top:8px;background:#FF8C42" onclick="sendUnsignedSms('${e.play_date}')" ${unsignedIds2.length?'':'disabled'}>Skicka SMS till ej anmälda →</button>`;
     }
     out+=`<button class="btn sm alt" style="margin-top:10px" onclick="deleteEvent('${e.id}')">Ta bort</button></div></div>`;
     return out;
