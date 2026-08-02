@@ -38,10 +38,12 @@ img{ max-width:100%; display:block; }
 .btn-primary:hover{ background:var(--o1); transform:translateY(-2px); }
 .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,.28); color:var(--white); }
 .btn-ghost:hover{ border-color:var(--o1); color:var(--o1); }
-.btn-ghost-dark{ background:transparent; border:1px solid rgba(18,58,40,.35); color:var(--navy); }
-.btn-ghost-dark:hover{ border-color:var(--navy); }
+.btn-ghost-dark{ background:rgba(13,46,32,.06); border:2px solid var(--navy); color:var(--navy); font-weight:700; }
+.btn-ghost-dark:hover{ background:var(--navy); color:#fff; transform:translateY(-2px); }
 .btn-navy{ background:var(--navy); color:#fff; }
 .btn-navy:hover{ background:var(--navy-deep); transform:translateY(-2px); }
+.btn-cream{ background:var(--court-line); color:var(--navy); font-weight:700; }
+.btn-cream:hover{ background:#fff; transform:translateY(-2px); }
 
 /* court-line painted bar */
 .pline{
