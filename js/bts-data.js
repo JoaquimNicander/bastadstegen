@@ -594,6 +594,11 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_shop_set_status', { p_admin_pw: adminPw, p_order_id: orderId, p_status: status });
     if (error) throw error;
   },
+  async adminShopSetFlag(adminPw, orderId, flag, val) {
+    _assert();
+    const { error } = await _sb.rpc('bts_admin_shop_set_flag', { p_admin_pw: adminPw, p_order_id: orderId, p_flag: flag, p_val: val });
+    if (error) throw error;
+  },
   // ── BETALNING (sommarstege) ──────────────────────────────────────
   async getPayments(competitionId) {
     _assert();

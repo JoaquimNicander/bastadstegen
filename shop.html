@@ -216,25 +216,51 @@ async function adminLogin(){
     loadAdminOrders();
   }catch(e){ err.textContent='Fel lösenord.'; }
 }
+let adminOrders=[], orderFilter='alla';
+function setOrderFilter(f){ orderFilter=f; renderAdminOrders(); }
 async function loadAdminOrders(){
   const box=document.getElementById('admin-orders'); if(!box||!adminPw) return;
   try{
-    const list=await BTS.adminShopOrders(adminPw);
-    if(!list.length){ box.innerHTML='<div class="muted">Inga beställningar än.</div>'; return; }
-    box.innerHTML=list.map(o=>`<div class="row" style="flex-wrap:wrap">
-      <div class="nm2" style="min-width:150px">${o.name} — ${(o.items||[]).map(c=>`${NAMN[c.item]||c.item}${c.size?` · ${c.size}`:''} ×${c.qty}`).join(', ')}
-        <div class="muted" style="font-size:11px">${o.phone||'(ingen tel)'} · ${o.email||'(ingen mejl)'}</div></div>
-      <span class="pill ${o.status==='levererad'?'done':''}">${o.status}</span>
-      ${o.status==='ny'
-        ? `<button class="btn sm green" style="background:#4CAF50;color:#053" onclick="setStatus('${o.id}','levererad')">Markera levererad</button>`
-        : `<button class="btn sm alt" onclick="setStatus('${o.id}','ny')">Ångra</button>`}
-      <button class="btn sm alt" onclick="setStatus('${o.id}','delete')">🗑</button>
-    </div>`).join('');
+    adminOrders=await BTS.adminShopOrders(adminPw);
+    renderAdminOrders();
   }catch(e){ box.innerHTML='<div class="err">Fel: '+(e.message||e)+'</div>'; }
 }
-async function setStatus(id,status){
-  if(status==='delete' && !confirm('Ta bort beställningen?')) return;
-  try{ await BTS.adminShopSetStatus(adminPw,id,status); loadAdminOrders(); }
+function renderAdminOrders(){
+  const box=document.getElementById('admin-orders'); if(!box) return;
+  const all=adminOrders||[];
+  const list=all.filter(o=> orderFilter==='ejlev'?!o.delivered : orderFilter==='ejbet'?!o.paid : true);
+  const nLev=all.filter(o=>!o.delivered).length, nBet=all.filter(o=>!o.paid).length;
+  const chip=(id,label)=>`<button class="btn sm ${orderFilter===id?'green':'alt'}" onclick="setOrderFilter('${id}')" style="${orderFilter===id?'background:#FF8C42;color:#0D2E20':''}">${label}</button>`;
+  let html=`<div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    ${chip('alla','Alla ('+all.length+')')}
+    ${chip('ejlev','Ej levererade ('+nLev+')')}
+    ${chip('ejbet','Ej betalda ('+nBet+')')}
+  </div>`;
+  if(!list.length){ box.innerHTML=html+'<div class="muted">Inga beställningar här.</div>'; return; }
+  html+=list.map(o=>{
+    const done=o.delivered&&o.paid;
+    const when=new Date(o.created_at).toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
+    return `<div class="row" style="flex-wrap:wrap;align-items:center;gap:10px;${done?'opacity:.6':''}">
+      <div class="nm2" style="min-width:160px;flex:1">${o.name} — ${(o.items||[]).map(c=>`${NAMN[c.item]||c.item}${c.size?` · ${c.size}`:''} ×${c.qty}`).join(', ')}
+        <div class="muted" style="font-size:11px">${o.phone||'(ingen tel)'} · ${when}</div></div>
+      <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer">
+        <input type="checkbox" ${o.delivered?'checked':''} onchange="setFlag('${o.id}','delivered',this.checked)"> Levererad</label>
+      <label style="display:inline-flex;align-items:center;gap:5px;font-size:13px;cursor:pointer">
+        <input type="checkbox" ${o.paid?'checked':''} onchange="setFlag('${o.id}','paid',this.checked)"> Betald</label>
+      <button class="btn sm alt" onclick="delOrder('${o.id}')" title="Ta bort">🗑</button>
+    </div>`;
+  }).join('');
+  box.innerHTML=html;
+}
+async function setFlag(id,flag,val){
+  // uppdatera lokalt direkt så det känns snabbt
+  const o=adminOrders.find(x=>x.id===id); if(o) o[flag]=val;
+  try{ await BTS.adminShopSetFlag(adminPw,id,flag,val); renderAdminOrders(); }
+  catch(e){ alert('Fel: '+(e.message||e)); loadAdminOrders(); }
+}
+async function delOrder(id){
+  if(!confirm('Ta bort beställningen?')) return;
+  try{ await BTS.adminShopSetStatus(adminPw,id,'delete'); loadAdminOrders(); }
   catch(e){ alert('Fel: '+(e.message||e)); }
 }
 
