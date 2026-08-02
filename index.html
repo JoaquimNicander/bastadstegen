@@ -41,7 +41,9 @@
   .hero .wm2{ font-size:clamp(64px,11vw,150px); color:#fff; }
   .hero-sub{ font-weight:300; font-size:clamp(18px,2vw,22px); line-height:1.55; color:var(--navy);
     max-width:520px; margin:30px 0 0; opacity:.92; }
-  .hero-cta{ display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; }
+  .hero-cta{ display:flex; gap:14px; margin-top:38px; flex-wrap:wrap; max-width:720px; }
+  .hero-cta .btn{ flex:1 1 200px; justify-content:center; text-align:center; }
+  @media(max-width:560px){ .hero-cta{ flex-direction:column; } .hero-cta .btn{ width:100%; flex:none; } }
   /* Hero-loggan: responsiv, ~3x större än SVG:ns standardbredd. */
   .hero-lock{ position:relative; width:min(82vw,1000px); }
   .hero-content .bts-lockup{ width:100%; max-width:none; }
