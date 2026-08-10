@@ -1299,6 +1299,7 @@ function renderPlayers(){
       <div class="player-card-avatar">${avatarHtml(p.name,88)}</div>
       <div class="player-card-name">${p.name}</div>
       <div class="player-card-hand">${age?age+' år':''} ${hand?'· '+hand:''}${p.note?` · <span style="color:var(--clay)">${p.note}</span>`:''}</div>
+      ${(prof.wtn)?`<div style="margin:-2px 0 8px"><span style="display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid #e3e3e8;padding:2px 9px 2px 7px;border-radius:100px;box-shadow:0 1px 3px rgba(0,0,0,.18)"><img src="wtn-mark.png" style="height:13px;width:auto;display:block"><span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#1B2A4A">${prof.wtn}</span></span></div>`:''}
       <div class="player-card-stats-main">
         <div class="pc-stat"><div class="pc-stat-val">${p.wins}</div><div class="pc-stat-lbl">Vunna</div></div>
         <div class="pc-stat"><div class="pc-stat-val">${p.losses}</div><div class="pc-stat-lbl">Förl</div></div>
@@ -1684,11 +1685,11 @@ async function reloadLadderFromDB(){
     // hela profilen från databasen (delas mellan alla) — born/spelhand/hemort/…
     dbProfiles = {};
     allPlayers.forEach(p => {
-      if(p.born||p.hand||p.hometown||p.fav_shot||p.fav_surface||p.since_year||p.bio){
+      if(p.born||p.hand||p.hometown||p.fav_shot||p.fav_surface||p.since_year||p.bio||p.wtn){
         dbProfiles[p.name] = {
           born: p.born||'', hand: p.hand||'', hometown: p.hometown||'',
           favShot: p.fav_shot||'', favSurface: p.fav_surface||'',
-          since: p.since_year||'', bio: p.bio||'',
+          since: p.since_year||'', bio: p.bio||'', wtn: p.wtn||'',
         };
       }
     });
