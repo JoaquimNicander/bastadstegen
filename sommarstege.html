@@ -925,7 +925,7 @@ function renderSpelare(){
   const grid=roster.length?`<div class="sp-grid">${roster.map(p=>{
     const photo=p.photo_url||'';
     const youTag=(me&&p.id===me.id)?' <span class="pill drawn">du</span>':'';
-    const wtnTag=p.wtn?`<div style="margin-top:3px"><span style="display:inline-block;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.5px;font-weight:700;color:#fff;background:#E4004B;padding:2px 6px;border-radius:100px">WTN ${p.wtn}</span></div>`:'';
+    const wtnTag=p.wtn?`<div style="margin-top:4px"><span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #e3e3e8;padding:2px 8px 2px 6px;border-radius:100px;box-shadow:0 1px 3px rgba(0,0,0,.15)"><img src="wtn-mark.png" style="height:12px;width:auto;display:block"><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#1B2A4A">${p.wtn}</span></span></div>`:'';
     return `<div class="sp-pcard" onclick="openPlayerCard(${p.id})" title="Visa spelarkort">
       <div class="sp-pavatar ${photo?'':'empty'}" ${photo?`style="background-image:url('${photo}')"`:''}>${photo?'':'<span>—</span>'}</div>
       <div class="sp-pname">${p.name}${youTag}</div>${wtnTag}
@@ -956,7 +956,7 @@ function openPlayerCard(id){
       <button class="pm-x" onclick="closePlayerCard()">✕</button>
       <div class="pf-avatar ${photo?'':'empty'}" style="width:120px;height:120px;margin:0 auto;${photo?`background-image:url('${photo}')`:''}">${photo?'':'<span>Ingen bild</span>'}</div>
       <div class="pf-name" style="text-align:center">${p.name}</div>
-      ${p.wtn?`<div style="text-align:center;margin:2px 0 10px"><span style="display:inline-block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;font-weight:700;color:#fff;background:#E4004B;padding:3px 10px;border-radius:100px">WTN ${p.wtn}</span></div>`:''}
+      ${p.wtn?`<div style="text-align:center;margin:4px 0 12px"><span style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e3e3e8;padding:4px 12px 4px 9px;border-radius:100px;box-shadow:0 1px 4px rgba(0,0,0,.18)"><img src="wtn-mark.png" style="height:18px;width:auto;display:block"><span style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#1B2A4A">${p.wtn}</span></span></div>`:''}
       <div class="pm-stats">
         <div><span class="n">${played}</span><span class="l">Matcher</span></div>
         <div><span class="n">${wins}</span><span class="l">Vinster</span></div>
