@@ -885,6 +885,7 @@ function profileFormHtml(row){
         <option value="Gräs" ${row.fav_surface==='Gräs'?'selected':''}>Gräs</option>
         <option value="Inomhus" ${row.fav_surface==='Inomhus'?'selected':''}>Inomhus</option></select></div>
     <div class="form-row"><label class="form-label">På stegen sedan</label><input id="p-since" type="text" value="${row.since_year||''}" placeholder="2020"></div>
+    <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input id="p-wtn" type="text" value="${row.wtn||''}" placeholder="t.ex. 18.4"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt WTN så visas en badge på kortet. Inget WTN? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--clay)">Skaffa här →</a></div></div>
     <div class="form-row"><label class="form-label">Om mig</label><textarea id="p-bio" placeholder="Berätta något kul om dig själv…">${row.bio||''}</textarea></div>
     <button class="btn" onclick="saveMyProfile(this)">Spara profil →</button>
     <div class="pin-row">
@@ -924,9 +925,10 @@ function renderSpelare(){
   const grid=roster.length?`<div class="sp-grid">${roster.map(p=>{
     const photo=p.photo_url||'';
     const youTag=(me&&p.id===me.id)?' <span class="pill drawn">du</span>':'';
+    const wtnTag=p.wtn?`<div style="margin-top:3px"><span style="display:inline-block;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.5px;font-weight:700;color:#fff;background:#E4004B;padding:2px 6px;border-radius:100px">WTN ${p.wtn}</span></div>`:'';
     return `<div class="sp-pcard" onclick="openPlayerCard(${p.id})" title="Visa spelarkort">
       <div class="sp-pavatar ${photo?'':'empty'}" ${photo?`style="background-image:url('${photo}')"`:''}>${photo?'':'<span>—</span>'}</div>
-      <div class="sp-pname">${p.name}${youTag}</div>
+      <div class="sp-pname">${p.name}${youTag}</div>${wtnTag}
     </div>`;}).join('')}</div>`
     :'<div class="muted">Inga spelare har anmält sig till sommarstegen än.</div>';
 
@@ -943,7 +945,10 @@ function openPlayerCard(id){
   const mine=(matches||[]).filter(m=>m.winner_id && (m.player_a_id===id||m.player_b_id===id));
   const played=mine.length, wins=mine.filter(m=>m.winner_id===id).length, losses=played-wins;
   const upcoming=(matches||[]).find(m=>!m.winner_id && (m.player_a_id===id||m.player_b_id===id));
-  const oppName=upcoming?nameById(upcoming.player_a_id===id?upcoming.player_b_id:upcoming.player_a_id):'';
+  const oppId=upcoming?(upcoming.player_a_id===id?upcoming.player_b_id:upcoming.player_a_id):null;
+  const oppName=oppId?nameById(oppId):'';
+  const oppP=oppId?players.find(x=>x.id===oppId):null;
+  const bothWtn=!!(p.wtn && oppP && oppP.wtn);
   const age=p.born?Math.floor((Date.now()-new Date(p.born).getTime())/3.15576e10):'';
   const info=[['Ålder',age?age+' år':''],['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Favoritunderlag',p.fav_surface],['På stegen sedan',p.since_year]].filter(x=>x[1]);
   modal.innerHTML=`<div class="pm-backdrop" onclick="closePlayerCard()"></div>
@@ -951,12 +956,14 @@ function openPlayerCard(id){
       <button class="pm-x" onclick="closePlayerCard()">✕</button>
       <div class="pf-avatar ${photo?'':'empty'}" style="width:120px;height:120px;margin:0 auto;${photo?`background-image:url('${photo}')`:''}">${photo?'':'<span>Ingen bild</span>'}</div>
       <div class="pf-name" style="text-align:center">${p.name}</div>
+      ${p.wtn?`<div style="text-align:center;margin:2px 0 10px"><span style="display:inline-block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;font-weight:700;color:#fff;background:#E4004B;padding:3px 10px;border-radius:100px">WTN ${p.wtn}</span></div>`:''}
       <div class="pm-stats">
         <div><span class="n">${played}</span><span class="l">Matcher</span></div>
         <div><span class="n">${wins}</span><span class="l">Vinster</span></div>
         <div><span class="n">${losses}</span><span class="l">Förluster</span></div>
       </div>
-      ${upcoming?`<div class="muted" style="text-align:center;margin-bottom:14px">Nästa: <strong style="color:var(--cream)">${oppName}</strong>${upcoming.court?` · bana ${upcoming.court}`:''}${upcoming.start_time?` · kl ${upcoming.start_time}`:''}</div>`:''}
+      ${upcoming?`<div class="muted" style="text-align:center;margin-bottom:${bothWtn?'8px':'14px'}">Nästa: <strong style="color:var(--cream)">${oppName}</strong>${upcoming.court?` · bana ${upcoming.court}`:''}${upcoming.start_time?` · kl ${upcoming.start_time}`:''}</div>`:''}
+      ${bothWtn?`<div style="text-align:center;margin-bottom:14px"><span style="font-size:11px;color:#9EE6A0">✓ Båda har WTN — matchen kan räknas</span><br><a href="https://worldtennisnumber.com" target="_blank" style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#fff;background:#E4004B;padding:7px 14px;border-radius:8px;text-decoration:none">Registrera matchen i WTN →</a></div>`:''}
       ${me?(function(){const tel=(p.phone||'').replace(/[^\d+]/g,'');return `<div class="pm-contact"><div class="label" style="margin-bottom:6px">📞 Kontakt — endast för inloggade</div>
         <div class="pm-row"><span class="k">Telefon</span><span class="v">${p.phone?`<a href="tel:${tel}" style="color:var(--clay);text-decoration:none">${p.phone}</a> · <a href="sms:${tel}" style="color:var(--clay);text-decoration:none">SMS</a>`:'<span style="color:var(--muted)">—</span>'}</span></div></div>`;})():''}
       ${info.map(([k,v])=>`<div class="pm-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}
@@ -998,6 +1005,7 @@ async function saveMyProfile(btn){
     favShot:(document.getElementById('p-favshot')||{}).value||'',
     favSurface:(document.getElementById('p-surface')||{}).value||'',
     since:(document.getElementById('p-since')||{}).value||'',
+    wtn:(document.getElementById('p-wtn')||{}).value||'',
     bio:(document.getElementById('p-bio')||{}).value||'',
   };
   const orig=btn?btn.textContent:'';

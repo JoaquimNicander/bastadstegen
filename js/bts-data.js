@@ -33,7 +33,7 @@ const BTS = {
     _assert();
     // OBS: läser INTE pin-kolumnen (dold av säkerhetsskäl)
     const { data, error } = await _sb.from('players')
-      .select('id,name,phone,born,photo_url,is_admin,active,hand,hometown,fav_shot,fav_surface,since_year,bio').order('name');
+      .select('id,name,phone,born,photo_url,is_admin,active,hand,hometown,fav_shot,fav_surface,since_year,bio,wtn').order('name');
     if (error) throw error;
     return data;
   },
@@ -66,13 +66,13 @@ const BTS = {
   },
 
   // Spara hela den delade spelarprofilen (PIN-skyddat). Fälten är publika.
-  async setProfile(playerId, pin, { born, hand, hometown, favShot, favSurface, since, bio } = {}) {
+  async setProfile(playerId, pin, { born, hand, hometown, favShot, favSurface, since, bio, wtn } = {}) {
     _assert();
     const { error } = await _sb.rpc('bts_set_profile', {
       p_player_id: playerId, p_pin: pin,
       p_born: born || '', p_hand: hand || '', p_hometown: hometown || '',
       p_fav_shot: favShot || '', p_fav_surface: favSurface || '',
-      p_since: since || '', p_bio: bio || '',
+      p_since: since || '', p_bio: bio || '', p_wtn: wtn || '',
     });
     if (error) throw error;
   },

@@ -450,6 +450,7 @@ function dbProfileForMe(){
     favShot:row.fav_shot||local.favShot||'',
     favSurface:row.fav_surface||local.favSurface||'',
     since:row.since_year||local.since||'',
+    wtn:row.wtn||local.wtn||'',
     bio:row.bio||local.bio||'',
     email:local.email||'',
     photo:row.photo_url||local.photo||'',
@@ -833,6 +834,7 @@ function renderApp(){
         </select>
       </div>
       <div class="form-row"><label class="form-label">På stegen sedan</label><input class="form-input" id="p-since" type="text" value="${prof.since||''}" placeholder="2020"></div>
+      <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input class="form-input" id="p-wtn" type="text" value="${prof.wtn||''}" placeholder="t.ex. 18.4"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt WTN så visas en badge på ditt spelarkort. Har du inget? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--o1,#FF8C42)">Skaffa här →</a></div></div>
       <div class="form-row"><label class="form-label">Om mig</label><textarea class="form-textarea" id="p-bio" placeholder="Berätta något kul om dig själv...">${prof.bio||''}</textarea></div>
       <button class="save-btn" onclick="saveMyProfile(this)">Spara profil →</button>
       <div class="pin-row">
@@ -1071,6 +1073,7 @@ async function saveMyProfile(btn){
     favShot:document.getElementById('p-favshot')?.value||'',
     favSurface:document.getElementById('p-surface')?.value||'',
     since:document.getElementById('p-since')?.value||'',
+    wtn:document.getElementById('p-wtn')?.value||'',
     bio:document.getElementById('p-bio')?.value||'',
   };
   // Behåll localStorage som offline-fallback
