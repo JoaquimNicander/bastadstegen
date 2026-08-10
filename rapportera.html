@@ -801,7 +801,7 @@ function renderApp(){
   // Profile section — läs den DELADE profilen från databasen (fallback: localStorage)
   const prof=dbProfileForMe();
   html+=`
-  <div class="section">
+  <div class="section" id="min-profil">
     <div class="section-label">Min profil</div>
     ${(function(){const myRank=getLadder().indexOf(me.id)+1;return `
     <div class="pf-card">
@@ -869,6 +869,12 @@ function renderApp(){
   }
 
   main.innerHTML=html;
+
+  // Kom man via "Redigera min profil" (#profil) — hoppa direkt till profilsektionen
+  if(location.hash==='#profil'){
+    const el=document.getElementById('min-profil');
+    if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),120);
+  }
 
   // Förifyll mejl från databasen (PIN-skyddat, hålls privat) — så sparad mejl syns
   if(DBC && me && me._pin && window.BTS){
