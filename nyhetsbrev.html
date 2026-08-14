@@ -116,6 +116,8 @@
         <button class="btn alt" type="button" onclick="addBlock('text')">+ Text</button>
         <button class="btn alt" type="button" onclick="addBlock('image')">+ Bild</button>
         <button class="btn alt" type="button" onclick="addBlock('button')">+ Knapp</button>
+        <button class="btn alt" type="button" onclick="addBlock('divider')">+ Avskiljare</button>
+        <button class="btn alt" type="button" onclick="addBlock('spacer')">+ Mellanrum</button>
       </div>
 
       <div style="border-top:1px solid var(--border);margin:24px 0 16px"></div>
@@ -198,16 +200,18 @@ function blocksToHtml(name){
     if(b.type==='heading') return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:21px;line-height:1.2;color:#0D2E20;font-weight:700;margin:28px 0 12px;">${esc(b.text||'Rubrik')}</div>`;
     if(b.type==='image') return b.url?`<img src="${b.url}" style="display:block;border:0;width:100%;max-width:484px;height:auto;border-radius:12px;margin:18px 0;">`:`<div style="border:1px dashed #C9BFB0;border-radius:12px;padding:26px;text-align:center;color:#9A8F86;font-family:Arial;font-size:13px;margin:18px 0;">Ingen bild vald än</div>`;
     if(b.type==='button') return `<div style="margin:20px 0;"><a href="${esc(b.url||'#')}" style="display:inline-block;background:#E8520A;color:#fff;font-family:Arial;font-weight:700;text-decoration:none;font-size:15px;padding:14px 28px;border-radius:10px;">${esc(b.text||'Knapptext')} →</a></div>`;
+    if(b.type==='divider') return `<div style="border-top:1px solid #D8CEBD;margin:26px 0;"></div>`;
+    if(b.type==='spacer'){ const h={small:12,medium:28,large:52}[b.text]||28; return `<div style="height:${h}px;line-height:${h}px;font-size:0;">&nbsp;</div>`; }
     return paras(b.text||'Text…', name);
   }).join('');
 }
 
 // ── Blockeditor ──
 function addBlock(type){
-  const b={id:uid(),type,text:'',url:''};
+  const b={id:uid(),type,text:type==='spacer'?'medium':'',url:''};
   blocks.push(b); renderBlocks(); render(); scheduleAutosave();
   if(type==='image'){ /* öppna filväljaren direkt */ setTimeout(()=>{const el=document.getElementById('file-'+b.id); if(el) el.click();},50); }
-  else { setTimeout(()=>{const el=document.getElementById('ta-'+b.id); if(el) el.focus();},50); }
+  else if(type!=='divider'&&type!=='spacer'){ setTimeout(()=>{const el=document.getElementById('ta-'+b.id); if(el) el.focus();},50); }
 }
 function moveBlock(id,dir){
   const i=blocks.findIndex(b=>b.id===id); const j=i+dir;
@@ -229,7 +233,7 @@ function renderBlocks(){
   const box=document.getElementById('blocks');
   if(!blocks.length){ box.innerHTML='<div class="hint" style="margin-top:8px">Inga block än — lägg till Rubrik, Text, Bild eller Knapp nedan.</div>'; return; }
   box.innerHTML=blocks.map((b,i)=>{
-    const label=b.type==='heading'?'Rubrik':b.type==='image'?'Bild':b.type==='button'?'Knapp':'Text';
+    const label=b.type==='heading'?'Rubrik':b.type==='image'?'Bild':b.type==='button'?'Knapp':b.type==='divider'?'Avskiljare':b.type==='spacer'?'Mellanrum':'Text';
     const tools=`<div class="blk-tools">
       <button onclick="moveBlock('${b.id}',-1)" ${i===0?'disabled':''} title="Upp">↑</button>
       <button onclick="moveBlock('${b.id}',1)" ${i===blocks.length-1?'disabled':''} title="Ner">↓</button>
@@ -246,6 +250,14 @@ function renderBlocks(){
     } else if(b.type==='button'){
       inner=`<input type="text" id="ta-${b.id}" value="${(b.text||'').replace(/"/g,'&quot;')}" placeholder="Knapptext, t.ex. Anmäl dig" oninput="setText('${b.id}',this.value)" style="margin-bottom:6px">
         <input type="text" id="url-${b.id}" value="${(b.url||'').replace(/"/g,'&quot;')}" placeholder="Länk, https://…" oninput="setUrl('${b.id}',this.value)">`;
+    } else if(b.type==='divider'){
+      inner=`<div style="border-top:1px solid var(--border);margin:4px 0 2px"></div><div class="hint">Tunn linje som skiljer av två avsnitt.</div>`;
+    } else if(b.type==='spacer'){
+      const sz=b.text||'medium';
+      const opt=(v,t)=>`<option value="${v}" ${sz===v?'selected':''}>${t}</option>`;
+      inner=`<div class="row"><span class="hint" style="margin:0">Höjd:</span>
+        <select onchange="setText('${b.id}',this.value)" style="background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:13px;padding:8px 10px;border-radius:8px">
+        ${opt('small','Litet')}${opt('medium','Mellan')}${opt('large','Stort')}</select></div>`;
     } else {
       inner=`<textarea id="ta-${b.id}" placeholder="Skriv text… (tom rad = nytt stycke, [förnamn] fylls i)" oninput="setText('${b.id}',this.value)">${esc(b.text||'')}</textarea>`;
     }
@@ -435,7 +447,7 @@ function validate(){
   if(!n.blocks.length){ return 'Lägg till minst ett innehållsblock.'; }
   if(n.blocks.some(b=>b.type==='image' && !b.url)){ return 'En bild är inte uppladdad än.'; }
   if(n.blocks.some(b=>b.type==='button' && !(b.url||'').trim())){ return 'En knapp saknar länk.'; }
-  if(n.blocks.every(b=>b.type==='image'||b.type==='button')){ return 'Lägg till lite text också.'; }
+  if(n.blocks.every(b=>b.type==='image'||b.type==='button'||b.type==='divider'||b.type==='spacer')){ return 'Lägg till lite text också.'; }
   return '';
 }
 
