@@ -398,9 +398,13 @@ function matcherRoundHtml(e){
       const canReport=me&&(m.player_a_id===me.id||m.player_b_id===me.id)&&!m.winner_id;
       const _pa=players.find(p=>p.id===m.player_a_id), _pb=players.find(p=>p.id===m.player_b_id);
       const bothWtn=!!(_pa&&_pa.wtn&&_pb&&_pb.wtn);
-      const wtnNote=bothWtn?`<div style="margin-top:10px;background:#fff;border:1px solid #e3e3e8;border-radius:9px;padding:9px 11px;display:flex;align-items:center;gap:9px;box-shadow:0 1px 3px rgba(0,0,0,.12)">
-        <img src="wtn-mark.png" style="height:20px;width:auto;flex-shrink:0">
-        <span style="font-size:12px;color:#1B2A4A;flex:1;line-height:1.35;font-weight:600">Glöm inte registrera er match i WTN!</span>
+      const wtnNote=(bothWtn&&!m.winner_id)?`<div style="margin-top:8px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+        <img src="wtn-mark.png" style="height:12px;width:auto;opacity:.85">
+        <span>Räknas i WTN — <a href="https://worldtennisnumber.com" target="_blank" style="color:var(--clay);text-decoration:none;font-weight:600">registrera →</a></span>
+      </div>`:'';
+      const wtnDone=(bothWtn&&m.winner_id)?`<div style="margin-top:10px;background:#fff;border:1px solid #e3e3e8;border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.15)">
+        <img src="wtn-mark.png" style="height:22px;width:auto;flex-shrink:0">
+        <span style="font-size:12.5px;color:#1B2A4A;flex:1;line-height:1.35;font-weight:600">Ni har båda WTN — glöm inte registrera matchen där också!</span>
         <a href="https://worldtennisnumber.com" target="_blank" style="font-size:11px;font-weight:700;color:#E4004B;text-decoration:none;white-space:nowrap">Registrera →</a>
       </div>`:'';
       return `<div class="ev" style="padding:14px 16px">
@@ -408,6 +412,7 @@ function matcherRoundHtml(e){
         ${(!m.court && !m.winner_id)?`<div style="text-align:center;margin-bottom:8px"><span class="pill" style="color:var(--clay);border-color:var(--clay)">⏳ Väntar på ledig bana</span></div>`:''}
         <div class="vs"><div class="side ${aWin?'winner':''}">${nameById(m.player_a_id)}</div><div class="x">${m.score||'vs'}</div><div class="side b ${bWin?'winner':''}">${nameById(m.player_b_id)}</div></div>
         ${m.winner_id?`<div class="muted" style="margin-top:6px">Vinnare: <span class="winner">${nameById(m.winner_id)}</span> · klar</div>`:''}
+        ${wtnDone}
         ${(!m.winner_id && m.deferred)?`<div style="text-align:center;margin-top:8px;background:rgba(193,120,73,.16);border:1px solid var(--clay);border-radius:8px;padding:9px;color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase">⏳ Spelas senare${m.planned_date?' · '+fmtDate(m.planned_date):''}</div>`:''}
         ${(!m.winner_id && (canReport||isAdmin()))?`<div style="margin-top:8px">${m.deferred?`<button class="btn sm alt" onclick="deferMatch('${m.id}',false)">Ångra spelas senare</button>`:`<button class="btn sm alt" onclick="deferMatch('${m.id}',true)">⏳ Spelas senare</button>`}</div>`:''}
         ${canReport?`<div style="margin-top:12px">

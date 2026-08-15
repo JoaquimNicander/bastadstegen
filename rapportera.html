@@ -678,6 +678,15 @@ function renderApp(){
   } else if(!match){
     html+=`<div class="section"><div style="color:var(--muted2);font-size:15px;padding:16px 0">Ingen match hittad för omgång ${round}.</div></div>`;
   } else if(myReport&&myReport.status!=='disputed'){
+    const _all=(DBC&&DBC.allPlayers)||[];
+    const _myWtn=(dbProfileForMe().wtn||'').trim();
+    const _oppWtn=((_all.find(p=>p.id===match.opp.id)||{}).wtn||'').trim();
+    const wtnReminder=(_myWtn&&_oppWtn)?`
+      <div style="margin-top:10px;background:#fff;border:1px solid #e3e3e8;border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.15)">
+        <img src="wtn-mark.png" style="height:22px;width:auto;flex-shrink:0">
+        <span style="font-size:12.5px;color:#1B2A4A;flex:1;line-height:1.35;font-weight:600">Ni har båda WTN — glöm inte registrera matchen där också!</span>
+        <a href="https://worldtennisnumber.com" target="_blank" style="font-size:11px;font-weight:700;color:#E4004B;text-decoration:none;white-space:nowrap">Registrera →</a>
+      </div>`:'';
     html+=`
     <div class="section">
       <div class="section-label">Omgång ${round} — Din match</div>
@@ -691,6 +700,7 @@ function renderApp(){
         <div><div class="success-score">${myReport.wo?'WO':setsToStr(myReport.sets)}</div></div>
         <div><span class="status-tag ${myReport.status}">${myReport.status==='confirmed'?'Bekräftad':'Väntar'}</span></div>
       </div>
+      ${wtnReminder}
       ${myReport.status!=='confirmed'?`<button class="btn-sm" style="width:100%;padding:14px;text-align:center;margin-top:8px;font-size:14px;justify-content:center" onclick="undoReport()">← Ångra rapportering</button>`:''}
     </div>`;
   } else {
