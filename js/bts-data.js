@@ -298,6 +298,43 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
+  // ── Kickoff/avslutning 23 aug: öppen anmälan (tennis/middag/båda) ──
+  async kickoffSignup(name, contact, attend, guests, note) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_kickoff_signup', {
+      p_name: name, p_contact: contact || '', p_attend: attend, p_guests: Number(guests) || 1, p_note: note || '' });
+    if (error) throw error;
+    return data;
+  },
+  async kickoffUpdate(id, name, contact, attend, guests, note) {
+    _assert();
+    const { error } = await _sb.rpc('bts_kickoff_update', {
+      p_id: id, p_name: name, p_contact: contact || '', p_attend: attend, p_guests: Number(guests) || 1, p_note: note || '' });
+    if (error) throw error;
+  },
+  async kickoffCancel(id) {
+    _assert();
+    const { error } = await _sb.rpc('bts_kickoff_cancel', { p_id: id });
+    if (error) throw error;
+  },
+  async kickoffSummary() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_kickoff_summary');
+    if (error) throw error;
+    return data || { total: 0, tennis: 0, middag: 0, gaster: 0 };
+  },
+  async kickoffPublicList() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_kickoff_public_list');
+    if (error) throw error;
+    return data || [];
+  },
+  async kickoffAdminList(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_kickoff_admin_list', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
   // Steg 3: generera nästa omgångs matcher (grannar möts) + sätt current_round
   async adminGenerateRound(adminPw, competitionId, round) {
     _assert();
@@ -780,6 +817,59 @@ const BTS = {
     const { data, error } = await _sb.rpc('bts_news_openers', { p_admin_pw: adminPw, p_num: num });
     if (error) throw error;
     return data || [];
+  },
+  // ── SPEED CUP ──
+  async scState() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_sc_state');
+    if (error) throw error;
+    return data || { players: [], matches: [] };
+  },
+  async scReport(matchId, scPlayerId, code, a, b) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_report', { p_match_id: matchId, p_sc_player_id: scPlayerId, p_code: code, p_a: a, p_b: b });
+    if (error) throw error;
+  },
+  async scAddPlayer(adminPw, { name, playerId, pin, grp, seed }) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_sc_add_player', { p_admin_pw: adminPw, p_name: name, p_player_id: playerId ?? null, p_pin: pin || null, p_grp: grp || null, p_seed: seed ?? null });
+    if (error) throw error;
+    return data;
+  },
+  async scSetPlayer(adminPw, id, grp, seed) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_set_player', { p_admin_pw: adminPw, p_id: id, p_grp: grp || null, p_seed: seed ?? null });
+    if (error) throw error;
+  },
+  async scDelPlayer(adminPw, id) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_del_player', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+  },
+  async scGenGroups(adminPw) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_gen_groups', { p_admin_pw: adminPw });
+    if (error) throw error;
+  },
+  async scGenKnockout(adminPw) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_gen_knockout', { p_admin_pw: adminPw });
+    if (error) throw error;
+  },
+  async scAdminResult(adminPw, matchId, a, b) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_admin_result', { p_admin_pw: adminPw, p_match_id: matchId, p_a: a, p_b: b });
+    if (error) throw error;
+  },
+  async scSetCourt(adminPw, matchId, court) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_set_court', { p_admin_pw: adminPw, p_match_id: matchId, p_court: court || null });
+    if (error) throw error;
+  },
+  async scReset(adminPw, alsoPlayers) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_reset', { p_admin_pw: adminPw, p_players: !!alsoPlayers });
+    if (error) throw error;
   },
 };
 

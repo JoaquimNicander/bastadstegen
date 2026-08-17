@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Säsongsavslutning · Båstad Stegen</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0D2E20; --card:#0D2A1D; --border:#1C3A2B; --cream:#F5EDE3; --muted:#9A8F86;
+         --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  a{color:var(--sun)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;max-width:640px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 12px;border-radius:8px;background:rgba(0,0,0,.18)}
+  .hero-img{display:block;width:100%;max-width:640px;height:auto;margin:0 auto}
+  .subhero{text-align:center;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:14px 16px 2px}
+  .subhero b{color:var(--sun)}
+  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+  .lead{font-size:15px;line-height:1.6;color:#DCD5CB;text-align:center;margin:6px 4px 22px}
+  .lead b{color:var(--cream)}
+
+  .steps{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+  .step{display:flex;gap:13px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:15px 16px}
+  .step .ic{font-size:22px;line-height:1;flex-shrink:0;margin-top:1px}
+  .step .t{font-weight:700;font-size:15px;margin-bottom:3px}
+  .step .d{font-size:13.5px;line-height:1.5;color:var(--muted)}
+  .step .d b{color:var(--cream)}
+  .step .when{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--sun);margin-top:5px}
+
+  .count{text-align:center;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;color:var(--muted);margin:16px 0 6px;min-height:16px}
+  .count b{color:var(--sun)}
+
+  .lists{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  @media(max-width:460px){ .lists{grid-template-columns:1fr} }
+  .lcol{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px 15px}
+  .lcol h3{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+  .lcol.tn h3{color:var(--sun)} .lcol.md h3{color:var(--green)}
+  .lcol h3 .c{margin-left:auto;background:#10231a;border:1px solid var(--border);border-radius:100px;padding:2px 9px;font-size:10px;color:var(--cream)}
+  .lcol ul{list-style:none;margin:0;padding:0}
+  .lcol li{font-size:14px;padding:5px 0;border-bottom:1px solid rgba(28,58,43,.6);display:flex;justify-content:space-between;gap:8px}
+  .lcol li:last-child{border-bottom:none}
+  .lcol li .g{font-size:11px;color:var(--muted);font-family:'Space Mono',monospace}
+  .lcol .empty{font-size:13px;color:var(--muted)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 18px;margin-top:14px}
+  .lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:block}
+  .lbl.mt{margin-top:18px}
+  input[type=text],input[type=tel],textarea{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:15px;padding:12px 13px;border-radius:10px;outline:none}
+  input:focus,textarea:focus{border-color:var(--clay)}
+  textarea{min-height:70px;line-height:1.5;resize:vertical}
+
+  .picks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  @media(max-width:460px){ .picks{grid-template-columns:1fr} }
+  .pick{background:#10231a;border:1.5px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:.13s;user-select:none}
+  .pick:hover{border-color:#2c5140}
+  .pick.on{border-color:var(--clay);background:rgba(255,140,66,.12);box-shadow:0 0 0 2px rgba(255,140,66,.18) inset}
+  .pick .pic{font-size:24px;line-height:1}
+  .pick .pt{font-weight:700;font-size:14px;margin-top:6px}
+  .pick .ps{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .guests{margin-top:16px}
+  .stepper{display:flex;align-items:center;gap:14px}
+  .stepper button{width:44px;height:44px;border-radius:11px;border:1px solid var(--border);background:#10231a;color:var(--cream);font-size:22px;font-weight:700;cursor:pointer;line-height:1}
+  .stepper button:active{background:rgba(255,140,66,.15)}
+  .stepper .n{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;min-width:34px;text-align:center}
+  .guests .hint{font-size:12px;color:var(--muted);margin-top:7px}
+
+  .btn{display:block;width:100%;border:none;border-radius:11px;font:inherit;font-weight:700;font-size:16px;padding:15px;cursor:pointer;background:var(--orange);color:#fff;margin-top:20px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.alt{background:transparent;color:var(--cream);border:1px solid var(--border);font-size:14px;padding:12px}
+  .status{font-size:13.5px;margin-top:12px;text-align:center;min-height:18px}
+  .hidden{display:none}
+
+  .done{text-align:center;padding:8px 4px}
+  .done .big{font-size:44px;line-height:1}
+  .done h2{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:1px;margin:10px 0 4px;color:#fff}
+  .done .sum{font-size:14px;color:var(--cream);line-height:1.6;margin:10px 0 4px}
+  .done .sum .tag{display:inline-block;background:rgba(255,140,66,.16);border:1px solid var(--clay);color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;padding:4px 11px;border-radius:100px;margin-top:6px}
+
+  .admin{margin-top:34px;border-top:1px solid var(--border);padding-top:14px}
+  .admin .foot{text-align:center}
+  .admin .foot a{color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-decoration:none}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+  th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  td .att{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;padding:2px 7px;border-radius:100px;white-space:nowrap}
+  .att.tennis{background:rgba(244,183,64,.16);color:var(--sun)}
+  .att.middag{background:rgba(123,198,123,.16);color:var(--green)}
+  .att.both{background:rgba(255,140,66,.16);color:var(--clay)}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html">← Startsida</a><a href="sommarstege.html">Sommarstegen →</a></div>
+
+<img class="hero-img" src="kickoff-header.png" alt="Båstad Stegen · Summer Edition Masters · 23 augusti">
+<div class="subhero">Sommarstegens avslutning · <b>Söndag 23 augusti</b></div>
+
+<div class="wrap">
+  <div class="lead">Vi avslutar <b>Sommarstegen</b> och drar igång hösten — en eftermiddag <b>speed-tennis</b>
+    som koras med en vinnare, och en <b>gemensam middag</b> på kvällen. Kom på tennisen, middagen eller båda!</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="ic">🎾</div>
+      <div>
+        <div class="t">Speed-tennis</div>
+        <div class="d">Snabba matcher i högt tempo. Beroende på hur många vi blir kör vi <b>gruppspel</b> och sedan <b>utslagning</b> — hela vägen fram till en vinnare.</div>
+        <div class="when">Start kl 15:00 · spel i ca 2,5 h</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="ic">🍽️</div>
+      <div>
+        <div class="t">Gemensam middag</div>
+        <div class="d">Vi avslutar dagen med middag och häng på <b><a href="https://www.dogandfox.se/" target="_blank" style="color:var(--cream);text-decoration:underline">Dog &amp; Fox</a></b> i Båstad.</div>
+        <div class="when">På kvällen efter spelet</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="lists" id="lists"></div>
+
+  <!-- FORMULÄR -->
+  <div class="card" id="form-card">
+    <span class="lbl">Anmäl dig</span>
+    <input type="text" id="f-name" placeholder="Ditt namn" autocomplete="name">
+
+    <span class="lbl mt">Mobil (för info via SMS)</span>
+    <input type="tel" id="f-contact" inputmode="tel" placeholder="07XX XXX XX XX" autocomplete="tel">
+
+    <span class="lbl mt">Vad vill du vara med på?</span>
+    <div class="picks">
+      <div class="pick" data-v="tennis" onclick="pick('tennis')"><div class="pic">🎾</div><div class="pt">Bara tennis</div><div class="ps">15:00</div></div>
+      <div class="pick" data-v="middag" onclick="pick('middag')"><div class="pic">🍽️</div><div class="pt">Bara middag</div><div class="ps">Kvällen</div></div>
+      <div class="pick" data-v="both" onclick="pick('both')"><div class="pic">⭐</div><div class="pt">Både och</div><div class="ps">Hela dagen</div></div>
+    </div>
+
+    <div class="guests hidden" id="guests">
+      <span class="lbl">Antal till middagen</span>
+      <div class="stepper">
+        <button type="button" onclick="bump(-1)">–</button>
+        <span class="n" id="g-num">1</span>
+        <button type="button" onclick="bump(1)">+</button>
+      </div>
+      <div class="hint">Inklusive dig själv — ta med respektive eller sällskap om du vill.</div>
+    </div>
+
+    <span class="lbl mt">Övrigt (valfritt)</span>
+    <textarea id="f-note" placeholder="Något vi bör veta?"></textarea>
+
+    <button class="btn" id="submit" onclick="submit()">Skicka anmälan →</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <!-- BEKRÄFTELSE -->
+  <div class="card hidden" id="done-card">
+    <div class="done">
+      <div class="big">🎉</div>
+      <h2>Du är anmäld!</h2>
+      <div class="sum" id="done-sum"></div>
+    </div>
+    <button class="btn alt" onclick="editSignup()">Ändra min anmälan</button>
+    <button class="btn alt" onclick="cancelSignup()" style="color:#EF9A9A;border-color:#5a2f2f">Avanmäl mig</button>
+    <div class="status" id="done-status"></div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="admin">
+    <div class="foot" id="admin-foot"><a href="#" onclick="showAdmin();return false">⚙ Admin</a></div>
+    <div class="hidden" id="admin-box">
+      <div class="card">
+        <span class="lbl">Admin — anmälningar</span>
+        <input type="text" id="a-pw" placeholder="Adminlösenord" onkeydown="if(event.key==='Enter')loadAdmin()">
+        <button class="btn" style="margin-top:12px" onclick="loadAdmin()">Visa lista</button>
+        <div class="status" id="a-status"></div>
+        <div id="a-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const LS_ID='bts_kickoff_id';
+let attend=null, guests=1, myId=localStorage.getItem(LS_ID)||null;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+const attLabel=a=>({tennis:'Bara tennis',middag:'Bara middag',both:'Både och'}[a]||a);
+
+function pick(v){
+  attend=v;
+  document.querySelectorAll('.pick').forEach(p=>p.classList.toggle('on',p.dataset.v===v));
+  document.getElementById('guests').classList.toggle('hidden', v==='tennis');
+}
+function bump(d){ guests=Math.max(1,Math.min(20,guests+d)); document.getElementById('g-num').textContent=guests; }
+
+async function refreshCount(){
+  try{
+    const s=await BTS.kickoffSummary();
+    const el=document.getElementById('count');
+    if(s && s.total>0){
+      el.innerHTML=`<b>${s.total}</b> anmälda · <b>${s.tennis}</b> på tennisen · <b>${s.gaster}</b> till middagen`;
+    } else { el.textContent=''; }
+  }catch(e){ /* tyst */ }
+}
+
+async function renderLists(){
+  const box=document.getElementById('lists');
+  try{
+    const rows=await BTS.kickoffPublicList();
+    const tennis=rows.filter(r=>r.attend!=='middag');
+    const middag=rows.filter(r=>r.attend!=='tennis');
+    const kuvert=middag.reduce((a,r)=>a+(r.guests||0),0);
+    const li=(r,showG)=>`<li><span>${esc(r.name)}</span>${showG&&r.guests>1?`<span class="g">${r.guests} pers</span>`:''}</li>`;
+    const col=(cls,ic,title,arr,cnt,showG)=>`<div class="lcol ${cls}"><h3>${ic} ${title}<span class="c">${cnt}</span></h3>
+      ${arr.length?`<ul>${arr.map(r=>li(r,showG)).join('')}</ul>`:'<div class="empty">Ingen anmäld än</div>'}</div>`;
+    box.innerHTML=col('tn','🎾','På tennisen',tennis,tennis.length,false)
+      +col('md','🍽️','På middagen',middag,kuvert,true);
+  }catch(e){ box.innerHTML=''; }
+}
+function refreshAll(){ refreshCount(); renderLists(); }
+
+async function submit(){
+  const s=document.getElementById('status');
+  const name=document.getElementById('f-name').value.trim();
+  const contact=document.getElementById('f-contact').value.trim();
+  const note=document.getElementById('f-note').value.trim();
+  if(!name){ s.textContent='Fyll i ditt namn.'; return; }
+  if(!contact){ s.textContent='Fyll i ditt mobilnummer (vi skickar info via SMS).'; return; }
+  if(!attend){ s.textContent='Välj tennis, middag eller båda.'; return; }
+  const btn=document.getElementById('submit'); btn.disabled=true; s.textContent='Skickar…';
+  try{
+    if(myId){ await BTS.kickoffUpdate(myId,name,contact,attend,guests,note); }
+    else { myId=await BTS.kickoffSignup(name,contact,attend,guests,note); localStorage.setItem(LS_ID,myId); }
+    showDone({name,attend,guests,contact,note});
+    refreshAll();
+  }catch(e){ s.textContent='Fel: '+(e.message||e); btn.disabled=false; }
+}
+
+function showDone(d){
+  document.getElementById('form-card').classList.add('hidden');
+  const dc=document.getElementById('done-card'); dc.classList.remove('hidden');
+  const parts=[`<div class="tag">${attLabel(d.attend)}</div>`];
+  let line=`<strong>${esc(d.name)}</strong>`;
+  if(d.attend!=='tennis') line+=` · ${d.guests} till middagen`;
+  document.getElementById('done-sum').innerHTML=line+'<br>'+parts.join('');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function editSignup(){
+  document.getElementById('done-card').classList.add('hidden');
+  document.getElementById('form-card').classList.remove('hidden');
+  document.getElementById('submit').disabled=false;
+  document.getElementById('submit').textContent='Uppdatera anmälan →';
+  document.getElementById('status').textContent='';
+}
+async function cancelSignup(){
+  if(!myId) return;
+  if(!confirm('Avanmäl dig från säsongsavslutningen?')) return;
+  const s=document.getElementById('done-status'); s.textContent='Avanmäler…';
+  try{
+    await BTS.kickoffCancel(myId);
+    localStorage.removeItem(LS_ID); myId=null;
+    document.getElementById('done-card').classList.add('hidden');
+    const fc=document.getElementById('form-card'); fc.classList.remove('hidden');
+    ['f-name','f-contact','f-note'].forEach(id=>document.getElementById(id).value='');
+    attend=null; guests=1; document.getElementById('g-num').textContent='1';
+    document.querySelectorAll('.pick').forEach(p=>p.classList.remove('on'));
+    document.getElementById('guests').classList.add('hidden');
+    document.getElementById('submit').disabled=false;
+    document.getElementById('submit').textContent='Skicka anmälan →';
+    document.getElementById('status').textContent='Du är avanmäld.';
+    refreshAll();
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+// ── Admin ──
+function showAdmin(){ document.getElementById('admin-foot').classList.add('hidden'); document.getElementById('admin-box').classList.remove('hidden'); }
+async function loadAdmin(){
+  const pw=document.getElementById('a-pw').value.trim();
+  const s=document.getElementById('a-status'); const box=document.getElementById('a-list');
+  if(!pw){ s.textContent='Ange lösenord.'; return; }
+  s.textContent='Hämtar…';
+  try{
+    const rows=await BTS.kickoffAdminList(pw);
+    s.textContent='';
+    if(!rows.length){ box.innerHTML='<div class="status">Inga anmälningar än.</div>'; return; }
+    const tennis=rows.filter(r=>r.attend!=='middag').length;
+    const midd=rows.filter(r=>r.attend!=='tennis');
+    const gaster=midd.reduce((a,r)=>a+(r.guests||0),0);
+    box.innerHTML=`<div class="status" style="text-align:left;color:var(--cream)"><b>${rows.length}</b> anmälda · ${tennis} på tennisen · ${midd.length} på middagen (${gaster} kuvert)</div>
+      <table><tr><th>Namn</th><th>Val</th><th>Middag</th><th>Mobil</th></tr>
+      ${rows.map(r=>`<tr>
+        <td>${esc(r.name)}${r.note?`<br><span style="color:var(--muted);font-size:11px">${esc(r.note)}</span>`:''}</td>
+        <td><span class="att ${r.attend}">${attLabel(r.attend)}</span></td>
+        <td>${r.attend==='tennis'?'—':r.guests}</td>
+        <td style="color:var(--muted)">${esc(r.contact||'—')}</td>
+      </tr>`).join('')}</table>
+      <button class="btn alt" style="margin-top:14px" onclick='exportCsv(${JSON.stringify(rows).replace(/'/g,"&#39;")})'>⬇ Exportera CSV</button>`;
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+function exportCsv(rows){
+  const head=['Namn','Val','Antal middag','Mobil','Övrigt','Anmäld'];
+  const line=r=>[r.name,attLabel(r.attend),r.attend==='tennis'?0:r.guests,r.contact||'',r.note||'',new Date(r.created_at).toLocaleString('sv-SE')]
+    .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',');
+  const csv=[head.join(','),...rows.map(line)].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));
+  a.download='kickoff-anmalningar.csv'; a.click();
+}
+
+// ── Init: har jag redan anmält mig? Visa bekräftelse via listan finns ej publikt,
+//    så vi litar på localStorage-id och låter dig ändra/avanmäla. ──
+(async function init(){
+  refreshAll();
+  if(myId){
+    // Visa "du är anmäld" med möjlighet att ändra (vi känner inte till detaljerna publikt)
+    document.getElementById('form-card').classList.remove('hidden');
+  }
+})();
+</script>
+</body>
+</html>
