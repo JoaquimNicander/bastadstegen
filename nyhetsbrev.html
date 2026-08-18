@@ -137,6 +137,11 @@
         <input type="text" id="test-email" placeholder="din@mejl.se" style="flex:1;min-width:170px">
         <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
       </div>
+      <label style="display:flex;align-items:center;gap:9px;font-size:13px;color:var(--cream);margin:14px 0 2px;cursor:pointer">
+        <input type="checkbox" id="inc-guests" style="width:16px;height:16px;flex:none">
+        <span id="inc-guests-lbl">Inkludera gästlistan (tjejstegen)</span>
+      </label>
+      <div class="hint">Extra mottagare utanför stegen. Bocka i för att även mejla dem — annars går det bara till spelarna.</div>
       <div style="height:12px"></div>
       <button class="btn primary" id="btn-send" style="width:100%" onclick="sendAll()">Skicka till alla →</button>
       <div class="status" id="status"></div>
@@ -183,6 +188,7 @@ async function doLogin(){
     suppressAutosave=true;
     if(!blocks.length) blocks=[{id:uid(),type:'text',text:'',url:''}];
     renderBlocks(); render(); updateState(); loadDrafts();
+    BTS.guestCount().then(n=>{ const el=document.getElementById('inc-guests-lbl'); if(el&&n) el.textContent=`Inkludera gästlistan (tjejstegen · ${n} st)`; }).catch(()=>{});
     suppressAutosave=false;
   }catch(e){ s.textContent = (e.message||e); }
 }
@@ -337,7 +343,7 @@ function payload(){
   };
 }
 // Payload för mejlutskick: inkluderar id (öppningsspårning) + num (webblänk)
-function mailPayload(){ return { ...payload(), id: currentId, num: currentNum }; }
+function mailPayload(){ return { ...payload(), id: currentId, num: currentNum, includeGuests: !!(document.getElementById('inc-guests')||{}).checked }; }
 
 // ── Header ──
 async function uploadHeader(input){

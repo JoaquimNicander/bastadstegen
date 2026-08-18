@@ -323,6 +323,12 @@ const BTS = {
     if (error) throw error;
     return data || { total: 0, tennis: 0, middag: 0, gaster: 0 };
   },
+  async guestCount() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_guest_count');
+    if (error) throw error;
+    return Number(data) || 0;
+  },
   async kickoffPublicList() {
     _assert();
     const { data, error } = await _sb.rpc('bts_kickoff_public_list');
