@@ -137,11 +137,13 @@
         <input type="text" id="test-email" placeholder="din@mejl.se" style="flex:1;min-width:170px">
         <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
       </div>
-      <label style="display:flex;align-items:center;gap:9px;font-size:13px;color:var(--cream);margin:14px 0 2px;cursor:pointer">
-        <input type="checkbox" id="inc-guests" style="width:16px;height:16px;flex:none">
-        <span id="inc-guests-lbl">Inkludera gästlistan (tjejstegen)</span>
-      </label>
-      <div class="hint">Extra mottagare utanför stegen. Bocka i för att även mejla dem — annars går det bara till spelarna.</div>
+      <div class="label" style="margin-top:16px">Mottagare</div>
+      <select id="aud-mode" style="width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none">
+        <option value="off">Bara spelarna på stegen</option>
+        <option value="add" id="aud-add">Spelarna + gästlistan (tjejstegen)</option>
+        <option value="only" id="aud-only">Bara gästlistan (tjejstegen)</option>
+      </select>
+      <div class="hint">Gästlistan är mottagare utanför stegen (t.ex. tjejstegen). Öppningsstatistik gäller bara spelarna.</div>
       <div style="height:12px"></div>
       <button class="btn primary" id="btn-send" style="width:100%" onclick="sendAll()">Skicka till alla →</button>
       <div class="status" id="status"></div>
@@ -188,7 +190,8 @@ async function doLogin(){
     suppressAutosave=true;
     if(!blocks.length) blocks=[{id:uid(),type:'text',text:'',url:''}];
     renderBlocks(); render(); updateState(); loadDrafts();
-    BTS.guestCount().then(n=>{ const el=document.getElementById('inc-guests-lbl'); if(el&&n) el.textContent=`Inkludera gästlistan (tjejstegen · ${n} st)`; }).catch(()=>{});
+    BTS.guestCount().then(n=>{ if(!n) return; const a=document.getElementById('aud-add'), o=document.getElementById('aud-only');
+      if(a) a.textContent=`Spelarna + gästlistan (tjejstegen · ${n} st)`; if(o) o.textContent=`Bara gästlistan (tjejstegen · ${n} st)`; }).catch(()=>{});
     suppressAutosave=false;
   }catch(e){ s.textContent = (e.message||e); }
 }
@@ -343,7 +346,7 @@ function payload(){
   };
 }
 // Payload för mejlutskick: inkluderar id (öppningsspårning) + num (webblänk)
-function mailPayload(){ return { ...payload(), id: currentId, num: currentNum, includeGuests: !!(document.getElementById('inc-guests')||{}).checked }; }
+function mailPayload(){ const gm=(document.getElementById('aud-mode')||{}).value||'off'; return { ...payload(), id: currentId, num: currentNum, guestMode: gm, includeGuests: gm!=='off' }; }
 
 // ── Header ──
 async function uploadHeader(input){
