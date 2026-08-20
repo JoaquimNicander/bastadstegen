@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Tennis Masters · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0D2E20; --card:#0D2A1D; --border:#1C3A2B; --cream:#F5EDE3; --muted:#9A8F86; --clay:#FF8C42; --sun:#F4B740; --green:#7BC67B; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
+  a{color:var(--sun)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;max-width:820px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 12px;border-radius:8px}
+  .hero{text-align:center;padding:18px}
+  .hero h1{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:2px;margin:0}
+  .hero .tag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .wrap{max-width:820px;margin:0 auto;padding:14px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  input,select{background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:9px 11px;border-radius:9px;outline:none}
+  input:focus,select:focus{border-color:var(--clay)}
+  .btn{background:var(--clay);color:#0D2E20;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer}
+  .btn.alt{background:transparent;color:var(--cream);border:1px solid var(--border)}
+  .btn.sm{padding:7px 11px;font-size:13px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .hidden{display:none}
+  .plist .pr{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .plist .pr .nm{flex:1;min-width:120px;font-weight:600}
+  .plist .pr .tag{font-size:11px;color:var(--muted)}
+  .mrow{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .mrow .nmx{flex:1;min-width:130px;font-size:14px}
+  .mrow input{width:52px;text-align:center;font-weight:700}
+  .muted{color:var(--muted);font-size:13px}
+  .status{font-size:13px;margin-top:8px;color:var(--muted);min-height:16px}
+  .login{max-width:360px;margin:50px auto;text-align:center}
+  .phase-h{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin:14px 0 6px}
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html">← Startsida</a><a href="speedcup.html">Live-vy →</a></div>
+<div class="hero"><h1>SPEED TENNIS MASTERS · ADMIN</h1><div class="tag">Seeda · generera · styr</div></div>
+
+<div id="login" class="login"><div class="panel">
+  <div class="label">Adminlösenord</div>
+  <input type="password" id="pw" placeholder="Lösenord" style="width:100%;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+  <div style="height:10px"></div>
+  <button class="btn" style="width:100%" onclick="doLogin()">Logga in</button>
+  <div class="status" id="login-status"></div>
+</div></div>
+
+<div id="app" class="wrap hidden">
+  <!-- DELTAGARE -->
+  <div class="panel">
+    <div class="label">Deltagare (<span id="pcount">0</span>)</div>
+    <div class="row" style="margin-bottom:10px">
+      <select id="add-ladder" style="flex:1;min-width:160px"><option value="">Lägg till från stegen…</option></select>
+      <button class="btn sm" onclick="addFromLadder()">Lägg till</button>
+    </div>
+    <div class="row" style="margin-bottom:12px">
+      <input id="add-name" placeholder="…eller gästnamn" style="flex:1;min-width:130px">
+      <input id="add-code" placeholder="Gästkod (4 siffror)" style="width:150px" maxlength="8">
+      <button class="btn sm alt" onclick="addGuest()">Lägg till gäst</button>
+    </div>
+    <div class="row" style="margin-bottom:12px">
+      <button class="btn sm alt" onclick="importKickoff()">⬇ Importera från kickoff-anmälan</button>
+    </div>
+    <div class="plist" id="players"></div>
+    <div class="status" id="p-status"></div>
+  </div>
+
+  <!-- GENERERA -->
+  <div class="panel">
+    <div class="label">Kör turneringen</div>
+    <div class="row" style="margin-bottom:8px">
+      <span style="font-size:13px;color:var(--muted)">Antal grupper:</span>
+      <input id="n-groups" type="number" min="1" max="12" value="4" style="width:70px;text-align:center">
+      <button class="btn" onclick="genGroups()">Generera gruppspel</button>
+    </div>
+    <div class="row">
+      <span style="font-size:13px;color:var(--muted)">Vidare per grupp:</span>
+      <input id="n-adv" type="number" min="1" max="8" value="2" style="width:70px;text-align:center">
+      <button class="btn" onclick="genKnockout()">Generera slutspel</button>
+    </div>
+    <div class="muted" style="margin-top:8px">Gruppspel fördelar spelarna jämnt i valt antal grupper (alla möter alla). Slutspel tar de <b>N bästa i varje grupp</b> (t.ex. 2) och seedar in dem efter grupplaceringen i en utslagningsstege — kör det när gruppspelet är färdigspelat. Lämna tomt/0 för att ta alla vidare.</div>
+    <div class="status" id="g-status"></div>
+  </div>
+
+  <!-- RESULTAT -->
+  <div class="panel">
+    <div class="label">Resultat &amp; banor</div>
+    <div id="matches"></div>
+  </div>
+
+  <!-- RESET -->
+  <div class="panel">
+    <div class="label">Nollställ</div>
+    <div class="row">
+      <button class="btn sm alt" onclick="resetMatches()">Rensa alla matcher</button>
+      <button class="btn sm alt" style="border-color:#EF9A9A;color:#EF9A9A" onclick="resetAll()">Rensa allt (även spelare)</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let adminPw='', ST={players:[],matches:[]}, ladder=[];
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const nm=id=>(ST.players.find(p=>p.id===id)||{name:'—'}).name;
+
+async function doLogin(){
+  const pw=document.getElementById('pw').value.trim(); const s=document.getElementById('login-status');
+  if(!pw){ s.textContent='Ange lösenord.'; return; } s.textContent='Kontrollerar…';
+  try{ if(!(await BTS.adminCheck(pw))) throw new Error('Fel lösenord'); adminPw=pw;
+    document.getElementById('login').classList.add('hidden'); document.getElementById('app').classList.remove('hidden');
+    ladder=await BTS.getPlayers(); fillLadder(); await load();
+  }catch(e){ s.textContent=(e.message||e); }
+}
+function fillLadder(){
+  const sel=document.getElementById('add-ladder');
+  sel.innerHTML='<option value="">Lägg till från stegen…</option>'+ladder.filter(p=>p.active!==false)
+    .sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+}
+async function load(){ ST=await BTS.scState(); renderPlayers(); renderMatches(); }
+
+function renderPlayers(){
+  document.getElementById('pcount').textContent=ST.players.length;
+  const grpSel=(id,g)=>`<select onchange="setGroup(${id},this.value)" style="width:64px">
+    <option value="">–</option>${'ABCDEFGH'.split('').map(x=>`<option value="${x}" ${g===x?'selected':''}>${x}</option>`).join('')}</select>`;
+  document.getElementById('players').innerHTML=ST.players.slice().sort((a,b)=>(a.grp||'~').localeCompare(b.grp||'~')||a.name.localeCompare(b.name,'sv'))
+    .map(p=>`<div class="pr"><span class="nm">${esc(p.name)} ${p.player_id?'':'<span class="tag">· gäst</span>'}</span>
+      ${grpSel(p.id,p.grp)}
+      <button class="btn sm alt" onclick="delPlayer(${p.id})">✕</button></div>`).join('')
+    || '<div class="muted">Inga deltagare än.</div>';
+}
+async function addFromLadder(){
+  const id=parseInt(document.getElementById('add-ladder').value); if(!id)return;
+  const p=ladder.find(x=>x.id===id); if(!p)return;
+  try{ await BTS.scAddPlayer(adminPw,{name:p.name,playerId:p.id}); document.getElementById('add-ladder').value=''; await load(); }
+  catch(e){ document.getElementById('p-status').textContent='Fel: '+(e.message||e); }
+}
+async function addGuest(){
+  const name=document.getElementById('add-name').value.trim(); const code=document.getElementById('add-code').value.trim();
+  if(!name){ document.getElementById('p-status').textContent='Ange gästnamn.'; return; }
+  try{ await BTS.scAddPlayer(adminPw,{name,pin:code}); document.getElementById('add-name').value=''; document.getElementById('add-code').value=''; await load();
+    document.getElementById('p-status').textContent=code?'Gäst tillagd. Kod: '+code:'Gäst tillagd (ingen kod — kan ej rapportera själv).'; }
+  catch(e){ document.getElementById('p-status').textContent='Fel: '+(e.message||e); }
+}
+async function setGroup(id,g){ try{ await BTS.scSetPlayer(adminPw,id,g,null); await load(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+async function delPlayer(id){ if(!confirm('Ta bort deltagaren?'))return; try{ await BTS.scDelPlayer(adminPw,id); await load(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+async function importKickoff(){
+  if(!confirm('Importera alla som anmält sig till tennisen (inkl. gäster) från kickoff-anmälan?'))return;
+  const s=document.getElementById('p-status'); s.textContent='Importerar…';
+  try{ const n=await BTS.scImportKickoff(adminPw); await load();
+    s.textContent=n?`${n} deltagare importerade ✓ (medlemmar länkade, gäster får kod = 4 sista i mobilnr)`:'Inga nya att importera.'; }
+  catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+
+async function genGroups(){
+  const g=parseInt(document.getElementById('n-groups').value)||1;
+  if(!confirm(`Fördela ${ST.players.length} spelare i ${g} grupper och generera gruppspel? (ev. slutspel nollställs)`))return;
+  try{ await BTS.scGenGroups(adminPw, g); await load(); document.getElementById('g-status').textContent=`Gruppspel genererat i ${g} grupper ✓`; }
+  catch(e){ document.getElementById('g-status').textContent='Fel: '+(e.message||e); }
+}
+async function genKnockout(){
+  const adv=parseInt(document.getElementById('n-adv').value)||0;
+  const txt=adv>0?`Generera slutspel med de ${adv} bästa i varje grupp?`:'Generera slutspel (alla vidare)?';
+  if(!confirm(txt))return;
+  try{ await BTS.scGenKnockout(adminPw, adv>0?adv:null); await load();
+    document.getElementById('g-status').textContent=adv>0?`Slutspel genererat (topp ${adv}/grupp) ✓`:'Slutspel genererat ✓'; }
+  catch(e){ document.getElementById('g-status').textContent='Fel: '+(e.message||e); }
+}
+
+function koRoundName(nMatches){
+  return ({1:'Final',2:'Semifinal',4:'Kvartsfinal',8:'Åttondelsfinal',16:'Sextondelsfinal',32:'Trettiotvådelsfinal'})[nMatches]||'Slutspel';
+}
+function renderMatches(){
+  const box=document.getElementById('matches');
+  if(!ST.matches.length){ box.innerHTML='<div class="muted">Inga matcher än — generera gruppspel ovan.</div>'; return; }
+  // Bygg ordnade sektioner: grupper (A,B…), sedan ko-ronder (1..K), sedan brons
+  const sections=[];
+  const groups=[...new Set(ST.matches.filter(m=>m.phase==='group').map(m=>m.grp))].sort();
+  groups.forEach(g=>sections.push({label:'Grupp '+g, ms:ST.matches.filter(m=>m.phase==='group'&&m.grp===g)}));
+  const koRounds=[...new Set(ST.matches.filter(m=>m.phase==='ko').map(m=>+m.grp))].sort((a,b)=>a-b);
+  koRounds.forEach(r=>{ const ms=ST.matches.filter(m=>m.phase==='ko'&&+m.grp===r); sections.push({label:koRoundName(ms.length), ms}); });
+  const brz=ST.matches.filter(m=>m.phase==='bronze'); if(brz.length) sections.push({label:'Bronsmatch', ms:brz});
+
+  let html='';
+  sections.forEach(sec=>{
+    html+=`<div class="phase-h">${sec.label}</div>`;
+    sec.ms.slice().sort((a,b)=>(a.slot||0)-(b.slot||0)||a.id-b.id).forEach(m=>{
+      if(!m.a_id&&!m.b_id){ html+=`<div class="mrow"><span class="nmx muted">Väntar på föregående match…</span></div>`; return; }
+      if(!m.a_id||!m.b_id){ const p=m.a_id||m.b_id; html+=`<div class="mrow"><span class="nmx">${esc(nm(p))} <span class="muted">— frilott (vidare)</span></span></div>`; return; }
+      html+=`<div class="mrow">
+        <span class="nmx">${esc(nm(m.a_id))} <span class="muted">vs</span> ${esc(nm(m.b_id))}</span>
+        <input id="m-a-${m.id}" type="number" min="0" max="30" inputmode="numeric" value="${m.score_a??''}" placeholder="–">
+        <span>–</span>
+        <input id="m-b-${m.id}" type="number" min="0" max="30" inputmode="numeric" value="${m.score_b??''}" placeholder="–">
+        <input id="m-c-${m.id}" placeholder="bana" value="${esc(m.court||'')}" style="width:54px">
+        <button class="btn sm" onclick="saveMatch(${m.id})">Spara</button>
+        ${m.status==='done'?'<span class="tag" style="color:#7BC67B">✓</span>':''}
+      </div>`;
+    });
+  });
+  box.innerHTML=html;
+}
+async function saveMatch(id){
+  const a=parseInt(document.getElementById('m-a-'+id).value), b=parseInt(document.getElementById('m-b-'+id).value);
+  const c=document.getElementById('m-c-'+id).value;
+  try{
+    await BTS.scSetCourt(adminPw,id,c);
+    if(!isNaN(a)&&!isNaN(b)){ if(a===b){ alert('Kan inte bli lika.'); return; } await BTS.scAdminResult(adminPw,id,a,b); }
+    await load();
+  }catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function resetMatches(){ if(!confirm('Rensa ALLA matcher (behåll spelare)?'))return; try{ await BTS.scReset(adminPw,false); await load(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+async function resetAll(){ if(!confirm('Rensa ALLT inkl. spelare? Går inte att ångra.'))return; try{ await BTS.scReset(adminPw,true); await load(); }catch(e){ alert('Fel: '+(e.message||e)); } }
+</script>
+</body>
+</html>

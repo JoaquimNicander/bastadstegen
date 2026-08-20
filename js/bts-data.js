@@ -852,14 +852,20 @@ const BTS = {
     const { error } = await _sb.rpc('bts_sc_del_player', { p_admin_pw: adminPw, p_id: id });
     if (error) throw error;
   },
-  async scGenGroups(adminPw) {
+  async scImportKickoff(adminPw) {
     _assert();
-    const { error } = await _sb.rpc('bts_sc_gen_groups', { p_admin_pw: adminPw });
+    const { data, error } = await _sb.rpc('bts_sc_import_kickoff', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return Number(data) || 0;
+  },
+  async scGenGroups(adminPw, groups) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_gen_groups', { p_admin_pw: adminPw, p_groups: Number(groups) || 1 });
     if (error) throw error;
   },
-  async scGenKnockout(adminPw) {
+  async scGenKnockout(adminPw, advance) {
     _assert();
-    const { error } = await _sb.rpc('bts_sc_gen_knockout', { p_admin_pw: adminPw });
+    const { error } = await _sb.rpc('bts_sc_gen_knockout', { p_admin_pw: adminPw, p_advance: (advance == null ? null : Number(advance)) });
     if (error) throw error;
   },
   async scAdminResult(adminPw, matchId, a, b) {

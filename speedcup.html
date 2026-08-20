@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+<title>Speed Tennis Masters · Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0B241A; --bg2:#0D2E20; --card:#0F2E20; --card2:#0D2A1D; --border:#1E3E2E; --cream:#F5EDE3; --muted:#9A8F86; --muted2:#8a8a80; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; --down:#EF9A9A; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  a{color:var(--sun)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;max-width:760px;margin:0 auto}
+  .topbar a{color:#fff;text-decoration:none;font-size:14px;border:1px solid rgba(255,255,255,.22);padding:9px 14px;border-radius:9px;background:rgba(255,255,255,.03)}
+  /* Event-header (bild) + live-rad */
+  .ehead{max-width:760px;margin:0 auto;padding:0 14px}
+  .ehead img{display:block;width:100%;height:auto;border-radius:16px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .livebar{max-width:760px;margin:12px auto 2px;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+  .livebar .pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.4);color:var(--clay);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:7px 13px;border-radius:100px;font-weight:700}
+  .livebar .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--clay);animation:pulse 1.4s infinite}
+  .livebar .date{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+  @keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+  .wrap{max-width:760px;margin:0 auto;padding:14px}
+  .tabs{position:sticky;top:0;z-index:20;display:flex;gap:6px;margin:6px -14px 18px;padding:8px 14px;background:linear-gradient(var(--bg),var(--bg) 70%,rgba(11,36,26,0));backdrop-filter:blur(6px)}
+  .tab{flex:1;background:var(--card2);border:1px solid var(--border);color:var(--muted);font:inherit;font-size:15px;font-weight:700;padding:13px 6px;min-height:50px;cursor:pointer;border-radius:11px;transition:.15s}
+  .tab.on{color:#0D2E20;background:var(--clay);border-color:var(--clay);box-shadow:0 4px 14px rgba(255,140,66,.28)}
+  .hidden{display:none}
+  .glabel{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin:20px 2px 9px;display:flex;align-items:center;gap:9px}
+  .glabel::after{content:'';flex:1;height:1px;background:var(--border)}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  th,td{text-align:right;padding:13px 12px;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  tr:last-child td{border-bottom:none}
+  thead th{background:rgba(255,255,255,.02);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  td.nm{color:#fff;font-weight:600;display:flex;align-items:center;gap:10px}
+  .rk{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:7px;background:#10231a;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);flex:none}
+  tr.qual td{background:rgba(123,198,123,.09)}
+  tr.qual .rk{background:rgba(123,198,123,.16);border-color:#2f5d3a;color:var(--green);font-weight:700}
+  .medal{font-size:14px}
+  .mrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:14px 15px;margin-bottom:9px;box-shadow:0 3px 12px rgba(0,0,0,.18);position:relative;overflow:hidden}
+  .mrow.done{border-color:#2a4a38}
+  .mrow .side{flex:1;font-size:16px;min-width:0;overflow-wrap:anywhere}
+  .mrow .side.b{text-align:right}
+  .mrow .side.win{color:var(--sun);font-weight:700}
+  .mrow .sc{font-family:'Space Mono',monospace;font-weight:700;font-size:17px;color:var(--cream);min-width:60px;text-align:center;background:#10231a;border:1px solid var(--border);border-radius:8px;padding:5px 6px}
+  .mrow .sc.pending{background:none;border:none;color:var(--muted2);font-weight:400;font-size:12px}
+  .mrow .vs{font-size:12px;color:var(--muted2)}
+  .court{font-family:'Space Mono',monospace;font-size:11px;color:var(--sun);letter-spacing:1px}
+  .bracket .col{margin-bottom:16px}
+  .champ{background:linear-gradient(135deg,#F4B740 0%,#E8931F 60%,#C9761a 100%);border:none;border-radius:16px;padding:20px 16px;text-align:center;margin-bottom:16px;box-shadow:0 10px 30px rgba(244,183,64,.25)}
+  .champ .t{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#5A3A00;font-weight:700}
+  .champ .trophy{font-size:34px;line-height:1;margin:2px 0 2px}
+  .champ .n{font-family:'Anton',sans-serif;font-size:30px;color:#0D2E20;margin-top:2px;letter-spacing:.5px}
+  .muted{color:var(--muted);font-size:13px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  /* Rapportera */
+  select,input{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:16px;padding:14px 13px;border-radius:11px;outline:none;margin-bottom:10px}
+  select:focus,input:focus{border-color:var(--clay)}
+  select{min-height:52px}
+  .scin{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .scin input{text-align:center;font-size:26px;font-weight:700;margin:0;padding:12px 6px}
+  .btn{background:var(--orange);color:#fff;border:none;border-radius:11px;font:inherit;font-weight:700;font-size:17px;padding:16px;min-height:54px;cursor:pointer;width:100%;box-shadow:0 6px 16px rgba(232,82,10,.3)}
+  .status{font-size:14px;margin-top:8px;min-height:18px;color:var(--muted)}
+  @media(max-width:420px){
+    .wrap{padding:12px}
+    .tab{font-size:14px;padding:12px 4px}
+    table{font-size:15px}
+    th,td{padding:11px 9px}
+    .champ .n{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><a href="index.html">← Startsida</a><a href="#" onclick="refresh();return false">↻ Uppdatera</a></div>
+<div class="ehead"><img src="kickoff-header.png" alt="Summer Edition Masters · 23 augusti"></div>
+<div class="livebar">
+  <span class="pill"><span class="dot"></span>Live</span>
+  <span class="date">Sommarstegens avslutning · 23 augusti · uppdateras automatiskt</span>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab on" data-t="grupper" onclick="showTab('grupper',this)">Grupper</button>
+    <button class="tab" data-t="slutspel" onclick="showTab('slutspel',this)">Slutspel</button>
+    <button class="tab" data-t="rapportera" onclick="showTab('rapportera',this)">Rapportera</button>
+  </div>
+  <div id="v-grupper"></div>
+  <div id="v-slutspel" class="hidden"></div>
+  <div id="v-rapportera" class="hidden"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let ST={players:[],matches:[]};
+let tab='grupper';
+let reporting=false;
+const byId=id=>ST.players.find(p=>p.id===id)||{name:'—'};
+const nm=id=>byId(id).name;
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+async function refresh(){
+  try{ ST=await BTS.scState(); render(); }catch(e){ /* tyst */ }
+}
+function showTab(t,btn){ tab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); if(btn)btn.classList.add('on');
+  ['grupper','slutspel','rapportera'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hidden',x!==t)); render(); }
+
+function standings(grp){
+  const ps=ST.players.filter(p=>p.grp===grp);
+  const rows=ps.map(p=>{
+    let w=0,pl=0,diff=0;
+    ST.matches.forEach(m=>{ if(m.phase!=='group')return; if(m.a_id!==p.id&&m.b_id!==p.id)return; if(m.status!=='done')return;
+      pl++; if(m.winner_id===p.id)w++;
+      diff+= (m.a_id===p.id?(m.score_a-m.score_b):(m.score_b-m.score_a)); });
+    return {p,w,pl,diff};
+  });
+  rows.sort((x,y)=> y.w-x.w || y.diff-x.diff || x.p.name.localeCompare(y.p.name,'sv'));
+  return rows;
+}
+
+function renderGrupper(){
+  const grps=[...new Set(ST.players.map(p=>p.grp).filter(Boolean))].sort();
+  if(!grps.length){ return '<div class="muted">Grupperna lottas snart — håll utkik!</div>'; }
+  return grps.map(g=>{
+    const rows=standings(g);
+    const medal=i=>i===0?'🥇':i===1?'🥈':'';
+    return `<div class="glabel">Grupp ${g}</div>
+    <table><thead><tr><th>Spelare</th><th>S</th><th>V</th><th>Diff</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr class="${i<2?'qual':''}"><td class="nm"><span class="rk">${i+1}</span>${esc(r.p.name)}${medal(i)?` <span class="medal">${medal(i)}</span>`:''}</td><td>${r.pl}</td><td>${r.w}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}
+    </tbody></table>`;
+  }).join('') + `<div class="muted" style="margin-top:12px">Topp 2 i varje grupp går vidare till slutspel 🥇🥈 · placeringen avgör seedningen.</div>`;
+}
+
+function matchRow(m){
+  const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
+  const done=m.status==='done';
+  const sc=done?`<div class="sc">${m.score_a}–${m.score_b}</div>`
+    :(m.court?`<div class="sc pending"><span class="court">bana ${esc(m.court)}</span></div>`:'<div class="sc pending">vs</div>');
+  return `<div class="mrow ${done?'done':''}"><div class="side ${aw?'win':''}">${esc(nm(m.a_id))}</div>${sc}<div class="side b ${bw?'win':''}">${esc(nm(m.b_id))}</div></div>`;
+}
+function roundName(nMatches){
+  return ({1:'Final',2:'Semifinal',4:'Kvartsfinal',8:'Åttondelsfinal',16:'Sextondelsfinal',32:'Trettiotvådelsfinal'})[nMatches]||('Slutspel');
+}
+function koByRound(){
+  const kos=ST.matches.filter(m=>m.phase==='ko');
+  const byR={}; kos.forEach(m=>{ const r=+m.grp; (byR[r]=byR[r]||[]).push(m); });
+  const rounds=Object.keys(byR).map(Number).sort((a,b)=>a-b);
+  return {byR,rounds};
+}
+function koMatchRow(m){
+  if(!m.a_id && !m.b_id) return `<div class="mrow"><div class="side muted">Väntar…</div></div>`;
+  if(!m.a_id || !m.b_id){ const p=m.a_id||m.b_id;
+    return `<div class="mrow"><div class="side win">${esc(nm(p))}</div><div class="sc"><span class="vs">frilott</span></div><div class="side b muted">—</div></div>`; }
+  return matchRow(m);
+}
+function renderSlutspel(){
+  const {byR,rounds}=koByRound();
+  const br=ST.matches.filter(m=>m.phase==='bronze').sort((a,b)=>(a.slot||0)-(b.slot||0));
+  if(!rounds.length){ return '<div class="muted">Slutspelsträdet visas när gruppspelet är klart.</div>'; }
+  const maxR=rounds[rounds.length-1];
+  const finM=byR[maxR][0];
+  const champ=(finM&&finM.status==='done')?`<div class="champ"><div class="trophy">🏆</div><div class="t">Mästare</div><div class="n">${esc(nm(finM.winner_id))}</div></div>`:'';
+  const cols=rounds.slice().reverse().map(r=>{
+    const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
+    return `<div class="col"><div class="glabel">${roundName(ms.length)}</div>${ms.map(koMatchRow).join('')}</div>`;
+  }).join('');
+  const bronze=br.length?`<div class="col"><div class="glabel">Bronsmatch</div>${br.map(koMatchRow).join('')}</div>`:'';
+  return champ + cols + bronze;
+}
+
+function myMatches(scId){
+  return ST.matches.filter(m=>m.status!=='done' && m.a_id && m.b_id && (m.a_id===scId||m.b_id===scId));
+}
+function renderRapportera(){
+  const opts=ST.players.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  return `<div class="glabel">Rapportera din match</div>
+  <select id="rp-me" onchange="renderRpMatches()"><option value="">Välj ditt namn…</option>${opts}</select>
+  <div id="rp-matches"></div>`;
+}
+function renderRpMatches(){
+  const box=document.getElementById('rp-matches'); const scId=parseInt(document.getElementById('rp-me').value);
+  if(!scId){ box.innerHTML=''; return; }
+  const ms=myMatches(scId);
+  if(!ms.length){ box.innerHTML='<div class="muted">Inga matcher att rapportera just nu.</div>'; return; }
+  box.innerHTML=ms.map(m=>{
+    const opp=m.a_id===scId?m.b_id:m.a_id;
+    const ph = m.phase==='group' ? ('Grupp '+(m.grp||''))
+             : m.phase==='bronze' ? 'Bronsmatch'
+             : roundName(ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length);
+    return `<div class="mrow" style="flex-direction:column;align-items:stretch;gap:10px">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:600">Mot ${esc(nm(opp))}</span><span class="court">${ph}</span></div>
+      <div class="scin"><span style="flex:1;font-size:13px;color:var(--muted)">Du</span>
+        <input id="rp-a-${m.id}" type="number" min="0" max="30" inputmode="numeric" placeholder="0" style="max-width:70px">
+        <span>–</span>
+        <input id="rp-b-${m.id}" type="number" min="0" max="30" inputmode="numeric" placeholder="0" style="max-width:70px">
+        <span style="flex:1;font-size:13px;color:var(--muted);text-align:right">${esc(nm(opp))}</span></div>
+      <input id="rp-code-${m.id}" type="password" inputmode="numeric" placeholder="Din kod (PIN / gästkod)">
+      <button class="btn" onclick="submitReport(${m.id},${scId})">Skicka resultat →</button>
+      <div class="status" id="rp-st-${m.id}"></div>
+    </div>`;
+  }).join('');
+}
+async function submitReport(matchId,scId){
+  reporting=true;
+  const st=document.getElementById('rp-st-'+matchId);
+  const my=parseInt(document.getElementById('rp-a-'+matchId).value);
+  const op=parseInt(document.getElementById('rp-b-'+matchId).value);
+  const code=(document.getElementById('rp-code-'+matchId).value||'').trim();
+  if(isNaN(my)||isNaN(op)){ st.textContent='Fyll i båda siffrorna.'; reporting=false; return; }
+  if(my===op){ st.textContent='Kan inte bli lika — någon vinner.'; reporting=false; return; }
+  if(!code){ st.textContent='Ange din kod.'; reporting=false; return; }
+  const m=ST.matches.find(x=>x.id===matchId);
+  const a = m.a_id===scId?my:op, b = m.a_id===scId?op:my;   // mappa till matchens a/b
+  st.textContent='Skickar…';
+  try{ await BTS.scReport(matchId,scId,code,a,b); st.textContent='Klart! ✓'; await refresh(); showTab('rapportera',document.querySelector('.tab[data-t=rapportera]')); }
+  catch(e){ st.textContent='Fel: '+(e.message||e); }
+  reporting=false;
+}
+
+function render(){
+  document.getElementById('v-grupper').innerHTML=renderGrupper();
+  document.getElementById('v-slutspel').innerHTML=renderSlutspel();
+  if(tab==='rapportera'){
+    // behåll formuläret om man redan valt namn
+    if(!document.getElementById('rp-me')){ document.getElementById('v-rapportera').innerHTML=renderRapportera(); }
+  }
+}
+
+refresh();
+setInterval(()=>{ if(!reporting) refresh(); }, 15000);
+// bygg rapportera-vyn första gången man öppnar den
+document.querySelector('.tab[data-t=rapportera]').addEventListener('click',()=>{ document.getElementById('v-rapportera').innerHTML=renderRapportera(); });
+</script>
+</body>
+</html>
