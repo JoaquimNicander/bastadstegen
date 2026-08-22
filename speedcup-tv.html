@@ -82,12 +82,14 @@
   .mrow .gtag{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;min-width:64px;text-align:right}
   .mrow .qn{flex:none;width:34px;height:34px;border-radius:9px;background:var(--clay);color:#0D2E20;font-family:'Space Mono',monospace;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center}
   .empty{color:var(--muted);font-size:18px;padding:14px}
-  /* QR-kod (fast i hörnet) */
-  .qr{position:fixed;right:22px;bottom:62px;z-index:60;display:flex;align-items:center;gap:14px;background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:12px 18px 12px 12px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
-  .qrbox{width:132px;height:132px;background:#F6EFE2;border-radius:10px;padding:8px;display:flex;align-items:center;justify-content:center}
-  .qrbox img,.qrbox canvas{width:116px!important;height:116px!important;display:block}
-  .qrtxt{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--cream);line-height:1.6;max-width:160px}
-  .qrtxt .big{font-family:'Anton',sans-serif;font-size:17px;letter-spacing:.5px;color:var(--sun);display:block;margin-bottom:2px}
+  /* QR-kod (fast, nere till vänster, rund mjuk design) */
+  .qr{position:fixed;left:26px;bottom:60px;z-index:60;display:flex;align-items:center;gap:16px;
+    background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:26px;
+    padding:14px 24px 14px 14px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .qrbox{width:130px;height:130px;background:#F6EFE2;border-radius:22px;padding:10px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,140,66,.25)}
+  .qrbox img,.qrbox canvas{width:110px!important;height:110px!important;display:block;border-radius:6px}
+  .qrtxt{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:1px;color:var(--cream);line-height:1.6;max-width:172px}
+  .qrtxt .big{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;color:var(--sun);display:block;margin-bottom:2px}
   .qrtxt b{color:var(--cream)}
 
   /* Slutspel */
