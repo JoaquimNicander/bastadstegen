@@ -81,10 +81,12 @@
 <div class="wrap">
   <div class="tabs">
     <button class="tab on" data-t="grupper" onclick="showTab('grupper',this)">Grupper</button>
+    <button class="tab" data-t="matcher" onclick="showTab('matcher',this)">Matcher</button>
     <button class="tab" data-t="slutspel" onclick="showTab('slutspel',this)">Slutspel</button>
     <button class="tab" data-t="rapportera" onclick="showTab('rapportera',this)">Rapportera</button>
   </div>
   <div id="v-grupper"></div>
+  <div id="v-matcher" class="hidden"></div>
   <div id="v-slutspel" class="hidden"></div>
   <div id="v-rapportera" class="hidden"></div>
 </div>
@@ -103,7 +105,7 @@ async function refresh(){
   try{ ST=await BTS.scState(); render(); }catch(e){ /* tyst */ }
 }
 function showTab(t,btn){ tab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); if(btn)btn.classList.add('on');
-  ['grupper','slutspel','rapportera'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hidden',x!==t)); render(); }
+  ['grupper','matcher','slutspel','rapportera'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hidden',x!==t)); render(); }
 
 function standings(grp){
   const ps=ST.players.filter(p=>p.grp===grp);
@@ -214,8 +216,32 @@ async function submitReport(matchId,scId){
   reporting=false;
 }
 
+function grpTitle(g){ return g==='E'?'Damklass':'Grupp '+g; }
+function playOrder(){
+  const ms=ST.matches.filter(m=>m.a_id&&m.b_id).slice()
+    .sort((a,b)=>(''+(a.grp||'')).localeCompare(''+(b.grp||''))||a.id-b.id);
+  const rounds={}, out=[];
+  ms.forEach(m=>{ let r=1; for(;;){ const s=rounds[r]||(rounds[r]=new Set());
+    if(!s.has(m.a_id)&&!s.has(m.b_id)){ s.add(m.a_id); s.add(m.b_id); out.push({m,r}); break; } r++; } });
+  out.sort((x,y)=>x.r-y.r||(''+(x.m.grp||'')).localeCompare(''+(y.m.grp||''))||x.m.id-y.m.id);
+  return out.map(o=>o.m);
+}
+function koLbl(m){ const n=ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length; return roundName(n); }
+function renderMatcher(){
+  const pending=playOrder().filter(m=>m.status!=='done');
+  const done=ST.matches.filter(m=>m.a_id&&m.b_id&&m.status==='done').slice().sort((a,b)=>b.id-a.id).slice(0,12);
+  const lbl=m=>m.phase==='group'?grpTitle(m.grp):m.phase==='bronze'?'Brons':koLbl(m);
+  const q=pending.map((m,i)=>`<div class="mrow"><div style="flex:none;width:30px;height:30px;border-radius:8px;background:var(--clay);color:#0D2E20;font-family:'Space Mono',monospace;font-weight:700;display:flex;align-items:center;justify-content:center">${i+1}</div>
+    <div class="side">${esc(nm(m.a_id))}</div><div class="sc pending">vs</div><div class="side b">${esc(nm(m.b_id))}</div></div>
+    <div style="margin:-4px 0 10px 42px"><span class="court">${lbl(m)}</span></div>`).join('');
+  return `<div class="glabel">Spelordning · näst på tur (${pending.length} kvar)</div>
+    ${q||'<div class="muted">Inga matcher kvar att spela.</div>'}
+    <div class="glabel" style="margin-top:20px">Senaste resultat</div>
+    ${done.length?done.map(matchRow).join(''):'<div class="muted">Inga rapporterade än.</div>'}`;
+}
 function render(){
   document.getElementById('v-grupper').innerHTML=renderGrupper();
+  document.getElementById('v-matcher').innerHTML=renderMatcher();
   document.getElementById('v-slutspel').innerHTML=renderSlutspel();
   if(tab==='rapportera'){
     // behåll formuläret om man redan valt namn
