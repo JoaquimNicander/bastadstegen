@@ -6,86 +6,110 @@
 <title>Speed Tennis Masters · Storbild</title>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg:#0B241A; --card:#0F2E20; --card2:#0D2A1D; --border:#1E3E2E; --cream:#F5EDE3;
-         --muted:#9A8F86; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; }
+  :root{ --bg:#0D2E20; --card:#0F2E20; --card2:#0D2A1D; --border:#1E3E2E; --cream:#F5EDE3;
+         --muted:#9A8F86; --muted2:#8a8a80; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:
-     radial-gradient(1200px 600px at 80% -10%, rgba(255,140,66,.10), transparent 60%),
-     var(--bg);color:var(--cream);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+  body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;color:var(--cream);overflow:hidden;height:100vh;display:flex;flex-direction:column;
+    background:
+      radial-gradient(1000px 520px at 88% -8%, rgba(244,183,64,.16), transparent 60%),
+      radial-gradient(900px 500px at 6% 108%, rgba(255,140,66,.08), transparent 60%),
+      var(--bg);}
+  /* svaga court-linjer i bakgrunden */
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.06;
+    background:
+      linear-gradient(var(--cream),var(--cream)) 0 22% / 100% 2px no-repeat,
+      linear-gradient(var(--cream),var(--cream)) 0 82% / 100% 2px no-repeat,
+      linear-gradient(90deg,var(--cream),var(--cream)) 50% 0 / 2px 100% no-repeat,
+      linear-gradient(90deg,var(--cream),var(--cream)) 16% 22% / 2px 60% no-repeat,
+      linear-gradient(90deg,var(--cream),var(--cream)) 84% 22% / 2px 60% no-repeat;}
 
-  /* Toppbar */
-  .bar{display:flex;align-items:center;gap:24px;padding:18px 34px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
-  .bar .logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1.5px;line-height:.9}
-  .bar .logo span{color:var(--clay)}
-  .bar .live{display:inline-flex;align-items:center;gap:10px;background:rgba(255,140,66,.14);border:1px solid rgba(255,140,66,.5);
-    color:var(--clay);font-family:'Space Mono',monospace;font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border-radius:100px}
-  .bar .live .dot{width:11px;height:11px;border-radius:50%;background:var(--clay);animation:pulse 1.4s infinite}
-  @keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+  /* Toppbar med solstrålar */
+  .bar{position:relative;overflow:hidden;display:flex;align-items:center;gap:22px;padding:16px 96px 16px 34px;
+    background:linear-gradient(120deg,#FF8C42 0%,#E8520A 46%,#7A2400 82%);border-bottom:3px solid #5A1800}
+  .bar .rays{position:absolute;inset:-40%;background:repeating-conic-gradient(from -8deg at 96% -10%, rgba(255,213,120,.55) 0deg 8deg, transparent 8deg 16deg);opacity:.45;pointer-events:none}
+  .bar .bsun{position:absolute;right:-22px;top:-22px;width:96px;height:96px;border-radius:50%;
+    background:radial-gradient(circle at 38% 32%,#FFFBE6,#FFE27A 55%,#FAC83C);box-shadow:0 0 46px 16px rgba(255,221,120,.5);pointer-events:none}
+  .bar>*{position:relative;z-index:2}
+  .bar .logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1.5px;line-height:.9;color:#0D2E20;text-shadow:0 2px 0 rgba(255,255,255,.18)}
+  .bar .logo small{display:block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:#5A1800;font-weight:700;margin-top:4px}
   .bar .spacer{flex:1}
-  .bar .viewname{font-family:'Space Mono',monospace;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--sun)}
-  .bar .date{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:1.5px;color:var(--muted)}
+  .bar .viewname{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#5A1800;font-weight:700;background:rgba(255,255,255,.22);padding:8px 15px;border-radius:100px}
+  .bar .live{display:inline-flex;align-items:center;gap:9px;background:#0D2E20;color:var(--sun);
+    font-family:'Space Mono',monospace;font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border-radius:100px}
+  .bar .live .dot{width:10px;height:10px;border-radius:50%;background:var(--sun);animation:pulse 1.3s infinite}
+  .bar .date{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:1.5px;color:#5A1800;font-weight:700}
+  @keyframes pulse{0%,100%{opacity:.3;transform:scale(.85)}50%{opacity:1;transform:scale(1)}}
 
-  /* Innehåll */
+  /* Innehåll + mjuk övergång */
   .stage{flex:1;position:relative;overflow:hidden}
-  .view{position:absolute;inset:0;padding:26px 34px;opacity:0;transition:opacity .6s;overflow:auto;pointer-events:none}
-  .view.on{opacity:1;pointer-events:auto}
-  .h{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:16px;color:#fff}
+  .view{position:absolute;inset:0;padding:22px 30px;opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s;overflow:auto;pointer-events:none}
+  .view.on{opacity:1;transform:none;pointer-events:auto}
 
   /* Grupper */
-  .ggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;align-items:start}
-  .gcard{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.25)}
-  .gcard h3{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;padding:12px 18px;background:linear-gradient(90deg,rgba(255,140,66,.16),transparent);border-bottom:1px solid var(--border)}
-  table{width:100%;border-collapse:collapse;font-size:19px}
-  th,td{padding:11px 16px;text-align:right}
-  th:first-child,td:first-child{text-align:left}
-  thead th{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  .ggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:14px;align-items:start}
+  @media(max-width:1100px){ .ggrid{grid-template-columns:repeat(3,1fr)} }
+  .gcard{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+  .gcard h3{position:relative;font-family:'Anton',sans-serif;font-size:19px;letter-spacing:1px;padding:11px 16px 11px 18px;color:#fff;
+    background:linear-gradient(90deg,rgba(255,140,66,.28),rgba(255,140,66,.02));border-bottom:1px solid var(--border)}
+  .gcard h3::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--clay)}
+  .gcard.dam h3{background:linear-gradient(90deg,rgba(244,183,64,.28),rgba(244,183,64,.02))}
+  .gcard.dam h3::before{background:var(--sun)}
+  table{width:100%;border-collapse:collapse;font-size:15.5px}
+  th,td{padding:8px 8px;text-align:right}
+  th:first-child,td:first-child{text-align:left;padding-left:14px}
+  td:last-child,th:last-child{padding-right:14px}
+  thead th{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  th:not(:first-child),td:not(:first-child){width:36px}
   tbody tr{border-top:1px solid var(--border)}
-  td.nm{color:#fff;font-weight:600;display:flex;align-items:center;gap:12px}
-  .rk{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:8px;background:#10231a;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);flex:none}
-  tr.adv td{background:rgba(123,198,123,.10)}
-  tr.adv .rk{background:rgba(123,198,123,.18);border-color:#2f5d3a;color:var(--green);font-weight:700}
-  .advtag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--green);border:1px solid #2f5d3a;border-radius:6px;padding:2px 7px;margin-left:auto}
+  td.nm{color:#fff;font-weight:600;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  td.nm .pn{white-space:nowrap}
+  .rk{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:7px;background:#10231a;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);flex:none}
+  tr.adv td{background:rgba(123,198,123,.12)}
+  tr.adv .rk{background:rgba(123,198,123,.2);border-color:#2f5d3a;color:var(--green);font-weight:700}
+  .cap{margin-top:16px;font-family:'Space Mono',monospace;font-size:13px;letter-spacing:1px;color:var(--muted)}
+  .cap b{color:var(--green)}
 
   /* Matcher */
   .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
   .mcol h2{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
-  .mrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 18px;margin-bottom:10px;font-size:20px}
+  .mrow{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:9px;font-size:19px}
   .mrow .side{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .mrow .side.b{text-align:right}
   .mrow .side.win{color:var(--sun);font-weight:700}
-  .mrow .sc{font-family:'Space Mono',monospace;font-weight:700;font-size:21px;background:#10231a;border:1px solid var(--border);border-radius:9px;padding:6px 12px;min-width:78px;text-align:center}
-  .mrow .sc.vs{background:none;border:none;color:var(--muted);font-weight:400;font-size:15px}
-  .mrow .gtag{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;min-width:66px;text-align:right}
+  .mrow .sc{font-family:'Space Mono',monospace;font-weight:700;font-size:20px;background:#10231a;border:1px solid var(--border);border-radius:9px;padding:6px 12px;min-width:74px;text-align:center}
+  .mrow .sc.vs{background:none;border:none;color:var(--muted);font-weight:400;font-size:14px}
+  .mrow .gtag{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;min-width:64px;text-align:right}
   .empty{color:var(--muted);font-size:18px;padding:14px}
 
   /* Slutspel */
-  .champ{display:flex;align-items:center;gap:22px;background:linear-gradient(135deg,#F4B740,#E8931F 60%,#C9761a);border-radius:18px;padding:18px 28px;margin-bottom:22px;box-shadow:0 12px 34px rgba(244,183,64,.28)}
-  .champ .tr{font-size:52px;line-height:1}
-  .champ .t{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#5A3A00;font-weight:700}
-  .champ .n{font-family:'Anton',sans-serif;font-size:44px;color:#0D2E20;line-height:1}
-  .bracket{display:flex;gap:26px;align-items:stretch}
+  .champ{display:flex;align-items:center;gap:22px;background:linear-gradient(135deg,#F4B740,#E8931F 60%,#C9761a);border-radius:18px;padding:16px 28px;margin-bottom:20px;box-shadow:0 12px 34px rgba(244,183,64,.3)}
+  .champ .tr{font-size:50px;line-height:1}
+  .champ .t{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#5A3A00;font-weight:700}
+  .champ .n{font-family:'Anton',sans-serif;font-size:42px;color:#0D2E20;line-height:1}
+  .bracket{display:flex;gap:24px;align-items:stretch}
   .bcol{flex:1;min-width:0}
   .bcol .rt{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
-  .bm{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 15px;margin-bottom:12px;font-size:18px}
+  .bm{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:11px;padding:11px 15px;margin-bottom:11px;font-size:17px}
   .bm .r{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
   .bm .r.win{color:var(--sun);font-weight:700}
   .bm .r .s{font-family:'Space Mono',monospace}
-  .bm.frilott{opacity:.7;font-style:italic}
+  .bm.frilott{opacity:.65;font-style:italic}
 
   /* Rotationsindikator */
-  .foot{display:flex;align-items:center;gap:14px;padding:0 34px 16px}
-  .prog{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
-  .prog i{display:block;height:100%;width:0;background:var(--clay);border-radius:3px}
+  .foot{display:flex;align-items:center;gap:14px;padding:0 34px 14px}
+  .prog{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sun),var(--clay));border-radius:4px}
   .dots{display:flex;gap:8px}
-  .dots b{width:9px;height:9px;border-radius:50%;background:var(--border);display:block}
-  .dots b.on{background:var(--clay)}
+  .dots b{width:9px;height:9px;border-radius:50%;background:var(--border);display:block;transition:.3s}
+  .dots b.on{background:var(--clay);box-shadow:0 0 10px rgba(255,140,66,.7)}
   .count{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:1px}
 </style>
 </head>
 <body>
 <div class="bar">
-  <div class="logo">BÅSTAD<span>·</span>SPEED TENNIS MASTERS</div>
+  <div class="rays"></div><div class="bsun"></div>
+  <div class="logo">SPEED TENNIS MASTERS<small>Båstad Stegen · Säsongsavslutning</small></div>
   <div class="spacer"></div>
   <div class="viewname" id="viewname">Gruppspel</div>
   <div class="live"><span class="dot"></span>Live</div>
@@ -99,7 +123,7 @@
 </div>
 
 <div class="foot">
-  <div class="count" id="count"></div>
+  <div class="count" id="count">Uppdateras live</div>
   <div class="prog"><i id="prog"></i></div>
   <div class="dots" id="dots"></div>
 </div>
@@ -111,7 +135,7 @@ let ST={players:[],matches:[]};
 const byId=id=>ST.players.find(p=>p.id===id)||{name:'—'};
 const nm=id=>byId(id).name;
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const ROT=20000, DATA=15000;   // rotation 20s, datauppdatering 15s
+const ROT=20000, DATA=15000;
 
 async function refresh(){ try{ ST=await BTS.scState(); render(); }catch(e){} }
 
@@ -124,24 +148,26 @@ function standings(grp){
   rows.sort((x,y)=>y.w-x.w||y.diff-x.diff||x.p.name.localeCompare(y.p.name,'sv'));
   return rows;
 }
+const DAM='E';   // damklassens grupp
+function grpTitle(g){ return g===DAM?'Damklass':'Grupp '+g; }
 function renderGrupper(){
   const grps=[...new Set(ST.players.map(p=>p.grp).filter(Boolean))].sort();
   if(!grps.length) return '<div class="empty">Grupperna lottas snart…</div>';
-  const medal=i=>i===0?'🥇':i===1?'🥈':'';
-  return '<div class="ggrid">'+grps.map(g=>{
-    const rows=standings(g);
-    return `<div class="gcard"><h3>Grupp ${g}</h3>
+  const grid='<div class="ggrid">'+grps.map(g=>{
+    const dam=(g===DAM), rows=standings(g);
+    return `<div class="gcard ${dam?'dam':''}"><h3>${grpTitle(g)}</h3>
       <table><thead><tr><th>Spelare</th><th>S</th><th>V</th><th>±</th></tr></thead><tbody>
-      ${rows.map((r,i)=>`<tr class="${i<2?'adv':''}">
-        <td class="nm"><span class="rk">${i+1}</span>${esc(r.p.name)}${medal(i)?` ${medal(i)}`:''}${i<2?'<span class="advtag">Vidare</span>':''}</td>
-        <td>${r.pl}</td><td>${r.w}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}
+      ${rows.map((r,i)=>{ const adv=(!dam&&i<2); const medal=dam?'':(i===0?'🥇':i===1?'🥈':'');
+        return `<tr class="${adv?'adv':''}"><td class="nm"><span class="rk">${i+1}</span><span class="pn">${esc(r.p.name)}</span>${medal?` ${medal}`:''}</td>
+          <td>${r.pl}</td><td>${r.w}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`; }).join('')}
       </tbody></table></div>`;
   }).join('')+'</div>';
+  return grid+`<div class="cap"><b>1 &amp; 2 i varje grupp</b> går vidare till utslagningen · placeringen avgör seedningen</div>`;
 }
 
 function mmatch(m,showG){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
-  const g=showG?`<span class="gtag">${m.phase==='group'?'Grupp '+m.grp:koName(m)}</span>`:'';
+  const g=showG?`<span class="gtag">${m.phase==='group'?grpTitle(m.grp):koName(m)}</span>`:'';
   const sc=m.status==='done'?`<div class="sc">${m.score_a}–${m.score_b}</div>`
     :(m.court?`<div class="sc vs">bana ${esc(m.court)}</div>`:'<div class="sc vs">vs</div>');
   return `<div class="mrow"><div class="side ${aw?'win':''}">${esc(nm(m.a_id))}</div>${sc}<div class="side b ${bw?'win':''}">${esc(nm(m.b_id))}</div>${g}</div>`;
@@ -186,7 +212,6 @@ function renderSlutspel(){
   return champ+'<div class="bracket">'+cols+bronze+'</div>';
 }
 
-// ── Rendering + rotation ──
 const NAMES={grupper:'Gruppspel',matcher:'Matcher',slutspel:'Slutspel'};
 function activeViews(){ const v=['grupper','matcher']; if(hasKo()) v.push('slutspel'); return v; }
 let idx=0;
@@ -203,16 +228,12 @@ function showView(){
   ['grupper','matcher','slutspel'].forEach(v=>document.getElementById('v-'+v).classList.toggle('on',v===cur));
   document.getElementById('viewname').textContent=NAMES[cur];
   document.getElementById('dots').innerHTML=views.map((v,i)=>`<b class="${i===idx?'on':''}"></b>`).join('');
+  document.getElementById('count').textContent=(ST.players.length||0)+' spelare · uppdateras live';
 }
 function rotate(){ idx=(idx+1)%activeViews().length; showView(); }
 
-// progressbar för rotationen
 let t0=Date.now();
-function tick(){
-  const p=Math.min(1,(Date.now()-t0)/ROT);
-  document.getElementById('prog').style.width=(p*100)+'%';
-  requestAnimationFrame(tick);
-}
+function tick(){ document.getElementById('prog').style.width=(Math.min(1,(Date.now()-t0)/ROT)*100)+'%'; requestAnimationFrame(tick); }
 refresh(); tick();
 setInterval(refresh, DATA);
 setInterval(()=>{ rotate(); t0=Date.now(); }, ROT);
