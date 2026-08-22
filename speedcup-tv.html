@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speed Tennis Masters · Storbild</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0B241A; --card:#0F2E20; --card2:#0D2A1D; --border:#1E3E2E; --cream:#F5EDE3;
+         --muted:#9A8F86; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740; --green:#7BC67B; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:
+     radial-gradient(1200px 600px at 80% -10%, rgba(255,140,66,.10), transparent 60%),
+     var(--bg);color:var(--cream);overflow:hidden;height:100vh;display:flex;flex-direction:column}
+
+  /* Toppbar */
+  .bar{display:flex;align-items:center;gap:24px;padding:18px 34px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.15)}
+  .bar .logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1.5px;line-height:.9}
+  .bar .logo span{color:var(--clay)}
+  .bar .live{display:inline-flex;align-items:center;gap:10px;background:rgba(255,140,66,.14);border:1px solid rgba(255,140,66,.5);
+    color:var(--clay);font-family:'Space Mono',monospace;font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;border-radius:100px}
+  .bar .live .dot{width:11px;height:11px;border-radius:50%;background:var(--clay);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:.25}50%{opacity:1}}
+  .bar .spacer{flex:1}
+  .bar .viewname{font-family:'Space Mono',monospace;font-size:15px;letter-spacing:3px;text-transform:uppercase;color:var(--sun)}
+  .bar .date{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:1.5px;color:var(--muted)}
+
+  /* Innehåll */
+  .stage{flex:1;position:relative;overflow:hidden}
+  .view{position:absolute;inset:0;padding:26px 34px;opacity:0;transition:opacity .6s;overflow:auto;pointer-events:none}
+  .view.on{opacity:1;pointer-events:auto}
+  .h{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:16px;color:#fff}
+
+  /* Grupper */
+  .ggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px;align-items:start}
+  .gcard{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 22px rgba(0,0,0,.25)}
+  .gcard h3{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;padding:12px 18px;background:linear-gradient(90deg,rgba(255,140,66,.16),transparent);border-bottom:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;font-size:19px}
+  th,td{padding:11px 16px;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  thead th{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:400}
+  tbody tr{border-top:1px solid var(--border)}
+  td.nm{color:#fff;font-weight:600;display:flex;align-items:center;gap:12px}
+  .rk{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:8px;background:#10231a;border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);flex:none}
+  tr.adv td{background:rgba(123,198,123,.10)}
+  tr.adv .rk{background:rgba(123,198,123,.18);border-color:#2f5d3a;color:var(--green);font-weight:700}
+  .advtag{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--green);border:1px solid #2f5d3a;border-radius:6px;padding:2px 7px;margin-left:auto}
+
+  /* Matcher */
+  .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .mcol h2{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
+  .mrow{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 18px;margin-bottom:10px;font-size:20px}
+  .mrow .side{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mrow .side.b{text-align:right}
+  .mrow .side.win{color:var(--sun);font-weight:700}
+  .mrow .sc{font-family:'Space Mono',monospace;font-weight:700;font-size:21px;background:#10231a;border:1px solid var(--border);border-radius:9px;padding:6px 12px;min-width:78px;text-align:center}
+  .mrow .sc.vs{background:none;border:none;color:var(--muted);font-weight:400;font-size:15px}
+  .mrow .gtag{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;min-width:66px;text-align:right}
+  .empty{color:var(--muted);font-size:18px;padding:14px}
+
+  /* Slutspel */
+  .champ{display:flex;align-items:center;gap:22px;background:linear-gradient(135deg,#F4B740,#E8931F 60%,#C9761a);border-radius:18px;padding:18px 28px;margin-bottom:22px;box-shadow:0 12px 34px rgba(244,183,64,.28)}
+  .champ .tr{font-size:52px;line-height:1}
+  .champ .t{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:3px;text-transform:uppercase;color:#5A3A00;font-weight:700}
+  .champ .n{font-family:'Anton',sans-serif;font-size:44px;color:#0D2E20;line-height:1}
+  .bracket{display:flex;gap:26px;align-items:stretch}
+  .bcol{flex:1;min-width:0}
+  .bcol .rt{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--sun);margin-bottom:12px}
+  .bm{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 15px;margin-bottom:12px;font-size:18px}
+  .bm .r{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+  .bm .r.win{color:var(--sun);font-weight:700}
+  .bm .r .s{font-family:'Space Mono',monospace}
+  .bm.frilott{opacity:.7;font-style:italic}
+
+  /* Rotationsindikator */
+  .foot{display:flex;align-items:center;gap:14px;padding:0 34px 16px}
+  .prog{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--clay);border-radius:3px}
+  .dots{display:flex;gap:8px}
+  .dots b{width:9px;height:9px;border-radius:50%;background:var(--border);display:block}
+  .dots b.on{background:var(--clay)}
+  .count{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="logo">BÅSTAD<span>·</span>SPEED TENNIS MASTERS</div>
+  <div class="spacer"></div>
+  <div class="viewname" id="viewname">Gruppspel</div>
+  <div class="live"><span class="dot"></span>Live</div>
+  <div class="date">Söndag 23 aug</div>
+</div>
+
+<div class="stage">
+  <div class="view" id="v-grupper"></div>
+  <div class="view" id="v-matcher"></div>
+  <div class="view" id="v-slutspel"></div>
+</div>
+
+<div class="foot">
+  <div class="count" id="count"></div>
+  <div class="prog"><i id="prog"></i></div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let ST={players:[],matches:[]};
+const byId=id=>ST.players.find(p=>p.id===id)||{name:'—'};
+const nm=id=>byId(id).name;
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const ROT=20000, DATA=15000;   // rotation 20s, datauppdatering 15s
+
+async function refresh(){ try{ ST=await BTS.scState(); render(); }catch(e){} }
+
+function standings(grp){
+  const ps=ST.players.filter(p=>p.grp===grp);
+  const rows=ps.map(p=>{ let w=0,pl=0,diff=0;
+    ST.matches.forEach(m=>{ if(m.phase!=='group'||m.status!=='done')return; if(m.a_id!==p.id&&m.b_id!==p.id)return;
+      pl++; if(m.winner_id===p.id)w++; diff+=(m.a_id===p.id?(m.score_a-m.score_b):(m.score_b-m.score_a)); });
+    return {p,w,pl,diff}; });
+  rows.sort((x,y)=>y.w-x.w||y.diff-x.diff||x.p.name.localeCompare(y.p.name,'sv'));
+  return rows;
+}
+function renderGrupper(){
+  const grps=[...new Set(ST.players.map(p=>p.grp).filter(Boolean))].sort();
+  if(!grps.length) return '<div class="empty">Grupperna lottas snart…</div>';
+  const medal=i=>i===0?'🥇':i===1?'🥈':'';
+  return '<div class="ggrid">'+grps.map(g=>{
+    const rows=standings(g);
+    return `<div class="gcard"><h3>Grupp ${g}</h3>
+      <table><thead><tr><th>Spelare</th><th>S</th><th>V</th><th>±</th></tr></thead><tbody>
+      ${rows.map((r,i)=>`<tr class="${i<2?'adv':''}">
+        <td class="nm"><span class="rk">${i+1}</span>${esc(r.p.name)}${medal(i)?` ${medal(i)}`:''}${i<2?'<span class="advtag">Vidare</span>':''}</td>
+        <td>${r.pl}</td><td>${r.w}</td><td>${r.diff>0?'+':''}${r.diff}</td></tr>`).join('')}
+      </tbody></table></div>`;
+  }).join('')+'</div>';
+}
+
+function mmatch(m,showG){
+  const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
+  const g=showG?`<span class="gtag">${m.phase==='group'?'Grupp '+m.grp:koName(m)}</span>`:'';
+  const sc=m.status==='done'?`<div class="sc">${m.score_a}–${m.score_b}</div>`
+    :(m.court?`<div class="sc vs">bana ${esc(m.court)}</div>`:'<div class="sc vs">vs</div>');
+  return `<div class="mrow"><div class="side ${aw?'win':''}">${esc(nm(m.a_id))}</div>${sc}<div class="side b ${bw?'win':''}">${esc(nm(m.b_id))}</div>${g}</div>`;
+}
+function renderMatcher(){
+  const playable=ST.matches.filter(m=>m.a_id&&m.b_id);
+  const done=playable.filter(m=>m.status==='done').slice().sort((a,b)=>b.id-a.id).slice(0,9);
+  const left=playable.filter(m=>m.status!=='done').slice().sort((a,b)=>(a.court?0:1)-(b.court?0:1)||a.id-b.id).slice(0,9);
+  return `<div class="mgrid">
+    <div class="mcol"><h2>🎾 Kvar att spela (${playable.filter(m=>m.status!=='done').length})</h2>
+      ${left.length?left.map(m=>mmatch(m,true)).join(''):'<div class="empty">Inga just nu.</div>'}</div>
+    <div class="mcol"><h2>✅ Senaste resultat</h2>
+      ${done.length?done.map(m=>mmatch(m,true)).join(''):'<div class="empty">Inga rapporterade än.</div>'}</div>
+  </div>`;
+}
+
+function koName(m){ const n=ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length;
+  return ({1:'Final',2:'Semi',4:'Kvart',8:'Åttondel',16:'Sextondel'})[n]||'Slutspel'; }
+function roundLabel(n){ return ({1:'Final',2:'Semifinal',4:'Kvartsfinal',8:'Åttondelsfinal',16:'Sextondelsfinal'})[n]||'Slutspel'; }
+function bmatch(m){
+  if(!m.a_id&&!m.b_id) return `<div class="bm frilott"><div class="r"><span>Väntar…</span></div></div>`;
+  if(!m.a_id||!m.b_id){ const p=m.a_id||m.b_id; return `<div class="bm frilott"><div class="r win"><span>${esc(nm(p))}</span><span class="s">frilott</span></div></div>`; }
+  const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id, d=m.status==='done';
+  return `<div class="bm">
+    <div class="r ${aw?'win':''}"><span>${esc(nm(m.a_id))}</span><span class="s">${d?m.score_a:''}</span></div>
+    <div class="r ${bw?'win':''}"><span>${esc(nm(m.b_id))}</span><span class="s">${d?m.score_b:''}</span></div></div>`;
+}
+function hasKo(){ return ST.matches.some(m=>m.phase==='ko'); }
+function renderSlutspel(){
+  const ko=ST.matches.filter(m=>m.phase==='ko');
+  if(!ko.length) return '<div class="empty">Slutspelet visas när gruppspelet är klart.</div>';
+  const byR={}; ko.forEach(m=>{(byR[+m.grp]=byR[+m.grp]||[]).push(m);});
+  const rounds=Object.keys(byR).map(Number).sort((a,b)=>a-b);
+  const maxR=rounds[rounds.length-1], fin=byR[maxR][0];
+  const br=ST.matches.filter(m=>m.phase==='bronze');
+  const champ=(fin&&fin.status==='done')?`<div class="champ"><div class="tr">🏆</div><div><div class="t">Mästare · Speed Tennis Masters</div><div class="n">${esc(nm(fin.winner_id))}</div></div></div>`:'';
+  const cols=rounds.slice().reverse().map(r=>{
+    const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
+    return `<div class="bcol"><div class="rt">${roundLabel(ms.length)}</div>${ms.map(bmatch).join('')}</div>`;
+  }).join('');
+  const bronze=br.length?`<div class="bcol"><div class="rt">Bronsmatch</div>${br.map(bmatch).join('')}</div>`:'';
+  return champ+'<div class="bracket">'+cols+bronze+'</div>';
+}
+
+// ── Rendering + rotation ──
+const NAMES={grupper:'Gruppspel',matcher:'Matcher',slutspel:'Slutspel'};
+function activeViews(){ const v=['grupper','matcher']; if(hasKo()) v.push('slutspel'); return v; }
+let idx=0;
+function render(){
+  document.getElementById('v-grupper').innerHTML=renderGrupper();
+  document.getElementById('v-matcher').innerHTML=renderMatcher();
+  document.getElementById('v-slutspel').innerHTML=renderSlutspel();
+  showView();
+}
+function showView(){
+  const views=activeViews();
+  if(idx>=views.length) idx=0;
+  const cur=views[idx];
+  ['grupper','matcher','slutspel'].forEach(v=>document.getElementById('v-'+v).classList.toggle('on',v===cur));
+  document.getElementById('viewname').textContent=NAMES[cur];
+  document.getElementById('dots').innerHTML=views.map((v,i)=>`<b class="${i===idx?'on':''}"></b>`).join('');
+}
+function rotate(){ idx=(idx+1)%activeViews().length; showView(); }
+
+// progressbar för rotationen
+let t0=Date.now();
+function tick(){
+  const p=Math.min(1,(Date.now()-t0)/ROT);
+  document.getElementById('prog').style.width=(p*100)+'%';
+  requestAnimationFrame(tick);
+}
+refresh(); tick();
+setInterval(refresh, DATA);
+setInterval(()=>{ rotate(); t0=Date.now(); }, ROT);
+</script>
+</body>
+</html>
