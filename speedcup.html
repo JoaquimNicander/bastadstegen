@@ -194,7 +194,6 @@ function renderRpMatches(){
         <span>–</span>
         <input id="rp-b-${m.id}" type="number" min="0" max="30" inputmode="numeric" placeholder="0" style="max-width:70px">
         <span style="flex:1;font-size:13px;color:var(--muted);text-align:right">${esc(nm(opp))}</span></div>
-      <input id="rp-code-${m.id}" type="password" inputmode="numeric" placeholder="Din kod (PIN / gästkod)">
       <button class="btn" onclick="submitReport(${m.id},${scId})">Skicka resultat →</button>
       <div class="status" id="rp-st-${m.id}"></div>
     </div>`;
@@ -205,14 +204,12 @@ async function submitReport(matchId,scId){
   const st=document.getElementById('rp-st-'+matchId);
   const my=parseInt(document.getElementById('rp-a-'+matchId).value);
   const op=parseInt(document.getElementById('rp-b-'+matchId).value);
-  const code=(document.getElementById('rp-code-'+matchId).value||'').trim();
   if(isNaN(my)||isNaN(op)){ st.textContent='Fyll i båda siffrorna.'; reporting=false; return; }
   if(my===op){ st.textContent='Kan inte bli lika — någon vinner.'; reporting=false; return; }
-  if(!code){ st.textContent='Ange din kod.'; reporting=false; return; }
   const m=ST.matches.find(x=>x.id===matchId);
   const a = m.a_id===scId?my:op, b = m.a_id===scId?op:my;   // mappa till matchens a/b
   st.textContent='Skickar…';
-  try{ await BTS.scReport(matchId,scId,code,a,b); st.textContent='Klart! ✓'; await refresh(); showTab('rapportera',document.querySelector('.tab[data-t=rapportera]')); }
+  try{ await BTS.scReport(matchId,scId,'',a,b); st.textContent='Klart! ✓'; await refresh(); showTab('rapportera',document.querySelector('.tab[data-t=rapportera]')); }
   catch(e){ st.textContent='Fel: '+(e.message||e); }
   reporting=false;
 }
