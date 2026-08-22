@@ -53,6 +53,25 @@
   .champ .n{font-family:'Anton',sans-serif;font-size:30px;color:#0D2E20;margin-top:2px;letter-spacing:.5px}
   .muted{color:var(--muted);font-size:13px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  /* Slutspelsträd */
+  .scrollhint{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);margin:-2px 0 8px;text-align:center}
+  .tree{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 2px 16px;gap:22px;scroll-snap-type:x proximity}
+  .tree .col{flex:0 0 auto;width:210px;display:flex;flex-direction:column;scroll-snap-align:start}
+  .tree .rh{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--sun);text-align:center;margin-bottom:12px}
+  .colbody{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:18px;min-height:140px}
+  .pair{display:flex;flex-direction:column;justify-content:space-around;gap:18px;position:relative;flex:1}
+  .tie{position:relative;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:10px 12px;font-size:14px}
+  .tie.done{border-color:#2a4a38}
+  .tie .tr{display:flex;justify-content:space-between;gap:8px;padding:4px 0;color:var(--cream)}
+  .tie .tr span:first-child{white-space:nowrap}
+  .tie .tr.win{color:var(--sun);font-weight:700}
+  .tie .tr .s{font-family:'Space Mono',monospace;font-weight:700;flex:none}
+  .tie.empty{color:var(--muted);text-align:center;font-size:12px}
+  .tree .col:not(:first-child) .tie::before{content:'';position:absolute;left:-12px;top:50%;width:12px;height:2px;background:var(--border)}
+  .tree .col:not(:last-child) .tie::after{content:'';position:absolute;right:-12px;top:50%;width:12px;height:2px;background:var(--border)}
+  .pair::after{content:'';position:absolute;right:-12px;top:25%;bottom:25%;width:2px;background:var(--border)}
+  .champcol{width:150px;justify-content:center}
+  .wintie{background:linear-gradient(135deg,#F4B740,#E8931F);color:#0D2E20;font-weight:700;border-radius:10px;padding:12px 10px;text-align:center;font-size:14px}
   /* Rapportera */
   select,input{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:16px;padding:14px 13px;border-radius:11px;outline:none;margin-bottom:10px}
   select:focus,input:focus{border-color:var(--clay)}
@@ -155,19 +174,35 @@ function koMatchRow(m){
     return `<div class="mrow"><div class="side win">${esc(nm(p))}</div><div class="sc"><span class="vs">frilott</span></div><div class="side b muted">—</div></div>`; }
   return matchRow(m);
 }
+function tieCard(m){
+  if(!m.a_id && !m.b_id) return `<div class="tie empty">Väntar…</div>`;
+  if(!m.a_id || !m.b_id){ const p=m.a_id||m.b_id;
+    return `<div class="tie"><div class="tr win"><span>${esc(nm(p))}</span></div><div class="tr muted"><span>frilott</span></div></div>`; }
+  const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id, d=m.status==='done';
+  return `<div class="tie ${d?'done':''}">
+    <div class="tr ${aw?'win':''}"><span>${esc(nm(m.a_id))}</span><span class="s">${d?m.score_a:''}</span></div>
+    <div class="tr ${bw?'win':''}"><span>${esc(nm(m.b_id))}</span><span class="s">${d?m.score_b:''}</span></div></div>`;
+}
 function renderSlutspel(){
   const {byR,rounds}=koByRound();
   const br=ST.matches.filter(m=>m.phase==='bronze').sort((a,b)=>(a.slot||0)-(b.slot||0));
-  if(!rounds.length){ return '<div class="muted">Slutspelsträdet visas när gruppspelet är klart.</div>'; }
+  if(!rounds.length){ return '<div class="muted">Slutspelsträdet visas när gruppspelet är klart. Seedning: gruppettorna toppseedas och möts så sent som möjligt.</div>'; }
   const maxR=rounds[rounds.length-1];
   const finM=byR[maxR][0];
   const champ=(finM&&finM.status==='done')?`<div class="champ"><div class="trophy">🏆</div><div class="t">Mästare</div><div class="n">${esc(nm(finM.winner_id))}</div></div>`:'';
-  const cols=rounds.slice().reverse().map(r=>{
+  // Horisontellt träd: kvart → semi → final → mästare
+  const cols=rounds.map(r=>{
     const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
-    return `<div class="col"><div class="glabel">${roundName(ms.length)}</div>${ms.map(koMatchRow).join('')}</div>`;
+    let body='';
+    if(r<maxR){ for(let i=0;i<ms.length;i+=2){ body+=`<div class="pair">${tieCard(ms[i])}${ms[i+1]?tieCard(ms[i+1]):''}</div>`; } }
+    else { body=tieCard(ms[0]); }
+    return `<div class="col"><div class="rh">${roundName(ms.length)}</div><div class="colbody">${body}</div></div>`;
   }).join('');
-  const bronze=br.length?`<div class="col"><div class="glabel">Bronsmatch</div>${br.map(koMatchRow).join('')}</div>`:'';
-  return champ + cols + bronze;
+  const champCol=`<div class="col champcol"><div class="rh">Mästare</div><div class="colbody">
+    <div class="wintie">${finM&&finM.status==='done'?('🏆 '+esc(nm(finM.winner_id))):'<span class="muted">väntar</span>'}</div></div></div>`;
+  const tree=`<div class="glabel">Slutspelsträd</div><div class="scrollhint">← dra i sidled för att se hela trädet →</div><div class="tree">${cols}${champCol}</div>`;
+  const bronze=br.length?`<div class="glabel" style="margin-top:18px">Bronsmatch</div>${br.map(koMatchRow).join('')}`:'';
+  return champ + tree + bronze;
 }
 
 function myMatches(scId){
