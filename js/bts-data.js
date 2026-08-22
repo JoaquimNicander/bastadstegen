@@ -831,6 +831,11 @@ const BTS = {
     if (error) throw error;
     return data || { players: [], matches: [] };
   },
+  async scStart(matchId, scPlayerId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_start', { p_match_id: matchId, p_sc_player_id: scPlayerId });
+    if (error) throw error;
+  },
   async scReport(matchId, scPlayerId, code, a, b) {
     _assert();
     const { error } = await _sb.rpc('bts_sc_report', { p_match_id: matchId, p_sc_player_id: scPlayerId, p_code: code, p_a: a, p_b: b });

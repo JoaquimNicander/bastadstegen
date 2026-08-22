@@ -81,6 +81,8 @@
   .mrow .sc.vs{background:none;border:none;color:var(--muted);font-weight:400;font-size:14px}
   .mrow .gtag{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:1px;min-width:64px;text-align:right}
   .mrow .qn{flex:none;width:34px;height:34px;border-radius:9px;background:var(--clay);color:#0D2E20;font-family:'Space Mono',monospace;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .mrow.live{border-color:var(--clay);box-shadow:0 0 0 2px rgba(255,140,66,.3)}
+  .mrow .ld{flex:none;width:14px;height:14px;border-radius:50%;background:var(--clay);animation:pulse 1.3s infinite}
   .empty{color:var(--muted);font-size:18px;padding:14px}
   /* QR-kod (fast, nere till höger, rund mjuk design) */
   .qr{position:fixed;right:26px;bottom:60px;z-index:60;display:flex;align-items:center;gap:16px;
@@ -201,14 +203,22 @@ function playOrder(){
 function renderMatcher(){
   const order=playOrder();
   const pending=order.filter(m=>m.status!=='done');
+  const live=pending.filter(m=>m.status==='live');
+  const upcoming=pending.filter(m=>m.status!=='live');
   const done=ST.matches.filter(m=>m.a_id&&m.b_id&&m.status==='done').slice().sort((a,b)=>b.id-a.id).slice(0,10);
-  const q=pending.slice(0,12).map((m,i)=>`
+  const lbl=m=>m.phase==='group'?grpTitle(m.grp):koName(m);
+  const liveRow=m=>`<div class="mrow live"><span class="ld"></span>
+    <div class="side win">${esc(nm(m.a_id))}</div><div class="sc vs">pågår</div><div class="side b win">${esc(nm(m.b_id))}</div>
+    <span class="gtag">${lbl(m)}</span></div>`;
+  const q=upcoming.slice(0,12).map((m,i)=>`
     <div class="mrow"><div class="qn">${i+1}</div>
       <div class="side">${esc(nm(m.a_id))}</div><div class="sc vs">vs</div>
       <div class="side b">${esc(nm(m.b_id))}</div>
-      <span class="gtag">${m.phase==='group'?grpTitle(m.grp):koName(m)}</span></div>`).join('');
+      <span class="gtag">${lbl(m)}</span></div>`).join('');
   return `<div class="mgrid">
-    <div class="mcol"><h2>🎾 Spelordning · näst på tur (${pending.length} kvar)</h2>
+    <div class="mcol">
+      ${live.length?`<h2>🟢 Pågår nu (${live.length})</h2>${live.map(liveRow).join('')}<h2 style="margin-top:18px">🎾 Näst på tur (${upcoming.length} kvar)</h2>`
+                   :`<h2>🎾 Spelordning · näst på tur (${upcoming.length} kvar)</h2>`}
       ${q||'<div class="empty">Inga matcher kvar att spela.</div>'}</div>
     <div class="mcol"><h2>✅ Senaste resultat</h2>
       ${done.length?done.map(m=>mmatch(m,true)).join(''):'<div class="empty">Inga rapporterade än.</div>'}</div>

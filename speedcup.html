@@ -72,6 +72,12 @@
   .pair::after{content:'';position:absolute;right:-12px;top:25%;bottom:25%;width:2px;background:var(--border)}
   .champcol{width:150px;justify-content:center}
   .wintie{background:linear-gradient(135deg,#F4B740,#E8931F);color:#0D2E20;font-weight:700;border-radius:10px;padding:12px 10px;text-align:center;font-size:14px}
+  /* Pågående match */
+  .qn{flex:none;width:30px;height:30px;border-radius:8px;background:var(--clay);color:#0D2E20;font-family:'Space Mono',monospace;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .btn.ghost{background:transparent;border:1px solid var(--clay);color:var(--clay);box-shadow:none;font-size:15px;padding:12px}
+  .livechip{display:inline-flex;align-items:center;gap:9px;background:rgba(255,140,66,.14);border:1px solid var(--clay);color:var(--clay);font-weight:700;font-size:14px;padding:11px 14px;border-radius:10px}
+  .ld{width:10px;height:10px;border-radius:50%;background:var(--clay);animation:pulse 1.3s infinite;flex:none}
+  .mrow.live{border-color:var(--clay);box-shadow:0 0 0 1px rgba(255,140,66,.3)}
   /* Rapportera */
   select,input{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:16px;padding:14px 13px;border-radius:11px;outline:none;margin-bottom:10px}
   select:focus,input:focus{border-color:var(--clay)}
@@ -226,6 +232,9 @@ function renderRpMatches(){
              : roundName(ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length);
     return `<div class="mrow" style="flex-direction:column;align-items:stretch;gap:10px">
       <div style="display:flex;justify-content:space-between"><span style="font-weight:600">Mot ${esc(nm(opp))}</span><span class="court">${ph}</span></div>
+      ${m.status==='live'
+        ? '<div class="livechip"><span class="ld"></span>Matchen pågår</div>'
+        : `<button class="btn ghost" onclick="startMatch('${m.id}',${scId})">▶ Starta match</button>`}
       <div class="scin"><span style="flex:1;font-size:13px;color:var(--muted)">Du</span>
         <input id="rp-a-${m.id}" type="number" min="0" max="30" inputmode="numeric" placeholder="0" style="max-width:70px">
         <span>–</span>
@@ -235,6 +244,10 @@ function renderRpMatches(){
       <div class="status" id="rp-st-${m.id}"></div>
     </div>`;
   }).join('');
+}
+async function startMatch(matchId,scId){
+  try{ await BTS.scStart(parseInt(matchId),scId); await refresh(); renderRpMatches(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function submitReport(matchId,scId){
   reporting=true;
@@ -264,12 +277,18 @@ function playOrder(){
 function koLbl(m){ const n=ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length; return roundName(n); }
 function renderMatcher(){
   const pending=playOrder().filter(m=>m.status!=='done');
+  const live=pending.filter(m=>m.status==='live');
+  const upcoming=pending.filter(m=>m.status!=='live');
   const done=ST.matches.filter(m=>m.a_id&&m.b_id&&m.status==='done').slice().sort((a,b)=>b.id-a.id).slice(0,12);
   const lbl=m=>m.phase==='group'?grpTitle(m.grp):m.phase==='bronze'?'Brons':koLbl(m);
-  const q=pending.map((m,i)=>`<div class="mrow"><div style="flex:none;width:30px;height:30px;border-radius:8px;background:var(--clay);color:#0D2E20;font-family:'Space Mono',monospace;font-weight:700;display:flex;align-items:center;justify-content:center">${i+1}</div>
+  const liveRow=m=>`<div class="mrow live"><span class="ld"></span>
+    <div class="side win">${esc(nm(m.a_id))}</div><div class="sc pending">pågår</div><div class="side b win">${esc(nm(m.b_id))}</div>
+    <span class="court">${lbl(m)}</span></div>`;
+  const q=upcoming.map((m,i)=>`<div class="mrow"><div class="qn">${i+1}</div>
     <div class="side">${esc(nm(m.a_id))}</div><div class="sc pending">vs</div><div class="side b">${esc(nm(m.b_id))}</div></div>
     <div style="margin:-4px 0 10px 42px"><span class="court">${lbl(m)}</span></div>`).join('');
-  return `<div class="glabel">Spelordning · näst på tur (${pending.length} kvar)</div>
+  return `${live.length?`<div class="glabel">🟢 Pågår nu (${live.length})</div>${live.map(liveRow).join('')}`:''}
+    <div class="glabel"${live.length?' style="margin-top:18px"':''}>Spelordning · näst på tur (${upcoming.length} kvar)</div>
     ${q||'<div class="muted">Inga matcher kvar att spela.</div>'}
     <div class="glabel" style="margin-top:20px">Senaste resultat</div>
     ${done.length?done.map(matchRow).join(''):'<div class="muted">Inga rapporterade än.</div>'}`;
