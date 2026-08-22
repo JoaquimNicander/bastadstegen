@@ -78,6 +78,12 @@
   .done .sum{font-size:14px;color:var(--cream);line-height:1.6;margin:10px 0 4px}
   .done .sum .tag{display:inline-block;background:rgba(255,140,66,.16);border:1px solid var(--clay);color:var(--clay);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;padding:4px 11px;border-radius:100px;margin-top:6px}
 
+  .closed-card{position:relative;overflow:hidden}
+  .closed-stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-11deg);
+    font-family:'Anton',sans-serif;font-size:38px;letter-spacing:3px;text-transform:uppercase;
+    color:#FF8C42;border:5px solid #FF8C42;border-radius:12px;padding:10px 26px;white-space:nowrap;
+    background:rgba(13,42,29,.82);box-shadow:0 8px 28px rgba(0,0,0,.4);opacity:.95;pointer-events:none;z-index:3}
+  @media(max-width:460px){ .closed-stamp{font-size:26px;padding:8px 16px;letter-spacing:2px} }
   .admin{margin-top:34px;border-top:1px solid var(--border);padding-top:14px}
   .admin .foot{text-align:center}
   .admin .foot a{color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-decoration:none}
@@ -122,48 +128,14 @@
   <div class="count" id="count"></div>
   <div class="lists" id="lists"></div>
 
-  <!-- FORMULÄR -->
-  <div class="card" id="form-card">
-    <span class="lbl">Anmäl dig</span>
-    <input type="text" id="f-name" placeholder="Ditt namn" autocomplete="name">
-
-    <span class="lbl mt">Mobil (för info via SMS)</span>
-    <input type="tel" id="f-contact" inputmode="tel" placeholder="07XX XXX XX XX" autocomplete="tel">
-
-    <span class="lbl mt">Vad vill du vara med på?</span>
-    <div class="picks">
-      <div class="pick" data-v="tennis" onclick="pick('tennis')"><div class="pic">🎾</div><div class="pt">Bara tennis</div><div class="ps">15:00</div></div>
-      <div class="pick" data-v="middag" onclick="pick('middag')"><div class="pic">🍽️</div><div class="pt">Bara middag</div><div class="ps">Kvällen</div></div>
-      <div class="pick" data-v="both" onclick="pick('both')"><div class="pic">⭐</div><div class="pt">Både och</div><div class="ps">Hela dagen</div></div>
+  <!-- ANMÄLAN STÄNGD -->
+  <div class="card closed-card" id="form-card">
+    <div class="closed-stamp">Anmälan stängd</div>
+    <div style="text-align:center;padding:30px 8px 10px">
+      <div style="font-size:38px">🎾</div>
+      <h2 style="font-family:'Anton',sans-serif;font-size:26px;color:#fff;margin:12px 0 6px;letter-spacing:1px">Anmälan är stängd</h2>
+      <p class="muted" style="font-size:14px;line-height:1.6;max-width:420px;margin:0 auto">Tack till alla som anmält sig! Nu laddar vi för Speed Tennis Masters den 23:e. Se vilka som är med i listorna ovan — vi ses på plats!</p>
     </div>
-
-    <div class="guests hidden" id="guests">
-      <span class="lbl">Antal till middagen</span>
-      <div class="stepper">
-        <button type="button" onclick="bump(-1)">–</button>
-        <span class="n" id="g-num">1</span>
-        <button type="button" onclick="bump(1)">+</button>
-      </div>
-      <div class="hint">Inklusive dig själv — ta med respektive eller sällskap om du vill.</div>
-    </div>
-
-    <span class="lbl mt">Övrigt (valfritt)</span>
-    <textarea id="f-note" placeholder="Något vi bör veta?"></textarea>
-
-    <button class="btn" id="submit" onclick="submit()">Skicka anmälan →</button>
-    <div class="status" id="status"></div>
-  </div>
-
-  <!-- BEKRÄFTELSE -->
-  <div class="card hidden" id="done-card">
-    <div class="done">
-      <div class="big">🎉</div>
-      <h2>Du är anmäld!</h2>
-      <div class="sum" id="done-sum"></div>
-    </div>
-    <button class="btn alt" onclick="editSignup()">Ändra min anmälan</button>
-    <button class="btn alt" onclick="cancelSignup()" style="color:#EF9A9A;border-color:#5a2f2f">Avanmäl mig</button>
-    <div class="status" id="done-status"></div>
   </div>
 
   <!-- ADMIN -->
