@@ -868,9 +868,13 @@ const BTS = {
     const { error } = await _sb.rpc('bts_sc_gen_groups', { p_admin_pw: adminPw, p_groups: Number(groups) || 1 });
     if (error) throw error;
   },
-  async scGenKnockout(adminPw, advance) {
+  async scGenKnockout(adminPw, advance, dam) {
     _assert();
-    const { error } = await _sb.rpc('bts_sc_gen_knockout', { p_admin_pw: adminPw, p_advance: (advance == null ? null : Number(advance)) });
+    const { error } = await _sb.rpc('bts_sc_gen_knockout', {
+      p_admin_pw: adminPw,
+      p_advance: (advance == null ? null : Number(advance)),
+      p_dam: !!dam,
+      p_bronze: false });
     if (error) throw error;
   },
   async scAdminResult(adminPw, matchId, a, b) {

@@ -168,8 +168,8 @@ function matchRow(m){
 function roundName(nMatches){
   return ({1:'Final',2:'Semifinal',4:'Kvartsfinal',8:'Åttondelsfinal',16:'Sextondelsfinal',32:'Trettiotvådelsfinal'})[nMatches]||('Slutspel');
 }
-function koByRound(){
-  const kos=ST.matches.filter(m=>m.phase==='ko');
+function koByRound(tag){
+  const kos=ST.matches.filter(m=>m.phase===tag);
   const byR={}; kos.forEach(m=>{ const r=+m.grp; (byR[r]=byR[r]||[]).push(m); });
   const rounds=Object.keys(byR).map(Number).sort((a,b)=>a-b);
   return {byR,rounds};
@@ -189,14 +189,10 @@ function tieCard(m){
     <div class="tr ${aw?'win':''}"><span>${esc(nm(m.a_id))}</span><span class="s">${d?m.score_a:''}</span></div>
     <div class="tr ${bw?'win':''}"><span>${esc(nm(m.b_id))}</span><span class="s">${d?m.score_b:''}</span></div></div>`;
 }
-function renderSlutspel(){
-  const {byR,rounds}=koByRound();
-  const br=ST.matches.filter(m=>m.phase==='bronze').sort((a,b)=>(a.slot||0)-(b.slot||0));
-  if(!rounds.length){ return '<div class="muted">Slutspelsträdet visas när gruppspelet är klart. Seedning: gruppettorna toppseedas och möts så sent som möjligt.</div>'; }
-  const maxR=rounds[rounds.length-1];
-  const finM=byR[maxR][0];
-  const champ=(finM&&finM.status==='done')?`<div class="champ"><div class="trophy">🏆</div><div class="t">Mästare</div><div class="n">${esc(nm(finM.winner_id))}</div></div>`:'';
-  // Horisontellt träd: kvart → semi → final → mästare
+function renderTree(tag,title){
+  const {byR,rounds}=koByRound(tag);
+  if(!rounds.length) return '';
+  const maxR=rounds[rounds.length-1], finM=byR[maxR][0];
   const cols=rounds.map(r=>{
     const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
     let body='';
@@ -206,9 +202,13 @@ function renderSlutspel(){
   }).join('');
   const champCol=`<div class="col champcol"><div class="rh">Mästare</div><div class="colbody">
     <div class="wintie">${finM&&finM.status==='done'?('🏆 '+esc(nm(finM.winner_id))):'<span class="muted">väntar</span>'}</div></div></div>`;
-  const tree=`<div class="glabel">Slutspelsträd</div><div class="scrollhint">← dra i sidled för att se hela trädet →</div><div class="tree">${cols}${champCol}</div>`;
-  const bronze=br.length?`<div class="glabel" style="margin-top:18px">Bronsmatch</div>${br.map(koMatchRow).join('')}`:'';
-  return champ + tree + bronze;
+  return `<div class="glabel">${title}</div><div class="scrollhint">← dra i sidled →</div><div class="tree">${cols}${champCol}</div>`;
+}
+function renderSlutspel(){
+  const herr=renderTree('ko','🎾 Herrklass');
+  const dam=renderTree('kod','👑 Damklass');
+  if(!herr && !dam){ return '<div class="muted">Slutspelsträden visas när gruppspelet är klart. Herr: topp 2 i grupp A–D. Dam: alla i grupp E (1:a möter 4:a).</div>'; }
+  return herr + (herr&&dam?'<div style="height:22px"></div>':'') + dam;
 }
 
 function myMatches(scId){
@@ -274,13 +274,13 @@ function playOrder(){
   out.sort((x,y)=>x.r-y.r||(''+(x.m.grp||'')).localeCompare(''+(y.m.grp||''))||x.m.id-y.m.id);
   return out.map(o=>o.m);
 }
-function koLbl(m){ const n=ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length; return roundName(n); }
+function koLbl(m){ const n=ST.matches.filter(x=>x.phase===m.phase&&x.grp===m.grp).length; return (m.phase==='kod'?'Dam ':'')+roundName(n); }
 function renderMatcher(){
   const pending=playOrder().filter(m=>m.status!=='done');
   const live=pending.filter(m=>m.status==='live');
   const upcoming=pending.filter(m=>m.status!=='live');
   const done=ST.matches.filter(m=>m.a_id&&m.b_id&&m.status==='done').slice().sort((a,b)=>b.id-a.id).slice(0,12);
-  const lbl=m=>m.phase==='group'?grpTitle(m.grp):m.phase==='bronze'?'Brons':koLbl(m);
+  const lbl=m=>m.phase==='group'?grpTitle(m.grp):koLbl(m);
   const liveRow=m=>`<div class="mrow live"><span class="ld"></span>
     <div class="side win">${esc(nm(m.a_id))}</div><div class="sc pending">pågår</div><div class="side b win">${esc(nm(m.b_id))}</div>
     <span class="court">${lbl(m)}</span></div>`;

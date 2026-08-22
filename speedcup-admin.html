@@ -165,11 +165,14 @@ async function genGroups(){
 }
 async function genKnockout(){
   const adv=parseInt(document.getElementById('n-adv').value)||0;
-  const txt=adv>0?`Generera slutspel med de ${adv} bästa i varje grupp?`:'Generera slutspel (alla vidare)?';
-  if(!confirm(txt))return;
-  try{ await BTS.scGenKnockout(adminPw, adv>0?adv:null); await load();
-    document.getElementById('g-status').textContent=adv>0?`Slutspel genererat (topp ${adv}/grupp) ✓`:'Slutspel genererat ✓'; }
-  catch(e){ document.getElementById('g-status').textContent='Fel: '+(e.message||e); }
+  if(!confirm(`Generera slutspel?\n\n• Herr: topp ${adv>0?adv:'alla'} i grupp A–D\n• Dam: alla i grupp E (1:a möter 4:a, 2:a möter 3:a → final)`))return;
+  const st=document.getElementById('g-status'); st.textContent='Genererar…';
+  try{
+    await BTS.scGenKnockout(adminPw, adv>0?adv:null, false);   // herr (grupp A–D)
+    await BTS.scGenKnockout(adminPw, null, true);              // dam (grupp E, alla)
+    await load();
+    st.textContent=`Slutspel genererat ✓ (herr topp ${adv>0?adv:'alla'} + damklass)`;
+  }catch(e){ st.textContent='Fel: '+(e.message||e); }
 }
 
 function koRoundName(nMatches){
@@ -181,10 +184,12 @@ function renderMatches(){
   // Bygg ordnade sektioner: grupper (A,B…), sedan ko-ronder (1..K), sedan brons
   const sections=[];
   const groups=[...new Set(ST.matches.filter(m=>m.phase==='group').map(m=>m.grp))].sort();
-  groups.forEach(g=>sections.push({label:'Grupp '+g, ms:ST.matches.filter(m=>m.phase==='group'&&m.grp===g)}));
-  const koRounds=[...new Set(ST.matches.filter(m=>m.phase==='ko').map(m=>+m.grp))].sort((a,b)=>a-b);
-  koRounds.forEach(r=>{ const ms=ST.matches.filter(m=>m.phase==='ko'&&+m.grp===r); sections.push({label:koRoundName(ms.length), ms}); });
-  const brz=ST.matches.filter(m=>m.phase==='bronze'); if(brz.length) sections.push({label:'Bronsmatch', ms:brz});
+  groups.forEach(g=>sections.push({label:(g==='E'?'Damklass (grupp E)':'Grupp '+g), ms:ST.matches.filter(m=>m.phase==='group'&&m.grp===g)}));
+  // Slutspel: herr ('ko') och dam ('kod')
+  [['ko','Herr'],['kod','Dam']].forEach(([tag,pre])=>{
+    const rounds=[...new Set(ST.matches.filter(m=>m.phase===tag).map(m=>+m.grp))].sort((a,b)=>a-b);
+    rounds.forEach(r=>{ const ms=ST.matches.filter(m=>m.phase===tag&&+m.grp===r); sections.push({label:pre+' · '+koRoundName(ms.length), ms}); });
+  });
 
   let html='';
   sections.forEach(sec=>{

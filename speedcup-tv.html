@@ -226,8 +226,8 @@ function renderMatcher(){
   </div>`;
 }
 
-function koName(m){ const n=ST.matches.filter(x=>x.phase==='ko'&&x.grp===m.grp).length;
-  return ({1:'Final',2:'Semi',4:'Kvart',8:'Åttondel',16:'Sextondel'})[n]||'Slutspel'; }
+function koName(m){ const n=ST.matches.filter(x=>x.phase===m.phase&&x.grp===m.grp).length;
+  return (m.phase==='kod'?'Dam ':'')+({1:'Final',2:'Semi',4:'Kvart',8:'Åttondel',16:'Sextondel'})[n]||'Slutspel'; }
 function roundLabel(n){ return ({1:'Final',2:'Semifinal',4:'Kvartsfinal',8:'Åttondelsfinal',16:'Sextondelsfinal'})[n]||'Slutspel'; }
 function bmatch(m){
   if(!m.a_id&&!m.b_id) return `<div class="bm frilott"><div class="r"><span>Väntar…</span></div></div>`;
@@ -237,21 +237,26 @@ function bmatch(m){
     <div class="r ${aw?'win':''}"><span>${esc(nm(m.a_id))}</span><span class="s">${d?m.score_a:''}</span></div>
     <div class="r ${bw?'win':''}"><span>${esc(nm(m.b_id))}</span><span class="s">${d?m.score_b:''}</span></div></div>`;
 }
-function hasKo(){ return ST.matches.some(m=>m.phase==='ko'); }
-function renderSlutspel(){
-  const ko=ST.matches.filter(m=>m.phase==='ko');
-  if(!ko.length) return '<div class="empty">Slutspelet visas när gruppspelet är klart.</div>';
+function hasKo(){ return ST.matches.some(m=>m.phase==='ko'||m.phase==='kod'); }
+function renderTreeTV(tag,title){
+  const ko=ST.matches.filter(m=>m.phase===tag);
+  if(!ko.length) return '';
   const byR={}; ko.forEach(m=>{(byR[+m.grp]=byR[+m.grp]||[]).push(m);});
   const rounds=Object.keys(byR).map(Number).sort((a,b)=>a-b);
   const maxR=rounds[rounds.length-1], fin=byR[maxR][0];
-  const br=ST.matches.filter(m=>m.phase==='bronze');
-  const champ=(fin&&fin.status==='done')?`<div class="champ"><div class="tr">🏆</div><div><div class="t">Mästare · Speed Tennis Masters</div><div class="n">${esc(nm(fin.winner_id))}</div></div></div>`:'';
+  const champ=(fin&&fin.status==='done')
+    ? `<div class="champ"><div class="tr">🏆</div><div><div class="t">${title} · Mästare</div><div class="n">${esc(nm(fin.winner_id))}</div></div></div>` : '';
   const cols=rounds.slice().reverse().map(r=>{
     const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
     return `<div class="bcol"><div class="rt">${roundLabel(ms.length)}</div>${ms.map(bmatch).join('')}</div>`;
   }).join('');
-  const bronze=br.length?`<div class="bcol"><div class="rt">Bronsmatch</div>${br.map(bmatch).join('')}</div>`:'';
-  return champ+'<div class="bracket">'+cols+bronze+'</div>';
+  return `<div class="rt" style="font-size:16px;color:var(--cream);margin:6px 0 10px">${title}</div>${champ}<div class="bracket">${cols}</div>`;
+}
+function renderSlutspel(){
+  const herr=renderTreeTV('ko','Herrklass');
+  const dam=renderTreeTV('kod','Damklass');
+  if(!herr && !dam) return '<div class="empty">Slutspelet visas när gruppspelet är klart.</div>';
+  return herr + (herr&&dam?'<div style="height:22px"></div>':'') + dam;
 }
 
 const NAMES={grupper:'Gruppspel',matcher:'Matcher',slutspel:'Slutspel'};
