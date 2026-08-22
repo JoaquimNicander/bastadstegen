@@ -191,15 +191,27 @@ function mmatch(m,showG){
     :(m.court?`<div class="sc vs">bana ${esc(m.court)}</div>`:'<div class="sc vs">vs</div>');
   return `<div class="mrow"><div class="side ${aw?'win':''}">${esc(nm(m.a_id))}</div>${sc}<div class="side b ${bw?'win':''}">${esc(nm(m.b_id))}</div>${g}</div>`;
 }
-// Rättvis spelordning: greedy-rondindelning så samma spelare inte möts två gånger i rad
-function playOrder(){
-  const ms=ST.matches.filter(m=>m.a_id&&m.b_id).slice()
-    .sort((a,b)=>(''+(a.grp||'')).localeCompare(''+(b.grp||''))||a.id-b.id);
+function isDamMatch(m){ return (m.phase==='group'&&m.grp==='E')||m.phase==='kod'; }
+function fairOrder(list){
   const rounds={}, out=[];
-  ms.forEach(m=>{ let r=1; for(;;){ const s=rounds[r]||(rounds[r]=new Set());
-    if(!s.has(m.a_id)&&!s.has(m.b_id)){ s.add(m.a_id); s.add(m.b_id); out.push({m,r}); break; } r++; } });
+  list.slice().sort((a,b)=>(''+(a.grp||'')).localeCompare(''+(b.grp||''))||a.id-b.id)
+    .forEach(m=>{ let r=1; for(;;){ const s=rounds[r]||(rounds[r]=new Set());
+      if(!s.has(m.a_id)&&!s.has(m.b_id)){ s.add(m.a_id); s.add(m.b_id); out.push({m,r}); break; } r++; } });
   out.sort((x,y)=>x.r-y.r||(''+(x.m.grp||'')).localeCompare(''+(y.m.grp||''))||x.m.id-y.m.id);
   return out.map(o=>o.m);
+}
+// Spelordning: väv 2 herr + 1 dam, upprepa (jämnt utfördelat)
+function playOrder(){
+  const all=ST.matches.filter(m=>m.a_id&&m.b_id);
+  const herr=fairOrder(all.filter(m=>!isDamMatch(m)));
+  const dam=fairOrder(all.filter(m=>isDamMatch(m)));
+  const merged=[]; let i=0,j=0;
+  while(i<herr.length||j<dam.length){
+    if(i<herr.length) merged.push(herr[i++]);
+    if(i<herr.length) merged.push(herr[i++]);
+    if(j<dam.length) merged.push(dam[j++]);
+  }
+  return merged;
 }
 function renderMatcher(){
   const order=playOrder();
