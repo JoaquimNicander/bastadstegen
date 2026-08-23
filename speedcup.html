@@ -111,11 +111,13 @@
     <button class="tab on" data-t="grupper" onclick="showTab('grupper',this)">Grupper</button>
     <button class="tab" data-t="matcher" onclick="showTab('matcher',this)">Matcher</button>
     <button class="tab" data-t="slutspel" onclick="showTab('slutspel',this)">Slutspel</button>
+    <button class="tab" data-t="serve" onclick="showTab('serve',this)">Serve</button>
     <button class="tab" data-t="rapportera" onclick="showTab('rapportera',this)">Rapportera</button>
   </div>
   <div id="v-grupper"></div>
   <div id="v-matcher" class="hidden"></div>
   <div id="v-slutspel" class="hidden"></div>
+  <div id="v-serve" class="hidden"></div>
   <div id="v-rapportera" class="hidden"></div>
 </div>
 
@@ -130,10 +132,12 @@ const nm=id=>byId(id).name;
 function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 async function refresh(){
-  try{ ST=await BTS.scState(); render(); }catch(e){ /* tyst */ }
+  try{ const [st,serves]=await Promise.all([BTS.scState(), BTS.scServeTop(30).catch(()=>[])]);
+    ST=st; ST.serves=serves||[]; render();
+  }catch(e){ /* tyst */ }
 }
 function showTab(t,btn){ tab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); if(btn)btn.classList.add('on');
-  ['grupper','matcher','slutspel','rapportera'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hidden',x!==t)); render(); }
+  ['grupper','matcher','slutspel','serve','rapportera'].forEach(x=>document.getElementById('v-'+x).classList.toggle('hidden',x!==t)); render(); }
 
 function standings(grp){
   const ps=ST.players.filter(p=>p.grp===grp);
@@ -319,10 +323,22 @@ function renderMatcher(){
     <div class="glabel" style="margin-top:20px">Senaste resultat</div>
     ${done.length?done.map(matchRow).join(''):'<div class="muted">Inga rapporterade än.</div>'}`;
 }
+function renderServe(){
+  const list=(ST.serves||[]);
+  const fmt=s=>(Math.round(Number(s)*10)/10).toString().replace('.',',');
+  const cta=`<a href="serve.html" style="display:block;text-align:center;background:var(--clay);color:#fff;font-weight:800;font-size:16px;text-decoration:none;padding:15px;border-radius:12px;margin-bottom:16px">⚡ Logga din serve →</a>`;
+  if(!list.length) return cta+'<div class="muted">Ingen har loggat än — bli först! Servat hårt? Tryck på knappen ovan.</div>';
+  const rows=list.map((r,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <span style="font-family:'Space Mono',monospace;font-weight:700;color:var(--clay);min-width:24px">${i+1}</span>
+    <span style="flex:1;font-weight:600;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}${i===0?' 🏆':''}</span>
+    <span style="font-weight:800;font-size:18px">${fmt(r.speed)} <small style="font-weight:400;color:var(--muted)">km/h</small></span></div>`).join('');
+  return cta+`<div class="glabel">🏆 Hårdaste serven · live</div><div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:6px 14px">${rows}</div>`;
+}
 function render(){
   document.getElementById('v-grupper').innerHTML=renderGrupper();
   document.getElementById('v-matcher').innerHTML=renderMatcher();
   document.getElementById('v-slutspel').innerHTML=renderSlutspel();
+  document.getElementById('v-serve').innerHTML=renderServe();
   if(tab==='rapportera'){
     // behåll formuläret om man redan valt namn
     if(!document.getElementById('rp-me')){ document.getElementById('v-rapportera').innerHTML=renderRapportera(); }

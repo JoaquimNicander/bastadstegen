@@ -842,6 +842,24 @@ const BTS = {
     const { error } = await _sb.rpc('bts_sc_start', { p_match_id: matchId, p_sc_player_id: scPlayerId });
     if (error) throw error;
   },
+  // ── Servetävling ──
+  async scServeLog(name, speed) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_sc_serve_log', { p_name: name, p_speed: speed });
+    if (error) throw error;
+    return data;
+  },
+  async scServeTop(limit = 30) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_sc_serve_top', { p_limit: limit });
+    if (error) throw error;
+    return data || [];
+  },
+  async scServeDel(adminPw, id) {
+    _assert();
+    const { error } = await _sb.rpc('bts_sc_serve_del', { p_admin_pw: adminPw, p_id: id });
+    if (error) throw error;
+  },
   async scReport(matchId, scPlayerId, code, a, b) {
     _assert();
     const { error } = await _sb.rpc('bts_sc_report', { p_match_id: matchId, p_sc_player_id: scPlayerId, p_code: code, p_a: a, p_b: b });

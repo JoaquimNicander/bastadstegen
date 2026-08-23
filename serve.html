@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Servetävling · Speed Tennis Masters</title>
+<link rel="icon" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0D2E20; --card:#10231a; --card2:#0D2A1D; --border:#1E3E2E; --cream:#F5EDE3; --sun:#F4B740; --clay:#E8520A; }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:
+    radial-gradient(1200px 500px at 50% -10%, #14432E 0%, transparent 60%), var(--bg);
+    color:var(--cream);min-height:100vh;padding:22px 16px 60px}
+  .wrap{max-width:520px;margin:0 auto}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .top .b{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sun)}
+  h1{font-family:'Anton',sans-serif;font-size:40px;letter-spacing:1px;margin:2px 0 4px;line-height:1}
+  .sub{font-family:'Space Mono',monospace;font-size:12.5px;letter-spacing:1px;color:#9DBBA8;margin-bottom:22px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:20px}
+  label{display:block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8FB39B;margin:0 0 7px}
+  input{width:100%;background:#0D2E20;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:17px;padding:14px 15px;border-radius:12px;outline:none}
+  input:focus{border-color:var(--clay)}
+  .speed-in{display:flex;align-items:center;gap:12px}
+  .speed-in input{font-family:'Anton',sans-serif;font-size:30px;text-align:center;letter-spacing:1px}
+  .speed-in .unit{font-family:'Space Mono',monospace;font-size:15px;color:#9DBBA8;white-space:nowrap}
+  .btn{width:100%;margin-top:18px;background:var(--clay);color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:17px;letter-spacing:.5px;border:none;padding:16px;border-radius:12px;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .status{font-family:'Space Mono',monospace;font-size:13px;margin-top:14px;min-height:18px;text-align:center}
+  .ok{color:#5FD08A}.err{color:var(--sun)}
+  .bigok{background:#0f3a24;border:1px solid #2E7D4F;color:#8CE0AC;border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-top:14px;display:none}
+  .bigok.show{display:block}
+  h2{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+  h2 .live{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:#5FD08A;border:1px solid #2E7D4F;border-radius:100px;padding:3px 9px}
+  .row{display:flex;align-items:center;gap:13px;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .row:last-child{border-bottom:none}
+  .row .rk{font-family:'Space Mono',monospace;font-weight:700;font-size:15px;color:var(--sun);min-width:26px}
+  .row .nm{flex:1;font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .spd{font-family:'Anton',sans-serif;font-size:22px}
+  .row .spd small{font-family:'Space Mono',monospace;font-size:11px;color:#8FB39B}
+  .row.top1 .spd{color:var(--sun)}
+  .empty{color:#8FB39B;font-size:14px;text-align:center;padding:20px 0}
+  .foot{font-family:'Space Mono',monospace;font-size:10px;color:#6E8C7B;text-align:center;margin-top:24px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><span class="b">Speed Tennis Masters · Båstad Stegen</span></div>
+  <h1>⚡ Servetävling</h1>
+  <div class="sub">Servat hårt? Logga din hastighet — hårdaste serven vinner.</div>
+
+  <div class="card">
+    <label for="nm">Ditt namn</label>
+    <input id="nm" list="players" autocomplete="off" placeholder="Välj eller skriv ditt namn">
+    <datalist id="players"></datalist>
+
+    <div style="height:16px"></div>
+    <label for="spd">Uppmätt hastighet</label>
+    <div class="speed-in">
+      <input id="spd" type="number" inputmode="decimal" min="1" max="300" step="0.1" placeholder="0">
+      <span class="unit">km/h</span>
+    </div>
+
+    <button class="btn" id="send" onclick="submitServe()">Logga min serve →</button>
+    <div class="status" id="status"></div>
+    <div class="bigok" id="bigok">✅ Registrerad! Kolla topplistan nedan 👇</div>
+  </div>
+
+  <div class="card">
+    <h2>🏆 Topplista <span class="live">LIVE</span></h2>
+    <div id="board"><div class="empty">Laddar…</div></div>
+  </div>
+
+  <div class="foot">Drivs av CX Reach</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let busy=false;
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const fmt=s=>(Math.round(Number(s)*10)/10).toString().replace('.',',');
+
+async function loadPlayers(){
+  try{ const st=await BTS.scState();
+    const names=[...new Set((st.players||[]).map(p=>p.name).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'sv'));
+    document.getElementById('players').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+  }catch(e){}
+}
+async function loadBoard(){
+  try{ const list=await BTS.scServeTop(30);
+    const el=document.getElementById('board');
+    if(!list.length){ el.innerHTML='<div class="empty">Ingen har loggat än — bli först! ⚡</div>'; return; }
+    el.innerHTML=list.map((r,i)=>`<div class="row ${i===0?'top1':''}">
+      <span class="rk">${i+1}</span><span class="nm">${esc(r.name)}</span>
+      <span class="spd">${fmt(r.speed)}<small> km/h</small></span></div>`).join('');
+  }catch(e){}
+}
+async function submitServe(){
+  if(busy) return;
+  const name=(document.getElementById('nm').value||'').trim();
+  const speed=parseFloat((document.getElementById('spd').value||'').replace(',','.'));
+  const s=document.getElementById('status'), ok=document.getElementById('bigok');
+  ok.classList.remove('show'); s.className='status';
+  if(!name){ s.textContent='Skriv ditt namn först.'; s.className='status err'; return; }
+  if(!speed||speed<=0||speed>300){ s.textContent='Ange en giltig hastighet (km/h).'; s.className='status err'; return; }
+  busy=true; document.getElementById('send').disabled=true; s.textContent='Sparar…';
+  try{
+    await BTS.scServeLog(name, speed);
+    s.textContent=''; ok.classList.add('show');
+    document.getElementById('spd').value='';
+    await loadBoard();
+    setTimeout(()=>ok.classList.remove('show'), 6000);
+  }catch(e){ s.textContent='Fel: '+(e.message||e); s.className='status err'; }
+  busy=false; document.getElementById('send').disabled=false;
+}
+
+loadPlayers(); loadBoard();
+setInterval(loadBoard, 10000);
+</script>
+</body>
+</html>
