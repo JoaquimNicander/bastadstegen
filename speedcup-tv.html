@@ -169,12 +169,7 @@
 
 <div class="qr" id="qr-main">
   <div class="qrbox" id="qrbox"></div>
-  <div class="qrtxt"><span class="big">📱 Rapportera</span>Skanna &amp; välj ditt namn<br><b>bastadstegen.se/speedcup</b></div>
-</div>
-
-<div class="qr qr-serve" id="qr-serve" style="display:none">
-  <div class="qrbox" id="qrbox-serve"></div>
-  <div class="qrtxt"><span class="big">⚡ Servtävling</span>Servat hårt? Logga din km/h!<br><b>bastadstegen.se/serve</b></div>
+  <div class="qrtxt"><span class="big">📱 Spelar-appen</span>Skanna – följ allt live &amp; rapportera<br><b>bastadstegen.se/speedcup</b></div>
 </div>
 
 <div class="poweredby"><span>Drivs av</span><img src="cxreach-white.png" alt="CX Reach"></div>
@@ -343,19 +338,11 @@ function showView(){
   document.getElementById('viewname').textContent=NAMES[cur];
   document.getElementById('dots').innerHTML=views.map((v,i)=>`<b class="${i===idx?'on':''}"></b>`).join('');
   document.getElementById('count').textContent=(ST.players.length||0)+' spelare · uppdateras live';
-  // Serve-sliden visar sin egen QR, övriga visar rapporterings-QR
-  const isServe=(cur==='serve');
-  const qMain=document.getElementById('qr-main'), qServe=document.getElementById('qr-serve');
-  if(qMain) qMain.style.display=isServe?'none':'';
-  if(qServe) qServe.style.display=isServe?'':'none';
 }
 function rotate(){ idx=(idx+1)%activeViews().length; showView(); }
 
-// QR-kod till rapporteringen
+// QR-kod till spelar-appen (allt finns där: grupper, matcher, slutspel, serve, rapportera)
 try{ new QRCode(document.getElementById('qrbox'), {text:'https://bastadstegen.se/speedcup.html',
-  width:132, height:132, colorDark:'#0D2E20', colorLight:'#F6EFE2', correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
-// QR-kod till servetävlingens loggning
-try{ new QRCode(document.getElementById('qrbox-serve'), {text:'https://bastadstegen.se/serve.html',
   width:132, height:132, colorDark:'#0D2E20', colorLight:'#F6EFE2', correctLevel:QRCode.CorrectLevel.M}); }catch(e){}
 
 let t0=Date.now();
