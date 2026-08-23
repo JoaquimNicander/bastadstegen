@@ -140,6 +140,7 @@
       <div class="label" style="margin-top:16px">Mottagare</div>
       <select id="aud-mode" style="width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none">
         <option value="off">Bara spelarna på stegen</option>
+        <option value="speedtennis" id="aud-speed">Bara Speed Tennis-gruppen</option>
         <option value="add" id="aud-add">Spelarna + gästlistan (tjejstegen)</option>
         <option value="only" id="aud-only">Bara gästlistan (tjejstegen)</option>
       </select>
@@ -192,6 +193,8 @@ async function doLogin(){
     renderBlocks(); render(); updateState(); loadDrafts();
     BTS.guestCount().then(n=>{ if(!n) return; const a=document.getElementById('aud-add'), o=document.getElementById('aud-only');
       if(a) a.textContent=`Spelarna + gästlistan (tjejstegen · ${n} st)`; if(o) o.textContent=`Bara gästlistan (tjejstegen · ${n} st)`; }).catch(()=>{});
+    (BTS.scMaillistCount?BTS.scMaillistCount():Promise.resolve(0)).then(n=>{ if(!n) return; const e=document.getElementById('aud-speed');
+      if(e) e.textContent=`Bara Speed Tennis-gruppen (${n} st)`; }).catch(()=>{});
     suppressAutosave=false;
   }catch(e){ s.textContent = (e.message||e); }
 }

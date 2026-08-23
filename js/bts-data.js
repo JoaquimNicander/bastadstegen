@@ -329,6 +329,12 @@ const BTS = {
     if (error) throw error;
     return Number(data) || 0;
   },
+  async scMaillistCount() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_sc_maillist_count');
+    if (error) throw error;
+    return Number(data) || 0;
+  },
   async kickoffPublicList() {
     _assert();
     const { data, error } = await _sb.rpc('bts_kickoff_public_list');
