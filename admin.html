@@ -401,6 +401,13 @@ En knapptryckning kvar, sen slipper du fler pip från mig :) [länk]</textarea>
       <div class="sms-meta"></div>
     </div>
 
+    <div class="sms-card" style="border-left-color:#E8520A;margin-top:14px">
+      <div class="sms-head"><span>Skicka till Speed Tennis-gruppen <span class="sms-cnt">· <span id="sms-cnt-speedtennis">–</span> st</span></span>
+        <button class="sms-send" onclick="doSend('speedtennis')">Skicka →</button></div>
+      <textarea id="sms-tpl-speedtennis" class="sms-ta" oninput="smsCount(this)">Hej [förnamn]! Speed Tennis Masters idag – samling inomhus på läktaren senast 14.45. Ta med inneskor. Vi ses! [länk]</textarea>
+      <div class="sms-meta"></div>
+    </div>
+
     <div style="display:flex;align-items:center;gap:8px;margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;flex-wrap:wrap">
       <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase">Testa till dig själv</span>
       <input id="sms-test-num" type="tel" placeholder="07XXXXXXXX (SMS)" style="background:#0D2E20;border:1px solid var(--border2);color:var(--white);font-family:'Space Mono',monospace;font-size:12px;padding:7px 10px;width:160px">
@@ -1566,6 +1573,7 @@ async function renderSms(){
     set('sms-cnt-all_ladder', active.length);
     set('sms-cov-sms', active.length);
     set('sms-cov-email', active.filter(p=>p.email).length);
+    if(BTS.scMaillistCount) BTS.scMaillistCount().then(n=>set('sms-cnt-speedtennis', n)).catch(()=>{});
     document.querySelectorAll('.sms-ta').forEach(smsCount);
   }catch(e){ /* tyst — visningssiffror */ }
 }
