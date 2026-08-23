@@ -165,13 +165,13 @@ async function genGroups(){
 }
 async function genKnockout(){
   const adv=parseInt(document.getElementById('n-adv').value)||0;
-  if(!confirm(`Generera slutspel?\n\n• Herr: topp ${adv>0?adv:'alla'} i grupp A–D\n• Dam: alla i grupp E (1:a möter 4:a, 2:a möter 3:a → final)`))return;
+  if(!confirm(`Generera slutspel?\n\n• Herr: topp ${adv>0?adv:'alla'} i grupp A–D\n• Dam: topp 4 i grupp E (1:a möter 4:a, 2:a möter 3:a → final)`))return;
   const st=document.getElementById('g-status'); st.textContent='Genererar…';
   try{
     await BTS.scGenKnockout(adminPw, adv>0?adv:null, false);   // herr (grupp A–D)
-    await BTS.scGenKnockout(adminPw, null, true);              // dam (grupp E, alla)
+    await BTS.scGenKnockout(adminPw, 4, true);                 // dam (grupp E, topp 4)
     await load();
-    st.textContent=`Slutspel genererat ✓ (herr topp ${adv>0?adv:'alla'} + damklass)`;
+    st.textContent=`Slutspel genererat ✓ (herr topp ${adv>0?adv:'alla'} + dam topp 4)`;
   }catch(e){ st.textContent='Fel: '+(e.message||e); }
 }
 
