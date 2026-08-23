@@ -11,18 +11,12 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;color:var(--cream);overflow:hidden;height:100vh;display:flex;flex-direction:column;
+    background:var(--bg);}
+  /* arenafoto som bakgrund + mörk toning så innehållet syns */
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
     background:
-      radial-gradient(1000px 520px at 88% -8%, rgba(244,183,64,.16), transparent 60%),
-      radial-gradient(900px 500px at 6% 108%, rgba(255,140,66,.08), transparent 60%),
-      var(--bg);}
-  /* svaga court-linjer i bakgrunden */
-  body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:.06;
-    background:
-      linear-gradient(var(--cream),var(--cream)) 0 22% / 100% 2px no-repeat,
-      linear-gradient(var(--cream),var(--cream)) 0 82% / 100% 2px no-repeat,
-      linear-gradient(90deg,var(--cream),var(--cream)) 50% 0 / 2px 100% no-repeat,
-      linear-gradient(90deg,var(--cream),var(--cream)) 16% 22% / 2px 60% no-repeat,
-      linear-gradient(90deg,var(--cream),var(--cream)) 84% 22% / 2px 60% no-repeat;}
+      linear-gradient(rgba(9,26,18,.74), rgba(7,20,14,.86)),
+      url('tv-bg.png') center center / cover no-repeat;}
 
   /* Toppbar med solstrålar */
   .bar{position:relative;overflow:hidden;display:flex;align-items:center;gap:26px;padding:16px 96px 16px 40px;
