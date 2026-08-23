@@ -31,7 +31,7 @@
   .bar .bsun{position:absolute;right:-22px;top:-22px;width:96px;height:96px;border-radius:50%;
     background:radial-gradient(circle at 38% 32%,#FFFBE6,#FFE27A 55%,#FAC83C);box-shadow:0 0 46px 16px rgba(255,221,120,.5);pointer-events:none}
   .bar>*{position:relative;z-index:2}
-  .bar .crest{height:58px;width:auto;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.25))}
+  .bar .crest{height:74px;width:auto;display:block}
   .bar .logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1.5px;line-height:.9;color:#0D2E20;text-shadow:0 2px 0 rgba(255,255,255,.18)}
   .bar .logo small{display:block;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;color:#5A1800;font-weight:700;margin-top:4px}
   .bar .spacer{flex:1}
@@ -95,9 +95,7 @@
   .qrtxt{font-family:'Space Mono',monospace;font-size:14px;letter-spacing:.5px;color:var(--cream);line-height:1.55;width:200px}
   .qrtxt .big{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.5px;color:var(--sun);display:block;margin-bottom:3px}
   .qrtxt b{color:var(--cream);display:block;font-size:12.5px;word-break:break-all;margin-top:3px}
-  .poweredby{position:fixed;right:26px;bottom:206px;z-index:60;display:flex;align-items:center;justify-content:flex-end;gap:11px;opacity:.9}
-  .poweredby span{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cream)}
-  .poweredby img{height:40px;width:auto;display:block}
+  .bar .cxbar{height:30px;width:auto;display:block;background:rgba(255,255,255,.9);padding:6px 12px;border-radius:100px;box-shadow:0 2px 6px rgba(0,0,0,.15)}
 
   /* Slutspel */
   .champ{display:flex;align-items:center;gap:22px;background:linear-gradient(135deg,#F4B740,#E8931F 60%,#C9761a);border-radius:18px;padding:16px 28px;margin-bottom:20px;box-shadow:0 12px 34px rgba(244,183,64,.3)}
@@ -126,9 +124,10 @@
 <body>
 <div class="bar">
   <div class="rays"></div><div class="bsun"></div>
-  <img class="crest" src="bts-crest.png" alt="Båstad Stegen">
+  <img class="crest" src="mail-logga.png" alt="Båstad Stegen">
   <div class="logo">SPEED TENNIS MASTERS<small>Båstad Stegen · Säsongsavslutning</small></div>
   <div class="spacer"></div>
+  <img class="cxbar" src="cxreach-color.png" alt="CX Reach">
   <div class="viewname" id="viewname">Gruppspel</div>
   <div class="live"><span class="dot"></span>Live</div>
   <div class="date">Söndag 23 aug</div>
@@ -150,8 +149,6 @@
   <div class="qrbox" id="qrbox"></div>
   <div class="qrtxt"><span class="big">📱 Rapportera</span>Skanna &amp; välj ditt namn<br><b>bastadstegen.se/speedcup</b></div>
 </div>
-
-<div class="poweredby"><span>Drivs av</span><img src="cxreach-white.png" alt="CX Reach"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
