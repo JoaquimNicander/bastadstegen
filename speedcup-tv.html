@@ -283,7 +283,7 @@ function renderTreeTV(tag,title){
   const maxR=rounds[rounds.length-1], fin=byR[maxR][0];
   const champ=(fin&&fin.status==='done')
     ? `<div class="champ"><div class="tr">🏆</div><div><div class="t">${title} · Mästare</div><div class="n">${esc(nm(fin.winner_id))}</div></div></div>` : '';
-  const cols=rounds.slice().reverse().map(r=>{
+  const cols=rounds.slice().map(r=>{
     const ms=byR[r].slice().sort((a,b)=>(a.slot||0)-(b.slot||0));
     return `<div class="bcol"><div class="rt">${roundLabel(ms.length)}</div>${ms.map(bmatch).join('')}</div>`;
   }).join('');
@@ -315,7 +315,7 @@ function renderServe(){
 }
 
 const NAMES={grupper:'Gruppspel',matcher:'Matcher',slutspel:'Slutspel',serve:'Servetävling'};
-function activeViews(){ const v=['grupper','matcher']; if(hasKo()) v.push('slutspel'); v.push('serve'); return v; }
+function activeViews(){ if(hasKo()) return ['slutspel']; return ['grupper','matcher','serve']; }
 let idx=0;
 function render(){
   document.getElementById('v-grupper').innerHTML=renderGrupper();
