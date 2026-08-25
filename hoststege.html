@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Höststege – anmälan · Båstad Stegen</title>
+<title>Höststegen – anmälan · Båstad Stegen</title>
 <link rel="icon" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -20,32 +20,26 @@
   .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
   h2{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.5px;margin:0 0 4px}
   .hint{color:var(--muted);font-size:13.5px;line-height:1.6;margin:2px 0 16px}
+  .facts{list-style:none;margin:0 0 16px;padding:0}
+  .facts li{position:relative;padding:6px 0 6px 24px;font-size:14px;line-height:1.55;color:var(--cream)}
+  .facts li::before{content:'';position:absolute;left:2px;top:12px;width:9px;height:9px;border-radius:50%;background:var(--clay)}
   label{display:block;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8FB39B;margin:14px 0 7px}
   input,select{width:100%;background:#0D2E20;border:1px solid var(--border2);color:var(--cream);font:inherit;font-size:16px;padding:13px 14px;border-radius:11px;outline:none}
   input:focus,select:focus{border-color:var(--clay)}
   .grid2{display:grid;grid-template-columns:1fr 118px;gap:10px}
   .btn{width:100%;margin-top:16px;background:var(--clay);color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:16px;border:none;padding:15px;border-radius:12px;cursor:pointer}
   .btn.ghost{background:var(--card2);color:var(--cream);border:1px solid var(--border2)}
+  .btn.leave{background:var(--card2);color:var(--sun);border:1px solid var(--border2)}
   .btn.sm{width:auto;margin:0;padding:9px 15px;font-size:14px;border-radius:9px}
   .btn:disabled{opacity:.5}
   .status{font-family:'Space Mono',monospace;font-size:13px;margin-top:12px;min-height:18px}
   .ok{color:#7Fe0a0}.err{color:var(--sun)}
-  .rnd{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--border);border-radius:12px;margin-bottom:9px;background:rgba(255,255,255,.02)}
-  .rnd .info{flex:1;min-width:0}
-  .rnd .nm{font-weight:700;font-size:16px}
-  .rnd .meta{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:2px}
-  .rnd .closed{color:var(--sun)}
-  .pill{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;color:var(--sun);border:1px solid var(--border2);border-radius:100px;padding:3px 9px}
-  .signed{border-color:var(--green);background:rgba(76,175,106,.08)}
-  .signed .nm::after{content:' ✓';color:var(--green)}
-  .toggle{flex:none;border:none;border-radius:10px;padding:11px 16px;font-family:'Outfit';font-weight:700;font-size:14px;cursor:pointer}
-  .toggle.on{background:var(--green);color:#06301a}
-  .toggle.off{background:var(--clay);color:#fff}
-  .names{font-size:14px;color:var(--cream);line-height:1.7}
-  details{margin-top:6px}
-  summary{cursor:pointer;color:var(--muted);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.5px}
-  .divider{border-top:1px solid var(--border);margin:22px 0 6px}
+  .bigok{background:#0f3a24;border:1px solid #2E7D4F;color:#8CE0AC;border-radius:14px;padding:16px;text-align:center;font-weight:700;margin-top:14px}
+  .names{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:100px;padding:7px 13px;font-size:14px}
+  .count{font-family:'Space Mono',monospace;font-size:12px;color:var(--sun);letter-spacing:1px}
   .admin-link{display:block;text-align:center;color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;margin:26px 0 8px;text-decoration:none}
+  .divider{border-top:1px solid var(--border);margin:22px 0 6px}
   .hidden{display:none}
   .approw{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;flex-wrap:wrap}
   .approw .an{flex:1;min-width:120px}.approw .an b{font-size:15px}.approw .an span{display:block;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
@@ -57,36 +51,45 @@
 <div class="topbar"><a href="index.html">← Startsidan</a></div>
 <div class="hero"><div class="bsun"></div>
   <h1>HÖSTSTEGEN</h1>
-  <div class="sub">Anmälan · spelomgångar</div>
+  <div class="sub">Anmälan · hela höstsäsongen</div>
 </div>
 
 <div class="wrap">
 
+  <!-- OM -->
+  <div class="card">
+    <h2>Om höststegen</h2>
+    <ul class="facts">
+      <li>Du anmäler dig <b>en gång</b> och är med hela hösten fram till årsskiftet.</li>
+      <li>Spel <b>varje söndag</b>.</li>
+      <li>Närvaro förväntas — kan du inte spela en söndag lämnar du <b>WO</b>.</li>
+    </ul>
+  </div>
+
   <!-- ANMÄL DIG -->
   <div class="card">
     <h2>Anmäl dig</h2>
-    <p class="hint">Har du en spelarprofil? Välj ditt namn och ange din PIN, så visas omgångarna där du kan anmäla dig.</p>
+    <p class="hint">Har du en spelarprofil? Välj ditt namn och ange din PIN.</p>
     <label for="nm">Ditt namn</label>
     <div class="grid2">
       <input id="nm" list="players" autocomplete="off" placeholder="Välj din profil">
       <input id="pin" type="password" inputmode="numeric" placeholder="PIN">
     </div>
     <datalist id="players"></datalist>
-    <button class="btn" id="loadBtn" onclick="loadMine()">Visa mina omgångar →</button>
-    <div class="status" id="loginStatus"></div>
-    <div id="myrounds" class="hidden" style="margin-top:16px"></div>
+    <div id="joinArea"></div>
+    <div class="status" id="joinStatus"></div>
   </div>
 
   <!-- ANMÄLDA -->
   <div class="card">
-    <h2>Anmälda per omgång</h2>
-    <div id="public"><div class="hint">Laddar…</div></div>
+    <h2>Anmälda <span class="count" id="rcount"></span></h2>
+    <div id="roster"><div class="hint">Laddar…</div></div>
   </div>
 
   <!-- NY SPELARE -->
   <div class="card">
     <h2>Ny spelare?</h2>
-    <p class="hint">Har du ingen profil än? Ansök här. En admin godkänner dig, sedan kan du logga in med ditt namn och anmäla dig till omgångarna.</p>
+    <p class="hint">Ingen profil än? Ansök här. En admin godkänner dig, sedan loggar du in med ditt namn och anmäler dig.</p>
     <label for="an-nm">Namn</label>
     <input id="an-nm" placeholder="För- och efternamn">
     <label for="an-ph">Mobil</label>
@@ -104,20 +107,12 @@
     <h2>Admin</h2>
     <label for="apw">Adminlösenord</label>
     <input id="apw" type="password" placeholder="lösenord" oninput="adminRender()">
-
     <div class="divider"></div>
-    <h2 style="font-size:18px">Ny omgång</h2>
-    <div class="grid2" style="grid-template-columns:1fr 150px">
-      <input id="r-label" placeholder="t.ex. Omgång 1">
-      <input id="r-date" type="date">
-    </div>
-    <button class="btn sm" style="margin-top:12px" onclick="addRound()">+ Lägg till omgång</button>
-    <div class="status" id="adminStatus"></div>
-    <div id="admin-rounds" style="margin-top:14px"></div>
-
+    <h2 style="font-size:18px">Anmälda</h2>
+    <div id="admin-roster"><div class="hint">Ange lösenord.</div></div>
     <div class="divider"></div>
     <h2 style="font-size:18px">Ansökningar</h2>
-    <div id="admin-apps"><div class="hint">Ange lösenord för att se ansökningar.</div></div>
+    <div id="admin-apps"><div class="hint">Ange lösenord.</div></div>
   </div>
 
 </div>
@@ -127,66 +122,59 @@
 <script>
 const COMP='HT2026';
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let PLAYERS=[], ROUNDS=[], SIGNS=[], me=null, busy=false;
+let PLAYERS=[], ROSTER=[], me=null, busy=false;
 
 async function loadAll(){
   try{
-    [PLAYERS, ROUNDS, SIGNS] = await Promise.all([ BTS.getPlayers(), BTS.hostRounds(), BTS.hostSignups() ]);
+    [PLAYERS, ROSTER] = await Promise.all([ BTS.getPlayers(), BTS.hostRoster() ]);
     document.getElementById('players').innerHTML =
       PLAYERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${esc(p.name)}">`).join('');
-    renderPublic();
-    if(me) renderMine();
+    renderRoster(); renderJoin();
   }catch(e){ /* tyst */ }
 }
-function fmtDate(d){ if(!d) return ''; try{ return new Date(d).toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}); }catch(e){ return d; } }
-
-function renderPublic(){
-  const el=document.getElementById('public');
-  if(!ROUNDS.length){ el.innerHTML='<div class="hint">Inga omgångar upplagda än.</div>'; return; }
-  el.innerHTML = ROUNDS.map(r=>{
-    const names = SIGNS.filter(s=>s.round_id===r.id).map(s=>s.name);
-    return `<div class="rnd"><div class="info">
-      <div class="nm">${esc(r.label)}</div>
-      <div class="meta">${r.play_date?fmtDate(r.play_date)+' · ':''}${r.signups} anmälda${r.is_open?'':' · <span class="closed">stängd</span>'}</div>
-      ${names.length?`<details><summary>Visa anmälda</summary><div class="names">${names.map(esc).join(', ')}</div></details>`:''}
-    </div></div>`;
-  }).join('');
+function renderRoster(){
+  document.getElementById('rcount').textContent = ROSTER.length?('· '+ROSTER.length+' st'):'';
+  const el=document.getElementById('roster');
+  el.innerHTML = ROSTER.length
+    ? '<div class="names">'+ROSTER.map(r=>`<span class="chip">${esc(r.name)}</span>`).join('')+'</div>'
+    : '<div class="hint">Ingen anmäld än — bli först!</div>';
 }
-
-async function loadMine(){
+function currentPlayer(){
   const name=(document.getElementById('nm').value||'').trim();
-  const pin=(document.getElementById('pin').value||'').trim();
-  const s=document.getElementById('loginStatus'); s.className='status';
-  const p = PLAYERS.find(x=>x.name.toLowerCase()===name.toLowerCase());
+  return PLAYERS.find(x=>x.name.toLowerCase()===name.toLowerCase())||null;
+}
+function isIn(id){ return ROSTER.some(r=>r.player_id===id); }
+function renderJoin(){
+  const area=document.getElementById('joinArea');
+  const p=currentPlayer();
+  if(p && isIn(p.id)){
+    area.innerHTML = `<div class="bigok">✅ Du är anmäld till höststegen, ${esc(p.name.split(' ')[0])}!</div>
+      <button class="btn leave" onclick="doLeave()">Avanmäl mig</button>`;
+  }else{
+    area.innerHTML = `<button class="btn" onclick="doJoin()">Anmäl mig →</button>`;
+  }
+}
+document.addEventListener('input', e=>{ if(e.target && e.target.id==='nm') renderJoin(); });
+
+async function doJoin(){
+  if(busy) return;
+  const p=currentPlayer(); const pin=(document.getElementById('pin').value||'').trim();
+  const s=document.getElementById('joinStatus'); s.className='status';
   if(!p){ s.textContent='Hittar ingen profil med det namnet. Är du ny? Ansök längre ner.'; s.className='status err'; return; }
-  me={ id:p.id, name:p.name, pin };
-  s.textContent=''; renderMine();
-  document.getElementById('myrounds').classList.remove('hidden');
+  busy=true; s.textContent='Anmäler…';
+  try{ await BTS.hostJoin(p.id, pin); await loadAll(); s.textContent=''; }
+  catch(e){ s.textContent = /PIN/i.test(e.message||'')?'Fel PIN — försök igen.':('Fel: '+(e.message||e)); s.className='status err'; }
+  busy=false;
 }
-function renderMine(){
-  const box=document.getElementById('myrounds');
-  if(!ROUNDS.length){ box.innerHTML='<div class="hint">Inga omgångar att anmäla sig till än.</div>'; return; }
-  const mine=new Set(SIGNS.filter(s=>s.player_id===me.id).map(s=>s.round_id));
-  box.innerHTML = `<div class="hint" style="margin-bottom:10px">Inloggad som <b style="color:var(--cream)">${esc(me.name)}</b> — tryck för att anmäla/avanmäla.</div>` +
-    ROUNDS.map(r=>{
-      const on=mine.has(r.id);
-      const canToggle = r.is_open || on;
-      return `<div class="rnd ${on?'signed':''}"><div class="info">
-        <div class="nm">${esc(r.label)}</div>
-        <div class="meta">${r.play_date?fmtDate(r.play_date)+' · ':''}${r.signups} anmälda${r.is_open?'':' · <span class="closed">stängd</span>'}</div>
-      </div>${canToggle
-        ? `<button class="toggle ${on?'on':'off'}" onclick="toggle(${r.id},${on?1:0})">${on?'Anmäld':'Anmäl'}</button>`
-        : `<span class="pill">stängd</span>`}</div>`;
-    }).join('');
-}
-async function toggle(roundId, isOn){
-  if(busy||!me) return; busy=true;
-  const s=document.getElementById('loginStatus'); s.className='status'; s.textContent='Sparar…';
-  try{
-    if(isOn) await BTS.hostUnsign(me.id, me.pin, roundId);
-    else     await BTS.hostSignup(me.id, me.pin, roundId);
-    await loadAll(); s.textContent='';
-  }catch(e){ s.textContent = /PIN/i.test(e.message||'')?'Fel PIN — försök igen.':('Fel: '+(e.message||e)); s.className='status err'; }
+async function doLeave(){
+  if(busy) return;
+  const p=currentPlayer(); const pin=(document.getElementById('pin').value||'').trim();
+  const s=document.getElementById('joinStatus'); s.className='status';
+  if(!p) return;
+  if(!confirm('Vill du avanmäla dig från höststegen?')) return;
+  busy=true; s.textContent='Avanmäler…';
+  try{ await BTS.hostLeave(p.id, pin); await loadAll(); s.textContent=''; }
+  catch(e){ s.textContent = /PIN/i.test(e.message||'')?'Fel PIN — försök igen.':('Fel: '+(e.message||e)); s.className='status err'; }
   busy=false;
 }
 
@@ -208,26 +196,12 @@ async function apply(){
 // ── ADMIN ──
 function toggleAdmin(e){ if(e)e.preventDefault(); document.getElementById('admin').classList.toggle('hidden'); }
 const apw=()=>document.getElementById('apw').value||'';
-async function addRound(){
-  const label=(document.getElementById('r-label').value||'').trim();
-  const date=document.getElementById('r-date').value||null;
-  const s=document.getElementById('adminStatus'); s.className='status';
-  if(!apw()){ s.textContent='Ange adminlösenord.'; s.className='status err'; return; }
-  if(!label){ s.textContent='Ange namn på omgången.'; s.className='status err'; return; }
-  try{ await BTS.hostAddRound(apw(), label, date, ROUNDS.length);
-    document.getElementById('r-label').value=''; document.getElementById('r-date').value='';
-    s.textContent='Omgång tillagd ✓'; s.className='status ok'; await loadAll(); adminRender();
-  }catch(e){ s.textContent='Fel: '+(e.message||e); s.className='status err'; }
-}
 async function adminRender(){
-  if(!apw()){ document.getElementById('admin-rounds').innerHTML=''; document.getElementById('admin-apps').innerHTML='<div class="hint">Ange lösenord för att se ansökningar.</div>'; return; }
-  // omgångar
-  document.getElementById('admin-rounds').innerHTML = ROUNDS.length
-    ? ROUNDS.map(r=>`<div class="approw"><div class="an"><b>${esc(r.label)}</b><span>${r.play_date?fmtDate(r.play_date)+' · ':''}${r.signups} anmälda</span></div>
-        <button class="btn sm ghost" onclick="setOpen(${r.id},${r.is_open?0:1})">${r.is_open?'Stäng':'Öppna'}</button>
-        <button class="btn sm ghost" onclick="delRound(${r.id})" style="color:var(--sun)">Ta bort</button></div>`).join('')
-    : '<div class="hint">Inga omgångar än.</div>';
-  // ansökningar
+  if(!apw()){ document.getElementById('admin-roster').innerHTML='<div class="hint">Ange lösenord.</div>'; document.getElementById('admin-apps').innerHTML='<div class="hint">Ange lösenord.</div>'; return; }
+  document.getElementById('admin-roster').innerHTML = ROSTER.length
+    ? ROSTER.map(r=>`<div class="approw"><div class="an"><b>${esc(r.name)}</b></div>
+        <button class="btn sm ghost" onclick="adminRemove(${r.player_id})" style="color:var(--sun)">Ta bort</button></div>`).join('')
+    : '<div class="hint">Ingen anmäld än.</div>';
   try{
     const apps = await BTS.adminListJoins(apw(), COMP);
     document.getElementById('admin-apps').innerHTML = apps.length
@@ -237,8 +211,7 @@ async function adminRender(){
       : '<div class="hint">Inga väntande ansökningar.</div>';
   }catch(e){ document.getElementById('admin-apps').innerHTML='<div class="status err">'+(e.message||e)+'</div>'; }
 }
-async function setOpen(id,open){ try{ await BTS.hostSetOpen(apw(),id,!!open); await loadAll(); adminRender(); }catch(e){ alert(e.message||e); } }
-async function delRound(id){ if(!confirm('Ta bort omgången och dess anmälningar?'))return; try{ await BTS.hostDelRound(apw(),id); await loadAll(); adminRender(); }catch(e){ alert(e.message||e); } }
+async function adminRemove(id){ if(!confirm('Ta bort spelaren från höststegen?'))return; try{ await BTS.hostAdminRemove(apw(),id); await loadAll(); adminRender(); }catch(e){ alert(e.message||e); } }
 async function approve(id){ try{ await BTS.hostApprove(apw(),id); await loadAll(); adminRender(); }catch(e){ alert(e.message||e); } }
 async function reject(id){ try{ await BTS.adminRejectJoin(apw(),id); adminRender(); }catch(e){ alert(e.message||e); } }
 

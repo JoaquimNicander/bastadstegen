@@ -497,43 +497,26 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_reject_join', { p_admin_pw: adminPw, p_request_id: requestId });
     if (error) throw error;
   },
-  // ── HÖSTSTEGE (anmälan till spelomgångar) ──
-  async hostRounds() {
+  // ── HÖSTSTEGE (en anmälan till hela höstsäsongen) ──
+  async hostRoster() {
     _assert();
-    const { data, error } = await _sb.rpc('bts_host_rounds');
+    const { data, error } = await _sb.rpc('bts_host_roster');
     if (error) throw error;
     return data || [];
   },
-  async hostSignups() {
+  async hostJoin(playerId, pin) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_host_signups');
-    if (error) throw error;
-    return data || [];
-  },
-  async hostSignup(playerId, pin, roundId) {
-    _assert();
-    const { error } = await _sb.rpc('bts_host_signup', { p_player_id: playerId, p_pin: pin || '', p_round_id: roundId });
+    const { error } = await _sb.rpc('bts_host_join', { p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
-  async hostUnsign(playerId, pin, roundId) {
+  async hostLeave(playerId, pin) {
     _assert();
-    const { error } = await _sb.rpc('bts_host_unsign', { p_player_id: playerId, p_pin: pin || '', p_round_id: roundId });
+    const { error } = await _sb.rpc('bts_host_leave', { p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
-  async hostAddRound(adminPw, label, date, sort) {
+  async hostAdminRemove(adminPw, playerId) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_host_add_round', { p_admin_pw: adminPw, p_label: label, p_date: date || null, p_sort: sort ?? 0 });
-    if (error) throw error;
-    return data;
-  },
-  async hostSetOpen(adminPw, roundId, open) {
-    _assert();
-    const { error } = await _sb.rpc('bts_host_set_open', { p_admin_pw: adminPw, p_round_id: roundId, p_open: open });
-    if (error) throw error;
-  },
-  async hostDelRound(adminPw, roundId) {
-    _assert();
-    const { error } = await _sb.rpc('bts_host_del_round', { p_admin_pw: adminPw, p_round_id: roundId });
+    const { error } = await _sb.rpc('bts_host_admin_remove', { p_admin_pw: adminPw, p_player_id: playerId });
     if (error) throw error;
   },
   async hostApprove(adminPw, requestId) {
