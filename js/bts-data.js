@@ -497,6 +497,51 @@ const BTS = {
     const { error } = await _sb.rpc('bts_admin_reject_join', { p_admin_pw: adminPw, p_request_id: requestId });
     if (error) throw error;
   },
+  // ── HÖSTSTEGE (anmälan till spelomgångar) ──
+  async hostRounds() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_rounds');
+    if (error) throw error;
+    return data || [];
+  },
+  async hostSignups() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_signups');
+    if (error) throw error;
+    return data || [];
+  },
+  async hostSignup(playerId, pin, roundId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_signup', { p_player_id: playerId, p_pin: pin || '', p_round_id: roundId });
+    if (error) throw error;
+  },
+  async hostUnsign(playerId, pin, roundId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_unsign', { p_player_id: playerId, p_pin: pin || '', p_round_id: roundId });
+    if (error) throw error;
+  },
+  async hostAddRound(adminPw, label, date, sort) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_add_round', { p_admin_pw: adminPw, p_label: label, p_date: date || null, p_sort: sort ?? 0 });
+    if (error) throw error;
+    return data;
+  },
+  async hostSetOpen(adminPw, roundId, open) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_set_open', { p_admin_pw: adminPw, p_round_id: roundId, p_open: open });
+    if (error) throw error;
+  },
+  async hostDelRound(adminPw, roundId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_del_round', { p_admin_pw: adminPw, p_round_id: roundId });
+    if (error) throw error;
+  },
+  async hostApprove(adminPw, requestId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_approve_join', { p_admin_pw: adminPw, p_request_id: requestId });
+    if (error) throw error;
+    return data;
+  },
 
   // Admin lägger till ny spelare (placeras sist i tävlingens stege)
   async adminAddPlayer(adminPw, { name, phone, email, competitionId }) {
