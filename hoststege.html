@@ -99,7 +99,8 @@
       <select id="nm"><option value="">Välj din profil…</option></select>
       <input id="pin" type="password" inputmode="numeric" placeholder="PIN">
     </div>
-    <div id="joinArea"></div>
+    <div id="joinOk"></div>
+    <button class="btn" id="joinBtn" onclick="doJoin()">Anmäl mig →</button>
     <div class="status" id="joinStatus"></div>
   </div>
 
@@ -170,13 +171,16 @@ function currentPlayer(){
 }
 function isIn(id){ return ROSTER.some(r=>r.player_id===id); }
 function renderJoin(){
-  const area=document.getElementById('joinArea');
   const p=currentPlayer();
+  const ok=document.getElementById('joinOk');
+  const btn=document.getElementById('joinBtn');
+  if(!btn) return;
   if(p && isIn(p.id)){
-    area.innerHTML = `<div class="bigok">✅ Du är anmäld till höststegen, ${esc(p.name.split(' ')[0])}!</div>
-      <button class="btn leave" onclick="doLeave()">Avanmäl mig</button>`;
+    ok.innerHTML = `<div class="bigok">✅ Du är anmäld till höststegen, ${esc(p.name.split(' ')[0])}!</div>`;
+    btn.textContent='Avanmäl mig'; btn.className='btn leave'; btn.onclick=doLeave;
   }else{
-    area.innerHTML = `<button class="btn" onclick="doJoin()">Anmäl mig →</button>`;
+    ok.innerHTML='';
+    btn.textContent='Anmäl mig →'; btn.className='btn'; btn.onclick=doJoin;
   }
 }
 document.addEventListener('change', e=>{ if(e.target && e.target.id==='nm') renderJoin(); });
