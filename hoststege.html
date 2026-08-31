@@ -96,10 +96,9 @@
     <p class="hint">Har du en spelarprofil? Välj ditt namn och ange din PIN.</p>
     <label for="nm">Ditt namn</label>
     <div class="grid2">
-      <input id="nm" list="players" autocomplete="off" placeholder="Välj din profil">
+      <select id="nm"><option value="">Välj din profil…</option></select>
       <input id="pin" type="password" inputmode="numeric" placeholder="PIN">
     </div>
-    <datalist id="players"></datalist>
     <div id="joinArea"></div>
     <div class="status" id="joinStatus"></div>
   </div>
@@ -151,8 +150,10 @@ let PLAYERS=[], ROSTER=[], me=null, busy=false;
 async function loadAll(){
   try{
     [PLAYERS, ROSTER] = await Promise.all([ BTS.getPlayers(), BTS.hostRoster() ]);
-    document.getElementById('players').innerHTML =
-      PLAYERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${esc(p.name)}">`).join('');
+    const sel=document.getElementById('nm'); const cur=sel.value;
+    sel.innerHTML = '<option value="">Välj din profil…</option>' +
+      PLAYERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+    sel.value=cur;
     renderRoster(); renderJoin();
   }catch(e){ /* tyst */ }
 }
@@ -178,7 +179,7 @@ function renderJoin(){
     area.innerHTML = `<button class="btn" onclick="doJoin()">Anmäl mig →</button>`;
   }
 }
-document.addEventListener('input', e=>{ if(e.target && e.target.id==='nm') renderJoin(); });
+document.addEventListener('change', e=>{ if(e.target && e.target.id==='nm') renderJoin(); });
 
 async function doJoin(){
   if(busy) return;
