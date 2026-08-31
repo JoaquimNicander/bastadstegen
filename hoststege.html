@@ -61,16 +61,7 @@
 </head>
 <body>
 <div class="banner">
-  <video class="bvid" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="mail-host-banner.png" disablepictureinpicture>
-    <source src="host-banner.mp4" type="video/mp4">
-  </video>
-  <script>
-    (function(){var v=document.querySelector('.bvid');if(!v)return;v.muted=true;v.setAttribute('muted','');
-      var go=function(){var p=v.play();if(p&&p.catch)p.catch(function(){});};go();
-      ['touchstart','click','scroll'].forEach(function(ev){document.addEventListener(ev,go,{once:true,passive:true});});
-      document.addEventListener('visibilitychange',function(){if(!document.hidden)go();});
-      v.addEventListener('canplay',go);})();
-  </script>
+  <img class="bvid" src="host-banner.webp" alt="Höstbana" fetchpriority="high">
   <a class="backlink" href="index.html">← Startsidan</a>
   <div class="scrim"></div>
   <div class="bstack">
