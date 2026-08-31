@@ -257,29 +257,40 @@
 </header>
 
 <!-- HÖST -->
-<section class="sommar sec-pad" id="host">
-  <div class="wrap sommar-in">
-    <div class="reveal">
-      <div class="badge-new"><span style="width:7px;height:7px;border-radius:50%;background:var(--o2);display:inline-block"></span>Anmälan öppen · start 6 sep</div>
+<style>
+  .hostfilm-sec{position:relative;overflow:hidden;min-height:580px;display:flex;align-items:center;isolation:isolate}
+  .hostfilm-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+  .hostfilm-shade{position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(90deg,rgba(9,32,21,.92) 0%,rgba(9,32,21,.74) 32%,rgba(9,32,21,.3) 60%,rgba(9,32,21,.06) 100%)}
+  .hostfilm-in{padding:78px 0}
+  .hostfilm-in .col{max-width:560px}
+  .hostfilm-badge{display:inline-flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:12px;
+    letter-spacing:1.6px;text-transform:uppercase;color:#FFD9A8;font-weight:700;
+    background:rgba(0,0,0,.34);border:1px solid rgba(255,210,150,.4);padding:8px 14px;border-radius:100px}
+  .hostfilm-badge .dot{width:7px;height:7px;border-radius:50%;background:#F4861E;box-shadow:0 0 0 4px rgba(244,134,30,.28)}
+  .hostfilm-sec h2{font-weight:800;font-size:clamp(34px,4.8vw,56px);letter-spacing:-1.6px;line-height:1.03;
+    margin:20px 0 0;color:#fff;text-shadow:0 2px 26px rgba(0,0,0,.55)}
+  .hostfilm-sec p{font-weight:300;font-size:18px;line-height:1.66;color:rgba(255,255,255,.92);
+    margin:16px 0 30px;max-width:500px;text-shadow:0 1px 14px rgba(0,0,0,.45)}
+  .hostfilm-cta{display:flex;gap:12px;flex-wrap:wrap}
+  @media(max-width:760px){
+    .hostfilm-shade{background:linear-gradient(180deg,rgba(9,32,21,.5) 0%,rgba(9,32,21,.86) 100%)}
+    .hostfilm-in{padding:56px 0}
+    .hostfilm-cta .btn{flex:1 1 220px;text-align:center;box-sizing:border-box}
+  }
+</style>
+<section class="hostfilm-sec" id="host">
+  <img class="hostfilm-bg" src="host-banner.webp" alt="Höstbana med fallande löv" fetchpriority="high">
+  <div class="hostfilm-shade"></div>
+  <div class="wrap hostfilm-in">
+    <div class="col reveal">
+      <div class="hostfilm-badge"><span class="dot"></span>Anmälan öppen · start 6 sep</div>
       <h2>Höststegen 2026</h2>
       <p>Nu drar höstsäsongen igång! Höststegen spelas som poolspel på söndagar — du anmäler dig en gång och spelar hela hösten. Möt nya motståndare, klättra i grupperna och håll tennisen igång in på vintern.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
-        <a href="hoststege.html" class="btn btn-primary" style="flex:1 1 220px;text-align:center;box-sizing:border-box">Anmäl dig till höststegen →</a>
-        <a href="stegen.html" class="btn btn-navy" style="flex:1 1 220px;text-align:center;box-sizing:border-box">Se aktuell stege →</a>
+      <div class="hostfilm-cta">
+        <a href="hoststege.html" class="btn btn-primary">Anmäl dig till höststegen →</a>
+        <a href="stegen.html" class="btn btn-cream">Se aktuell stege →</a>
       </div>
-    </div>
-    <div class="sommar-card reveal">
-      <div class="rays"></div>
-      <div class="vig"></div>
-      <div class="suns"></div>
-      <div class="court-plane">
-        <div class="pline base"></div>
-        <div class="pline side"></div>
-      </div>
-      <div class="sommar-burst"><span class="s1">★ Nyhet ★</span><span class="s2">AUTUMN<br>EDITION</span><span class="s3">SÄSONG 2026</span></div>
-      <div class="sommar-logo"><span class="line" style="color:var(--navy)">BÅSTAD</span><span class="line" style="color:#fff">STEGEN</span></div>
-      <div class="frame"></div>
-      <div class="tex-grain"></div>
     </div>
   </div>
 </section>
