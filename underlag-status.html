@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avstämning betalningar · Sommarstegen 2026</title>
+<style>
+  :root{ --green:#0D2E20; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62; --gold:#F4B740;
+    --line:#e7dfd2; --ok:#1c7a3f; --okbg:#e7f6ec; --okln:#bfe6cc; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0ea;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);padding:22px 14px}
+  .wrap{max-width:720px;margin:0 auto}
+  .card{background:var(--cream);border:1px solid #e4ddd0;border-radius:18px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.10)}
+  .head{background:var(--green);color:#fff;padding:26px 26px 22px;position:relative;overflow:hidden}
+  .head .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .head h1{margin:6px 0 0;font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .head .ball{position:absolute;right:22px;top:22px;width:42px;height:42px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#eaff70,#c7e600);box-shadow:0 0 22px rgba(199,230,0,.45)}
+  .body{padding:20px 24px 26px}
+  .kpis{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .kpi .n{font-size:20px;font-weight:800} .kpi .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .kpi.ok .n{color:var(--ok)} .kpi.out .n{color:#b9440a}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{border-bottom:1px solid var(--line);padding:10px 13px;text-align:left}
+  th{background:var(--green);color:#fff;font-size:12px;letter-spacing:.4px}
+  td.r,th.r{text-align:right}
+  tr.done td{background:#f4faf5}
+  tfoot td{font-weight:800;background:#fbf8f2;border-top:2px solid #dcd3c4}
+  .chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;white-space:nowrap;display:inline-block}
+  .chip.paid{background:var(--okbg);color:var(--ok);border:1px solid var(--okln)}
+  .chip.self{background:#fff;color:var(--ok);border:1px solid var(--okln)}
+  .chip.wait{background:#f1efe9;color:#8a8577;border:1px solid #e4ddd0}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
+  .meta{color:var(--muted);font-size:12px}
+  .print{background:var(--green);color:#fff;border:0;border-radius:9px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}
+  .foot{background:var(--green);color:#cbd8ce;padding:14px 24px;font-size:12px;text-align:center}
+  .state{text-align:center;color:var(--muted);padding:30px}
+
+  @media print{
+    @page{ size:A4 portrait; margin:14mm; }
+    body{background:#fff;padding:0;color:#000}
+    .wrap{max-width:none}
+    .card{border:0;border-radius:0;box-shadow:none}
+    .head{background:#fff;color:#000;padding:0 0 10px;border-bottom:2px solid #0D2E20}
+    .head .kick{color:#0D2E20} .head .ball{display:none}
+    .body{padding:14px 0 0}
+    .print{display:none}
+    .kpi{background:#fff;border:1px solid #999}
+    th{background:#0D2E20 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    tr.done td{background:#fff}
+    .chip{border:1px solid #666 !important;color:#000 !important;background:#fff !important}
+    .foot{background:#fff;color:#666;padding-top:14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="head">
+      <div class="ball"></div>
+      <div class="kick">Avstämning betalningar</div>
+      <h1>Sommarstegen 2026</h1>
+    </div>
+    <div class="body" id="body"><div class="state">Laddar…</div></div>
+    <div class="foot">Båstad Tennissällskap · Sommarstegen 2026</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const kr=n=>Number(n||0).toLocaleString('sv-SE');
+const today=()=> new Date().toLocaleDateString('sv-SE');
+
+(async function(){
+  const el=document.getElementById('body');
+  try{
+    const rows=await BTS.underlagBoard();
+    const total=rows.length;
+    const done=rows.filter(r=>r.paid||r.marked_paid).length;
+    const sum=rows.reduce((a,r)=>a+Number(r.belopp||0),0);
+    const paidSum=rows.filter(r=>r.paid||r.marked_paid).reduce((a,r)=>a+Number(r.belopp||0),0);
+    const outSum=sum-paidSum;
+    const statusChip=r=> r.paid?'<span class="chip paid">✓ Betald</span>'
+      : r.marked_paid?'<span class="chip self">✓ Anmält</span>'
+      : '<span class="chip wait">Väntar</span>';
+    const body=rows.map(r=>`<tr class="${(r.paid||r.marked_paid)?'done':''}">
+        <td>${esc(r.name)}</td>
+        <td class="r">${r.tillfallen}</td>
+        <td class="r">${kr(r.belopp)} kr</td>
+        <td>${statusChip(r)}</td></tr>`).join('');
+    el.innerHTML=`
+      <div class="toolbar">
+        <div class="meta">Utskriven ${today()} · ${total} deltagare</div>
+        <button class="print" onclick="window.print()">Skriv ut / spara PDF</button>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="n">${kr(sum)} kr</div><div class="l">Totalt</div></div>
+        <div class="kpi ok"><div class="n">${kr(paidSum)} kr</div><div class="l">Betalt (${done}/${total})</div></div>
+        <div class="kpi out"><div class="n">${kr(outSum)} kr</div><div class="l">Utestående</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Namn</th><th class="r">Tillf.</th><th class="r">Belopp</th><th>Status</th></tr></thead>
+        <tbody>${body}</tbody>
+        <tfoot><tr><td>Summa</td><td class="r">${rows.reduce((a,r)=>a+Number(r.tillfallen||0),0)}</td><td class="r">${kr(sum)} kr</td><td></td></tr></tfoot>
+      </table>`;
+  }catch(e){ el.innerHTML='<div class="state">Kunde inte ladda avstämningen just nu. Försök igen om en stund.</div>'; }
+})();
+</script>
+</body>
+</html>

@@ -523,6 +523,13 @@ const BTS = {
     if (error) throw error;
     return data === true;
   },
+  // Publik statustavla (bara namn + betald-status)
+  async underlagBoard() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_underlag_board');
+    if (error) throw error;
+    return data || [];
+  },
   // Admin: hela listan med betalstatus
   async underlagAdmin(adminPw) {
     _assert();
