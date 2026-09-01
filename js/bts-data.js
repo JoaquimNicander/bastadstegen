@@ -516,6 +516,26 @@ const BTS = {
     if (error) throw error;
     return (data && data[0]) || null;
   },
+  // Spelaren markerar själv "jag har betalat"
+  async underlagMarkPaid(token) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_underlag_mark_paid', { p_token: token });
+    if (error) throw error;
+    return data === true;
+  },
+  // Admin: hela listan med betalstatus
+  async underlagAdmin(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_underlag_admin', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data || [];
+  },
+  // Admin: bocka av bekräftad betalning
+  async underlagSetPaid(adminPw, token, paid) {
+    _assert();
+    const { error } = await _sb.rpc('bts_underlag_set_paid', { p_admin_pw: adminPw, p_token: token, p_paid: paid });
+    if (error) throw error;
+  },
   // Ny spelare: skapa profil + hamna direkt bland höststegens anmälda (utan godkännande)
   async hostSignup(name, phone, email, pin) {
     _assert();

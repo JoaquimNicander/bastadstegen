@@ -34,6 +34,12 @@
   .pay .ref b{background:#FDEBD8;color:#b9440a;padding:2px 9px;border-radius:6px}
   .paidbadge{display:none;text-align:center;background:#e7f6ec;color:#1c7a3f;border:1px solid #bfe6cc;
     border-radius:10px;padding:10px;font-weight:700;margin:0 0 16px}
+  .paybtn{display:block;width:100%;background:#0D2E20;color:#fff;border:0;border-radius:12px;padding:15px;
+    font-size:15px;font-weight:800;cursor:pointer;margin:2px 0 4px;font-family:inherit}
+  .paybtn:active{transform:translateY(1px)} .paybtn:disabled{opacity:.6;cursor:default}
+  .paiddone{background:#e7f6ec;color:#1c7a3f;border:1px solid #bfe6cc;border-radius:12px;padding:14px;
+    text-align:center;font-weight:700;margin:2px 0 4px}
+  .paidsub{color:#5d6b62;font-size:12.5px;text-align:center;margin:2px 0 2px}
   .foot{background:var(--green);color:#cbd8ce;padding:16px 26px;font-size:12px;text-align:center}
   .state{max-width:520px;margin:40px auto;text-align:center;color:#556}
   @media(max-width:520px){ .head h1{font-size:20px} .pay .swish{font-size:23px} }
@@ -73,11 +79,36 @@ function render(u){
         <div class="swish">123 264 8400</div>
         <div class="ref">Ange meddelande: <b>Sommarstegen</b></div>
       </div>
-      <p class="lead" style="font-size:13px">Belopp: <b>${u.belopp} kr</b>. Har du redan betalat eller har en fråga? Svara på sms:et/mejlet så hör vi av oss.</p>
+      <div id="paidbox"></div>
+      <p class="lead" style="font-size:13px">Har du en fråga? Svara på sms:et/mejlet så hör vi av oss.</p>
     </div>
     <div class="foot">Båstad Tennissällskap · Sommarstegen 2026</div>
   </div>`;
   if(u.paid){ document.getElementById('paid').style.display='block'; }
+  window.__u=u; renderPaid();
+}
+
+function renderPaid(){
+  const u=window.__u||{}; const box=document.getElementById('paidbox'); if(!box) return;
+  if(u.marked_paid){
+    box.innerHTML = `<div class="paiddone">✓ Tack! Vi har noterat att du betalat.</div>`;
+  } else {
+    box.innerHTML = `<button class="paybtn" id="paybtn" onclick="markPaid()">Jag har betalat →</button>
+      <div class="paidsub">Tryck när du swishat, så vet vi att det är på väg.</div>`;
+  }
+}
+async function markPaid(){
+  const btn=document.getElementById('paybtn'); if(btn){ btn.disabled=true; btn.textContent='Sparar…'; }
+  try{
+    await BTS.underlagMarkPaid(token());
+    if(window.__u) window.__u.marked_paid=true;
+    renderPaid();
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Jag har betalat →'; }
+    const box=document.getElementById('paidbox');
+    if(box){ const s=document.createElement('div'); s.className='paidsub'; s.style.color='#c0392b';
+      s.textContent='Kunde inte spara just nu — försök igen.'; box.appendChild(s); }
+  }
 }
 
 (async function(){
