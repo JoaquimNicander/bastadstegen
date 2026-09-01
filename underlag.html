@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Ditt betalningsunderlag · Sommarstegen 2026</title>
+<style>
+  :root{ --green:#0D2E20; --green2:#123c2a; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62;
+    --orange:#E8520A; --line:#e7dfd2; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0ea;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);
+    padding:22px 14px;line-height:1.5}
+  .card{max-width:520px;margin:0 auto;background:var(--cream);border-radius:18px;overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.14);border:1px solid #e4ddd0}
+  .head{background:var(--green);color:#fff;padding:26px 26px 22px;position:relative}
+  .head .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#F4B740;font-weight:700}
+  .head h1{margin:6px 0 0;font-size:23px;font-weight:800;letter-spacing:-.4px}
+  .head .ball{position:absolute;right:22px;top:22px;width:44px;height:44px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#eaff70,#c7e600);box-shadow:0 0 22px rgba(199,230,0,.5)}
+  .body{padding:24px 26px 8px}
+  .hi{font-size:17px;font-weight:700;margin:0 0 4px}
+  .lead{color:var(--muted);margin:0 0 18px;font-size:14.5px}
+  .spec{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 18px}
+  .spec .r{display:flex;justify-content:space-between;padding:11px 15px;font-size:14px;border-top:1px solid var(--line)}
+  .spec .r:first-child{border-top:0}
+  .spec .r .d{color:var(--muted)}
+  .spec .r.big{background:#fff;font-weight:800;font-size:16px}
+  .spec .r.big .v{color:var(--orange)}
+  .pay{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 16px;text-align:center}
+  .pay .lbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .pay .swish{font-size:26px;font-weight:800;letter-spacing:.5px;margin:4px 0 2px}
+  .pay .ref{font-size:14px;margin-top:8px}
+  .pay .ref b{background:#FDEBD8;color:#b9440a;padding:2px 9px;border-radius:6px}
+  .paidbadge{display:none;text-align:center;background:#e7f6ec;color:#1c7a3f;border:1px solid #bfe6cc;
+    border-radius:10px;padding:10px;font-weight:700;margin:0 0 16px}
+  .foot{background:var(--green);color:#cbd8ce;padding:16px 26px;font-size:12px;text-align:center}
+  .state{max-width:520px;margin:40px auto;text-align:center;color:#556}
+  @media(max-width:520px){ .head h1{font-size:20px} .pay .swish{font-size:23px} }
+</style>
+</head>
+<body>
+  <div id="app" class="state">Laddar ditt underlag…</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function token(){ return new URLSearchParams(location.search).get('t')||''; }
+
+function render(u){
+  const first=(u.name||'').split(' ')[0];
+  const dates=(u.dates||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const rows=dates.map(d=>`<div class="r"><span class="d">${esc(d)}</span><span>${u.price} kr</span></div>`).join('');
+  document.getElementById('app').className='';
+  document.getElementById('app').innerHTML = `
+  <div class="card">
+    <div class="head">
+      <div class="ball"></div>
+      <div class="kick">Betalningsunderlag</div>
+      <h1>Sommarstegen 2026</h1>
+    </div>
+    <div class="body">
+      <p class="hi">Hej ${esc(first)}!</p>
+      <p class="lead">Tack för en grym sommar på banorna. Här är ditt underlag — ${u.tillfallen} speltillfällen à ${u.price} kr.</p>
+      <div class="paidbadge" id="paid">✓ Registrerad som betald — tack!</div>
+      <div class="spec">
+        ${rows}
+        <div class="r big"><span>Att betala</span><span class="v">${u.belopp} kr</span></div>
+      </div>
+      <div class="pay">
+        <div class="lbl">Betala enkelt med Swish</div>
+        <div class="swish">123 264 8400</div>
+        <div class="ref">Ange meddelande: <b>Sommarstegen</b></div>
+      </div>
+      <p class="lead" style="font-size:13px">Belopp: <b>${u.belopp} kr</b>. Har du redan betalat eller har en fråga? Svara på sms:et/mejlet så hör vi av oss.</p>
+    </div>
+    <div class="foot">Båstad Tennissällskap · Sommarstegen 2026</div>
+  </div>`;
+  if(u.paid){ document.getElementById('paid').style.display='block'; }
+}
+
+(async function(){
+  const t=token();
+  const app=document.getElementById('app');
+  if(!t){ app.textContent='Länken saknar kod. Öppna länken från ditt sms/mejl igen.'; return; }
+  try{
+    const u=await BTS.underlagGet(t);
+    if(!u){ app.textContent='Hittar inget underlag för den här länken. Hör av dig så hjälper vi dig.'; return; }
+    render(u);
+  }catch(e){ app.textContent='Kunde inte ladda underlaget just nu. Försök igen om en stund.'; }
+})();
+</script>
+</body>
+</html>

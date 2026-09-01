@@ -509,6 +509,13 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_join', { p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
+  // Personligt betalningsunderlag (Sommarstegen) via token
+  async underlagGet(token) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_underlag_get', { p_token: token });
+    if (error) throw error;
+    return (data && data[0]) || null;
+  },
   // Ny spelare: skapa profil + hamna direkt bland höststegens anmälda (utan godkännande)
   async hostSignup(name, phone, email, pin) {
     _assert();
