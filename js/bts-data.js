@@ -530,17 +530,17 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
-  // Admin: hela listan med betalstatus
-  async underlagAdmin(adminPw) {
+  // Kontoret: hela listan med betalstatus (öppen länk med hemlig nyckel)
+  async underlagOffice(key) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_underlag_admin', { p_admin_pw: adminPw });
+    const { data, error } = await _sb.rpc('bts_underlag_office', { p_key: key });
     if (error) throw error;
     return data || [];
   },
-  // Admin: bocka av bekräftad betalning
-  async underlagSetPaid(adminPw, token, paid) {
+  // Kontoret: bocka av bekräftad betalning
+  async underlagOfficeSetPaid(key, token, paid) {
     _assert();
-    const { error } = await _sb.rpc('bts_underlag_set_paid', { p_admin_pw: adminPw, p_token: token, p_paid: paid });
+    const { error } = await _sb.rpc('bts_underlag_office_set_paid', { p_key: key, p_token: token, p_paid: paid });
     if (error) throw error;
   },
   // Ny spelare: skapa profil + hamna direkt bland höststegens anmälda (utan godkännande)
