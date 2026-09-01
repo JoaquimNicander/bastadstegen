@@ -509,6 +509,15 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_join', { p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
+  // Ny spelare: skapa profil + hamna direkt bland höststegens anmälda (utan godkännande)
+  async hostSignup(name, phone, email, pin) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_signup', {
+      p_name: name, p_phone: phone, p_email: email, p_pin: pin || null,
+    });
+    if (error) throw error;
+    return data;
+  },
   async hostLeave(playerId, pin) {
     _assert();
     const { error } = await _sb.rpc('bts_host_leave', { p_player_id: playerId, p_pin: pin || '' });

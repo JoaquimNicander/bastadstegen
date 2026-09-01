@@ -113,14 +113,16 @@
   <!-- NY SPELARE -->
   <div class="card">
     <h2>Ny spelare?</h2>
-    <p class="hint">Ingen profil än? Ansök här. En admin godkänner dig, sedan loggar du in med ditt namn och anmäler dig.</p>
+    <p class="hint">Ingen profil än? Skapa din profil här — du blir <b>direkt anmäld</b> till höststegen, ingen väntan på godkännande.</p>
     <label for="an-nm">Namn</label>
     <input id="an-nm" placeholder="För- och efternamn">
     <label for="an-ph">Mobil</label>
-    <input id="an-ph" type="tel" placeholder="07XXXXXXXX">
-    <label for="an-em">Mejl (valfritt)</label>
-    <input id="an-em" type="email" placeholder="din@mejl.se">
-    <button class="btn ghost" id="applyBtn" onclick="apply()">Ansök om att vara med →</button>
+    <input id="an-ph" type="tel" inputmode="tel" placeholder="07XXXXXXXX">
+    <label for="an-em">Mejl</label>
+    <input id="an-em" type="email" inputmode="email" placeholder="din@mejl.se">
+    <label for="an-pin">PIN (valfritt — för att av/anmäla dig senare)</label>
+    <input id="an-pin" type="password" inputmode="numeric" placeholder="valfri PIN">
+    <button class="btn ghost" id="applyBtn" onclick="apply()">Skapa profil &amp; anmäl mig →</button>
     <div class="status" id="applyStatus"></div>
   </div>
 
@@ -208,18 +210,24 @@ async function doLeave(){
 }
 
 async function apply(){
+  if(busy) return;
   const name=(document.getElementById('an-nm').value||'').trim();
   const phone=(document.getElementById('an-ph').value||'').trim();
   const email=(document.getElementById('an-em').value||'').trim();
+  const pin=(document.getElementById('an-pin').value||'').trim();
   const s=document.getElementById('applyStatus'); s.className='status';
   if(!name){ s.textContent='Skriv ditt namn.'; s.className='status err'; return; }
-  document.getElementById('applyBtn').disabled=true; s.textContent='Skickar…';
+  if(!phone){ s.textContent='Ange ditt mobilnummer.'; s.className='status err'; return; }
+  if(!email || email.indexOf('@')<0){ s.textContent='Ange en giltig mejladress.'; s.className='status err'; return; }
+  busy=true; document.getElementById('applyBtn').disabled=true; s.textContent='Skapar profil…';
   try{
-    await BTS.requestJoin(COMP, name, phone, email);
-    s.textContent='Tack! Din ansökan är inskickad — en admin godkänner dig snart. ✓'; s.className='status ok';
-    document.getElementById('an-nm').value=document.getElementById('an-ph').value=document.getElementById('an-em').value='';
+    await BTS.hostSignup(name, phone, email, pin);
+    await loadAll();
+    const sel=document.getElementById('nm'); if(sel){ sel.value=name; renderJoin(); }
+    s.textContent='Klart! Din profil är skapad och du är anmäld till höststegen. ✓'; s.className='status ok';
+    document.getElementById('an-nm').value=document.getElementById('an-ph').value=document.getElementById('an-em').value=document.getElementById('an-pin').value='';
   }catch(e){ s.textContent='Fel: '+(e.message||e); s.className='status err'; }
-  document.getElementById('applyBtn').disabled=false;
+  busy=false; document.getElementById('applyBtn').disabled=false;
 }
 
 // ── ADMIN ──
