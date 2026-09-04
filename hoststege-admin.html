@@ -49,7 +49,7 @@
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[];
+let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[];
 
 async function start(){
   const pw=(document.getElementById('pw').value||'').trim();
@@ -65,7 +65,7 @@ async function start(){
 
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
-  [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
+  [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   render();
 }
 
@@ -86,6 +86,8 @@ function movesFor(div){
 
 function render(){
   const app=document.getElementById('app');
+  const inSet=new Set(ST.map(r=>r.player_id));
+  const inRound=PLAYERS.filter(p=>inSet.has(p.id));
   const done=MATCHES.filter(m=>m.status==='done').length, tot=MATCHES.length;
   const perDiv=d=>{ const ms=MATCHES.filter(m=>m.division===d); const dd=ms.filter(m=>m.status==='done').length; return `${dd}/${ms.length}`; };
   const mv=d=>{ const m=movesFor(d); if(!m.length) return '<div class="state">Inga matcher spelade ännu.</div>';
@@ -113,7 +115,32 @@ function render(){
       <div style="height:12px"></div>
       <button class="btn go" onclick="advance()">Starta omgång ${ROUND+1} →</button>
       <div class="state" id="advs"></div>
+    </div>
+
+    <div class="card">
+      <h3>Lägg till spelare (börjar längst ner)</h3>
+      <div class="state">Lägger spelaren i bottengruppen i vald stege för aktuell omgång och skapar deras matcher.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <select id="lateDiv" style="flex:0 0 110px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          <option value="H">Herr</option><option value="D">Dam</option>
+        </select>
+        <select id="latePlayer" style="flex:1 1 200px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          ${inRound.length===PLAYERS.length ? '<option value="">(alla spelare är redan med)</option>' :
+            '<option value="">Välj spelare…</option>'+PLAYERS.filter(p=>!inSet.has(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+        </select>
+        <button class="btn" onclick="addLate()">Lägg till</button>
+      </div>
+      <div class="state" id="lates"></div>
     </div>`;
+}
+
+async function addLate(){
+  const pid=parseInt(document.getElementById('latePlayer').value), div=document.getElementById('lateDiv').value;
+  const s=document.getElementById('lates');
+  if(!pid){ s.textContent='Välj en spelare.'; return; }
+  s.textContent='Lägger till…';
+  try{ await BTS.hostPoolAddLate(PW,pid,div); s.textContent='Tillagd i bottengruppen ✓'; await load(); }
+  catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 
 async function advance(){

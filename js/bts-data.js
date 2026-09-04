@@ -582,6 +582,11 @@ const BTS = {
     if (error) throw error;
     return data;
   },
+  async hostPoolAddLate(adminPw, playerId, division) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_pool_add_late', { p_admin_pw: adminPw, p_player_id: playerId, p_div: division });
+    if (error) throw error;
+  },
 
   async hostLeave(playerId, pin) {
     _assert();

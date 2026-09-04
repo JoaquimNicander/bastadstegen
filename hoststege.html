@@ -90,18 +90,11 @@
     <p class="p">Du behöver spela din match <b>innan gruppens alla matcher är färdigspelade</b> — alltså innan upp- och nedflyttningen sker. Hittar ni ingen gemensam tid till dess lämnar man <b>WO</b>. Ni får gärna spela matchen en annan tid i stället — men den banhyran ingår inte i avgiften, utan den som inte kunde spela på söndagens tid står för den extra bankostnaden (det är söndagstiden avgiften täcker).</p>
   </div>
 
-  <!-- ANMÄL DIG -->
+  <!-- ANMÄLAN STÄNGD -->
   <div class="card">
-    <h2>Anmäl dig</h2>
-    <p class="hint">Har du en spelarprofil? Välj ditt namn och ange din PIN.</p>
-    <label for="nm">Ditt namn</label>
-    <div class="grid2">
-      <select id="nm"><option value="">Välj din profil…</option></select>
-      <input id="pin" type="password" inputmode="numeric" placeholder="PIN">
-    </div>
-    <div id="joinOk"></div>
-    <button class="btn" id="joinBtn" onclick="doJoin()">Anmäl mig →</button>
-    <div class="status" id="joinStatus"></div>
+    <h2>Anmälan är stängd</h2>
+    <p class="hint">Höststegen är igång och grupperna är satta. Vill du vara med? Hör av dig till klubben — du kommer in <b>efter nästa spelade omgång</b> och startar då längst ner i din stege.</p>
+    <a class="btn" href="hoststege-spel.html">Se grupper & tabeller →</a>
   </div>
 
   <!-- ANMÄLDA -->
@@ -110,21 +103,6 @@
     <div id="roster"><div class="hint">Laddar…</div></div>
   </div>
 
-  <!-- NY SPELARE -->
-  <div class="card">
-    <h2>Ny spelare?</h2>
-    <p class="hint">Ingen profil än? Skapa din profil här — du blir <b>direkt anmäld</b> till höststegen, ingen väntan på godkännande.</p>
-    <label for="an-nm">Namn</label>
-    <input id="an-nm" placeholder="För- och efternamn">
-    <label for="an-ph">Mobil</label>
-    <input id="an-ph" type="tel" inputmode="tel" placeholder="07XXXXXXXX">
-    <label for="an-em">Mejl</label>
-    <input id="an-em" type="email" inputmode="email" placeholder="din@mejl.se">
-    <label for="an-pin">PIN (valfritt — för att av/anmäla dig senare)</label>
-    <input id="an-pin" type="password" inputmode="numeric" placeholder="valfri PIN">
-    <button class="btn ghost" id="applyBtn" onclick="apply()">Skapa profil &amp; anmäl mig →</button>
-    <div class="status" id="applyStatus"></div>
-  </div>
 
   <a class="admin-link" href="#admin" onclick="toggleAdmin(event)">⚙ Admin</a>
 
