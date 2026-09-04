@@ -31,23 +31,32 @@
   tr.up .pos{color:var(--up)} tr.down .pos{color:var(--down)}
   .zone{font-size:10px;font-weight:800;padding:2px 7px;border-radius:100px;margin-left:6px}
   .zone.up{background:var(--up);color:#fff} .zone.down{background:var(--down);color:#fff}
-  .matches{padding:10px 14px 4px;border-top:1px solid var(--line);background:#fdfbf7}
-  .mtitle{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:2px 0 8px;font-weight:700}
-  .m{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed #ece4d6;font-size:13.5px}
-  .m:first-of-type{border-top:0}
-  .m .nm{flex:1;min-width:0}
-  .m .nm.win{font-weight:800}
-  .m input{width:38px;text-align:center;font:inherit;font-size:14px;padding:5px;border:1px solid var(--line);border-radius:7px}
-  .m .sv{background:var(--green);color:#fff;border:0;border-radius:7px;padding:6px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
-  .m .done{color:var(--up);font-size:12px;font-weight:700;white-space:nowrap}
-  .mrow{border-top:1px dashed #ece4d6;padding:7px 0}
-  .mrow:first-of-type{border-top:0}
-  .mrow .m{border-top:0;padding:2px 0}
-  .mmeta{font-size:11.5px;color:var(--muted);margin:3px 2px 0}
+  .macc{border-top:1px solid var(--line)}
+  .macc summary{list-style:none;cursor:pointer;padding:13px 15px;font-size:13px;font-weight:800;color:var(--green);
+    display:flex;justify-content:space-between;align-items:center;background:#fdfbf7;letter-spacing:.3px}
+  .macc summary::-webkit-details-marker{display:none}
+  .macc summary .cnt{font-weight:700;color:var(--muted);font-size:12px}
+  .macc summary::after{content:'▾ Visa matcher';color:var(--down);font-size:12px;font-weight:700;margin-left:auto;padding-left:10px}
+  .macc[open] summary::after{content:'▴ Dölj'}
+  .matches{padding:6px 14px 8px;border-top:1px solid var(--line);background:#fff}
+  .match{padding:13px 0;border-top:1px dashed #ece4d6}
+  .match:first-of-type{border-top:0}
+  .match .names{display:flex;justify-content:space-between;gap:10px;font-size:15.5px;line-height:1.25}
+  .match .names .b{text-align:right}
+  .match .names .win{font-weight:800}
+  .score-row{display:flex;align-items:center;gap:10px;margin-top:11px}
+  .score-row input{flex:1;min-width:0;height:48px;text-align:center;font:inherit;font-size:20px;font-weight:700;
+    border:1px solid var(--line);border-radius:11px;background:#fff}
+  .score-row .vs{color:var(--muted);font-weight:700;font-size:16px}
+  .score-row .sv{height:48px;padding:0 20px;background:var(--green);color:#fff;border:0;border-radius:11px;
+    font:inherit;font-size:15px;font-weight:800;flex:0 0 auto;cursor:pointer}
+  .result{text-align:center;font-size:23px;font-weight:800;margin-top:8px;letter-spacing:1px}
+  .cmt{width:100%;font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-top:9px}
+  .mcmt{font-size:13.5px;color:var(--ink);background:#f6f2ea;border-left:3px solid var(--gold);padding:8px 11px;border-radius:8px;margin-top:9px;font-style:italic}
+  .mmeta{font-size:12.5px;color:var(--muted);margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .mmeta a{color:var(--down);text-decoration:none;font-weight:700}
   .mmeta .later{color:#b9440a;font-weight:700}
-  .cmt{width:100%;font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;margin-top:6px}
-  .mcmt{font-size:12.5px;color:var(--ink);background:#f6f2ea;border-left:3px solid var(--gold);padding:5px 9px;border-radius:6px;margin-top:5px;font-style:italic}
+  .editlink{background:none;border:0;color:var(--down);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:6px 0}
   .legend{font-size:12px;color:var(--muted);margin:6px 2px 0;display:flex;gap:14px;flex-wrap:wrap}
   .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
   .state{text-align:center;color:var(--muted);padding:24px}
@@ -78,6 +87,8 @@
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
 let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H';
+const OPEN=new Set();
+function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
 
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
@@ -119,24 +130,29 @@ function render(){
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
     const mrows=gm.map(m=>{
       const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
-      const line = m.status==='done'
-        ? `<div class="m"><span class="nm ${aw?'win':''}">${esc(m.a_name)}</span>
-             <span class="done">${m.games_a}–${m.games_b}</span>
-             <span class="nm ${bw?'win':''}" style="text-align:right">${esc(m.b_name)}</span>
-             <button class="sv" onclick="editM(${m.id})">Ändra</button></div>`
-        : `<div class="m" id="m${m.id}"><span class="nm">${esc(m.a_name)}</span>
-             <input type="number" min="0" id="ga${m.id}" inputmode="numeric">
-             <input type="number" min="0" id="gb${m.id}" inputmode="numeric">
-             <span class="nm" style="text-align:right">${esc(m.b_name)}</span>
-             <button class="sv" onclick="saveM(${m.id})">Spara</button></div>`;
-      const cmtLine = m.status==='done'
-        ? (m.comment ? `<div class="mcmt">💬 ${esc(m.comment)}</div>` : '')
-        : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (syns för alla)…" value="${escAttr(m.comment)}">`;
-      return `<div class="mrow">${line}${cmtLine}<div class="mmeta">${whenLabel(m)}${m.status==='done'?'':` · <a href="#" onclick="deferM(event,${m.id})">Spela senare</a>`}</div></div>`;
+      const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
+      if(m.status==='done'){
+        return `<div class="match">${names}
+          <div class="result">${m.games_a} – ${m.games_b}</div>
+          ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
+          <div class="mmeta"><span>${whenLabel(m)}</span><button class="editlink" onclick="editM(${m.id})">Ändra resultat</button></div></div>`;
+      }
+      const cmtField = m._noComment
+        ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
+        : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (du som spelat – syns för alla)…" value="${escAttr(m.comment)}">`;
+      return `<div class="match" id="m${m.id}">${names}
+        <div class="score-row"><input type="number" min="0" inputmode="numeric" id="ga${m.id}"><span class="vs">–</span><input type="number" min="0" inputmode="numeric" id="gb${m.id}"><button class="sv" onclick="saveM(${m.id})">Spara</button></div>
+        ${cmtField}
+        <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a></div></div>`;
     }).join('');
+    const key=DIV+'-'+lab;
+    const doneN=gm.filter(m=>m.status==='done').length;
     return `<div class="grp"><h2>Grupp ${esc(lab)} <span class="lvl">${grp[0].level===Math.min(...rows.map(r=>r.level))?'Toppgrupp':grp[0].level===Math.max(...rows.map(r=>r.level))?'Bottengrupp':'Nivå '+grp[0].level}</span></h2>
       <table><thead><tr><th class="pos">#</th><th>Spelare</th><th class="r">Sp</th><th class="r">V</th><th class="r">+/−</th></tr></thead><tbody>${trs}</tbody></table>
-      <div class="matches"><div class="mtitle">Matcher</div>${mrows||'<div class="state">Inga matcher.</div>'}</div></div>`;
+      <details class="macc" ${OPEN.has(key)?'open':''} ontoggle="onToggle('${key}',this)">
+        <summary>Resultat &amp; matcher <span class="cnt">${doneN}/${gm.length} spelade</span></summary>
+        <div class="matches">${mrows||'<div class="state">Inga matcher.</div>'}</div>
+      </details></div>`;
   }).join('');
 }
 function whenLabel(m){
@@ -158,12 +174,13 @@ async function deferM(e,id){
 async function saveM(id){
   const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
   if(isNaN(ga)||isNaN(gb)){ alert('Fyll i båda siffrorna.'); return; }
-  const cm=(document.getElementById('cm'+id)||{}).value||'';
+  const cmEl=document.getElementById('cm'+id);
+  const cm = cmEl ? cmEl.value : ((MATCHES.find(x=>x.id===id)||{}).comment||'');
   try{ await BTS.hostPoolReport(id,ga,gb,cm); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
   catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
 }
 function editM(id){
-  const m=MATCHES.find(x=>x.id===id); if(!m)return; m.status='pending'; render();
+  const m=MATCHES.find(x=>x.id===id); if(!m)return; m.status='pending'; m._noComment=true; OPEN.add(m.division+'-'+m.label); render();
   const ga=document.getElementById('ga'+id), gb=document.getElementById('gb'+id);
   if(ga) ga.value=m.games_a??''; if(gb) gb.value=m.games_b??'';
 }
