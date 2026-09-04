@@ -13,12 +13,12 @@
   body{margin:0;background:var(--bg);color:var(--cream);font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;
     -webkit-font-smoothing:antialiased;font-size:16px}
   .wrap{max-width:640px;margin:0 auto;padding:0 14px 40px}
-  .top{background:linear-gradient(180deg,#061712 0%,var(--card) 100%);border-bottom:1px solid var(--border);padding:18px 0 0}
+  .hero{position:relative;width:100%;height:clamp(160px,46vw,240px);overflow:hidden;background:#0a2016}
+  .hero .herobg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .hero .veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,23,18,.35) 0%,rgba(13,46,32,0) 45%,var(--bg) 100%)}
+  .hero .herologo{position:absolute;left:16px;top:14px;height:clamp(64px,17vw,92px);width:auto;z-index:2;filter:drop-shadow(0 3px 10px rgba(0,0,0,.55))}
+  .top{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 0 0;margin-top:-1px}
   .top .wrap{padding-bottom:0}
-  .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-  .crest{width:40px;height:40px;flex:0 0 40px}
-  .btitle{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);line-height:1}
-  .bsub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px}
   .rndbadge{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
     background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.35);color:var(--clay);padding:6px 14px;border-radius:100px;display:inline-block;margin-bottom:14px}
   .tabs{display:flex;border-bottom:1px solid var(--border)}
@@ -82,12 +82,13 @@
 </style>
 </head>
 <body>
+<div class="hero">
+  <img class="herobg" src="host-banner.webp" alt="Höstbana med fallande löv" fetchpriority="high">
+  <div class="veil"></div>
+  <img class="herologo" src="mail-logga-orange-tight.png" alt="Båstad Stegen">
+</div>
 <div class="top">
   <div class="wrap">
-    <div class="brand">
-      <img class="crest" src="bts-crest.png" alt="">
-      <div><div class="btitle">Höststegen</div><div class="bsub">Båstad Tennissällskap</div></div>
-    </div>
     <div class="rndbadge" id="rndbadge">Omgång –</div>
     <div class="tabs">
       <button class="tab active" data-div="H" id="tab-H">Herr</button>
