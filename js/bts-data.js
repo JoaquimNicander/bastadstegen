@@ -571,9 +571,15 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
-  async hostPoolReport(matchId, gamesA, gamesB, comment) {
+  async hostPinOk(playerId, pin) {
     _assert();
-    const { error } = await _sb.rpc('bts_host_pool_report', { p_match_id: matchId, p_games_a: gamesA, p_games_b: gamesB, p_comment: comment || null });
+    const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });
+    if (error) throw error;
+    return data === true;
+  },
+  async hostPoolReport(matchId, gamesA, gamesB, comment, playerId, pin) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_pool_report', { p_match_id: matchId, p_games_a: gamesA, p_games_b: gamesB, p_comment: comment || null, p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
   async hostPoolAdvance(adminPw, fromRound) {
@@ -592,9 +598,9 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_pool_set_schedule', { p_admin_pw: adminPw, p_match_id: matchId, p_date: date || null, p_time: time || null, p_court: court || null });
     if (error) throw error;
   },
-  async hostPoolDefer(matchId, note) {
+  async hostPoolDefer(matchId, note, playerId, pin) {
     _assert();
-    const { error } = await _sb.rpc('bts_host_pool_defer', { p_match_id: matchId, p_note: note || null });
+    const { error } = await _sb.rpc('bts_host_pool_defer', { p_match_id: matchId, p_note: note || null, p_player_id: playerId, p_pin: pin || '' });
     if (error) throw error;
   },
 

@@ -26,6 +26,13 @@
     font-family:'Outfit';font-size:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
     padding:15px 0;cursor:pointer}
   .tab.active{color:var(--white);border-bottom-color:var(--clay)}
+  .loginbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:2px 0 12px}
+  .loginbar .lin{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .loginbar select,.loginbar input{background:#0a2016;border:1px solid var(--border2);border-radius:8px;color:var(--white);font:inherit;font-size:13px;padding:9px 10px}
+  .loginbar select{flex:1 1 150px;min-width:0}
+  .loginbar input{width:92px}
+  .loginbar .lbtn{background:var(--clay);color:#3a1400;border:0;border-radius:8px;font:inherit;font-weight:700;font-size:13px;padding:9px 15px;cursor:pointer}
+  .loginbar .lerr{flex-basis:100%;color:var(--clay);font-size:12px}
   .grp{margin:20px 0 0}
   .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
@@ -90,6 +97,7 @@
 <div class="top">
   <div class="wrap">
     <div class="rndbadge" id="rndbadge">Omgång –</div>
+    <div class="loginbar" id="loginbar"></div>
     <div class="tabs">
       <button class="tab active" data-div="H" id="tab-H">Herr</button>
       <button class="tab" data-div="D" id="tab-D">Dam</button>
@@ -110,16 +118,45 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H';
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], ME=null;
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
+try{ ME=JSON.parse(localStorage.getItem('bts_host_me')||'null'); }catch(e){ ME=null; }
 
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
-  [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
-  render();
+  [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
+  renderLogin(); render();
 }
+function renderLogin(){
+  const el=document.getElementById('loginbar'); if(!el) return;
+  if(ME){
+    el.innerHTML=`<span class="lin">Inloggad: <b>${esc(ME.name)}</b> — rapportera dina matcher nedan</span><button class="lbtn" onclick="logout()">Logga ut</button>`;
+    return;
+  }
+  const opts='<option value="">Välj ditt namn…</option>'+PLAYERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  el.innerHTML=`<span class="lin">Logga in för att rapportera:</span>
+    <select id="me-name">${opts}</select>
+    <input id="me-pin" type="password" inputmode="numeric" placeholder="PIN">
+    <button class="lbtn" onclick="doLogin()">Logga in</button>
+    <div class="lerr" id="me-err"></div>`;
+}
+async function doLogin(){
+  const id=parseInt((document.getElementById('me-name')||{}).value||'');
+  const pin=((document.getElementById('me-pin')||{}).value||'').trim();
+  const err=document.getElementById('me-err');
+  if(!id){ if(err) err.textContent='Välj ditt namn.'; return; }
+  try{
+    const ok=await BTS.hostPinOk(id,pin);
+    if(!ok){ if(err) err.textContent='Fel PIN — försök igen.'; return; }
+    const p=PLAYERS.find(x=>x.id===id);
+    ME={id, name:p?p.name:'', pin};
+    localStorage.setItem('bts_host_me', JSON.stringify(ME));
+    renderLogin(); render();
+  }catch(e){ if(err) err.textContent='Kunde inte logga in.'; }
+}
+function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); render(); }
 function zonesFor(rows){
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
   const top=Math.min(...levels), bot=Math.max(...levels);
@@ -140,12 +177,18 @@ function dayDate(dm){
 }
 function matchCard(m){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
+  const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
   const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
   if(m.status==='done'){
     return `<div class="match">${names}
       <div class="result">${m.games_a} – ${m.games_b}</div>
       ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
-      <div class="mmeta"><span>${whenLabel(m)}</span><button class="editlink" onclick="editM(${m.id})">Ändra resultat</button></div></div>`;
+      <div class="mmeta"><span>${whenLabel(m)}</span>${mine?`<button class="editlink" onclick="editM(${m.id})">Ändra resultat</button>`:''}</div></div>`;
+  }
+  if(!mine){
+    return `<div class="match">${names}
+      <div class="result" style="color:var(--muted2);font-size:16px;letter-spacing:0">Ej spelad</div>
+      <div class="mmeta"><span>${whenLabel(m)}</span></div></div>`;
   }
   const cmtField = m._noComment
     ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
@@ -201,11 +244,12 @@ function render(){
   }).join('');
 }
 async function saveM(id){
+  if(!ME){ alert('Logga in för att rapportera.'); return; }
   const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
   if(isNaN(ga)||isNaN(gb)){ alert('Fyll i båda siffrorna.'); return; }
   const cmEl=document.getElementById('cm'+id);
   const cm = cmEl ? cmEl.value : ((MATCHES.find(x=>x.id===id)||{}).comment||'');
-  try{ await BTS.hostPoolReport(id,ga,gb,cm); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  try{ await BTS.hostPoolReport(id,ga,gb,cm,ME.id,ME.pin); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
   catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
 }
 function editM(id){
@@ -215,9 +259,10 @@ function editM(id){
 }
 async function deferM(e,id){
   e.preventDefault();
+  if(!ME){ alert('Logga in först.'); return; }
   const note=prompt('När kan ni spela matchen? (t.ex. "sön 21/9 efter 12" — lämna tomt för att ta bort)');
   if(note===null) return;
-  try{ await BTS.hostPoolDefer(id, note.trim()); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  try{ await BTS.hostPoolDefer(id, note.trim(), ME.id, ME.pin); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
   catch(err){ alert('Kunde inte spara: '+(err.message||err)); }
 }
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{DIV=t.dataset.div;render();});
