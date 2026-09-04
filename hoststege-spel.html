@@ -162,7 +162,7 @@ function matchCard(m){
   }
   const cmtField = m._noComment
     ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
-    : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (du som spelat – syns för alla)…" value="${escAttr(m.comment)}">`;
+    : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="(Ev kommentar om matchen)" value="${escAttr(m.comment)}">`;
   return `<div class="match" id="m${m.id}">${names}
     <div class="score-row"><input type="number" min="0" inputmode="numeric" id="ga${m.id}"><span class="vs">–</span><input type="number" min="0" inputmode="numeric" id="gb${m.id}"><button class="sv" onclick="saveM(${m.id})">Spara</button></div>
     ${cmtField}
