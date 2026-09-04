@@ -101,10 +101,10 @@ function render(){
   el.innerHTML = labels.map(lab=>{
     const grp=rows.filter(r=>r.label===lab).sort((a,b)=>a.rank-b.rank);
     const z=zonesFor(grp);
+    const played = grp.some(r=>r.spelade>0);
     const trs=grp.map(r=>{
-      const zone=z[r.player_id];
-      const badge = zone==='up'?'<span class="zone up">▲ UPP</span>':zone==='down'?'<span class="zone down">▼ NER</span>':'';
-      return `<tr class="${zone}"><td class="pos">${r.rank}</td><td>${esc(r.name)}${badge}</td>
+      const zone = played ? z[r.player_id] : '';
+      return `<tr class="${zone}"><td class="pos">${r.rank}</td><td>${esc(r.name)}</td>
         <td class="r">${r.spelade}</td><td class="r">${r.vinster}</td><td class="r">${r.diff>0?'+':''}${r.diff}</td></tr>`;
     }).join('');
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
