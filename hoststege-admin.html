@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Höststegen – admin · Båstad Stegen</title>
+<style>
+  :root{ --green:#0D2E20; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62; --gold:#F4B740;
+    --line:#e7dfd2; --up:#1c7a3f; --down:#b9440a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef0ea;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);padding:22px 14px}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:14px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 16px}
+  input[type=password]{width:100%;font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--line);border-radius:9px;outline:none}
+  .btn{background:var(--green);color:#fff;border:0;border-radius:9px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
+  .btn.go{background:var(--gold);color:var(--green);width:100%;font-size:16px;padding:15px}
+  .btn:disabled{opacity:.55;cursor:default}
+  .prog{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 8px}
+  .pill{background:var(--cream);border:1px solid var(--line);border-radius:100px;padding:7px 13px;font-size:13px;font-weight:700}
+  .pill.ok{background:#e7f6ec;color:var(--up);border-color:#bfe6cc}
+  h3{font-size:14px;margin:16px 0 8px;color:var(--green)}
+  .mv{font-size:13.5px;line-height:1.7}
+  .mv .u{color:var(--up);font-weight:700} .mv .d{color:var(--down);font-weight:700}
+  .state{color:var(--muted);font-size:13px;margin-top:8px}
+  .warn{background:#fff7e6;border:1px solid #f0d9a0;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+  a{color:var(--down)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Höststegen — admin</h1>
+  <p class="sub">Aktuell omgång, spelstatus och start av nästa omgång (upp/ner sköts automatiskt).</p>
+
+  <div class="card" id="login">
+    <label style="font-weight:700;font-size:14px">Adminlösenord</label>
+    <input id="pw" type="password" placeholder="lösenord" onkeydown="if(event.key==='Enter')start()">
+    <div style="height:10px"></div>
+    <button class="btn" onclick="start()">Öppna →</button>
+    <div class="state" id="ls"></div>
+  </div>
+
+  <div id="app" style="display:none"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[];
+
+async function start(){
+  const pw=(document.getElementById('pw').value||'').trim();
+  const ls=document.getElementById('ls');
+  if(!pw){ ls.textContent='Ange lösenord.'; return; }
+  ls.textContent='Kontrollerar…';
+  try{
+    const ok=await BTS.adminCheck(pw); if(!ok) throw new Error('Fel lösenord');
+    PW=pw; document.getElementById('login').style.display='none'; document.getElementById('app').style.display='';
+    await load();
+  }catch(e){ ls.textContent=(e.message||e); }
+}
+
+async function load(){
+  INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
+  [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
+  render();
+}
+
+function movesFor(div){
+  const rows=ST.filter(r=>r.division===div); if(!rows.length) return [];
+  const levels=[...new Set(rows.map(r=>r.level))]; const top=Math.min(...levels),bot=Math.max(...levels);
+  const labels=[...new Set(rows.map(r=>r.label))]; const out=[];
+  labels.forEach(lab=>{
+    const g=rows.filter(r=>r.label===lab).sort((a,b)=>a.rank-b.rank); const n=g.length; const lvl=g[0].level;
+    g.forEach(r=>{
+      let v=''; if(lvl===top){ v=r.rank>3?'down':''; } else if(lvl===bot){ v=r.rank<=2?'up':''; }
+      else { v=r.rank<=2?'up':(r.rank>n-2?'down':''); }
+      if(v) out.push({lab,name:r.name,dir:v});
+    });
+  });
+  return out;
+}
+
+function render(){
+  const app=document.getElementById('app');
+  const done=MATCHES.filter(m=>m.status==='done').length, tot=MATCHES.length;
+  const perDiv=d=>{ const ms=MATCHES.filter(m=>m.division===d); const dd=ms.filter(m=>m.status==='done').length; return `${dd}/${ms.length}`; };
+  const mv=d=>{ const m=movesFor(d); if(!m.length) return '<div class="state">Inga matcher spelade ännu.</div>';
+    const ups=m.filter(x=>x.dir==='up').map(x=>`<span class="u">▲ ${esc(x.name)}</span> (Grupp ${esc(x.lab)})`);
+    const dns=m.filter(x=>x.dir==='down').map(x=>`<span class="d">▼ ${esc(x.name)}</span> (Grupp ${esc(x.lab)})`);
+    return `<div class="mv"><div>Upp: ${ups.join(', ')||'—'}</div><div>Ner: ${dns.join(', ')||'—'}</div></div>`;
+  };
+  const allDone = tot>0 && done===tot;
+  app.innerHTML=`
+    <div class="card">
+      <div class="prog">
+        <span class="pill">Omgång ${ROUND}</span>
+        <span class="pill ${allDone?'ok':''}">${done}/${tot} matcher spelade</span>
+        <span class="pill">Herr ${perDiv('H')}</span>
+        <span class="pill">Dam ${perDiv('D')}</span>
+      </div>
+      <div class="state">Detaljer & rapportering finns på <a href="hoststege-spel.html" target="_blank">spel-sidan</a>.</div>
+    </div>
+
+    <div class="card">
+      <h3>Förhandsvisning: flyttar till omgång ${ROUND+1}</h3>
+      <div><b>Båstad Stegen Herr</b>${mv('H')}</div>
+      <div style="margin-top:10px"><b>Båstad Stegen Dam</b>${mv('D')}</div>
+      ${allDone?'':'<div class="warn">Alla matcher är inte inrapporterade än. Du kan ändå starta nästa omgång — ospelade matcher räknas som ospelade i tabellen.</div>'}
+      <div style="height:12px"></div>
+      <button class="btn go" onclick="advance()">Starta omgång ${ROUND+1} →</button>
+      <div class="state" id="advs"></div>
+    </div>`;
+}
+
+async function advance(){
+  if(!confirm('Starta omgång '+(ROUND+1)+'? Grupperna för nästa omgång skapas utifrån nuvarande ställning (2 upp / 2 ner / 1 kvar).')) return;
+  const s=document.getElementById('advs'); s.textContent='Skapar nästa omgång…';
+  try{ const to=await BTS.hostPoolAdvance(PW,ROUND); s.textContent='Klart! Omgång '+to+' är skapad.'; await load(); }
+  catch(e){ s.textContent='Fel: '+(e.message||e); }
+}
+</script>
+</body>
+</html>

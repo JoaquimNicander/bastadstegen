@@ -552,6 +552,37 @@ const BTS = {
     if (error) throw error;
     return data;
   },
+  // ── HÖSTSTEGE POOLSPEL ───────────────────────────────────────────────
+  async hostPoolInfo() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_pool_info');
+    if (error) throw error;
+    return (data && data[0]) || { current_round: 1, name_h: 'Båstad Stegen Herr', name_d: 'Båstad Stegen Dam' };
+  },
+  async hostPoolStandings(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_pool_standings_all', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostPoolMatches(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_pool_matches', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostPoolReport(matchId, gamesA, gamesB) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_pool_report', { p_match_id: matchId, p_games_a: gamesA, p_games_b: gamesB });
+    if (error) throw error;
+  },
+  async hostPoolAdvance(adminPw, fromRound) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_pool_advance', { p_admin_pw: adminPw, p_from_round: fromRound });
+    if (error) throw error;
+    return data;
+  },
+
   async hostLeave(playerId, pin) {
     _assert();
     const { error } = await _sb.rpc('bts_host_leave', { p_player_id: playerId, p_pin: pin || '' });
