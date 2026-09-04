@@ -4,82 +4,102 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Höststegen – spel & tabeller · Båstad Stegen</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root{ --green:#0D2E20; --green2:#123c2a; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62; --gold:#F4B740;
-    --line:#e7dfd2; --up:#1c7a3f; --upbg:#e7f6ec; --down:#b9440a; --downbg:#fbe9dd; }
+  :root{ --bg:#0D2E20; --card:#0D2A1D; --card2:#133124; --border:#1C3A2B; --border2:#2A5A42;
+    --clay:#FF8C42; --clay2:#C43E00; --cream:#F5EDE3; --white:#fff;
+    --muted:rgba(255,255,255,.66); --muted2:rgba(255,255,255,.5); --lime:#D7F23C; }
   *{box-sizing:border-box}
-  body{margin:0;background:#eef0ea;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);padding:20px 12px}
-  .wrap{max-width:760px;margin:0 auto}
-  .head{background:var(--green);color:#fff;border-radius:16px 16px 0 0;padding:22px 22px 18px;position:relative;overflow:hidden}
-  .head .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:700}
-  .head h1{margin:5px 0 0;font-size:23px;font-weight:800;letter-spacing:-.4px}
-  .head .rd{margin-top:4px;color:#cbd8ce;font-size:13px}
-  .tabs{display:flex;gap:8px;background:var(--green2);padding:0 14px 14px}
-  .tab{flex:1;text-align:center;padding:11px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;
-    color:#cbd8ce;background:rgba(255,255,255,.06);border:1px solid transparent}
-  .tab.active{background:var(--cream);color:var(--green);border-color:var(--cream)}
-  .body{background:var(--cream);border-radius:0 0 16px 16px;padding:18px 16px 24px;border:1px solid #e4ddd0;border-top:0}
-  .grp{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:0 0 16px}
-  .grp h2{margin:0;font-size:15px;padding:12px 15px;background:var(--green);color:#fff;display:flex;justify-content:space-between;align-items:center}
-  .grp h2 .lvl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px}
-  table{border-collapse:collapse;width:100%;font-size:13.5px}
-  th,td{padding:8px 10px;text-align:left;border-top:1px solid var(--line)}
-  th{background:#faf7f1;font-size:11px;letter-spacing:.3px;color:var(--muted);text-transform:uppercase}
-  td.r,th.r{text-align:right}
-  .pos{width:24px;text-align:center;font-weight:800;color:var(--muted)}
-  tr.up td{background:var(--upbg)} tr.down td{background:var(--downbg)}
-  tr.up .pos{color:var(--up)} tr.down .pos{color:var(--down)}
-  .zone{font-size:10px;font-weight:800;padding:2px 7px;border-radius:100px;margin-left:6px}
-  .zone.up{background:var(--up);color:#fff} .zone.down{background:var(--down);color:#fff}
-  .macc{border-top:1px solid var(--line)}
-  .macc summary{list-style:none;cursor:pointer;padding:13px 15px;font-size:13px;font-weight:800;color:var(--green);
-    display:flex;justify-content:space-between;align-items:center;background:#fdfbf7;letter-spacing:.3px}
-  .macc summary::-webkit-details-marker{display:none}
-  .macc summary .cnt{font-weight:700;color:var(--muted);font-size:12px}
-  .macc summary::after{content:'▾ Visa matcher';color:var(--down);font-size:12px;font-weight:700;margin-left:auto;padding-left:10px}
-  .macc[open] summary::after{content:'▴ Dölj'}
-  .matches{padding:6px 14px 8px;border-top:1px solid var(--line);background:#fff}
-  .dayhdr{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);
-    background:var(--green);border-radius:8px;padding:6px 10px;margin:12px 0 2px}
-  .dayhdr:first-child{margin-top:4px}
-  .match{padding:13px 0;border-top:1px dashed #ece4d6}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:16px}
+  .wrap{max-width:640px;margin:0 auto;padding:0 14px 40px}
+  .top{background:linear-gradient(180deg,#061712 0%,var(--card) 100%);border-bottom:1px solid var(--border);padding:18px 0 0}
+  .top .wrap{padding-bottom:0}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .crest{width:40px;height:40px;flex:0 0 40px}
+  .btitle{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);line-height:1}
+  .bsub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+  .rndbadge{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+    background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.35);color:var(--clay);padding:6px 14px;border-radius:100px;display:inline-block;margin-bottom:14px}
+  .tabs{display:flex;border-bottom:1px solid var(--border)}
+  .tab{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);
+    font-family:'Outfit';font-size:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;
+    padding:15px 0;cursor:pointer}
+  .tab.active{color:var(--white);border-bottom-color:var(--clay)}
+  .grp{margin:20px 0 0}
+  .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
+  .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
+  .glvl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--clay)}
+  .prow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);
+    border-left:3px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:7px}
+  .prow.up{border-left-color:var(--cream)}
+  .prow.down{border-left-color:var(--clay)}
+  .rnum{font-family:'Anton',sans-serif;font-size:30px;line-height:1;color:rgba(245,237,227,.16);width:30px;text-align:center;flex:0 0 30px}
+  .prow.up .rnum{color:rgba(245,237,227,.75)}
+  .prow.down .rnum{color:rgba(255,140,66,.6)}
+  .pinfo{flex:1;min-width:0}
+  .pname{font-weight:700;font-size:16px;color:var(--white)}
+  .pmeta{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);margin-top:3px}
+  .form{display:flex;gap:4px;margin-top:7px}
+  .vf{width:19px;height:19px;border-radius:5px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center}
+  .vf.v{background:var(--clay);color:#3a1400}
+  .vf.f{background:transparent;border:1px solid var(--border2);color:var(--muted2)}
+  .pdiff{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--cream);min-width:34px;text-align:right}
+  details.macc{margin:8px 0 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+  details.macc summary{list-style:none;cursor:pointer;padding:12px 14px;font-family:'Space Mono',monospace;font-size:10px;
+    letter-spacing:2px;text-transform:uppercase;color:var(--clay);display:flex;justify-content:space-between;align-items:center}
+  details.macc summary::-webkit-details-marker{display:none}
+  details.macc summary .cnt{color:var(--muted2)}
+  details.macc summary::after{content:'▾';color:var(--muted2)}
+  details.macc[open] summary::after{content:'▴'}
+  .matches{padding:4px 12px 12px;border-top:1px solid var(--border)}
+  .dayhdr{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cream);
+    background:var(--card2);border-radius:7px;padding:6px 10px;margin:12px 0 6px}
+  .match{padding:11px 2px;border-top:1px solid var(--border)}
   .match:first-of-type{border-top:0}
-  .match .names{display:flex;justify-content:space-between;gap:10px;font-size:15.5px;line-height:1.25}
-  .match .names .b{text-align:right}
-  .match .names .win{font-weight:800}
-  .score-row{display:flex;align-items:center;gap:10px;margin-top:11px}
-  .score-row input{flex:1;min-width:0;height:48px;text-align:center;font:inherit;font-size:20px;font-weight:700;
-    border:1px solid var(--line);border-radius:11px;background:#fff}
-  .score-row .vs{color:var(--muted);font-weight:700;font-size:16px}
-  .score-row .sv{height:48px;padding:0 20px;background:var(--green);color:#fff;border:0;border-radius:11px;
-    font:inherit;font-size:15px;font-weight:800;flex:0 0 auto;cursor:pointer}
-  .result{text-align:center;font-size:23px;font-weight:800;margin-top:8px;letter-spacing:1px}
-  .cmt{width:100%;font:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-top:9px}
-  .mcmt{font-size:13.5px;color:var(--ink);background:#f6f2ea;border-left:3px solid var(--gold);padding:8px 11px;border-radius:8px;margin-top:9px;font-style:italic}
-  .mmeta{font-size:12.5px;color:var(--muted);margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-  .mmeta a{color:var(--down);text-decoration:none;font-weight:700}
-  .mmeta .later{color:#b9440a;font-weight:700}
-  .editlink{background:none;border:0;color:var(--down);font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;padding:6px 0}
-  .legend{font-size:12px;color:var(--muted);margin:6px 2px 0;display:flex;gap:14px;flex-wrap:wrap}
+  .names{display:flex;justify-content:space-between;gap:10px;font-size:15px;color:var(--white)}
+  .names .b{text-align:right}
+  .names .win{font-weight:700;color:var(--clay)}
+  .score-row{display:flex;align-items:center;gap:9px;margin-top:10px}
+  .score-row input{flex:1;min-width:0;height:46px;text-align:center;font:inherit;font-size:20px;font-weight:700;
+    background:#0a2016;border:1px solid var(--border2);border-radius:10px;color:var(--white)}
+  .score-row .vs{color:var(--muted2);font-weight:700}
+  .score-row .sv{height:46px;padding:0 18px;background:var(--clay);color:#3a1400;border:0;border-radius:10px;
+    font:inherit;font-weight:800;cursor:pointer;flex:0 0 auto}
+  .result{text-align:center;font-family:'Anton',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);margin-top:8px}
+  .cmt{width:100%;font:inherit;font-size:14px;padding:10px 12px;margin-top:9px;background:#0a2016;border:1px solid var(--border2);border-radius:10px;color:var(--white)}
+  .cmt::placeholder{color:var(--muted2)}
+  .mcmt{font-size:13px;color:var(--cream);background:var(--card2);border-left:3px solid var(--clay);border-radius:6px;padding:8px 11px;margin-top:9px;font-style:italic}
+  .mmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;
+    font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted2)}
+  .mmeta a{color:var(--clay);text-decoration:none}
+  .mmeta .later{color:var(--clay)}
+  .editlink{background:none;border:0;color:var(--clay);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;padding:4px 0}
+  .legend{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);margin:18px 2px 0;display:flex;gap:16px;flex-wrap:wrap;text-transform:uppercase}
   .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
-  .state{text-align:center;color:var(--muted);padding:24px}
+  .state{text-align:center;color:var(--muted2);padding:26px;font-size:14px}
 </style>
 </head>
 <body>
+<div class="top">
+  <div class="wrap">
+    <div class="brand">
+      <img class="crest" src="bts-crest.png" alt="">
+      <div><div class="btitle">Höststegen</div><div class="bsub">Båstad Tennissällskap</div></div>
+    </div>
+    <div class="rndbadge" id="rndbadge">Omgång –</div>
+    <div class="tabs">
+      <button class="tab active" data-div="H" id="tab-H">Herr</button>
+      <button class="tab" data-div="D" id="tab-D">Dam</button>
+    </div>
+  </div>
+</div>
 <div class="wrap">
-  <div class="head">
-    <div class="kick">Höststegen 2026 · Poolspel</div>
-    <h1 id="divname">Båstad Stegen</h1>
-    <div class="rd" id="roundlbl">Omgång –</div>
-  </div>
-  <div class="tabs">
-    <div class="tab active" data-div="H" id="tab-H">Herr</div>
-    <div class="tab" data-div="D" id="tab-D">Dam</div>
-  </div>
-  <div class="body" id="body"><div class="state">Laddar…</div></div>
+  <div id="body"><div class="state">Laddar…</div></div>
   <div class="legend">
-    <span><b style="background:#1c7a3f"></b>Går upp en grupp</span>
-    <span><b style="background:#b9440a"></b>Åker ner en grupp</span>
+    <span><b style="background:#F5EDE3"></b>Går upp</span>
+    <span><b style="background:#FF8C42"></b>Åker ner</span>
     <span>Övriga stannar</span>
   </div>
 </div>
@@ -95,56 +115,22 @@ function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
 
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
-  document.getElementById('roundlbl').textContent='Omgång '+ROUND;
+  document.getElementById('rndbadge').textContent='Omgång '+ROUND;
   [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
   render();
 }
 function zonesFor(rows){
-  // rows = standings för en grupp (sorterade på rank). Returnera map player_id->'up'|'down'|''
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
   const top=Math.min(...levels), bot=Math.max(...levels);
   const lvl=rows[0].level, n=rows.length, z={};
-  rows.forEach(r=>{
-    let v='';
-    if(lvl===top){ v = r.rank>3 ? 'down' : ''; }
-    else if(lvl===bot){ v = r.rank<=2 ? 'up' : ''; }
-    else { v = r.rank<=2 ? 'up' : (r.rank>n-2 ? 'down' : ''); }
-    z[r.player_id]=v;
-  });
+  rows.forEach(r=>{ let v=''; if(lvl===top){ v=r.rank>3?'down':''; } else if(lvl===bot){ v=r.rank<=2?'up':''; }
+    else { v=r.rank<=2?'up':(r.rank>n-2?'down':''); } z[r.player_id]=v; });
   return z;
 }
-function render(){
-  document.getElementById('divname').textContent = DIV==='H'?(INFO.name_h||'Båstad Stegen Herr'):(INFO.name_d||'Båstad Stegen Dam');
-  document.getElementById('tab-H').classList.toggle('active',DIV==='H');
-  document.getElementById('tab-D').classList.toggle('active',DIV==='D');
-  const rows=ST.filter(r=>r.division===DIV);
-  const el=document.getElementById('body');
-  if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
-  const labels=[...new Set(rows.map(r=>r.label))];
-  el.innerHTML = labels.map(lab=>{
-    const grp=rows.filter(r=>r.label===lab).sort((a,b)=>a.rank-b.rank);
-    const z=zonesFor(grp);
-    const played = grp.some(r=>r.spelade>0);
-    const trs=grp.map(r=>{
-      const zone = played ? z[r.player_id] : '';
-      return `<tr class="${zone}"><td class="pos">${r.rank}</td><td>${esc(r.name)}</td>
-        <td class="r">${r.spelade}</td><td class="r">${r.vinster}</td><td class="r">${r.diff>0?'+':''}${r.diff}</td></tr>`;
-    }).join('');
-    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
-    const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
-    const mrows=days.map(d=>{
-      const dm=gm.filter(m=>(m.matchday||0)===d);
-      return `<div class="dayhdr">Spelomgång ${d||'?'}${dayDate(dm)}</div>`+dm.map(matchCard).join('');
-    }).join('');
-    const key=DIV+'-'+lab;
-    const doneN=gm.filter(m=>m.status==='done').length;
-    return `<div class="grp"><h2>Grupp ${esc(lab)} <span class="lvl">${grp[0].level===Math.min(...rows.map(r=>r.level))?'Toppgrupp':grp[0].level===Math.max(...rows.map(r=>r.level))?'Bottengrupp':'Nivå '+grp[0].level}</span></h2>
-      <table><thead><tr><th class="pos">#</th><th>Spelare</th><th class="r">Sp</th><th class="r">V</th><th class="r">+/−</th></tr></thead><tbody>${trs}</tbody></table>
-      <details class="macc" ${OPEN.has(key)?'open':''} ontoggle="onToggle('${key}',this)">
-        <summary>Resultat &amp; matcher <span class="cnt">${doneN}/${gm.length} spelade</span></summary>
-        <div class="matches">${mrows||'<div class="state">Inga matcher.</div>'}</div>
-      </details></div>`;
-  }).join('');
+function formFor(pid,div,lab){
+  return MATCHES.filter(m=>m.division===div&&m.label===lab&&m.status==='done'&&(m.a_id===pid||m.b_id===pid))
+    .sort((a,b)=>(a.matchday||0)-(b.matchday||0))
+    .map(m=>m.winner_id===pid?'V':'F');
 }
 function dayDate(dm){
   const ds=[...new Set(dm.map(m=>m.play_date).filter(Boolean))];
@@ -170,19 +156,48 @@ function matchCard(m){
 }
 function whenLabel(m){
   if(m.defer_note) return `<span class="later">⏳ Spelas senare: ${esc(m.defer_note)}</span>`;
-  if(m.play_date){
-    const d=new Date(m.play_date+'T00:00:00');
-    const ds=d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
-    return `📅 ${ds}${m.start_time?' '+esc(m.start_time):''}${m.court?' · '+esc(m.court):''}`;
-  }
+  if(m.play_date){ const d=new Date(m.play_date+'T00:00:00');
+    return '📅 '+d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'})+(m.start_time?' '+esc(m.start_time):'')+(m.court?' · '+esc(m.court):''); }
   return 'Tid ej satt';
 }
-async function deferM(e,id){
-  e.preventDefault();
-  const note=prompt('När kan ni spela matchen? (t.ex. "sön 21/9 efter 12" — lämna tomt för att ta bort)');
-  if(note===null) return;
-  try{ await BTS.hostPoolDefer(id, note.trim()); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
-  catch(err){ alert('Kunde inte spara: '+(err.message||err)); }
+function render(){
+  document.getElementById('tab-H').classList.toggle('active',DIV==='H');
+  document.getElementById('tab-D').classList.toggle('active',DIV==='D');
+  const rows=ST.filter(r=>r.division===DIV);
+  const el=document.getElementById('body');
+  if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
+  const levels=rows.map(r=>r.level), top=Math.min(...levels), bot=Math.max(...levels);
+  const labels=[...new Set(rows.map(r=>r.label))];
+  el.innerHTML = labels.map(lab=>{
+    const grp=rows.filter(r=>r.label===lab).sort((a,b)=>a.rank-b.rank);
+    const z=zonesFor(grp);
+    const played = grp.some(r=>r.spelade>0);
+    const lvlName = grp[0].level===top?'Toppgrupp':grp[0].level===bot?'Bottengrupp':'Nivå '+grp[0].level;
+    const prows=grp.map(r=>{
+      const zone = played ? z[r.player_id] : '';
+      const form = formFor(r.player_id,DIV,lab);
+      const fhtml = form.length?`<div class="form">${form.map(x=>`<span class="vf ${x==='V'?'v':'f'}">${x}</span>`).join('')}</div>`:'';
+      return `<div class="prow ${zone}">
+        <div class="rnum">${r.rank}</div>
+        <div class="pinfo"><div class="pname">${esc(r.name)}</div>
+          <div class="pmeta">${r.spelade} matcher · ${r.vinster} vinster</div>${fhtml}</div>
+        <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div></div>`;
+    }).join('');
+    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
+    const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
+    const mrows=days.map(d=>{
+      const dm=gm.filter(m=>(m.matchday||0)===d);
+      return `<div class="dayhdr">Spelomgång ${d||'?'}${dayDate(dm)}</div>`+dm.map(matchCard).join('');
+    }).join('');
+    const key=DIV+'-'+lab, doneN=gm.filter(m=>m.status==='done').length;
+    return `<div class="grp">
+      <div class="ghead"><h2>Grupp ${esc(lab)}</h2><span class="glvl">${lvlName}</span></div>
+      ${prows}
+      <details class="macc" ${OPEN.has(key)?'open':''} ontoggle="onToggle('${key}',this)">
+        <summary>Resultat &amp; matcher <span class="cnt">${doneN}/${gm.length} spelade</span></summary>
+        <div class="matches">${mrows||'<div class="state">Inga matcher.</div>'}</div>
+      </details></div>`;
+  }).join('');
 }
 async function saveM(id){
   const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
@@ -196,6 +211,13 @@ function editM(id){
   const m=MATCHES.find(x=>x.id===id); if(!m)return; m.status='pending'; m._noComment=true; OPEN.add(m.division+'-'+m.label); render();
   const ga=document.getElementById('ga'+id), gb=document.getElementById('gb'+id);
   if(ga) ga.value=m.games_a??''; if(gb) gb.value=m.games_b??'';
+}
+async function deferM(e,id){
+  e.preventDefault();
+  const note=prompt('När kan ni spela matchen? (t.ex. "sön 21/9 efter 12" — lämna tomt för att ta bort)');
+  if(note===null) return;
+  try{ await BTS.hostPoolDefer(id, note.trim()); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  catch(err){ alert('Kunde inte spara: '+(err.message||err)); }
 }
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{DIV=t.dataset.div;render();});
 load();
