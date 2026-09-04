@@ -39,6 +39,9 @@
   .macc summary::after{content:'▾ Visa matcher';color:var(--down);font-size:12px;font-weight:700;margin-left:auto;padding-left:10px}
   .macc[open] summary::after{content:'▴ Dölj'}
   .matches{padding:6px 14px 8px;border-top:1px solid var(--line);background:#fff}
+  .dayhdr{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);
+    background:var(--green);border-radius:8px;padding:6px 10px;margin:12px 0 2px}
+  .dayhdr:first-child{margin-top:4px}
   .match{padding:13px 0;border-top:1px dashed #ece4d6}
   .match:first-of-type{border-top:0}
   .match .names{display:flex;justify-content:space-between;gap:10px;font-size:15.5px;line-height:1.25}
@@ -128,22 +131,10 @@ function render(){
         <td class="r">${r.spelade}</td><td class="r">${r.vinster}</td><td class="r">${r.diff>0?'+':''}${r.diff}</td></tr>`;
     }).join('');
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
-    const mrows=gm.map(m=>{
-      const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
-      const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
-      if(m.status==='done'){
-        return `<div class="match">${names}
-          <div class="result">${m.games_a} – ${m.games_b}</div>
-          ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
-          <div class="mmeta"><span>${whenLabel(m)}</span><button class="editlink" onclick="editM(${m.id})">Ändra resultat</button></div></div>`;
-      }
-      const cmtField = m._noComment
-        ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
-        : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (du som spelat – syns för alla)…" value="${escAttr(m.comment)}">`;
-      return `<div class="match" id="m${m.id}">${names}
-        <div class="score-row"><input type="number" min="0" inputmode="numeric" id="ga${m.id}"><span class="vs">–</span><input type="number" min="0" inputmode="numeric" id="gb${m.id}"><button class="sv" onclick="saveM(${m.id})">Spara</button></div>
-        ${cmtField}
-        <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a></div></div>`;
+    const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
+    const mrows=days.map(d=>{
+      const dm=gm.filter(m=>(m.matchday||0)===d);
+      return `<div class="dayhdr">Spelomgång ${d||'?'}${dayDate(dm)}</div>`+dm.map(matchCard).join('');
     }).join('');
     const key=DIV+'-'+lab;
     const doneN=gm.filter(m=>m.status==='done').length;
@@ -154,6 +145,28 @@ function render(){
         <div class="matches">${mrows||'<div class="state">Inga matcher.</div>'}</div>
       </details></div>`;
   }).join('');
+}
+function dayDate(dm){
+  const ds=[...new Set(dm.map(m=>m.play_date).filter(Boolean))];
+  if(ds.length===1){ const d=new Date(ds[0]+'T00:00:00'); return ' · '+d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}); }
+  return '';
+}
+function matchCard(m){
+  const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
+  const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
+  if(m.status==='done'){
+    return `<div class="match">${names}
+      <div class="result">${m.games_a} – ${m.games_b}</div>
+      ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
+      <div class="mmeta"><span>${whenLabel(m)}</span><button class="editlink" onclick="editM(${m.id})">Ändra resultat</button></div></div>`;
+  }
+  const cmtField = m._noComment
+    ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
+    : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (du som spelat – syns för alla)…" value="${escAttr(m.comment)}">`;
+  return `<div class="match" id="m${m.id}">${names}
+    <div class="score-row"><input type="number" min="0" inputmode="numeric" id="ga${m.id}"><span class="vs">–</span><input type="number" min="0" inputmode="numeric" id="gb${m.id}"><button class="sv" onclick="saveM(${m.id})">Spara</button></div>
+    ${cmtField}
+    <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a></div></div>`;
 }
 function whenLabel(m){
   if(m.defer_note) return `<span class="later">⏳ Spelas senare: ${esc(m.defer_note)}</span>`;
