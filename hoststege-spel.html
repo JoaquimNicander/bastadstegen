@@ -40,6 +40,14 @@
   .m input{width:38px;text-align:center;font:inherit;font-size:14px;padding:5px;border:1px solid var(--line);border-radius:7px}
   .m .sv{background:var(--green);color:#fff;border:0;border-radius:7px;padding:6px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
   .m .done{color:var(--up);font-size:12px;font-weight:700;white-space:nowrap}
+  .mrow{border-top:1px dashed #ece4d6;padding:7px 0}
+  .mrow:first-of-type{border-top:0}
+  .mrow .m{border-top:0;padding:2px 0}
+  .mmeta{font-size:11.5px;color:var(--muted);margin:3px 2px 0}
+  .mmeta a{color:var(--down);text-decoration:none;font-weight:700}
+  .mmeta .later{color:#b9440a;font-weight:700}
+  .cmt{width:100%;font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;margin-top:6px}
+  .mcmt{font-size:12.5px;color:var(--ink);background:#f6f2ea;border-left:3px solid var(--gold);padding:5px 9px;border-radius:6px;margin-top:5px;font-style:italic}
   .legend{font-size:12px;color:var(--muted);margin:6px 2px 0;display:flex;gap:14px;flex-wrap:wrap}
   .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
   .state{text-align:center;color:var(--muted);padding:24px}
@@ -68,6 +76,7 @@
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const escAttr=s=>esc(s).replace(/"/g,'&quot;');
 let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H';
 
 async function load(){
@@ -110,27 +119,47 @@ function render(){
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
     const mrows=gm.map(m=>{
       const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
-      if(m.status==='done'){
-        return `<div class="m"><span class="nm ${aw?'win':''}">${esc(m.a_name)}</span>
-          <span class="done">${m.games_a}–${m.games_b}</span>
-          <span class="nm ${bw?'win':''}" style="text-align:right">${esc(m.b_name)}</span>
-          <button class="sv" onclick="editM(${m.id})">Ändra</button></div>`;
-      }
-      return `<div class="m" id="m${m.id}"><span class="nm">${esc(m.a_name)}</span>
-        <input type="number" min="0" id="ga${m.id}" inputmode="numeric">
-        <input type="number" min="0" id="gb${m.id}" inputmode="numeric">
-        <span class="nm" style="text-align:right">${esc(m.b_name)}</span>
-        <button class="sv" onclick="saveM(${m.id})">Spara</button></div>`;
+      const line = m.status==='done'
+        ? `<div class="m"><span class="nm ${aw?'win':''}">${esc(m.a_name)}</span>
+             <span class="done">${m.games_a}–${m.games_b}</span>
+             <span class="nm ${bw?'win':''}" style="text-align:right">${esc(m.b_name)}</span>
+             <button class="sv" onclick="editM(${m.id})">Ändra</button></div>`
+        : `<div class="m" id="m${m.id}"><span class="nm">${esc(m.a_name)}</span>
+             <input type="number" min="0" id="ga${m.id}" inputmode="numeric">
+             <input type="number" min="0" id="gb${m.id}" inputmode="numeric">
+             <span class="nm" style="text-align:right">${esc(m.b_name)}</span>
+             <button class="sv" onclick="saveM(${m.id})">Spara</button></div>`;
+      const cmtLine = m.status==='done'
+        ? (m.comment ? `<div class="mcmt">💬 ${esc(m.comment)}</div>` : '')
+        : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="Kommentar om matchen (syns för alla)…" value="${escAttr(m.comment)}">`;
+      return `<div class="mrow">${line}${cmtLine}<div class="mmeta">${whenLabel(m)}${m.status==='done'?'':` · <a href="#" onclick="deferM(event,${m.id})">Spela senare</a>`}</div></div>`;
     }).join('');
     return `<div class="grp"><h2>Grupp ${esc(lab)} <span class="lvl">${grp[0].level===Math.min(...rows.map(r=>r.level))?'Toppgrupp':grp[0].level===Math.max(...rows.map(r=>r.level))?'Bottengrupp':'Nivå '+grp[0].level}</span></h2>
       <table><thead><tr><th class="pos">#</th><th>Spelare</th><th class="r">Sp</th><th class="r">V</th><th class="r">+/−</th></tr></thead><tbody>${trs}</tbody></table>
       <div class="matches"><div class="mtitle">Matcher</div>${mrows||'<div class="state">Inga matcher.</div>'}</div></div>`;
   }).join('');
 }
+function whenLabel(m){
+  if(m.defer_note) return `<span class="later">⏳ Spelas senare: ${esc(m.defer_note)}</span>`;
+  if(m.play_date){
+    const d=new Date(m.play_date+'T00:00:00');
+    const ds=d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'});
+    return `📅 ${ds}${m.start_time?' '+esc(m.start_time):''}${m.court?' · '+esc(m.court):''}`;
+  }
+  return 'Tid ej satt';
+}
+async function deferM(e,id){
+  e.preventDefault();
+  const note=prompt('När kan ni spela matchen? (t.ex. "sön 21/9 efter 12" — lämna tomt för att ta bort)');
+  if(note===null) return;
+  try{ await BTS.hostPoolDefer(id, note.trim()); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  catch(err){ alert('Kunde inte spara: '+(err.message||err)); }
+}
 async function saveM(id){
   const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
   if(isNaN(ga)||isNaN(gb)){ alert('Fyll i båda siffrorna.'); return; }
-  try{ await BTS.hostPoolReport(id,ga,gb); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  const cm=(document.getElementById('cm'+id)||{}).value||'';
+  try{ await BTS.hostPoolReport(id,ga,gb,cm); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
   catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
 }
 function editM(id){
