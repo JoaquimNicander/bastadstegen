@@ -40,7 +40,9 @@
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
   .glvl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--clay)}
   .prow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);
-    border-left:3px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:7px}
+    border-left:3px solid var(--border);border-radius:12px;padding:11px 14px;margin-bottom:7px;cursor:pointer}
+  .prow:active{transform:scale(.995)}
+  .prow-arrow{font-style:normal;color:var(--muted2);font-size:20px;margin-left:-4px}
   .prow.up{border-left-color:var(--cream)}
   .prow.down{border-left-color:var(--clay)}
   .rnum{font-family:'Anton',sans-serif;font-size:30px;line-height:1;color:rgba(245,237,227,.16);width:30px;text-align:center;flex:0 0 30px}
@@ -88,6 +90,30 @@
   .legend{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted2);margin:18px 2px 0;display:flex;gap:16px;flex-wrap:wrap;text-transform:uppercase}
   .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
   .state{text-align:center;color:var(--muted2);padding:26px;font-size:14px}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
+  .pcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer}
+  .pcard:active{transform:scale(.98)}
+  .pav{width:64px;height:64px;border-radius:50%;margin:0 auto 8px;background:var(--card2);border:1.5px solid var(--border2);
+    display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:22px;color:var(--muted);overflow:hidden}
+  .pav img{width:100%;height:100%;object-fit:cover}
+  .pcard .pn{font-weight:700;font-size:14px;color:#fff}
+  .pcard .pg{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--clay);margin-top:3px}
+  .pcard .ps{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);margin-top:4px}
+  .pmodal{display:none;position:fixed;inset:0;background:rgba(6,18,13,.75);z-index:50;padding:18px;overflow:auto}
+  .pmodal.open{display:flex}
+  .pbox{background:var(--card);border:1px solid var(--border2);border-radius:16px;max-width:420px;width:100%;margin:auto;overflow:hidden}
+  .pbox .ph{position:relative;background:var(--card2);padding:24px 22px}
+  .pbox .pclose{position:absolute;right:12px;top:8px;background:none;border:0;color:var(--muted);font-size:26px;cursor:pointer;line-height:1}
+  .pbox .pav-lg{width:110px;height:110px;border-radius:50%;margin:0 auto 12px;background:#0a2016;border:2px solid var(--clay);
+    display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:40px;color:var(--muted);overflow:hidden}
+  .pbox .pav-lg img{width:100%;height:100%;object-fit:cover}
+  .pbox h3{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:1px;color:#fff;margin:0;text-align:center}
+  .pbox .pgr{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin-top:5px;text-align:center}
+  .pfacts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+  .pfact{background:var(--card);padding:11px 14px}
+  .pfact .k{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2)}
+  .pfact .v{font-size:14px;color:#fff;margin-top:2px}
+  .pbio{padding:14px 16px;font-size:14px;color:var(--cream);line-height:1.55;font-style:italic;border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -103,6 +129,7 @@
     <div class="tabs">
       <button class="tab active" data-div="H" id="tab-H">Herr</button>
       <button class="tab" data-div="D" id="tab-D">Dam</button>
+      <button class="tab" data-div="S" id="tab-S">Spelare</button>
     </div>
   </div>
 </div>
@@ -114,13 +141,14 @@
     <span>Övriga stannar</span>
   </div>
 </div>
+<div id="profmodal" class="pmodal" onclick="if(event.target===this)closeProfile()"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], ME=null;
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null;
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
 try{ ME=JSON.parse(localStorage.getItem('bts_host_me')||'null'); }catch(e){ ME=null; }
@@ -128,7 +156,7 @@ try{ ME=JSON.parse(localStorage.getItem('bts_host_me')||'null'); }catch(e){ ME=n
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
-  [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
+  [ST,MATCHES,PLAYERS,PROFILES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers(), BTS.hostPoolProfiles(ROUND)]);
   renderLogin(); render();
 }
 function renderLogin(){
@@ -139,10 +167,10 @@ function renderLogin(){
   }
   const roster=[...new Map(ST.map(r=>[r.player_id,r.name])).entries()].map(([id,name])=>({id,name})).sort((a,b)=>a.name.localeCompare(b.name,'sv'));
   const opts='<option value="">Välj ditt namn…</option>'+roster.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
-  el.innerHTML=`<div class="lhint">Logga in för att rapportera</div>
+  el.innerHTML=`<div class="lhint">Logga in för att rapportera · PIN = 4 sista i mobilnr</div>
     <div class="lrow">
       <select id="me-name">${opts}</select>
-      <input id="me-pin" type="password" inputmode="numeric" placeholder="PIN">
+      <input id="me-pin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN">
       <button class="lbtn" onclick="doLogin()">Logga in</button>
     </div>
     <div class="lerr" id="me-err"></div>`;
@@ -210,10 +238,11 @@ function whenLabel(m){
   return 'Tid ej satt';
 }
 function render(){
-  document.getElementById('tab-H').classList.toggle('active',DIV==='H');
-  document.getElementById('tab-D').classList.toggle('active',DIV==='D');
-  const rows=ST.filter(r=>r.division===DIV);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
+  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S')?'none':'';
   const el=document.getElementById('body');
+  if(DIV==='S'){ renderPlayers(el); return; }
+  const rows=ST.filter(r=>r.division===DIV);
   if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
   const levels=rows.map(r=>r.level), top=Math.min(...levels), bot=Math.max(...levels);
   const labels=[...new Set(rows.map(r=>r.label))];
@@ -227,11 +256,12 @@ function render(){
       const zone = (played && !single) ? z[r.player_id] : '';
       const form = formFor(r.player_id,DIV,lab);
       const fhtml = form.length?`<div class="form">${form.map(x=>`<span class="vf ${x==='V'?'v':'f'}">${x}</span>`).join('')}</div>`:'';
-      return `<div class="prow ${zone}">
+      return `<div class="prow ${zone}" onclick="openProfile(${r.player_id})">
         <div class="rnum">${r.rank}</div>
         <div class="pinfo"><div class="pname">${esc(r.name)}</div>
           <div class="pmeta">${r.spelade} matcher · ${r.vinster} vinster</div>${fhtml}</div>
-        <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div></div>`;
+        <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div>
+        <i class="prow-arrow">›</i></div>`;
     }).join('');
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
     const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
@@ -249,6 +279,36 @@ function render(){
       </details></div>`;
   }).join('');
 }
+function renderPlayers(el){
+  if(!PROFILES.length){ el.innerHTML='<div class="state">Inga spelare ännu.</div>'; return; }
+  const card=p=>{
+    const av=p.photo_url?`<img src="${escAttr(p.photo_url)}" alt="">`:esc((p.name||'?').trim().charAt(0)||'?');
+    const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
+    return `<div class="pcard" onclick="openProfile(${p.player_id})">
+      <div class="pav">${av}</div>
+      <div class="pn">${esc(p.name)}</div>
+      <div class="pg">${grp}</div>
+      <div class="ps">${p.spelade} matcher · ${p.vinster} vinster</div></div>`;
+  };
+  el.innerHTML='<div class="pgrid">'+PROFILES.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(card).join('')+'</div>';
+}
+function ageFrom(born){ if(!born) return ''; const d=new Date(born); if(isNaN(d)) return '';
+  const t=new Date(); let a=t.getFullYear()-d.getFullYear();
+  if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate())) a--; return a>0&&a<120?a+' år':''; }
+function openProfile(id){
+  const p=PROFILES.find(x=>x.player_id===id); if(!p) return;
+  const av=p.photo_url?`<img src="${escAttr(p.photo_url)}" alt="">`:esc((p.name||'?').trim().charAt(0)||'?');
+  const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
+  const facts=[['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Underlag',p.fav_surface],
+    ['Spelar sedan',p.since_year],['WTN',p.wtn],['Ålder',ageFrom(p.born)],['I höst',p.spelade+' m · '+p.vinster+' v']].filter(f=>f[1]);
+  document.getElementById('profmodal').innerHTML=`<div class="pbox">
+    <div class="ph"><button class="pclose" onclick="closeProfile()" aria-label="Stäng">×</button>
+      <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div></div>
+    <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
+    ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}</div>`;
+  document.getElementById('profmodal').classList.add('open');
+}
+function closeProfile(){ const m=document.getElementById('profmodal'); m.classList.remove('open'); m.innerHTML=''; }
 async function saveM(id){
   if(!ME){ alert('Logga in för att rapportera.'); return; }
   const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
