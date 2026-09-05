@@ -114,6 +114,15 @@
   .pfact .k{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2)}
   .pfact .v{font-size:14px;color:#fff;margin-top:2px}
   .pbio{padding:14px 16px;font-size:14px;color:var(--cream);line-height:1.55;font-style:italic;border-top:1px solid var(--border)}
+  .confirmbar{margin:14px 0 0}
+  .cnote{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--cream);margin-bottom:8px}
+  .cbx{background:var(--card);border:1px solid var(--clay);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .ctxt{font-weight:700;font-size:14px;color:#fff}
+  .cbtns{display:flex;gap:8px}
+  .cyes,.cno{border:1px solid var(--border2);background:#0a2016;color:var(--cream);border-radius:8px;font:inherit;font-size:13px;font-weight:700;padding:9px 13px;cursor:pointer}
+  .cyes.on{background:var(--clay);color:#3a1400;border-color:var(--clay)}
+  .cno.on{background:#3a1e14;color:#F0997B;border-color:#7a3a22}
+  .cchk{color:#9be29b;font-size:12px} .cx{color:var(--muted2);font-size:12px}
 </style>
 </head>
 <body>
@@ -134,6 +143,7 @@
   </div>
 </div>
 <div class="wrap">
+  <div class="confirmbar" id="confirmbar"></div>
   <div id="body"><div class="state">Laddar…</div></div>
   <div class="legend">
     <span><b style="background:#F5EDE3"></b>Går upp</span>
@@ -148,7 +158,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null;
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='';
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
 try{ ME=JSON.parse(localStorage.getItem('bts_host_me')||'null'); }catch(e){ ME=null; }
@@ -158,7 +168,9 @@ async function load(){
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
-  renderLogin(); render();
+  try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
+       const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
+  renderLogin(); renderConfirm(); render();
 }
 function renderLogin(){
   const el=document.getElementById('loginbar'); if(!el) return;
@@ -190,7 +202,33 @@ async function doLogin(){
     renderLogin(); render();
   }catch(e){ if(err) err.textContent='Kunde inte logga in.'; }
 }
-function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); render(); }
+function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); renderConfirm(); render(); }
+function renderConfirm(){
+  const el=document.getElementById('confirmbar'); if(!el) return;
+  const canConfirm = ME && ST.some(r=>r.player_id===ME.id);
+  if(!NOTE && !canConfirm){ el.innerHTML=''; return; }
+  const noteHtml = NOTE ? `<div class="cnote">📍 ${esc(NOTE)}</div>` : '';
+  let inner;
+  if(canConfirm){
+    const st=ATT[ME.id]; const yes=st===true, no=st===false;
+    inner=`<div class="cbx">
+      <div class="ctxt">Spelomgång ${WEEK} · spelar du kommande söndag?</div>
+      <div class="cbtns">
+        <button class="cyes ${yes?'on':''}" onclick="confirmPlay(true)">✓ Jag spelar</button>
+        <button class="cno ${no?'on':''}" onclick="confirmPlay(false)">Kan inte</button>
+      </div></div>`;
+  } else {
+    inner=`<div class="cbx"><div class="ctxt">Spelomgång ${WEEK} · logga in för att bekräfta spel</div></div>`;
+  }
+  el.innerHTML = noteHtml + inner;
+}
+async function confirmPlay(playing){
+  if(!ME) return;
+  try{ await BTS.hostConfirm(ME.id, ME.pin, playing);
+    const ar=await BTS.hostAttendance(ROUND,WEEK); ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;});
+    renderConfirm(); render();
+  }catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
+}
 function zonesFor(rows){
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
   const top=Math.min(...levels), bot=Math.max(...levels);
@@ -239,6 +277,7 @@ function whenLabel(m){
   return 'Tid ej satt';
 }
 function render(){
+  renderConfirm();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
   const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S')?'none':'';
   const el=document.getElementById('body');
@@ -259,7 +298,7 @@ function render(){
       const fhtml = form.length?`<div class="form">${form.map(x=>`<span class="vf ${x==='V'?'v':'f'}">${x}</span>`).join('')}</div>`:'';
       return `<div class="prow ${zone}" onclick="openProfile(${r.player_id})">
         <div class="rnum">${r.rank}</div>
-        <div class="pinfo"><div class="pname">${esc(r.name)}</div>
+        <div class="pinfo"><div class="pname">${esc(r.name)}${ATT[r.player_id]===true?' <span class="cchk">✓</span>':ATT[r.player_id]===false?' <span class="cx">✕</span>':''}</div>
           <div class="pmeta">${r.spelade} matcher · ${r.vinster} vinster</div>${fhtml}</div>
         <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div>
         <i class="prow-arrow">›</i></div>`;

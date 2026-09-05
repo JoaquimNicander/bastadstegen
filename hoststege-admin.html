@@ -49,7 +49,7 @@
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[];
+let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[], ACT={week:1,note:''}, ATT=[];
 
 async function start(){
   const pw=(document.getElementById('pw').value||'').trim();
@@ -66,6 +66,7 @@ async function start(){
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
+  try{ ACT=await BTS.hostActive(); ATT=await BTS.hostAttendance(ROUND, ACT.week); }catch(e){ ACT={week:1,note:''}; ATT=[]; }
   render();
 }
 
@@ -108,6 +109,20 @@ function render(){
     </div>
 
     <div class="card">
+      <h3>Kommande spelomgång (veckobekräftelse)</h3>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <label class="state">Spelomgång:</label>
+        <input id="wk" type="number" min="1" value="${ACT.week}" style="width:70px;font:inherit;padding:9px;border:1px solid var(--line);border-radius:9px">
+        <button class="btn" onclick="setWeek()">Sätt kommande</button>
+      </div>
+      <label class="state">Banor / info för veckan (inne/ute, antal banor, tider):</label>
+      <textarea id="wknote" rows="2" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;margin-top:6px" placeholder="T.ex. Utomhus · 3 banor · söndag 09–12">${esc(ACT.note||'')}</textarea>
+      <div style="margin-top:8px"><button class="btn" onclick="saveNote()">Spara info</button> <span class="state" id="wkmsg"></span></div>
+      <div style="height:14px"></div>
+      ${confirmSummary()}
+    </div>
+
+    <div class="card">
       <h3>Förhandsvisning: flyttar till omgång ${ROUND+1}</h3>
       <div><b>Båstad Stegen Herr</b>${mv('H')}</div>
       <div style="margin-top:10px"><b>Båstad Stegen Dam</b>${mv('D')}</div>
@@ -143,6 +158,26 @@ async function addLate(){
   catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 
+function confirmSummary(){
+  const play=ATT.filter(a=>a.playing===true), cant=ATT.filter(a=>a.playing===false), no=ATT.filter(a=>a.playing===null||a.playing===undefined);
+  const list=arr=>arr.map(a=>esc(a.name)).join(', ')||'—';
+  return `<div class="prog">
+      <span class="pill ok">${play.length} spelar</span>
+      <span class="pill out">${cant.length} kan inte</span>
+      <span class="pill">${no.length} ej svarat</span>
+    </div>
+    <div class="mv" style="margin-top:10px"><div><b>Kan inte:</b> ${list(cant)}</div>
+      <div style="margin-top:6px"><b>Ej svarat:</b> ${list(no)}</div></div>`;
+}
+async function setWeek(){
+  const w=parseInt(document.getElementById('wk').value); if(!w) return;
+  try{ await BTS.hostSetWeek(PW,w); await load(); }catch(e){ alert('Fel: '+(e.message||e)); }
+}
+async function saveNote(){
+  const n=document.getElementById('wknote').value; const m=document.getElementById('wkmsg'); m.textContent='Sparar…';
+  try{ await BTS.hostSetWeekNote(PW,n); ACT.note=n; m.textContent='Sparat ✓'; setTimeout(()=>{if(m.textContent==='Sparat ✓')m.textContent='';},1500); }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
 async function advance(){
   if(!confirm('Starta omgång '+(ROUND+1)+'? Grupperna för nästa omgång skapas utifrån nuvarande ställning (2 upp / 2 ner / 1 kvar).')) return;
   const s=document.getElementById('advs'); s.textContent='Skapar nästa omgång…';

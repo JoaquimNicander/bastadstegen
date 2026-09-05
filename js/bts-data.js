@@ -577,6 +577,33 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
+  async hostActive() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_active');
+    if (error) throw error;
+    return (data && data[0]) || { round: 1, week: 1 };
+  },
+  async hostConfirm(playerId, pin, playing) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_confirm', { p_player_id: playerId, p_pin: pin || '', p_playing: playing });
+    if (error) throw error;
+  },
+  async hostAttendance(round, week) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_attendance', { p_round: round, p_week: week });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostSetWeek(adminPw, week) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_set_week', { p_admin_pw: adminPw, p_week: week });
+    if (error) throw error;
+  },
+  async hostSetWeekNote(adminPw, note) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_set_weeknote', { p_admin_pw: adminPw, p_note: note || '' });
+    if (error) throw error;
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });
