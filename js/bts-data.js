@@ -571,6 +571,12 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
+  async hostPoolProfiles(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_pool_profiles', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });

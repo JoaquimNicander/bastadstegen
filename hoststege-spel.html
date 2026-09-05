@@ -156,7 +156,8 @@ try{ ME=JSON.parse(localStorage.getItem('bts_host_me')||'null'); }catch(e){ ME=n
 async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
-  [ST,MATCHES,PLAYERS,PROFILES]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers(), BTS.hostPoolProfiles(ROUND)]);
+  [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
+  try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
   renderLogin(); render();
 }
 function renderLogin(){
