@@ -90,11 +90,23 @@
     <p class="p">Du behöver spela din match <b>innan gruppens alla matcher är färdigspelade</b> — alltså innan upp- och nedflyttningen sker. Hittar ni ingen gemensam tid till dess lämnar man <b>WO</b>. Ni får gärna spela matchen en annan tid i stället — men den banhyran ingår inte i avgiften, utan den som inte kunde spela på söndagens tid står för den extra bankostnaden (det är söndagstiden avgiften täcker).</p>
   </div>
 
-  <!-- ANMÄLAN STÄNGD -->
+  <!-- ANMÄLAN -->
   <div class="card">
-    <h2>Anmälan är stängd</h2>
-    <p class="hint">Höststegen är igång och grupperna är satta. Vill du vara med? Hör av dig till klubben — du kommer in <b>efter nästa spelade omgång</b> och startar då längst ner i din stege.</p>
-    <a class="btn" href="hoststege-spel.html">Se grupper & tabeller →</a>
+    <h2>Anmäl dig</h2>
+    <p class="hint">Höststegen är redan igång, så du kommer in <b>när nästa spelomgång startar</b> och placeras då <b>längst ner i din stege</b> — sedan är det bara att jobba sig uppåt. Anmälan gäller hela hösten.</p>
+    <label for="an-nm">Namn</label>
+    <input id="an-nm" type="text" placeholder="För- och efternamn" autocomplete="name">
+    <label for="an-ph">Mobilnummer</label>
+    <input id="an-ph" type="tel" placeholder="07XX XX XX XX" autocomplete="tel">
+    <label for="an-em">Mejladress</label>
+    <input id="an-em" type="email" placeholder="namn@exempel.se" autocomplete="email">
+    <label for="an-div">Stege</label>
+    <select id="an-div"><option value="">Välj stege…</option><option value="H">Herr</option><option value="D">Dam</option></select>
+    <label for="an-pin">Välj en PIN (4 siffror)</label>
+    <input id="an-pin" type="text" inputmode="numeric" maxlength="4" placeholder="lämnas tom = sista 4 i mobilnr">
+    <button class="btn" id="applyBtn" onclick="signup()">Anmäl mig →</button>
+    <div class="status" id="applyStatus"></div>
+    <a class="btn ghost" href="hoststege-spel.html" style="margin-top:10px">Se grupper &amp; tabeller →</a>
   </div>
 
   <!-- ANMÄLDA -->
@@ -129,14 +141,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','
 let PLAYERS=[], ROSTER=[], me=null, busy=false;
 
 async function loadAll(){
-  try{
-    [PLAYERS, ROSTER] = await Promise.all([ BTS.getPlayers(), BTS.hostRoster() ]);
-    const sel=document.getElementById('nm'); const cur=sel.value;
-    sel.innerHTML = '<option value="">Välj din profil…</option>' +
-      PLAYERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
-    sel.value=cur;
-    renderRoster(); renderJoin();
-  }catch(e){ /* tyst */ }
+  try{ ROSTER = await BTS.hostRoster(); renderRoster(); }catch(e){ /* tyst */ }
 }
 function renderRoster(){
   document.getElementById('rcount').textContent = ROSTER.length?('· '+ROSTER.length+' st'):'';
@@ -145,65 +150,27 @@ function renderRoster(){
     ? '<div class="names">'+ROSTER.map(r=>`<span class="chip">${esc(r.name)}</span>`).join('')+'</div>'
     : '<div class="hint">Ingen anmäld än — bli först!</div>';
 }
-function currentPlayer(){
-  const name=(document.getElementById('nm').value||'').trim();
-  return PLAYERS.find(x=>x.name.toLowerCase()===name.toLowerCase())||null;
-}
-function isIn(id){ return ROSTER.some(r=>r.player_id===id); }
-function renderJoin(){
-  const p=currentPlayer();
-  const ok=document.getElementById('joinOk');
-  const btn=document.getElementById('joinBtn');
-  if(!btn) return;
-  if(p && isIn(p.id)){
-    ok.innerHTML = `<div class="bigok">✅ Du är anmäld till höststegen, ${esc(p.name.split(' ')[0])}!</div>`;
-    btn.textContent='Avanmäl mig'; btn.className='btn leave'; btn.onclick=doLeave;
-  }else{
-    ok.innerHTML='';
-    btn.textContent='Anmäl mig →'; btn.className='btn'; btn.onclick=doJoin;
-  }
-}
-document.addEventListener('change', e=>{ if(e.target && e.target.id==='nm') renderJoin(); });
-
-async function doJoin(){
-  if(busy) return;
-  const p=currentPlayer(); const pin=(document.getElementById('pin').value||'').trim();
-  const s=document.getElementById('joinStatus'); s.className='status';
-  if(!p){ s.textContent='Hittar ingen profil med det namnet. Är du ny? Ansök längre ner.'; s.className='status err'; return; }
-  busy=true; s.textContent='Anmäler…';
-  try{ await BTS.hostJoin(p.id, pin); await loadAll(); s.textContent=''; }
-  catch(e){ s.textContent = /PIN/i.test(e.message||'')?'Fel PIN — försök igen.':('Fel: '+(e.message||e)); s.className='status err'; }
-  busy=false;
-}
-async function doLeave(){
-  if(busy) return;
-  const p=currentPlayer(); const pin=(document.getElementById('pin').value||'').trim();
-  const s=document.getElementById('joinStatus'); s.className='status';
-  if(!p) return;
-  if(!confirm('Vill du avanmäla dig från höststegen?')) return;
-  busy=true; s.textContent='Avanmäler…';
-  try{ await BTS.hostLeave(p.id, pin); await loadAll(); s.textContent=''; }
-  catch(e){ s.textContent = /PIN/i.test(e.message||'')?'Fel PIN — försök igen.':('Fel: '+(e.message||e)); s.className='status err'; }
-  busy=false;
-}
-
-async function apply(){
+async function signup(){
   if(busy) return;
   const name=(document.getElementById('an-nm').value||'').trim();
   const phone=(document.getElementById('an-ph').value||'').trim();
   const email=(document.getElementById('an-em').value||'').trim();
-  const pin=(document.getElementById('an-pin').value||'').trim();
+  const div=document.getElementById('an-div').value;
+  let pin=(document.getElementById('an-pin').value||'').replace(/\D/g,'').slice(0,4);
   const s=document.getElementById('applyStatus'); s.className='status';
   if(!name){ s.textContent='Skriv ditt namn.'; s.className='status err'; return; }
   if(!phone){ s.textContent='Ange ditt mobilnummer.'; s.className='status err'; return; }
   if(!email || email.indexOf('@')<0){ s.textContent='Ange en giltig mejladress.'; s.className='status err'; return; }
-  busy=true; document.getElementById('applyBtn').disabled=true; s.textContent='Skapar profil…';
+  if(div!=='H' && div!=='D'){ s.textContent='Välj Herr eller Dam.'; s.className='status err'; return; }
+  if(!pin){ pin=phone.replace(/\D/g,'').slice(-4); }
+  busy=true; document.getElementById('applyBtn').disabled=true; s.textContent='Anmäler…';
   try{
-    await BTS.hostSignup(name, phone, email, pin);
+    await BTS.hostSignup(name, phone, email, pin, div);
     await loadAll();
-    const sel=document.getElementById('nm'); if(sel){ sel.value=name; renderJoin(); }
-    s.textContent='Klart! Din profil är skapad och du är anmäld till höststegen. ✓'; s.className='status ok';
+    s.innerHTML='✅ Tack '+esc(name.split(' ')[0])+'! Du är anmäld. Du kommer in längst ner i '+(div==='H'?'herrstegen':'damstegen')+' när nästa spelomgång startar. Din PIN är <b>'+esc(pin)+'</b> — spara den, du loggar in med den.';
+    s.className='status ok';
     document.getElementById('an-nm').value=document.getElementById('an-ph').value=document.getElementById('an-em').value=document.getElementById('an-pin').value='';
+    document.getElementById('an-div').value='';
   }catch(e){ s.textContent='Fel: '+(e.message||e); s.className='status err'; }
   busy=false; document.getElementById('applyBtn').disabled=false;
 }

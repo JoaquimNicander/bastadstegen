@@ -544,13 +544,19 @@ const BTS = {
     if (error) throw error;
   },
   // Ny spelare: skapa profil + hamna direkt bland höststegens anmälda (utan godkännande)
-  async hostSignup(name, phone, email, pin) {
+  async hostSignup(name, phone, email, pin, division) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_signup', {
-      p_name: name, p_phone: phone, p_email: email, p_pin: pin || null,
+      p_name: name, p_phone: phone, p_email: email, p_pin: pin || null, p_division: division || null,
     });
     if (error) throw error;
     return data;
+  },
+  async hostWaitlist() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_waitlist');
+    if (error) throw error;
+    return data || [];
   },
   // ── HÖSTSTEGE POOLSPEL ───────────────────────────────────────────────
   async hostPoolInfo() {

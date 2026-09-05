@@ -49,7 +49,7 @@
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[], ACT={week:1,note:''}, ATT=[];
+let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[], ACT={week:1,note:''}, ATT=[], WAIT=[];
 
 async function start(){
   const pw=(document.getElementById('pw').value||'').trim();
@@ -67,6 +67,7 @@ async function load(){
   INFO=await BTS.hostPoolInfo(); ROUND=INFO.current_round;
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   try{ ACT=await BTS.hostActive(); ATT=await BTS.hostAttendance(ROUND, ACT.week); }catch(e){ ACT={week:1,note:''}; ATT=[]; }
+  try{ WAIT=await BTS.hostWaitlist(); }catch(e){ WAIT=[]; }
   render();
 }
 
@@ -144,6 +145,8 @@ function render(){
       </div>
       <div class="state" id="remMsg"></div>
     </div>
+
+    ${waitCard()}
 
     <div class="card">
       <h3>Förhandsvisning: flyttar till omgång ${ROUND+1}</h3>
@@ -237,6 +240,17 @@ async function fillGroupDate(dv,lab){
     try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c); m.play_date=d; document.getElementById('sd_'+m.id).value=d; }catch(e){}
   }
   alert('Datum satt på gruppen ✓');
+}
+function waitCard(){
+  if(!WAIT || !WAIT.length) return '';
+  const dn={H:'Herr',D:'Dam'};
+  const rows=WAIT.map(w=>`<div class="approw" style="display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:14px">
+      <div><b>${esc(w.name)}</b> <span class="state">· ${dn[w.division]||w.division}</span></div>
+      <div class="state">${w.phone?esc(w.phone):(w.email?esc(w.email):'')}</div></div>`).join('');
+  return `<div class="card">
+    <h3>Väntelista (${WAIT.length}) — kommer in vid nästa omgångsstart</h3>
+    <div class="state">Nyanmälda placeras automatiskt längst ner i sin stege när du trycker "Starta omgång ${ROUND+1}".</div>
+    ${rows}</div>`;
 }
 function confirmSummary(){
   const play=ATT.filter(a=>a.playing===true), cant=ATT.filter(a=>a.playing===false), no=ATT.filter(a=>a.playing===null||a.playing===undefined);
