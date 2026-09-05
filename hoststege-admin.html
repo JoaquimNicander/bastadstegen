@@ -123,6 +123,27 @@ function render(){
     </div>
 
     <div class="card">
+      <h3>Skicka påminnelse (SMS + mejl)</h3>
+      <div class="state">SMS där mobil finns, annars mejl. Testa till dig själv först.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+        <select id="remTmpl" style="flex:1 1 170px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          <option value="confirm">Bekräfta spel</option>
+          <option value="report">Rapportera resultat</option>
+        </select>
+        <select id="remTarget" style="flex:1 1 190px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          <option value="unconfirmed">Ej svarat (bekräftelse)</option>
+          <option value="unreported">Har ospelade matcher</option>
+          <option value="all">Alla i höststegen</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="remTest()">Testa till mig</button>
+        <button class="btn go" style="flex:1" onclick="remSend()">Skicka påminnelse →</button>
+      </div>
+      <div class="state" id="remMsg"></div>
+    </div>
+
+    <div class="card">
       <h3>Förhandsvisning: flyttar till omgång ${ROUND+1}</h3>
       <div><b>Båstad Stegen Herr</b>${mv('H')}</div>
       <div style="margin-top:10px"><b>Båstad Stegen Dam</b>${mv('D')}</div>
@@ -176,6 +197,21 @@ async function setWeek(){
 async function saveNote(){
   const n=document.getElementById('wknote').value; const m=document.getElementById('wkmsg'); m.textContent='Sparar…';
   try{ await BTS.hostSetWeekNote(PW,n); ACT.note=n; m.textContent='Sparat ✓'; setTimeout(()=>{if(m.textContent==='Sparat ✓')m.textContent='';},1500); }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
+function remTmpl(){ return document.getElementById('remTmpl').value; }
+function remTgt(){ return document.getElementById('remTarget').value; }
+async function remTest(){
+  const m=document.getElementById('remMsg'); m.textContent='Skickar test till dig…';
+  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {test:true, testPhone:'0720787845', testEmail:'joaquim@cxdesign.se'});
+    m.textContent=`Test skickat ✓ (SMS ${r.sms.sent}, mejl ${r.email.sent})`; }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
+async function remSend(){
+  if(!confirm('Skicka påminnelse till vald målgrupp nu?')) return;
+  const m=document.getElementById('remMsg'); m.textContent='Skickar…';
+  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {});
+    m.textContent=`Skickat till ${r.recipients} (SMS ${r.sms.sent}, mejl ${r.email.sent})`+(r.errors&&r.errors.length?` · fel: ${r.errors.length}`:''); }
   catch(e){ m.textContent='Fel: '+(e.message||e); }
 }
 async function advance(){

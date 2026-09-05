@@ -604,6 +604,17 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_set_weeknote', { p_admin_pw: adminPw, p_note: note || '' });
     if (error) throw error;
   },
+  async hostReminder(adminPw, template, target, opts) {
+    opts = opts || {};
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ mode: 'host_reminder', adminPw, template, target, test: !!opts.test, testPhone: opts.testPhone || '', testEmail: opts.testEmail || '' }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });
