@@ -139,15 +139,21 @@ function render(){
       <h3>Skicka påminnelse (SMS + mejl)</h3>
       <div class="state">SMS där mobil finns, annars mejl. Testa till dig själv först.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
-        <select id="remTmpl" style="flex:1 1 170px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
-          <option value="confirm">Bekräfta spel</option>
-          <option value="report">Rapportera resultat</option>
-        </select>
-        <select id="remTarget" style="flex:1 1 190px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
-          <option value="unconfirmed">Ej svarat (bekräftelse)</option>
-          <option value="unreported">Har ospelade matcher</option>
-          <option value="all">Alla i höststegen</option>
-        </select>
+        <div style="flex:1 1 170px">
+          <label class="state" style="display:block;margin-bottom:4px">Meddelande (vad)</label>
+          <select id="remTmpl" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+            <option value="confirm">Bekräfta spel</option>
+            <option value="report">Rapportera resultat</option>
+          </select>
+        </div>
+        <div style="flex:1 1 190px">
+          <label class="state" style="display:block;margin-bottom:4px">Till vilka (mottagare)</label>
+          <select id="remTarget" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+            <option value="unconfirmed">Ej svarat (bekräftelse)</option>
+            <option value="unreported">Har ospelade matcher</option>
+            <option value="all">Alla i höststegen</option>
+          </select>
+        </div>
       </div>
       <label class="state">Eget meddelande (valfritt) — lämna tomt för standardtexten. {namn} = förnamn, länken läggs till automatiskt.</label>
       <textarea id="remCustom" rows="3" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;margin:6px 0 10px" placeholder="Eget SMS/mejl…"></textarea>
