@@ -141,25 +141,30 @@ function render(){
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
         <div style="flex:1 1 170px">
           <label class="state" style="display:block;margin-bottom:4px">Meddelande (vad)</label>
-          <select id="remTmpl" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          <select id="remTmpl" onchange="remReset()" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
             <option value="confirm">Bekräfta spel</option>
             <option value="report">Rapportera resultat</option>
           </select>
         </div>
         <div style="flex:1 1 190px">
           <label class="state" style="display:block;margin-bottom:4px">Till vilka (mottagare)</label>
-          <select id="remTarget" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
+          <select id="remTarget" onchange="remCount()" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
             <option value="unconfirmed">Ej svarat (bekräftelse)</option>
             <option value="unreported">Har ospelade matcher</option>
             <option value="all">Alla i höststegen</option>
           </select>
         </div>
       </div>
-      <label class="state">Eget meddelande (valfritt) — lämna tomt för standardtexten. {namn} = förnamn, länken läggs till automatiskt.</label>
-      <textarea id="remCustom" rows="3" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;margin:6px 0 10px" placeholder="Eget SMS/mejl…"></textarea>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:4px">
+        <label class="state">Detta skickas (justera fritt):</label>
+        <a href="#" onclick="remReset();return false" style="font-size:12px">Återställ standardtext</a>
+      </div>
+      <textarea id="remCustom" rows="3" oninput="remPreview()" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;margin:6px 0 4px">${remDefault(document.getElementById('remTmpl')?document.getElementById('remTmpl').value:'confirm')}</textarea>
+      <div class="state" style="margin-bottom:8px">{namn} = förnamn · länken till stegen läggs till automatiskt sist.</div>
+      <div class="warn" id="remPrev" style="margin:0 0 10px">Förhandsvisning…</div>
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="remTest()">Testa till mig</button>
-        <button class="btn go" style="flex:1" onclick="remSend()">Skicka påminnelse →</button>
+        <button class="btn go" style="flex:1" onclick="remSend()">Skicka till <span id="remCnt">…</span> →</button>
       </div>
       <div class="state" id="remMsg"></div>
     </div>
@@ -191,6 +196,7 @@ function render(){
       </div>
       <div class="state" id="lates"></div>
     </div>`;
+  remInit();
 }
 
 async function addLate(){
@@ -300,6 +306,41 @@ async function saveNote(){
 function remTmpl(){ return document.getElementById('remTmpl').value; }
 function remTgt(){ return document.getElementById('remTarget').value; }
 function remCustom(){ return (document.getElementById('remCustom').value||'').trim(); }
+function remDefault(tmpl){
+  const wk=(ACT&&ACT.week)||1;
+  return tmpl==='report'
+    ? 'Hej {namn}! Glöm inte att rapportera dina höststege-matcher:'
+    : 'Hej {namn}! Kom ihåg att bekräfta om du spelar kommande söndag (spelomgång '+wk+') i höststegen:';
+}
+const SITE_LINK='https://bastadstegen.se/hoststege-spel.html';
+function remPreview(){
+  const el=document.getElementById('remPrev'); if(!el) return;
+  let t=(document.getElementById('remCustom').value||'').trim();
+  if(!t){ el.textContent='(tomt — standardtexten skickas)'; return; }
+  t=t.replace(/\{namn\}/g,'Anna').replace(/\[namn\]/g,'Anna');
+  if(t.indexOf(SITE_LINK)<0) t+=' '+SITE_LINK;
+  el.innerHTML='<b>Så här ser det ut:</b><br>'+esc(t);
+}
+function remReset(){
+  const ta=document.getElementById('remCustom'); if(ta){ ta.value=remDefault(remTmpl()); }
+  remPreview();
+}
+function remCount(){
+  const span=document.getElementById('remCnt'); if(!span) return;
+  const members=new Set(ST.map(r=>r.player_id));
+  let ids;
+  const tgt=remTgt();
+  if(tgt==='all'){ ids=[...members]; }
+  else if(tgt==='unreported'){
+    const up=new Set(); MATCHES.forEach(m=>{ if(m.status!=='done'){ up.add(m.a_id); up.add(m.b_id); } });
+    ids=[...members].filter(i=>up.has(i));
+  } else { // unconfirmed
+    const answered=new Set(ATT.map(a=>a.player_id));
+    ids=[...members].filter(i=>!answered.has(i));
+  }
+  span.textContent=ids.length+' mottagare';
+}
+function remInit(){ remPreview(); remCount(); }
 async function remTest(){
   const m=document.getElementById('remMsg'); m.textContent='Skickar test till dig…';
   try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {test:true, testPhone:'0720787845', testEmail:'joaquim@cxdesign.se', customText:remCustom()});
