@@ -149,6 +149,8 @@ function render(){
           <option value="all">Alla i höststegen</option>
         </select>
       </div>
+      <label class="state">Eget meddelande (valfritt) — lämna tomt för standardtexten. {namn} = förnamn, länken läggs till automatiskt.</label>
+      <textarea id="remCustom" rows="3" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px;margin:6px 0 10px" placeholder="Eget SMS/mejl…"></textarea>
       <div style="display:flex;gap:8px">
         <button class="btn" onclick="remTest()">Testa till mig</button>
         <button class="btn go" style="flex:1" onclick="remSend()">Skicka påminnelse →</button>
@@ -291,16 +293,17 @@ async function saveNote(){
 }
 function remTmpl(){ return document.getElementById('remTmpl').value; }
 function remTgt(){ return document.getElementById('remTarget').value; }
+function remCustom(){ return (document.getElementById('remCustom').value||'').trim(); }
 async function remTest(){
   const m=document.getElementById('remMsg'); m.textContent='Skickar test till dig…';
-  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {test:true, testPhone:'0720787845', testEmail:'joaquim@cxdesign.se'});
+  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {test:true, testPhone:'0720787845', testEmail:'joaquim@cxdesign.se', customText:remCustom()});
     m.textContent=`Test skickat ✓ (SMS ${r.sms.sent}, mejl ${r.email.sent})`; }
   catch(e){ m.textContent='Fel: '+(e.message||e); }
 }
 async function remSend(){
   if(!confirm('Skicka påminnelse till vald målgrupp nu?')) return;
   const m=document.getElementById('remMsg'); m.textContent='Skickar…';
-  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {});
+  try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {customText:remCustom()});
     m.textContent=`Skickat till ${r.recipients} (SMS ${r.sms.sent}, mejl ${r.email.sent})`+(r.errors&&r.errors.length?` · fel: ${r.errors.length}`:''); }
   catch(e){ m.textContent='Fel: '+(e.message||e); }
 }
