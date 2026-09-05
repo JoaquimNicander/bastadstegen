@@ -654,6 +654,12 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
+  async hostContact(viewerId, pin, targetId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_contact', { p_viewer_id: viewerId, p_pin: pin || '', p_target_id: targetId });
+    if (error) throw error;
+    return (data && data[0]) || null;
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });

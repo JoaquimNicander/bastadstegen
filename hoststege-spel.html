@@ -400,12 +400,28 @@ function openProfile(id){
   const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
   const facts=[['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Underlag',p.fav_surface],
     ['Spelar sedan',p.since_year],['WTN',p.wtn],['Ålder',ageFrom(p.born)],['I höst',p.spelade+' m · '+p.vinster+' v']].filter(f=>f[1]);
+  const contactHtml = ME
+    ? `<div class="pbio" id="pcontact" style="font-style:normal">Laddar kontakt…</div>`
+    : `<div class="pbio" id="pcontact" style="font-style:normal;color:var(--muted2)">🔒 Logga in för att se kontaktuppgifter</div>`;
   document.getElementById('profmodal').innerHTML=`<div class="pbox">
     <div class="ph"><button class="pclose" onclick="closeProfile()" aria-label="Stäng">×</button>
       <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div></div>
     <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
-    ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}</div>`;
+    ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
+    ${contactHtml}</div>`;
   document.getElementById('profmodal').classList.add('open');
+  if(ME) fillContact(id);
+}
+async function fillContact(id){
+  const el=document.getElementById('pcontact'); if(!el) return;
+  try{
+    const c=await BTS.hostContact(ME.id, ME.pin, id);
+    if(!c || (!c.phone && !c.email)){ el.textContent='Inga kontaktuppgifter angivna.'; el.style.color='var(--muted2)'; return; }
+    let h='<div style="font-family:\'Space Mono\',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-bottom:6px">Kontakt</div>';
+    if(c.phone){ const tel=String(c.phone).replace(/[^\d+]/g,''); h+=`<div>📱 <a href="tel:${escAttr(tel)}" style="color:var(--clay);text-decoration:none;font-weight:700">${esc(c.phone)}</a></div>`; }
+    if(c.email){ h+=`<div style="margin-top:5px">✉️ <a href="mailto:${escAttr(c.email)}" style="color:var(--clay);text-decoration:none;font-weight:700">${esc(c.email)}</a></div>`; }
+    el.innerHTML=h;
+  }catch(e){ el.textContent='Kunde inte hämta kontakt.'; el.style.color='var(--muted2)'; }
 }
 function closeProfile(){ const m=document.getElementById('profmodal'); m.classList.remove('open'); m.innerHTML=''; }
 async function saveM(id){
