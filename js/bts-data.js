@@ -615,6 +615,29 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
+  async hostCantNotify(playerId, pin, week) {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ mode: 'host_cant', playerId, pin: pin || '', week: week || null }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
+  async hostReschedule(matchId, note, playerId, pin) {
+    // 1) skriv den nya tiden på matchen (PIN-skyddat, bara matchens spelare)
+    await this.hostPoolDefer(matchId, note, playerId, pin);
+    // 2) meddela motståndaren + klubben
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ mode: 'host_reschedule', matchId, note: note || '', playerId, pin: pin || '' }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });

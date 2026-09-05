@@ -154,6 +154,7 @@
   </div>
 </div>
 <div id="profmodal" class="pmodal" onclick="if(event.target===this)closeProfile()"></div>
+<div id="cantmodal" class="pmodal" onclick="if(event.target===this)closeCant()"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/bts-data.js"></script>
@@ -237,7 +238,55 @@ async function confirmPlay(playing){
   try{ await BTS.hostConfirm(ME.id, ME.pin, playing);
     const ar=await BTS.hostAttendance(ROUND,WEEK); ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;});
     renderConfirm(); render();
+    if(playing===false) openCant();
   }catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
+}
+function myWeekMatches(){
+  if(!ME) return [];
+  return MATCHES.filter(m=>(m.matchday||0)===WEEK && (m.a_id===ME.id||m.b_id===ME.id) && m.status!=='done');
+}
+function openCant(){
+  const mm=myWeekMatches();
+  const opp=mm.length ? mm.map(m=>m.a_id===ME.id?m.b_name:m.a_name).join(', ') : '';
+  const mid=mm.length?mm[0].id:0;
+  const rescheduleBox = mm.length ? `
+    <div style="border-top:1px solid var(--border);padding:16px">
+      <div style="font-weight:700;color:#fff;margin-bottom:4px">Kommit överens om ny tid?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Skriv in den så meddelas ${esc(opp)} och klubben, och tiden syns på matchen.</div>
+      <input id="cant-note" type="text" placeholder="T.ex. onsdag 18:00, bana 2" style="width:100%;font:inherit;padding:11px 13px;background:#0a2016;border:1px solid var(--border2);border-radius:9px;color:#fff;box-sizing:border-box">
+      <button class="repbtn" style="margin-top:10px" onclick="sendReschedule(${mid})">Meddela ny tid →</button>
+      <div class="state" id="cant-rmsg" style="color:var(--muted);font-size:13px;margin-top:8px"></div>
+    </div>` : '';
+  document.getElementById('cantmodal').innerHTML=`<div class="pbox" style="max-width:440px">
+    <div class="ph" style="padding:22px">
+      <button class="pclose" onclick="closeCant()" aria-label="Stäng">×</button>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);font-weight:700">Spelomgång ${WEEK}</div>
+      <h3 style="text-align:left;margin-top:4px;font-size:24px">Du kan inte spela</h3>
+    </div>
+    <div style="padding:16px 18px;color:var(--cream);font-size:14.5px;line-height:1.6">
+      ${opp ? `Vi meddelar <b>${esc(opp)}</b> och klubben automatiskt via SMS/mejl. Ta kontakt med varandra och kom överens om en ny tid att spela er match.`
+            : 'Klubben är meddelad. Du hade ingen inlagd match för den här spelomgången.'}
+      <div class="state" id="cant-nmsg" style="color:var(--muted);font-size:13px;margin-top:10px">Skickar avisering…</div>
+    </div>
+    ${rescheduleBox}
+    <div style="padding:0 18px 18px"><button class="cyes" style="width:100%;padding:12px" onclick="closeCant()">Klart</button></div>
+  </div>`;
+  document.getElementById('cantmodal').classList.add('open');
+  // skicka aviseringen automatiskt
+  BTS.hostCantNotify(ME.id, ME.pin, WEEK).then(r=>{
+    const el=document.getElementById('cant-nmsg'); if(el) el.innerHTML='✓ Motståndaren och klubben är meddelade.';
+  }).catch(e=>{ const el=document.getElementById('cant-nmsg'); if(el) el.textContent='Kunde inte skicka avisering: '+(e.message||e); });
+}
+function closeCant(){ const m=document.getElementById('cantmodal'); m.classList.remove('open'); m.innerHTML=''; }
+async function sendReschedule(mid){
+  const note=(document.getElementById('cant-note').value||'').trim();
+  const s=document.getElementById('cant-rmsg');
+  if(!note){ s.textContent='Skriv en ny tid först.'; return; }
+  s.textContent='Skickar…';
+  try{ await BTS.hostReschedule(mid, note, ME.id, ME.pin);
+    MATCHES=await BTS.hostPoolMatches(ROUND); render();
+    s.innerHTML='✓ Ny tid inlagd och meddelad.';
+  }catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 function zonesFor(rows){
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
