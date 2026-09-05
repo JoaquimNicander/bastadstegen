@@ -27,6 +27,18 @@
   .state{color:var(--muted);font-size:13px;margin-top:8px}
   .warn{background:#fff7e6;border:1px solid #f0d9a0;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
   a{color:var(--down)}
+  details.sgrp{border:1px solid var(--line);border-radius:11px;margin-top:12px;overflow:hidden}
+  details.sgrp>summary{cursor:pointer;padding:13px 15px;font-weight:800;color:var(--green);list-style:none;display:flex;align-items:center;gap:9px;background:var(--cream)}
+  details.sgrp>summary::-webkit-details-marker{display:none}
+  details.sgrp>summary::before{content:'▸';color:var(--gold);font-size:12px;transition:transform .15s}
+  details.sgrp[open]>summary::before{transform:rotate(90deg)}
+  .grpdate{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 15px;border-top:1px solid var(--line);background:#fff}
+  details.somg{border-top:1px solid var(--line);background:#fff}
+  details.somg>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:13.5px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:8px}
+  details.somg>summary::-webkit-details-marker{display:none}
+  details.somg>summary::before{content:'▸';color:var(--muted);font-size:11px;transition:transform .15s}
+  details.somg[open]>summary::before{transform:rotate(90deg)}
+  .cnt{color:var(--muted);font-weight:400;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -194,26 +206,30 @@ function schedCard(){
     labels.forEach(lab=>{
       const ms=MATCHES.filter(m=>m.division===dv&&m.label===lab)
         .sort((a,b)=>((a.matchday||999)-(b.matchday||999))||a.a_name.localeCompare(b.a_name,'sv'));
-      inner+=`<div style="margin-top:16px">
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <b style="color:var(--green)">${divName[dv]||dv} · Grupp ${esc(lab)}</b>
+      const doneG=ms.filter(m=>m.status==='done').length;
+      let g=`<details class="sgrp"><summary>${divName[dv]||dv} · Grupp ${esc(lab)} <span class="cnt">(${ms.length} matcher · ${doneG} spelade)</span></summary>
+        <div class="grpdate">
+          <span class="state">Sätt samma datum på hela gruppen:</span>
           <input id="gd_${dv}_${lab}" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-          <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillGroupDate('${dv}','${lab}')">Sätt datum på alla i gruppen</button>
+          <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillGroupDate('${dv}','${lab}')">Sätt på alla</button>
         </div>`;
       const mds=[...new Set(ms.map(m=>m.matchday||0))];
       mds.forEach(md=>{
-        if(mds.length>1) inner+=`<div class="state" style="margin-top:10px;font-weight:700">Spelomgång ${md||'—'}</div>`;
-        ms.filter(m=>(m.matchday||0)===md).forEach(m=>{ inner+=schedRow(m); });
+        const dayM=ms.filter(m=>(m.matchday||0)===md);
+        const set=dayM.filter(m=>m.play_date).length;
+        g+=`<details class="somg"><summary>Spelomgång ${md||'—'} <span class="cnt">(${dayM.length} matcher${set?` · ${set} med tid`:''})</span></summary>
+          ${dayM.map(schedRow).join('')}</details>`;
       });
-      inner+='</div>';
+      g+='</details>';
+      inner+=g;
     });
   });
   return `<div class="card"><h3>Tider &amp; banor (omgång ${ROUND})</h3>
-    <div class="state">Sätt datum, tid och bana per match — visas direkt på spel-sidan för spelarna.</div>
+    <div class="state">Öppna en grupp och en spelomgång, sätt datum, tid och bana per match — visas direkt på spel-sidan för spelarna.</div>
     ${inner}</div>`;
 }
 function schedRow(m){
-  return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)">
+  return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 15px;border-top:1px solid var(--line)">
     <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}</div>
     <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
     <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
