@@ -27,18 +27,16 @@
   .state{color:var(--muted);font-size:13px;margin-top:8px}
   .warn{background:#fff7e6;border:1px solid #f0d9a0;border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
   a{color:var(--down)}
-  details.sgrp{border:1px solid var(--line);border-radius:11px;margin-top:12px;overflow:hidden}
-  details.sgrp>summary{cursor:pointer;padding:13px 15px;font-weight:800;color:var(--green);list-style:none;display:flex;align-items:center;gap:9px;background:var(--cream)}
-  details.sgrp>summary::-webkit-details-marker{display:none}
-  details.sgrp>summary::before{content:'▸';color:var(--gold);font-size:12px;transition:transform .15s}
-  details.sgrp[open]>summary::before{transform:rotate(90deg)}
-  .grpdate{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 15px;border-top:1px solid var(--line);background:#fff}
-  details.somg{border-top:1px solid var(--line);background:#fff}
-  details.somg>summary{cursor:pointer;padding:11px 15px;font-weight:700;font-size:13.5px;color:var(--ink);list-style:none;display:flex;align-items:center;gap:8px}
-  details.somg>summary::-webkit-details-marker{display:none}
-  details.somg>summary::before{content:'▸';color:var(--muted);font-size:11px;transition:transform .15s}
-  details.somg[open]>summary::before{transform:rotate(90deg)}
   .cnt{color:var(--muted);font-weight:400;font-size:12.5px}
+  .wknav{display:flex;align-items:center;gap:8px;margin:14px 0 6px}
+  .wkchips{display:flex;gap:6px;overflow-x:auto;flex:1;padding:2px}
+  .wkchip{flex:0 0 auto;background:var(--cream);border:1px solid var(--line);border-radius:100px;padding:8px 14px;font:inherit;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+  .wkchip.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .wkarrow{flex:0 0 auto;background:#fff;border:1px solid var(--line);border-radius:9px;width:38px;height:38px;font-size:18px;cursor:pointer;color:var(--green)}
+  .wkarrow:disabled{opacity:.35;cursor:default}
+  .wkbulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0 4px}
+  .wkhead{margin:16px 0 2px;font-size:15px;color:var(--green)}
+  .sgh{margin:16px 0 2px;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold)}
 </style>
 </head>
 <body>
@@ -61,7 +59,7 @@
 <script src="js/bts-data.js"></script>
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[], ACT={week:1,note:''}, ATT=[], WAIT=[];
+let PW='', INFO=null, ROUND=1, ST=[], MATCHES=[], PLAYERS=[], ACT={week:1,note:''}, ATT=[], WAIT=[], SCHEDWK=null;
 
 async function start(){
   const pw=(document.getElementById('pw').value||'').trim();
@@ -199,34 +197,46 @@ async function addLate(){
 function schedCard(){
   if(!MATCHES.length) return '';
   const divName={H:'Herr',D:'Dam'};
-  const divs=[...new Set(MATCHES.map(m=>m.division))];
-  let inner='';
-  divs.forEach(dv=>{
-    const labels=[...new Set(MATCHES.filter(m=>m.division===dv).map(m=>m.label))].sort();
-    labels.forEach(lab=>{
-      const ms=MATCHES.filter(m=>m.division===dv&&m.label===lab)
-        .sort((a,b)=>((a.matchday||999)-(b.matchday||999))||a.a_name.localeCompare(b.a_name,'sv'));
-      const doneG=ms.filter(m=>m.status==='done').length;
-      let g=`<details class="sgrp"><summary>${divName[dv]||dv} · Grupp ${esc(lab)} <span class="cnt">(${ms.length} matcher · ${doneG} spelade)</span></summary>
-        <div class="grpdate">
-          <span class="state">Sätt samma datum på hela gruppen:</span>
-          <input id="gd_${dv}_${lab}" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-          <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillGroupDate('${dv}','${lab}')">Sätt på alla</button>
-        </div>`;
-      const mds=[...new Set(ms.map(m=>m.matchday||0))];
-      mds.forEach(md=>{
-        const dayM=ms.filter(m=>(m.matchday||0)===md);
-        const set=dayM.filter(m=>m.play_date).length;
-        g+=`<details class="somg"><summary>Spelomgång ${md||'—'} <span class="cnt">(${dayM.length} matcher${set?` · ${set} med tid`:''})</span></summary>
-          ${dayM.map(schedRow).join('')}</details>`;
-      });
-      g+='</details>';
-      inner+=g;
-    });
+  const mds=[...new Set(MATCHES.map(m=>m.matchday||0))].sort((a,b)=>a-b);
+  if(!mds.length) return '';
+  if(SCHEDWK==null || !mds.includes(SCHEDWK)) SCHEDWK = mds.includes(ACT.week)?ACT.week:mds[0];
+  const idx=mds.indexOf(SCHEDWK);
+  const chips=mds.map(md=>`<button class="wkchip ${md===SCHEDWK?'on':''}" onclick="setSchedWk(${md})">Omg ${md}</button>`).join('');
+  const dayM=MATCHES.filter(m=>(m.matchday||0)===SCHEDWK)
+    .sort((a,b)=> (a.division<b.division?-1:a.division>b.division?1:0) || (a.label<b.label?-1:a.label>b.label?1:0) || a.a_name.localeCompare(b.a_name,'sv'));
+  let rows='', lastKey='';
+  dayM.forEach(m=>{
+    const key=m.division+m.label;
+    if(key!==lastKey){ rows+=`<div class="sgh">${divName[m.division]||m.division} · Grupp ${esc(m.label)}</div>`; lastKey=key; }
+    rows+=schedRow(m);
   });
-  return `<div class="card"><h3>Tider &amp; banor (omgång ${ROUND})</h3>
-    <div class="state">Öppna en grupp och en spelomgång, sätt datum, tid och bana per match — visas direkt på spel-sidan för spelarna.</div>
-    ${inner}</div>`;
+  const doneD=dayM.filter(m=>m.status==='done').length, setD=dayM.filter(m=>m.play_date).length;
+  return `<div class="card"><h3>Tider &amp; banor</h3>
+    <div class="state">Välj en spelomgång (spelsöndag) och sätt datum, tid och bana. Visas direkt på spel-sidan för spelarna.</div>
+    <div class="wknav">
+      <button class="wkarrow" ${idx<=0?'disabled':''} onclick="setSchedWk(${mds[Math.max(0,idx-1)]})">←</button>
+      <div class="wkchips">${chips}</div>
+      <button class="wkarrow" ${idx>=mds.length-1?'disabled':''} onclick="setSchedWk(${mds[Math.min(mds.length-1,idx+1)]})">→</button>
+    </div>
+    <div class="wkbulk">
+      <span class="state">Hela spelomgång ${SCHEDWK} samma datum:</span>
+      <input id="wkdate" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillWeekDate()">Sätt på alla (${dayM.length})</button>
+    </div>
+    <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${doneD} spelade · ${setD} med tid</span></div>
+    ${rows}</div>`;
+}
+function setSchedWk(md){ SCHEDWK=md; render(); const c=document.querySelector('.wknav'); if(c) c.scrollIntoView({block:'center'}); }
+async function fillWeekDate(){
+  const d=document.getElementById('wkdate').value;
+  if(!d){ alert('Välj ett datum först.'); return; }
+  const ms=MATCHES.filter(m=>(m.matchday||0)===SCHEDWK);
+  if(!confirm('Sätt '+d+' som datum på alla '+ms.length+' matcher i spelomgång '+SCHEDWK+'? (tid/bana per match behålls)')) return;
+  for(const m of ms){
+    const t=(document.getElementById('st_'+m.id)?.value||'').trim(), c=(document.getElementById('sc_'+m.id)?.value||'').trim();
+    try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c); m.play_date=d; const el=document.getElementById('sd_'+m.id); if(el) el.value=d; }catch(e){}
+  }
+  alert('Datum satt på spelomgång '+SCHEDWK+' ✓');
 }
 function schedRow(m){
   return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 15px;border-top:1px solid var(--line)">
@@ -245,17 +255,6 @@ async function saveSched(id){
     const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; }
     s.textContent='✓'; setTimeout(()=>{ if(s.textContent==='✓') s.textContent=''; },1500);
   }catch(e){ s.textContent='✕'; alert('Fel: '+(e.message||e)); }
-}
-async function fillGroupDate(dv,lab){
-  const d=document.getElementById('gd_'+dv+'_'+lab).value;
-  if(!d){ alert('Välj ett datum först.'); return; }
-  const ms=MATCHES.filter(m=>m.division===dv&&m.label===lab);
-  if(!confirm('Sätt '+d+' som datum på alla '+ms.length+' matcher i gruppen? (tid/bana per match behålls)')) return;
-  for(const m of ms){
-    const t=(document.getElementById('st_'+m.id).value||'').trim(), c=(document.getElementById('sc_'+m.id).value||'').trim();
-    try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c); m.play_date=d; document.getElementById('sd_'+m.id).value=d; }catch(e){}
-  }
-  alert('Datum satt på gruppen ✓');
 }
 function waitCard(){
   if(!WAIT || !WAIT.length) return '';
