@@ -215,9 +215,8 @@ function openOk(name, div, pin){
   document.getElementById('ok-body').innerHTML =
     '<p class="p">Du är anmäld 🎾 Du kommer in <b>längst ner i '+stege+'</b> när nästa spelomgång startar — sedan är det bara att jobba sig uppåt.</p>'
     +'<div class="opin"><div class="k">Din PIN</div><div class="v">'+esc(pin)+'</div><div class="note">Spara den — du loggar in med den på stegen &amp; din profil</div></div>'
-    +'<div class="oprof">📸 <b>Gör profilen komplett!</b> Lägg till en <b>bild på dig själv</b> och lite info — hemort, favoritslag, WTN och en kort presentation. Det syns för alla vid stegen och gör det roligare.'
-    +'<a class="btn" style="margin-top:12px" href="rapportera.html#profil">Lägg till bild &amp; info →</a></div>'
-    +'<button class="btn ghost" style="margin-top:12px" onclick="closeOk()">Stäng</button>';
+    +'<div class="oprof">📸 <b>Gör profilen komplett!</b> Lägg till en <b>bild på dig själv</b> och lite info — hemort, favoritslag, WTN och en kort presentation. Det syns för alla vid stegen och gör det roligare. <a href="rapportera.html#profil" style="color:var(--clay);font-weight:700;white-space:nowrap">Gör det på din profil →</a></div>'
+    +'<button class="btn ghost" style="margin-top:14px" onclick="closeOk()">Stäng</button>';
   document.getElementById('okmodal').classList.add('open');
   document.body.style.overflow='hidden';
 }
