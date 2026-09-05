@@ -233,8 +233,9 @@ function schedCard(){
       <button class="wkarrow" ${idx>=mds.length-1?'disabled':''} onclick="setSchedWk(${mds[Math.min(mds.length-1,idx+1)]})">→</button>
     </div>
     <div class="wkbulk">
-      <span class="state">Hela spelomgång ${SCHEDWK} samma datum:</span>
+      <span class="state">Hela spelomgång ${SCHEDWK} — samma datum &amp; tid:</span>
       <input id="wkdate" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="wktime" type="text" placeholder="tid (valfri) 09:00" style="width:120px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillWeekDate()">Sätt på alla (${dayM.length})</button>
     </div>
     <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${doneD} spelade · ${setD} med tid</span></div>
@@ -243,30 +244,42 @@ function schedCard(){
 function setSchedWk(md){ SCHEDWK=md; render(); const c=document.querySelector('.wknav'); if(c) c.scrollIntoView({block:'center'}); }
 async function fillWeekDate(){
   const d=document.getElementById('wkdate').value;
+  const bulkT=(document.getElementById('wktime').value||'').trim();
   if(!d){ alert('Välj ett datum först.'); return; }
   const ms=MATCHES.filter(m=>(m.matchday||0)===SCHEDWK);
-  if(!confirm('Sätt '+d+' som datum på alla '+ms.length+' matcher i spelomgång '+SCHEDWK+'? (tid/bana per match behålls)')) return;
+  const msg='Sätt '+d+(bulkT?' kl '+bulkT:'')+' på alla '+ms.length+' matcher i spelomgång '+SCHEDWK+'?'+(bulkT?' (bana/notis per match behålls)':' (tid/bana/notis per match behålls)');
+  if(!confirm(msg)) return;
   for(const m of ms){
-    const t=(document.getElementById('st_'+m.id)?.value||'').trim(), c=(document.getElementById('sc_'+m.id)?.value||'').trim();
-    try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c); m.play_date=d; const el=document.getElementById('sd_'+m.id); if(el) el.value=d; }catch(e){}
+    // tid: bulk-tid om angiven, annars matchens egen
+    const t=bulkT || (document.getElementById('st_'+m.id)?.value||'').trim();
+    const c=(document.getElementById('sc_'+m.id)?.value||'').trim();
+    try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c);
+      m.play_date=d; if(bulkT) m.start_time=bulkT;
+      const el=document.getElementById('sd_'+m.id); if(el) el.value=d;
+      if(bulkT){ const te=document.getElementById('st_'+m.id); if(te) te.value=bulkT; }
+    }catch(e){}
   }
-  alert('Datum satt på spelomgång '+SCHEDWK+' ✓');
+  alert('Datum'+(bulkT?' & tid':'')+' satt på spelomgång '+SCHEDWK+' ✓');
 }
 function schedRow(m){
-  return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 15px;border-top:1px solid var(--line)">
-    <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}</div>
-    <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-    <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-    <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-    <button class="btn" style="padding:7px 12px" onclick="saveSched(${m.id})">Spara</button>
-    <span class="state" id="sm_${m.id}" style="min-width:14px"></span>
+  return `<div style="padding:9px 15px;border-top:1px solid var(--line)">
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}</div>
+      <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <button class="btn" style="padding:7px 12px" onclick="saveSched(${m.id})">Spara</button>
+      <span class="state" id="sm_${m.id}" style="min-width:14px"></span>
+    </div>
+    <input id="sn_${m.id}" type="text" value="${esc(m.defer_note||'')}" placeholder="Notis (valfri) — t.ex. Spelas senare" style="width:100%;margin-top:6px;font:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--line);border-radius:8px">
   </div>`;
 }
 async function saveSched(id){
-  const d=document.getElementById('sd_'+id).value, t=document.getElementById('st_'+id).value.trim(), c=document.getElementById('sc_'+id).value.trim();
+  const d=document.getElementById('sd_'+id).value, t=document.getElementById('st_'+id).value.trim(),
+        c=document.getElementById('sc_'+id).value.trim(), n=document.getElementById('sn_'+id).value.trim();
   const s=document.getElementById('sm_'+id); s.textContent='…';
-  try{ await BTS.hostPoolSetSchedule(PW,id,d,t,c);
-    const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; }
+  try{ await BTS.hostPoolSetSchedule(PW,id,d,t,c,n);
+    const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; m.defer_note=n||null; }
     s.textContent='✓'; setTimeout(()=>{ if(s.textContent==='✓') s.textContent=''; },1500);
   }catch(e){ s.textContent='✕'; alert('Fel: '+(e.message||e)); }
 }

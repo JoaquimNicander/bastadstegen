@@ -676,9 +676,11 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_pool_add_late', { p_admin_pw: adminPw, p_player_id: playerId, p_div: division });
     if (error) throw error;
   },
-  async hostPoolSetSchedule(adminPw, matchId, date, time, court) {
+  async hostPoolSetSchedule(adminPw, matchId, date, time, court, note) {
     _assert();
-    const { error } = await _sb.rpc('bts_host_pool_set_schedule', { p_admin_pw: adminPw, p_match_id: matchId, p_date: date || null, p_time: time || null, p_court: court || null });
+    const args = { p_admin_pw: adminPw, p_match_id: matchId, p_date: date || null, p_time: time || null, p_court: court || null };
+    if (note !== undefined) args.p_note = note; // undefined = lämna notisen orörd
+    const { error } = await _sb.rpc('bts_host_pool_set_schedule', args);
     if (error) throw error;
   },
   async hostPoolDefer(matchId, note, playerId, pin) {
