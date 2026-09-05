@@ -122,6 +122,8 @@ function render(){
       ${confirmSummary()}
     </div>
 
+    ${schedCard()}
+
     <div class="card">
       <h3>Skicka påminnelse (SMS + mejl)</h3>
       <div class="state">SMS där mobil finns, annars mejl. Testa till dig själv först.</div>
@@ -179,6 +181,63 @@ async function addLate(){
   catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 
+function schedCard(){
+  if(!MATCHES.length) return '';
+  const divName={H:'Herr',D:'Dam'};
+  const divs=[...new Set(MATCHES.map(m=>m.division))];
+  let inner='';
+  divs.forEach(dv=>{
+    const labels=[...new Set(MATCHES.filter(m=>m.division===dv).map(m=>m.label))].sort();
+    labels.forEach(lab=>{
+      const ms=MATCHES.filter(m=>m.division===dv&&m.label===lab)
+        .sort((a,b)=>((a.matchday||999)-(b.matchday||999))||a.a_name.localeCompare(b.a_name,'sv'));
+      inner+=`<div style="margin-top:16px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <b style="color:var(--green)">${divName[dv]||dv} · Grupp ${esc(lab)}</b>
+          <input id="gd_${dv}_${lab}" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+          <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillGroupDate('${dv}','${lab}')">Sätt datum på alla i gruppen</button>
+        </div>`;
+      const mds=[...new Set(ms.map(m=>m.matchday||0))];
+      mds.forEach(md=>{
+        if(mds.length>1) inner+=`<div class="state" style="margin-top:10px;font-weight:700">Spelomgång ${md||'—'}</div>`;
+        ms.filter(m=>(m.matchday||0)===md).forEach(m=>{ inner+=schedRow(m); });
+      });
+      inner+='</div>';
+    });
+  });
+  return `<div class="card"><h3>Tider &amp; banor (omgång ${ROUND})</h3>
+    <div class="state">Sätt datum, tid och bana per match — visas direkt på spel-sidan för spelarna.</div>
+    ${inner}</div>`;
+}
+function schedRow(m){
+  return `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)">
+    <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}</div>
+    <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+    <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+    <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+    <button class="btn" style="padding:7px 12px" onclick="saveSched(${m.id})">Spara</button>
+    <span class="state" id="sm_${m.id}" style="min-width:14px"></span>
+  </div>`;
+}
+async function saveSched(id){
+  const d=document.getElementById('sd_'+id).value, t=document.getElementById('st_'+id).value.trim(), c=document.getElementById('sc_'+id).value.trim();
+  const s=document.getElementById('sm_'+id); s.textContent='…';
+  try{ await BTS.hostPoolSetSchedule(PW,id,d,t,c);
+    const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; }
+    s.textContent='✓'; setTimeout(()=>{ if(s.textContent==='✓') s.textContent=''; },1500);
+  }catch(e){ s.textContent='✕'; alert('Fel: '+(e.message||e)); }
+}
+async function fillGroupDate(dv,lab){
+  const d=document.getElementById('gd_'+dv+'_'+lab).value;
+  if(!d){ alert('Välj ett datum först.'); return; }
+  const ms=MATCHES.filter(m=>m.division===dv&&m.label===lab);
+  if(!confirm('Sätt '+d+' som datum på alla '+ms.length+' matcher i gruppen? (tid/bana per match behålls)')) return;
+  for(const m of ms){
+    const t=(document.getElementById('st_'+m.id).value||'').trim(), c=(document.getElementById('sc_'+m.id).value||'').trim();
+    try{ await BTS.hostPoolSetSchedule(PW,m.id,d,t,c); m.play_date=d; document.getElementById('sd_'+m.id).value=d; }catch(e){}
+  }
+  alert('Datum satt på gruppen ✓');
+}
 function confirmSummary(){
   const play=ATT.filter(a=>a.playing===true), cant=ATT.filter(a=>a.playing===false), no=ATT.filter(a=>a.playing===null||a.playing===undefined);
   const list=arr=>arr.map(a=>esc(a.name)).join(', ')||'—';
