@@ -100,6 +100,7 @@
     <input id="an-ph" type="tel" placeholder="07XX XX XX XX" autocomplete="tel">
     <label for="an-em">Mejladress</label>
     <input id="an-em" type="email" placeholder="namn@exempel.se" autocomplete="email">
+    <p class="hint" style="margin:8px 0 0">📱✉️ Fyll gärna i <b>både mobil och mejl</b> — då kan både klubben och din motståndare alltid nå dig inför matcherna (påminnelser, ombokningar och besked går via SMS eller mejl).</p>
     <label for="an-div">Stege</label>
     <select id="an-div"><option value="">Välj stege…</option><option value="H">Herr</option><option value="D">Dam</option></select>
     <label for="an-pin">Välj en PIN (4 siffror)</label>
@@ -167,7 +168,10 @@ async function signup(){
   try{
     await BTS.hostSignup(name, phone, email, pin, div);
     await loadAll();
-    s.innerHTML='✅ Tack '+esc(name.split(' ')[0])+'! Du är anmäld. Du kommer in längst ner i '+(div==='H'?'herrstegen':'damstegen')+' när nästa spelomgång startar. Din PIN är <b>'+esc(pin)+'</b> — spara den, du loggar in med den.';
+    s.innerHTML='✅ Tack '+esc(name.split(' ')[0])+'! Du är anmäld. Du kommer in längst ner i '+(div==='H'?'herrstegen':'damstegen')+' när nästa spelomgång startar. Din PIN är <b>'+esc(pin)+'</b> — spara den, du loggar in med den.'
+      +'<div style="margin-top:12px;padding:14px 16px;background:#EAF6EE;border:1px solid #B7E0C6;border-radius:12px;color:var(--ink);font-family:\'Outfit\',sans-serif;line-height:1.55">'
+      +'📸 <b>Gör din spelarprofil komplett!</b> Lägg till en <b>bild på dig själv</b> och lite info — hemort, favoritslag, WTN och en kort presentation. Det syns för alla vid stegen och gör det mycket roligare.'
+      +'<br><a class="btn" style="margin-top:12px" href="rapportera.html#profil">Lägg till bild &amp; info →</a></div>';
     s.className='status ok';
     document.getElementById('an-nm').value=document.getElementById('an-ph').value=document.getElementById('an-em').value=document.getElementById('an-pin').value='';
     document.getElementById('an-div').value='';
