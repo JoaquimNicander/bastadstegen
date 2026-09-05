@@ -217,13 +217,14 @@ function render(){
   if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
   const levels=rows.map(r=>r.level), top=Math.min(...levels), bot=Math.max(...levels);
   const labels=[...new Set(rows.map(r=>r.label))];
+  const single = labels.length===1;
   el.innerHTML = labels.map(lab=>{
     const grp=rows.filter(r=>r.label===lab).sort((a,b)=>a.rank-b.rank);
     const z=zonesFor(grp);
     const played = grp.some(r=>r.spelade>0);
-    const lvlName = grp[0].level===top?'Toppgrupp':grp[0].level===bot?'Bottengrupp':'Nivå '+grp[0].level;
+    const lvlName = single ? 'Alla möter alla' : (grp[0].level===top?'Toppgrupp':grp[0].level===bot?'Bottengrupp':'Nivå '+grp[0].level);
     const prows=grp.map(r=>{
-      const zone = played ? z[r.player_id] : '';
+      const zone = (played && !single) ? z[r.player_id] : '';
       const form = formFor(r.player_id,DIV,lab);
       const fhtml = form.length?`<div class="form">${form.map(x=>`<span class="vf ${x==='V'?'v':'f'}">${x}</span>`).join('')}</div>`:'';
       return `<div class="prow ${zone}">
