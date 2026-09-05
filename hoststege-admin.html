@@ -275,7 +275,9 @@ function confirmSummary(){
       <span class="pill out">${cant.length} kan inte</span>
       <span class="pill">${no.length} ej svarat</span>
     </div>
-    <div class="mv" style="margin-top:10px"><div><b>Kan inte:</b> ${list(cant)}</div>
+    <div class="mv" style="margin-top:10px">
+      <div><b style="color:var(--up)">Spelar:</b> ${list(play)}</div>
+      <div style="margin-top:6px"><b>Kan inte:</b> ${list(cant)}</div>
       <div style="margin-top:6px"><b>Ej svarat:</b> ${list(no)}</div></div>`;
 }
 async function setWeek(){
