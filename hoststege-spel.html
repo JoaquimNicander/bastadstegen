@@ -124,15 +124,18 @@
   .cno.on{background:#3a1e14;color:#F0997B;border-color:#7a3a22}
   .cchk{color:#9be29b;font-size:12px;font-weight:700} .cx{color:#ff5b4d;font-size:12px;font-weight:700}
   .upc-day{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin:20px 0 9px}
-  .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:12px 14px;margin-bottom:9px}
+  .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:13px 14px;margin-bottom:9px}
   .upc.mine{border-color:var(--clay);background:#241811}
-  .upc .t{flex:0 0 auto;text-align:center;min-width:54px}
-  .upc .t .hh{font-family:'Anton',sans-serif;font-size:21px;color:#fff;line-height:1;letter-spacing:.5px}
-  .upc .t .co{font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);text-transform:uppercase;margin-top:4px;letter-spacing:.5px}
+  .upc .t{flex:0 0 auto;text-align:center;min-width:66px}
+  .upc .t .hh{font-family:'Anton',sans-serif;font-size:27px;color:#fff;line-height:1;letter-spacing:.5px}
   .upc .who{flex:1;min-width:0}
-  .upc .who .pl{font-size:14.5px;font-weight:700;color:#fff;line-height:1.3}
+  .upc .who .pl{font-size:16px;font-weight:700;color:#fff;line-height:1.3}
   .upc .who .gp{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;margin-top:4px;letter-spacing:.5px}
-  .upc .mine-badge{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#3a1400;background:var(--clay);padding:4px 9px;border-radius:100px}
+  .upc .who .gp .din{color:var(--clay);font-weight:700}
+  .upc .ct{flex:0 0 auto;text-align:center;background:#0a2016;border:1px solid var(--border2);border-radius:11px;padding:6px 11px;min-width:58px}
+  .upc.mine .ct{border-color:var(--clay)}
+  .upc .ct .ct-l{display:block;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
+  .upc .ct .ct-n{display:block;font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1.05;margin-top:1px}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clay);color:#3a1400;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
 </style>
@@ -348,11 +351,14 @@ function whenLabel(m){
 }
 function upcCard(m, mine){
   const dn={H:'Herr',D:'Dam'};
+  const cnum = m.court ? (String(m.court).replace(/^\s*bana\s*/i,'').trim() || String(m.court)) : '';
+  const court = cnum ? `<div class="ct"><span class="ct-l">Bana</span><span class="ct-n">${esc(cnum)}</span></div>` : '';
+  const gp = `${mine?'<span class="din">DIN MATCH · </span>':''}${dn[m.division]||m.division} · Grupp ${esc(m.label)}`;
   return `<div class="upc ${mine?'mine':''}">
-    <div class="t"><div class="hh">${esc(m.start_time||'')}</div>${m.court?`<div class="co">${esc(m.court)}</div>`:''}</div>
+    <div class="t"><div class="hh">${esc(m.start_time||'')}</div></div>
     <div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
-      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
-    ${mine?'<span class="mine-badge">Din</span>':''}</div>`;
+      <div class="gp">${gp}</div></div>
+    ${court}</div>`;
 }
 function renderUpcoming(el){
   const dn={H:'Herr',D:'Dam'};
