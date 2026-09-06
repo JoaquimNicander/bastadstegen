@@ -123,6 +123,16 @@
   .cyes.on{background:var(--clay);color:#3a1400;border-color:var(--clay)}
   .cno.on{background:#3a1e14;color:#F0997B;border-color:#7a3a22}
   .cchk{color:#9be29b;font-size:12px;font-weight:700} .cx{color:#ff5b4d;font-size:12px;font-weight:700}
+  .upc-day{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin:20px 0 9px}
+  .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:12px 14px;margin-bottom:9px}
+  .upc.mine{border-color:var(--clay);background:#241811}
+  .upc .t{flex:0 0 auto;text-align:center;min-width:54px}
+  .upc .t .hh{font-family:'Anton',sans-serif;font-size:21px;color:#fff;line-height:1;letter-spacing:.5px}
+  .upc .t .co{font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);text-transform:uppercase;margin-top:4px;letter-spacing:.5px}
+  .upc .who{flex:1;min-width:0}
+  .upc .who .pl{font-size:14.5px;font-weight:700;color:#fff;line-height:1.3}
+  .upc .who .gp{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;margin-top:4px;letter-spacing:.5px}
+  .upc .mine-badge{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#3a1400;background:var(--clay);padding:4px 9px;border-radius:100px}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clay);color:#3a1400;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
 </style>
@@ -140,6 +150,7 @@
     <div class="tabs">
       <button class="tab active" data-div="H" id="tab-H">Herr</button>
       <button class="tab" data-div="D" id="tab-D">Dam</button>
+      <button class="tab" data-div="M" id="tab-M">Matcher</button>
       <button class="tab" data-div="S" id="tab-S">Spelare</button>
     </div>
   </div>
@@ -335,12 +346,47 @@ function whenLabel(m){
     return '📅 '+d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'})+(m.start_time?' '+esc(m.start_time):'')+(m.court?' · '+esc(m.court):''); }
   return 'Tid ej satt';
 }
+function upcCard(m, mine){
+  const dn={H:'Herr',D:'Dam'};
+  return `<div class="upc ${mine?'mine':''}">
+    <div class="t"><div class="hh">${esc(m.start_time||'')}</div>${m.court?`<div class="co">${esc(m.court)}</div>`:''}</div>
+    <div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
+      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
+    ${mine?'<span class="mine-badge">Din</span>':''}</div>`;
+}
+function renderUpcoming(el){
+  const dn={H:'Herr',D:'Dam'};
+  const sched=MATCHES.filter(m=>m.status!=='done' && m.play_date && String(m.start_time||'').trim())
+    .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0) || (String(a.start_time)<String(b.start_time)?-1:String(a.start_time)>String(b.start_time)?1:0));
+  const later=MATCHES.filter(m=>m.status!=='done' && m.defer_note && !(m.play_date && String(m.start_time||'').trim()));
+  if(!sched.length && !later.length){ el.innerHTML='<div class="state" style="text-align:center;padding:30px 10px">Inga matcher är schemalagda ännu.<br>Håll utkik — tiderna dyker upp här! 🎾</div>'; return; }
+  const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
+  let html='';
+  if(ME && mineIds.size){
+    html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
+    html+=sched.filter(m=>mineIds.has(m.id)).map(m=>upcCard(m,true)).join('');
+  }
+  let lastD='';
+  sched.filter(m=>!mineIds.has(m.id)).forEach(m=>{
+    if(m.play_date!==lastD){ const d=new Date(m.play_date+'T00:00:00');
+      html+=`<div class="upc-day">${d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'})}</div>`; lastD=m.play_date; }
+    html+=upcCard(m,false);
+  });
+  if(later.length){
+    html+='<div class="upc-day">⏳ Att boka tid</div>';
+    html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+      return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
+      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+  }
+  el.innerHTML=html;
+}
 function render(){
   renderConfirm();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
-  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S')?'none':'';
+  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S'||DIV==='M')?'none':'';
   const el=document.getElementById('body');
   if(DIV==='S'){ renderPlayers(el); return; }
+  if(DIV==='M'){ renderUpcoming(el); return; }
   const rows=ST.filter(r=>r.division===DIV);
   if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
   const levels=rows.map(r=>r.level), top=Math.min(...levels), bot=Math.max(...levels);
