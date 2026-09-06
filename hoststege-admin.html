@@ -37,9 +37,9 @@
   .wkbulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0 4px}
   .wkhead{margin:16px 0 2px;font-size:15px;color:var(--green)}
   .sgh{margin:16px 0 2px;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold)}
-  .schip{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:100px;white-space:nowrap;display:inline-block}
-  .schip.done{background:#e7f6ec;color:var(--up);border:1px solid #bfe6cc}
-  .schip.todo{background:#fff2e0;color:#b9440a;border:1px solid #f0d9a0}
+  .schip{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:100px;white-space:nowrap;display:inline-block}
+  .schip.done{background:var(--up);color:#fff;border:1px solid var(--up)}
+  .schip.todo{background:#fff2e0;color:#b9440a;border:1px solid #e8b96a}
 </style>
 </head>
 <body>
@@ -274,7 +274,7 @@ function attMark(pid){
 }
 function schedIsDone(m){ return !!(m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim()); }
 function schedChip(m){
-  if(m.defer_note) return '<span class="schip todo" style="background:#fdeaea;color:#c0392b;border-color:#f0b3b3">Spelas senare</span>';
+  if(m.defer_note) return '<span class="schip done">✓ Spelas senare</span>';
   return schedIsDone(m) ? '<span class="schip done">✓ Schemalagd</span>' : '<span class="schip todo">Ej klar</span>';
 }
 function schedBorder(m){ return (schedIsDone(m)||m.defer_note) ? 'var(--up)' : '#e6a23c'; }
