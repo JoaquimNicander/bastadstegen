@@ -261,10 +261,17 @@ async function fillWeekDate(){
   }
   alert('Datum'+(bulkT?' & tid':'')+' satt på spelomgång '+SCHEDWK+' ✓');
 }
+function attMark(pid){
+  if(SCHEDWK!==ACT.week) return '';
+  const a=ATT.find(x=>x.player_id===pid);
+  if(a && a.playing===true)  return ' <span title="Spelar" style="color:var(--up);font-weight:700">✓</span>';
+  if(a && a.playing===false) return ' <span title="Kan inte" style="color:#d33a2c;font-weight:700">✕</span>';
+  return ' <span title="Ej svarat" style="color:#b98900;font-weight:700">?</span>';
+}
 function schedRow(m){
   return `<div style="padding:9px 15px;border-top:1px solid var(--line)">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}</div>
+      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)}</div>
       <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
