@@ -37,6 +37,9 @@
   .wkbulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0 4px}
   .wkhead{margin:16px 0 2px;font-size:15px;color:var(--green)}
   .sgh{margin:16px 0 2px;font-weight:800;font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold)}
+  .schip{font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:100px;white-space:nowrap;display:inline-block}
+  .schip.done{background:#e7f6ec;color:var(--up);border:1px solid #bfe6cc}
+  .schip.todo{background:#fff2e0;color:#b9440a;border:1px solid #f0d9a0}
 </style>
 </head>
 <body>
@@ -224,7 +227,8 @@ function schedCard(){
     if(key!==lastKey){ rows+=`<div class="sgh">${divName[m.division]||m.division} · Grupp ${esc(m.label)}</div>`; lastKey=key; }
     rows+=schedRow(m);
   });
-  const doneD=dayM.filter(m=>m.status==='done').length, setD=dayM.filter(m=>m.play_date).length;
+  const doneD=dayM.filter(m=>m.status==='done').length;
+  const setD=dayM.filter(m=>m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim()).length;
   return `<div class="card"><h3>Tider &amp; banor</h3>
     <div class="state">Välj en spelomgång (spelsöndag) och sätt datum, tid och bana. Visas direkt på spel-sidan för spelarna.</div>
     <div class="wknav">
@@ -238,7 +242,7 @@ function schedCard(){
       <input id="wktime" type="text" placeholder="tid (valfri) 09:00" style="width:120px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillWeekDate()">Sätt på alla (${dayM.length})</button>
     </div>
-    <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${doneD} spelade · ${setD} med tid</span></div>
+    <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${setD} schemalagda · ${doneD} spelade</span></div>
     ${rows}</div>`;
 }
 function setSchedWk(md){ SCHEDWK=md; render(); const c=document.querySelector('.wknav'); if(c) c.scrollIntoView({block:'center'}); }
@@ -269,9 +273,13 @@ function attMark(pid){
   return ' <span title="Ej svarat" style="color:#b98900;font-weight:700">?</span>';
 }
 function schedRow(m){
-  return `<div style="padding:9px 15px;border-top:1px solid var(--line)">
+  const sched = !!(m.play_date && (m.start_time&&String(m.start_time).trim()) && (m.court&&String(m.court).trim()));
+  const chip = m.defer_note
+    ? '<span class="schip todo" style="background:#fdeaea;color:#c0392b;border-color:#f0b3b3">Spelas senare</span>'
+    : sched ? '<span class="schip done">✓ Schemalagd</span>' : '<span class="schip todo">Ej klar</span>';
+  return `<div style="padding:9px 15px;border-top:1px solid var(--line);border-left:4px solid ${sched?'var(--up)':'#e6a23c'};${sched?'':'background:#fffdf8'}">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)}</div>
+      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)} ${chip}</div>
       <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
