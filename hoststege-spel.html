@@ -122,6 +122,15 @@
   .pst .pn{font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1}
   .pst .pk{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-top:4px}
   .pst-extra{font-size:12.5px;color:var(--cream);margin-top:11px;text-align:center}
+  .pmatches{padding:14px 16px;border-top:1px solid var(--border)}
+  .pmatches:empty{display:none}
+  .pmrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+  .pmrow:last-child{border-bottom:0}
+  .pmres{flex:0 0 auto;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:12px}
+  .pmres.v{background:#1f6d3a;color:#c9f5d6} .pmres.f{background:#5a2a20;color:#ffb3a6}
+  .pmopp{flex:1;min-width:0;font-size:14px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pmsc{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:13px;color:var(--cream)}
+  .pmd{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);min-width:44px;text-align:right}
   .confirmbar{margin:14px 0 0}
   .cnote{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--cream);margin-bottom:8px}
   .cbx{background:var(--card);border:1px solid var(--clay);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -525,10 +534,34 @@ function openProfile(id){
     <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
     ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
     <div class="pstats" id="pstats"></div>
+    <div class="pmatches" id="pmatches"></div>
     ${contactHtml}</div>`;
   document.getElementById('profmodal').classList.add('open');
   fillStats(id);
+  fillMatches(id);
   if(ME) fillContact(id);
+}
+function flipScore(score, isA){
+  if(isA || !score) return score||'';
+  return String(score).trim().split(/\s+/).map(s=>{ const p=s.split('-'); return p.length===2 ? p[1]+'-'+p[0] : s; }).join(' ');
+}
+async function fillMatches(id){
+  const el=document.getElementById('pmatches'); if(!el) return;
+  try{
+    const ms=await BTS.hostPlayerMatches(id, 8);
+    if(!ms || !ms.length){ el.innerHTML=''; return; }
+    let h='<div class="pst-h">Senaste matcher</div>';
+    ms.forEach(m=>{
+      const sc=flipScore(m.score, m.is_a);
+      const d=m.play_date?new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'}):'';
+      h+=`<div class="pmrow">
+        <span class="pmres ${m.won?'v':'f'}">${m.won?'V':'F'}</span>
+        <span class="pmopp">${esc(m.opp||'')}</span>
+        <span class="pmsc">${esc(sc)}</span>
+        <span class="pmd">${d}</span></div>`;
+    });
+    el.innerHTML=h;
+  }catch(e){ el.innerHTML=''; }
 }
 async function fillStats(id){
   const el=document.getElementById('pstats'); if(!el) return;

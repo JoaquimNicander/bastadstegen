@@ -660,6 +660,12 @@ const BTS = {
     if (error) throw error;
     return (data && data[0]) || null;
   },
+  async hostPlayerMatches(playerId, limit) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_player_matches', { p_player_id: playerId, p_limit: limit || 8 });
+    if (error) throw error;
+    return data || [];
+  },
   async hostContact(viewerId, pin, targetId) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_contact', { p_viewer_id: viewerId, p_pin: pin || '', p_target_id: targetId });
