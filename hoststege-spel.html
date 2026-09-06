@@ -362,8 +362,12 @@ function upcCard(m, mine){
 }
 function renderUpcoming(el){
   const dn={H:'Herr',D:'Dam'};
+  const cnum=m=>{ const x=String(m.court||'').match(/\d+/); return x?parseInt(x[0]):9999; };
+  const tkey=m=>String(m.start_time||'');
   const sched=MATCHES.filter(m=>m.status!=='done' && m.play_date && String(m.start_time||'').trim())
-    .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0) || (String(a.start_time)<String(b.start_time)?-1:String(a.start_time)>String(b.start_time)?1:0));
+    .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
+      || (cnum(a)-cnum(b))
+      || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0));
   const later=MATCHES.filter(m=>m.status!=='done' && m.defer_note && !(m.play_date && String(m.start_time||'').trim()));
   if(!sched.length && !later.length){ el.innerHTML='<div class="state" style="text-align:center;padding:30px 10px">Inga matcher är schemalagda ännu.<br>Håll utkik — tiderna dyker upp här! 🎾</div>'; return; }
   const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
