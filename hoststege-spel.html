@@ -78,6 +78,13 @@
   .score-row .vs{color:var(--muted2);font-weight:700}
   .score-row .sv{height:46px;padding:0 18px;background:var(--clay);color:#3a1400;border:0;border-radius:10px;
     font:inherit;font-weight:800;cursor:pointer;flex:0 0 auto}
+  .sets{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .setrow{display:flex;align-items:center;gap:9px}
+  .setrow .setlbl{flex:0 0 70px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2)}
+  .setrow input{flex:1;min-width:0;height:46px;text-align:center;font:inherit;font-size:20px;font-weight:700;background:#0a2016;border:1px solid var(--border2);border-radius:10px;color:var(--white)}
+  .setrow .vs{color:var(--muted2);font-weight:700}
+  .awin{min-height:16px;font-size:13px;font-weight:700;margin-top:9px;text-align:center}
+  .sv.wide{display:block;width:100%;height:46px;margin-top:10px;background:var(--clay);color:#3a1400;border:0;border-radius:10px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .result{text-align:center;font-family:'Anton',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);margin-top:8px}
   .cmt{width:100%;font:inherit;font-size:14px;padding:10px 12px;margin-top:9px;background:#0a2016;border:1px solid var(--border2);border-radius:10px;color:var(--white)}
   .cmt::placeholder{color:var(--muted2)}
@@ -379,8 +386,9 @@ function matchCard(m){
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
   const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
   if(m.status==='done'){
+    const res = m.score ? esc(m.score) : (m.games_a+' – '+m.games_b);
     return `<div class="match">${names}
-      <div class="result">${m.games_a} – ${m.games_b}</div>
+      <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
       ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
       <div class="mmeta"><span>${whenLabel(m)}</span>${mine?`<button class="editlink" onclick="editM(${m.id})">Ändra resultat</button>`:''}</div></div>`;
   }
@@ -392,9 +400,16 @@ function matchCard(m){
   const cmtField = m._noComment
     ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
     : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="(Ev kommentar om matchen)" value="${escAttr(m.comment)}">`;
+  const si=(k,ph)=>`<input type="number" min="0" inputmode="numeric" id="${k}${m.id}" placeholder="${ph}" oninput="autoWinM(${m.id})">`;
   return `<div class="match" id="m${m.id}">${names}
-    <div class="score-row"><input type="number" min="0" inputmode="numeric" id="ga${m.id}"><span class="vs">–</span><input type="number" min="0" inputmode="numeric" id="gb${m.id}"><button class="sv" onclick="saveM(${m.id})">Spara</button></div>
+    <div class="sets">
+      <div class="setrow"><span class="setlbl">Set 1</span>${si('s1a','')}<span class="vs">–</span>${si('s1b','')}</div>
+      <div class="setrow"><span class="setlbl">Set 2</span>${si('s2a','')}<span class="vs">–</span>${si('s2b','')}</div>
+      <div class="setrow"><span class="setlbl">Super&nbsp;TB</span>${si('stba','')}<span class="vs">–</span>${si('stbb','')}</div>
+    </div>
+    <div class="awin" id="aw${m.id}"></div>
     ${cmtField}
+    <button class="sv wide" onclick="saveM(${m.id})">Spara resultat</button>
     <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a></div></div>`;
 }
 function whenLabel(m){
@@ -589,19 +604,42 @@ async function fillContact(id){
   }catch(e){ el.textContent='Kunde inte hämta kontakt.'; el.style.color='var(--muted2)'; }
 }
 function closeProfile(){ const m=document.getElementById('profmodal'); m.classList.remove('open'); m.innerHTML=''; }
+function hostSets(id){
+  const g=k=>{const e=document.getElementById(k+id);return e&&e.value!==''?parseInt(e.value):null;};
+  const out=[];
+  if(g('s1a')!=null&&g('s1b')!=null) out.push({a:g('s1a'),b:g('s1b')});
+  if(g('s2a')!=null&&g('s2b')!=null) out.push({a:g('s2a'),b:g('s2b')});
+  if(g('stba')!=null&&g('stbb')!=null) out.push({a:g('stba'),b:g('stbb'),super:true});
+  return out;
+}
+function setsWinner(sets,aId,bId){ let a=0,b=0; sets.forEach(s=>{ if(s.a>s.b)a++; else if(s.b>s.a)b++; }); return a>b?aId:(b>a?bId:null); }
+function autoWinM(id){
+  const m=MATCHES.find(x=>x.id===id); if(!m)return;
+  const sets=hostSets(id), w=setsWinner(sets,m.a_id,m.b_id), el=document.getElementById('aw'+id); if(!el)return;
+  if(w){ el.textContent='✓ Vinnare: '+(w===m.a_id?m.a_name:m.b_name); el.style.color='#9be29b'; }
+  else { el.textContent=sets.length?'Fyll i så en vinnare blir tydlig':''; el.style.color='var(--muted2)'; }
+}
 async function saveM(id){
   if(!ME){ alert('Logga in för att rapportera.'); return; }
-  const ga=parseInt(document.getElementById('ga'+id).value), gb=parseInt(document.getElementById('gb'+id).value);
-  if(isNaN(ga)||isNaN(gb)){ alert('Fyll i båda siffrorna.'); return; }
+  const m=MATCHES.find(x=>x.id===id); if(!m)return;
+  const sets=hostSets(id), w=setsWinner(sets,m.a_id,m.b_id);
+  if(!w){ alert('Fyll i set-resultaten så vinnaren blir tydlig (bäst av 3, tredje = super-tiebreak).'); return; }
+  let ga=0, gb=0; sets.forEach(s=>{ if(!s.super){ ga+=s.a; gb+=s.b; } });
+  const score=sets.map(s=>s.a+'-'+s.b).join(' ');
   const cmEl=document.getElementById('cm'+id);
-  const cm = cmEl ? cmEl.value : ((MATCHES.find(x=>x.id===id)||{}).comment||'');
-  try{ await BTS.hostPoolReport(id,ga,gb,cm,ME.id,ME.pin); [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  const cm = cmEl ? cmEl.value : (m.comment||'');
+  try{ await BTS.hostPoolReport(id,ga,gb,cm,ME.id,ME.pin,score,sets,w);
+    [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
   catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
 }
 function editM(id){
   const m=MATCHES.find(x=>x.id===id); if(!m)return; m.status='pending'; m._noComment=true; OPEN.add(m.division+'-'+m.label); render();
-  const ga=document.getElementById('ga'+id), gb=document.getElementById('gb'+id);
-  if(ga) ga.value=m.games_a??''; if(gb) gb.value=m.games_b??'';
+  const s=Array.isArray(m.sets)?m.sets:[];
+  const set=(k,v)=>{ const e=document.getElementById(k+id); if(e&&v!=null) e.value=v; };
+  if(s[0]){ set('s1a',s[0].a); set('s1b',s[0].b); }
+  if(s[1] && !s[1].super){ set('s2a',s[1].a); set('s2b',s[1].b); }
+  const sup=s.find(x=>x&&x.super); if(sup){ set('stba',sup.a); set('stbb',sup.b); }
+  autoWinM(id);
 }
 async function deferM(e,id){
   e.preventDefault();

@@ -689,9 +689,13 @@ const BTS = {
     if (error) throw error;
     return data === true;
   },
-  async hostPoolReport(matchId, gamesA, gamesB, comment, playerId, pin) {
+  async hostPoolReport(matchId, gamesA, gamesB, comment, playerId, pin, score, sets, winnerId) {
     _assert();
-    const { error } = await _sb.rpc('bts_host_pool_report', { p_match_id: matchId, p_games_a: gamesA, p_games_b: gamesB, p_comment: comment || null, p_player_id: playerId, p_pin: pin || '' });
+    const { error } = await _sb.rpc('bts_host_pool_report', {
+      p_match_id: matchId, p_games_a: gamesA, p_games_b: gamesB, p_comment: comment || null,
+      p_player_id: playerId, p_pin: pin || '',
+      p_score: score || null, p_sets: sets || null, p_winner_id: winnerId || null,
+    });
     if (error) throw error;
   },
   async hostPoolAdvance(adminPw, fromRound) {
