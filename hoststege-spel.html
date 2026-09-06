@@ -196,8 +196,10 @@ async function load(){
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
+  { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]) DIV=map[h]; }
   renderLogin(); renderConfirm(); render();
 }
+window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]){ DIV=map[h]; render(); } });
 function renderLogin(){
   const el=document.getElementById('loginbar'); if(!el) return;
   if(ME){
