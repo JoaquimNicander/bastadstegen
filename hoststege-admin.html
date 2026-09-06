@@ -172,6 +172,16 @@ function render(){
       <div class="state" id="remMsg"></div>
     </div>
 
+    <div class="card">
+      <h3>Skicka matchinfo (personligt per spelare)</h3>
+      <div class="state">Varje spelare får sin egen match: schemalagd (tid &amp; bana), "spelas senare", eller "ej schemalagd – saknar bekräftelse". SMS där mobil finns, annars mejl.</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" onclick="miTest()">Testa till mig (3 exempel)</button>
+        <button class="btn go" style="flex:1" onclick="miSend()">Skicka matchinfo →</button>
+      </div>
+      <div class="state" id="miMsg"></div>
+    </div>
+
     ${waitCard()}
 
     <div class="card">
@@ -385,6 +395,19 @@ async function remSend(){
   if(!confirm('Skicka påminnelse till vald målgrupp nu?')) return;
   const m=document.getElementById('remMsg'); m.textContent='Skickar…';
   try{ const r=await BTS.hostReminder(PW, remTmpl(), remTgt(), {customText:remCustom()});
+    m.textContent=`Skickat till ${r.recipients} (SMS ${r.sms.sent}, mejl ${r.email.sent})`+(r.errors&&r.errors.length?` · fel: ${r.errors.length}`:''); }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
+async function miTest(){
+  const m=document.getElementById('miMsg'); m.textContent='Skickar 3 exempel till dig…';
+  try{ const r=await BTS.hostMatchInfo(PW,{test:true, testPhone:'0720787845', testEmail:'joaquim@cxdesign.se'});
+    m.textContent=`Test skickat ✓ (SMS ${r.sms.sent}, mejl ${r.email.sent})`; }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
+async function miSend(){
+  if(!confirm('Skicka personlig matchinfo till alla spelare i spelomgången nu?')) return;
+  const m=document.getElementById('miMsg'); m.textContent='Skickar…';
+  try{ const r=await BTS.hostMatchInfo(PW,{});
     m.textContent=`Skickat till ${r.recipients} (SMS ${r.sms.sent}, mejl ${r.email.sent})`+(r.errors&&r.errors.length?` · fel: ${r.errors.length}`:''); }
   catch(e){ m.textContent='Fel: '+(e.message||e); }
 }

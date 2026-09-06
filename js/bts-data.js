@@ -660,6 +660,17 @@ const BTS = {
     if (error) throw error;
     return (data && data[0]) || null;
   },
+  async hostMatchInfo(adminPw, opts) {
+    opts = opts || {};
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ mode: 'host_matchinfo', adminPw, test: !!opts.test, testPhone: opts.testPhone || '', testEmail: opts.testEmail || '' }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });
