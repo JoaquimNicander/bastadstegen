@@ -398,7 +398,7 @@ function renderUpcoming(el){
     html+=pending.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
       const pa=ATT[m.a_id], pb=ATT[m.b_id];
       let why='Väntar på tid & bana';
-      if(pa===false||pb===false) why='Någon kan inte – matchas om';
+      if(pa===false||pb===false) why='Någon kan inte just nu';
       else if(pa==null||pb==null) why='Väntar på bekräftelse';
       return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
       <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
