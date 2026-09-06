@@ -239,7 +239,7 @@ function schedCard(){
     <div class="wkbulk">
       <span class="state">Hela spelomgång ${SCHEDWK} — samma datum &amp; tid:</span>
       <input id="wkdate" type="date" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-      <input id="wktime" type="text" placeholder="tid (valfri) 09:00" style="width:120px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="wktime" type="text" placeholder="tid (valfri)" style="width:120px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillWeekDate()">Sätt på alla (${dayM.length})</button>
     </div>
     <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${setD} schemalagda · ${doneD} spelade</span></div>
@@ -281,8 +281,8 @@ function schedRow(m){
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)} ${chip}</div>
       <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-      <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="09:00" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
-      <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana 1" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="Tid" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
+      <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <button class="btn" style="padding:7px 12px" onclick="saveSched(${m.id})">Spara</button>
       <span class="state" id="sm_${m.id}" style="min-width:14px"></span>
     </div>
