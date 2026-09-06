@@ -114,6 +114,14 @@
   .pfact .k{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2)}
   .pfact .v{font-size:14px;color:#fff;margin-top:2px}
   .pbio{padding:14px 16px;font-size:14px;color:var(--cream);line-height:1.55;font-style:italic;border-top:1px solid var(--border)}
+  .pstats{padding:14px 16px;border-top:1px solid var(--border)}
+  .pstats:empty{display:none}
+  .pst-h{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
+  .pst-row{display:flex;gap:1px;background:var(--border);border-radius:10px;overflow:hidden}
+  .pst{flex:1;background:var(--card);padding:11px 6px;text-align:center}
+  .pst .pn{font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1}
+  .pst .pk{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-top:4px}
+  .pst-extra{font-size:12.5px;color:var(--cream);margin-top:11px;text-align:center}
   .confirmbar{margin:14px 0 0}
   .cnote{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--cream);margin-bottom:8px}
   .cbx{background:var(--card);border:1px solid var(--clay);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -143,6 +151,11 @@
   .cmini-ok{color:#9be29b} .cmini-no{color:#ff7a6d}
   .clink{background:none;border:0;color:var(--clay);font:inherit;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;padding:2px 4px}
   .clocked{font-size:11.5px;font-weight:600;color:var(--muted2);text-align:right}
+  .sitefoot{margin:34px 0 10px;padding:22px 4px;border-top:1px solid var(--border);text-align:center}
+  .sitefoot .ff-brand{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;color:var(--clay)}
+  .sitefoot .ff-admin{font-size:13px;color:var(--muted2);margin-top:8px}
+  .sitefoot .ff-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  .sitefoot .ff-links a{color:#fff;text-decoration:none;font-weight:700;font-size:14px;background:var(--card);border:1px solid var(--border2);border-radius:100px;padding:9px 16px}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clay);color:#3a1400;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
 </style>
@@ -174,6 +187,14 @@
     <span>Övriga stannar</span>
   </div>
 </div>
+<div class="wrap"><footer class="sitefoot">
+  <div class="ff-brand">BÅSTAD STEGEN</div>
+  <div class="ff-admin">Frågor eller ändringar? Kontakta Admin — Joaquim Nicander</div>
+  <div class="ff-links">
+    <a href="tel:0720787845">📱 0720-787845</a>
+    <a href="mailto:joaquim@cxdesign.se">✉️ joaquim@cxdesign.se</a>
+  </div>
+</footer></div>
 <div id="profmodal" class="pmodal" onclick="if(event.target===this)closeProfile()"></div>
 <div id="cantmodal" class="pmodal" onclick="if(event.target===this)closeCant()"></div>
 
@@ -245,11 +266,11 @@ function renderConfirm(){
       el.innerHTML = noteHtml + `<div class="cmini">${yes
           ? '<span class="cmini-ok">✓ Du spelar spelomgång '+WEEK+'</span>'
           : '<span class="cmini-no">✕ Du kan inte spelomgång '+WEEK+'</span>'}
-        ${locked ? '<span class="clocked">🔒 Matchen är satt – kontakta klubben för ändring</span>' : '<button class="clink" onclick="expandConfirm()">Ändra</button>'}</div>
+        ${locked ? '<span class="clocked">🔒 Matchen är satt – kontakta Admin för ändring</span>' : '<button class="clink" onclick="expandConfirm()">Ändra</button>'}</div>
         <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
     } else if(answered && CONFIRM_EDIT && locked){
       CONFIRM_EDIT=false;
-      el.innerHTML = noteHtml + `<div class="cmini"><span class="clocked">🔒 Din match är satt – kontakta klubben om något ändras</span></div>
+      el.innerHTML = noteHtml + `<div class="cmini"><span class="clocked">🔒 Din match är satt – kontakta Admin om något ändras</span></div>
         <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
     } else {
       el.innerHTML = noteHtml + `<div class="cbx">
@@ -503,9 +524,25 @@ function openProfile(id){
       <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div></div>
     <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
     ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
+    <div class="pstats" id="pstats"></div>
     ${contactHtml}</div>`;
   document.getElementById('profmodal').classList.add('open');
+  fillStats(id);
   if(ME) fillContact(id);
+}
+async function fillStats(id){
+  const el=document.getElementById('pstats'); if(!el) return;
+  try{
+    const s=await BTS.hostPlayerStats(id);
+    if(!s || !s.matcher){ el.innerHTML=''; return; }
+    const pct=s.matcher?Math.round(s.vinster/s.matcher*100):0;
+    let h='<div class="pst-h">Statistik · genom åren</div><div class="pst-row">'
+      +`<div class="pst"><div class="pn">${s.matcher}</div><div class="pk">Matcher</div></div>`
+      +`<div class="pst"><div class="pn">${s.vinster}</div><div class="pk">Vinster</div></div>`
+      +`<div class="pst"><div class="pn">${pct}%</div><div class="pk">Vinst</div></div></div>`;
+    if(s.topp_motstandare) h+=`<div class="pst-extra">🎾 Flest möten: <b>${esc(s.topp_motstandare)}</b> · ${s.topp_antal} ggr</div>`;
+    el.innerHTML=h;
+  }catch(e){ el.innerHTML=''; }
 }
 async function fillContact(id){
   const el=document.getElementById('pcontact'); if(!el) return;
