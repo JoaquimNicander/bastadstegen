@@ -716,6 +716,16 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_pool_set_schedule', args);
     if (error) throw error;
   },
+  async hostAdminResult(adminPw, matchId, o) {
+    _assert(); o = o || {};
+    const { error } = await _sb.rpc('bts_host_admin_result', {
+      p_admin_pw: adminPw, p_match_id: matchId,
+      p_games_a: o.gamesA ?? null, p_games_b: o.gamesB ?? null,
+      p_score: o.score || null, p_sets: o.sets || null, p_winner_id: o.winnerId || null,
+      p_clear: !!o.clear,
+    });
+    if (error) throw error;
+  },
   async hostPoolDefer(matchId, note, playerId, pin) {
     _assert();
     const { error } = await _sb.rpc('bts_host_pool_defer', { p_match_id: matchId, p_note: note || null, p_player_id: playerId, p_pin: pin || '' });

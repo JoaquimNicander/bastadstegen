@@ -40,6 +40,12 @@
   .schip{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:100px;white-space:nowrap;display:inline-block}
   .schip.done{background:var(--up);color:#fff;border:1px solid var(--up)}
   .schip.todo{background:#fff2e0;color:#b9440a;border:1px solid #e8b96a}
+  details.resacc{margin-top:8px;border:1px solid var(--line);border-radius:9px;background:#fff}
+  details.resacc>summary{cursor:pointer;padding:8px 11px;font-weight:700;font-size:12.5px;color:var(--green);list-style:none;display:flex;align-items:center;gap:7px}
+  details.resacc>summary::-webkit-details-marker{display:none}
+  details.resacc>summary::before{content:'▸';color:var(--muted);font-size:10px;transition:transform .15s}
+  details.resacc[open]>summary::before{transform:rotate(90deg)}
+  details.resacc>div{padding:0 11px 11px}
 </style>
 </head>
 <body>
@@ -300,7 +306,27 @@ function schedRow(m){
       <span class="state" id="sm_${m.id}" style="min-width:14px"></span>
     </div>
     <input id="sn_${m.id}" type="text" value="${esc(m.defer_note||'')}" placeholder="Notis (valfri) — t.ex. Spelas senare" style="width:100%;margin-top:6px;font:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--line);border-radius:8px">
+    ${resEditor(m)}
   </div>`;
+}
+function resEditor(m){
+  const s=Array.isArray(m.sets)?m.sets:[];
+  const v1a=s[0]?s[0].a:'', v1b=s[0]?s[0].b:'';
+  const v2=(s[1]&&!s[1].super)?s[1]:null; const v2a=v2?v2.a:'', v2b=v2?v2.b:'';
+  const sup=s.find(x=>x&&x.super); const vsa=sup?sup.a:'', vsb=sup?sup.b:'';
+  const inp=(k,v)=>`<input id="${k}_${m.id}" type="number" min="0" inputmode="numeric" value="${v}" style="width:38px;text-align:center;font:inherit;padding:5px 2px;border:1px solid var(--line);border-radius:7px">`;
+  const done=m.status==='done';
+  return `<details class="resacc"><summary>🎾 Resultat ${done?`<span class="cnt">· nu: ${esc(m.score||(m.games_a+'-'+m.games_b))}</span>`:'<span class="cnt">· ej rapporterat</span>'}</summary>
+    <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;padding:10px 2px 4px;font-size:12px">
+      <span class="state">Set 1</span>${inp('r1a',v1a)}<span>-</span>${inp('r1b',v1b)}
+      <span class="state" style="margin-left:6px">Set 2</span>${inp('r2a',v2a)}<span>-</span>${inp('r2b',v2b)}
+      <span class="state" style="margin-left:6px">STB</span>${inp('rsa',vsa)}<span>-</span>${inp('rsb',vsb)}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+      <button class="btn" style="padding:7px 12px" onclick="saveRes(${m.id})">Spara resultat</button>
+      ${done?`<button class="btn" style="padding:7px 12px;background:#fff;color:var(--down);border:1px solid var(--line)" onclick="clearRes(${m.id})">Nollställ</button>`:''}
+      <span class="state" id="rm_${m.id}"></span>
+    </div></details>`;
 }
 async function saveSched(id){
   const d=document.getElementById('sd_'+id).value, t=document.getElementById('st_'+id).value.trim(),
@@ -313,6 +339,33 @@ async function saveSched(id){
     }
     s.textContent='✓'; setTimeout(()=>{ if(s.textContent==='✓') s.textContent=''; },1500);
   }catch(e){ s.textContent='✕'; alert('Fel: '+(e.message||e)); }
+}
+function admSets(id){
+  const g=k=>{const e=document.getElementById(k+'_'+id);return e&&e.value!==''?parseInt(e.value):null;};
+  const out=[];
+  if(g('r1a')!=null&&g('r1b')!=null) out.push({a:g('r1a'),b:g('r1b')});
+  if(g('r2a')!=null&&g('r2b')!=null) out.push({a:g('r2a'),b:g('r2b')});
+  if(g('rsa')!=null&&g('rsb')!=null) out.push({a:g('rsa'),b:g('rsb'),super:true});
+  return out;
+}
+function admWinner(sets,aId,bId){ let a=0,b=0; sets.forEach(s=>{ if(s.a>s.b)a++; else if(s.b>s.a)b++; }); return a>b?aId:(b>a?bId:null); }
+async function saveRes(id){
+  const m=MATCHES.find(x=>x.id===id); if(!m)return;
+  const sets=admSets(id), w=admWinner(sets,m.a_id,m.b_id);
+  const rm=document.getElementById('rm_'+id);
+  if(!w){ rm.textContent='Fyll i så vinnaren blir tydlig.'; return; }
+  let ga=0,gb=0; sets.forEach(s=>{ if(!s.super){ ga+=s.a; gb+=s.b; } });
+  const score=sets.map(s=>s.a+'-'+s.b).join(' ');
+  rm.textContent='Sparar…';
+  try{ await BTS.hostAdminResult(PW,id,{gamesA:ga,gamesB:gb,score,sets,winnerId:w});
+    [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  catch(e){ rm.textContent='Fel: '+(e.message||e); }
+}
+async function clearRes(id){
+  if(!confirm('Nollställa resultatet? Matchen blir ospelad igen.')) return;
+  try{ await BTS.hostAdminResult(PW,id,{clear:true});
+    [ST,MATCHES]=await Promise.all([BTS.hostPoolStandings(ROUND),BTS.hostPoolMatches(ROUND)]); render(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
 }
 function waitCard(){
   if(!WAIT || !WAIT.length) return '';
