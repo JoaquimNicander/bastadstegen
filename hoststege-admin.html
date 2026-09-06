@@ -272,14 +272,17 @@ function attMark(pid){
   if(a && a.playing===false) return ' <span title="Kan inte" style="color:#d33a2c;font-weight:700">✕</span>';
   return ' <span title="Ej svarat" style="color:#b98900;font-weight:700">?</span>';
 }
+function schedIsDone(m){ return !!(m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim()); }
+function schedChip(m){
+  if(m.defer_note) return '<span class="schip todo" style="background:#fdeaea;color:#c0392b;border-color:#f0b3b3">Spelas senare</span>';
+  return schedIsDone(m) ? '<span class="schip done">✓ Schemalagd</span>' : '<span class="schip todo">Ej klar</span>';
+}
+function schedBorder(m){ return (schedIsDone(m)||m.defer_note) ? 'var(--up)' : '#e6a23c'; }
 function schedRow(m){
-  const sched = !!(m.play_date && (m.start_time&&String(m.start_time).trim()) && (m.court&&String(m.court).trim()));
-  const chip = m.defer_note
-    ? '<span class="schip todo" style="background:#fdeaea;color:#c0392b;border-color:#f0b3b3">Spelas senare</span>'
-    : sched ? '<span class="schip done">✓ Schemalagd</span>' : '<span class="schip todo">Ej klar</span>';
-  return `<div style="padding:9px 15px;border-top:1px solid var(--line);border-left:4px solid ${sched?'var(--up)':'#e6a23c'};${sched?'':'background:#fffdf8'}">
+  const green = schedIsDone(m) || m.defer_note;
+  return `<div id="schrow_${m.id}" style="padding:9px 15px;border-top:1px solid var(--line);border-left:4px solid ${schedBorder(m)};${green?'':'background:#fffdf8'}">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)} ${chip}</div>
+      <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)} <span id="chip_${m.id}">${schedChip(m)}</span></div>
       <input id="sd_${m.id}" type="date" value="${m.play_date||''}" style="font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="st_${m.id}" type="text" value="${esc(m.start_time||'')}" placeholder="Tid" style="width:64px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
       <input id="sc_${m.id}" type="text" value="${esc(m.court||'')}" placeholder="Bana" style="width:88px;font:inherit;padding:6px;border:1px solid var(--line);border-radius:8px">
@@ -294,7 +297,10 @@ async function saveSched(id){
         c=document.getElementById('sc_'+id).value.trim(), n=document.getElementById('sn_'+id).value.trim();
   const s=document.getElementById('sm_'+id); s.textContent='…';
   try{ await BTS.hostPoolSetSchedule(PW,id,d,t,c,n);
-    const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; m.defer_note=n||null; }
+    const m=MATCHES.find(x=>x.id===id); if(m){ m.play_date=d||null; m.start_time=t||null; m.court=c||null; m.defer_note=n||null;
+      const chipEl=document.getElementById('chip_'+id); if(chipEl) chipEl.innerHTML=schedChip(m);
+      const row=document.getElementById('schrow_'+id); if(row){ row.style.borderLeft='4px solid '+schedBorder(m); row.style.background=(schedIsDone(m)||m.defer_note)?'':'#fffdf8'; }
+    }
     s.textContent='✓'; setTimeout(()=>{ if(s.textContent==='✓') s.textContent=''; },1500);
   }catch(e){ s.textContent='✕'; alert('Fel: '+(e.message||e)); }
 }
