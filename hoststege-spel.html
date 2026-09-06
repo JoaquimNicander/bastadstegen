@@ -136,6 +136,7 @@
   .upc.mine .ct{border-color:var(--clay)}
   .upc .ct .ct-l{display:block;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
   .upc .ct .ct-n{display:block;font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1.05;margin-top:1px}
+  .upc .mine-badge{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#3a1400;background:var(--clay);padding:4px 9px;border-radius:100px}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clay);color:#3a1400;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
 </style>
@@ -387,6 +388,20 @@ function renderUpcoming(el){
     html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
       return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
       <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+  }
+  // Inte klara ännu: den aktuella spelomgångens matcher utan tid och utan notis
+  const pending=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)===WEEK
+    && !(m.play_date && String(m.start_time||'').trim()) && !m.defer_note);
+  if(pending.length){
+    html+='<div class="upc-day" style="color:#e6a23c">⚠️ Inte klara ännu</div>';
+    html+='<div class="state" style="margin:-4px 0 9px;font-size:12px;color:var(--muted2)">Dessa saknar tid/bana eller besked. Hör av dig till din motståndare eller klubben så får vi igång dem.</div>';
+    html+=pending.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+      const pa=ATT[m.a_id], pb=ATT[m.b_id];
+      let why='Väntar på tid & bana';
+      if(pa===false||pb===false) why='Någon kan inte – matchas om';
+      else if(pa==null||pb==null) why='Väntar på bekräftelse';
+      return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${esc(m.a_name)} <span style="color:var(--muted2)">–</span> ${esc(m.b_name)}</div>
+      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
   }
   el.innerHTML=html;
 }
