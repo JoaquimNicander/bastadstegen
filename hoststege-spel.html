@@ -404,7 +404,7 @@ function matchCard(m){
     return `<div class="match">${names}
       <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
       ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
-      <div class="mmeta"><span>${whenLabel(m)}</span>${mine?`<button class="editlink" onclick="editM(${m.id})">Ändra resultat</button>`:''}</div></div>`;
+      <div class="mmeta"><span>${whenLabel(m)}</span>${mine?'<span class="cx" style="font-size:11px;color:var(--muted2);font-weight:400">Fel? Kontakta Admin</span>':''}</div></div>`;
   }
   if(!mine){
     return `<div class="match">${names}
