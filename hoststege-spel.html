@@ -233,7 +233,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande';
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={};
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
@@ -244,6 +244,7 @@ async function load(){
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
+  try{ const sa=BTS.hostPlayerStatsAll?await BTS.hostPlayerStatsAll():[]; STATS={}; sa.forEach(x=>{STATS[x.player_id]={m:x.matcher,v:x.vinster};}); }catch(e){ STATS={}; }
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
@@ -570,7 +571,7 @@ function renderPlayers(el){
       <div class="pav">${av}</div>
       <div class="pn">${esc(p.name)}</div>
       <div class="pg">${grp}</div>
-      <div class="ps">${p.spelade} matcher · ${p.vinster} vinster</div></div>`;
+      <div class="ps">${(STATS[p.player_id]||{m:0}).m} matcher · ${(STATS[p.player_id]||{v:0}).v} vinster</div></div>`;
   };
   el.innerHTML='<div class="pgrid">'+PROFILES.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(card).join('')+'</div>';
 }
