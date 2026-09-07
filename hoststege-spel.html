@@ -497,7 +497,7 @@ function render(){
       const fhtml = form.length?`<div class="form">${form.map(x=>`<span class="vf ${x==='V'?'v':'f'}">${x}</span>`).join('')}</div>`:'';
       return `<div class="prow ${zone}" onclick="openProfile(${r.player_id})">
         <div class="rnum">${r.rank}</div>
-        <div class="pinfo"><div class="pname">${esc(r.name)}${ATT[r.player_id]===true?' <span class="cchk">✓</span>':ATT[r.player_id]===false?' <span class="cx">✕</span>':''}</div>
+        <div class="pinfo"><div class="pname">${esc(r.name)}</div>
           <div class="pmeta">${r.spelade} matcher · ${r.vinster} vinster</div>${fhtml}</div>
         <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div>
         <i class="prow-arrow">›</i></div>`;
