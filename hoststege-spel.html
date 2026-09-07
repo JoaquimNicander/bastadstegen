@@ -147,7 +147,12 @@
   .cyes.on{background:var(--clay);color:#3a1400;border-color:var(--clay)}
   .cno.on{background:#3a1e14;color:#F0997B;border-color:#7a3a22}
   .cchk{color:#9be29b;font-size:12px;font-weight:700} .cx{color:#ff5b4d;font-size:12px;font-weight:700}
+  .mtabs{display:flex;gap:7px;margin:2px 0 16px}
+  .mtab{flex:1;background:var(--card);border:1px solid var(--border2);border-radius:100px;padding:9px 6px;font:inherit;font-size:13px;font-weight:700;color:var(--muted2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .mtab.on{background:var(--clay);color:#3a1400;border-color:var(--clay)}
+  .mtab .mtn{font-family:'Space Mono',monospace;font-size:11px;opacity:.8}
   .upc-day{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin:20px 0 9px}
+  .upc-day:first-child{margin-top:2px}
   .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:13px 14px;margin-bottom:9px}
   .upc.mine{border-color:var(--clay);background:#241811}
   .upc .t{flex:0 0 auto;text-align:center;min-width:66px}
@@ -221,7 +226,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false;
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande';
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
@@ -441,44 +446,55 @@ function renderUpcoming(el){
       || (cnum(a)-cnum(b))
       || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0));
   const later=MATCHES.filter(m=>m.status!=='done' && m.defer_note && !(m.play_date && String(m.start_time||'').trim()));
-  const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
-  if(!sched.length && !later.length && !played.length){ el.innerHTML='<div class="state" style="text-align:center;padding:30px 10px">Inga matcher är schemalagda ännu.<br>Håll utkik — tiderna dyker upp här! 🎾</div>'; return; }
-  const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
-  let html='';
-  if(ME && mineIds.size){
-    html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
-    html+=sched.filter(m=>mineIds.has(m.id)).map(m=>upcCard(m,true)).join('');
-  }
-  let lastD='';
-  sched.filter(m=>!mineIds.has(m.id)).forEach(m=>{
-    if(m.play_date!==lastD){ const d=new Date(m.play_date+'T00:00:00');
-      html+=`<div class="upc-day">${d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'})}</div>`; lastD=m.play_date; }
-    html+=upcCard(m,false);
-  });
-  if(later.length){
-    html+='<div class="upc-day">⏳ Att boka tid</div>';
-    html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
-      return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
-  }
-  // Inte klara ännu: den aktuella spelomgångens matcher utan tid och utan notis
   const pending=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)===WEEK
     && !(m.play_date && String(m.start_time||'').trim()) && !m.defer_note);
-  if(pending.length){
-    html+='<div class="upc-day" style="color:#e6a23c">⚠️ Inte klara ännu</div>';
-    html+='<div class="state" style="margin:-4px 0 9px;font-size:12px;color:var(--muted2)">Dessa saknar tid/bana eller besked. Hör av dig till din motståndare eller klubben så får vi igång dem.</div>';
-    html+=pending.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
-      const pa=ATT[m.a_id], pb=ATT[m.b_id];
-      let why='Väntar på tid & bana';
-      if(pa===false||pb===false) why='Någon kan inte just nu';
-      else if(pa==null||pb==null) why='Väntar på bekräftelse';
-      return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-      <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+  const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
+  const ospelade = later.length + pending.length;
+
+  const tabs=[['kommande','Kommande',sched.length],['ospelade','Ospelade',ospelade],['spelade','Spelade',played.length]];
+  const nav='<div class="mtabs">'+tabs.map(t=>`<button class="mtab ${MTAB===t[0]?'on':''}" onclick="setMatchTab('${t[0]}')">${t[1]} <span class="mtn">${t[2]}</span></button>`).join('')+'</div>';
+
+  const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
+  let html='';
+
+  if(MTAB==='kommande'){
+    if(!sched.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher är schemalagda med tid ännu.<br>Håll utkik! 🎾</div>'; }
+    else{
+      if(ME && mineIds.size){
+        html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
+        html+=sched.filter(m=>mineIds.has(m.id)).map(m=>upcCard(m,true)).join('');
+      }
+      let lastD='';
+      sched.filter(m=>!mineIds.has(m.id)).forEach(m=>{
+        if(m.play_date!==lastD){ const d=new Date(m.play_date+'T00:00:00');
+          html+=`<div class="upc-day">${d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'})}</div>`; lastD=m.play_date; }
+        html+=upcCard(m,false);
+      });
+    }
   }
-  // Spelade matcher – resultat (öppet för alla)
-  if(played.length){
-    html+='<div class="upc-day">✅ Spelade – resultat</div>';
-    html+=played.map(m=>{
+  else if(MTAB==='ospelade'){
+    if(!ospelade){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga ospelade matcher utan tid — allt är schemalagt eller spelat! 👏</div>'; }
+    if(later.length){
+      html+='<div class="upc-day">⏳ Att boka tid</div>';
+      html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+        return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
+        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+    }
+    if(pending.length){
+      html+='<div class="upc-day" style="color:#e6a23c">⚠️ Inte klara ännu</div>';
+      html+='<div class="state" style="margin:-4px 0 9px;font-size:12px;color:var(--muted2)">Dessa saknar tid/bana eller besked. Hör av dig till din motståndare eller klubben så får vi igång dem.</div>';
+      html+=pending.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+        const pa=ATT[m.a_id], pb=ATT[m.b_id];
+        let why='Väntar på tid & bana';
+        if(pa===false||pb===false) why='Någon kan inte just nu';
+        else if(pa==null||pb==null) why='Väntar på bekräftelse';
+        return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
+        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+    }
+  }
+  else { // spelade
+    if(!played.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher spelade ännu.</div>'; }
+    else html+=played.map(m=>{
       const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
       const sc = m.score ? esc(m.score) : (m.games_a+'-'+m.games_b);
       return `<div class="upc"><div class="who">
@@ -487,8 +503,9 @@ function renderUpcoming(el){
         <div class="rsc">${sc}</div></div>`;
     }).join('');
   }
-  el.innerHTML=html;
+  el.innerHTML=nav+html;
 }
+function setMatchTab(t){ MTAB=t; render(); }
 function render(){
   renderConfirm();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
