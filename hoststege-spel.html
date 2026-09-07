@@ -163,6 +163,8 @@
   .upc .ct .ct-l{display:block;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
   .upc .ct .ct-n{display:block;font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1.05;margin-top:1px}
   .upc .mine-badge{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#3a1400;background:var(--clay);padding:4px 9px;border-radius:100px}
+  .upc .who .pl .rwin{color:var(--clay)}
+  .upc .rsc{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#fff;white-space:nowrap}
   .cmini{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13.5px;font-weight:700}
   .cmini-ok{color:#9be29b} .cmini-no{color:#ff7a6d}
   .clink{background:none;border:0;color:var(--clay);font:inherit;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;padding:2px 4px}
@@ -439,7 +441,8 @@ function renderUpcoming(el){
       || (cnum(a)-cnum(b))
       || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0));
   const later=MATCHES.filter(m=>m.status!=='done' && m.defer_note && !(m.play_date && String(m.start_time||'').trim()));
-  if(!sched.length && !later.length){ el.innerHTML='<div class="state" style="text-align:center;padding:30px 10px">Inga matcher är schemalagda ännu.<br>Håll utkik — tiderna dyker upp här! 🎾</div>'; return; }
+  const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
+  if(!sched.length && !later.length && !played.length){ el.innerHTML='<div class="state" style="text-align:center;padding:30px 10px">Inga matcher är schemalagda ännu.<br>Håll utkik — tiderna dyker upp här! 🎾</div>'; return; }
   const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
   let html='';
   if(ME && mineIds.size){
@@ -471,6 +474,18 @@ function renderUpcoming(el){
       else if(pa==null||pb==null) why='Väntar på bekräftelse';
       return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
       <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+  }
+  // Spelade matcher – resultat (öppet för alla)
+  if(played.length){
+    html+='<div class="upc-day">✅ Spelade – resultat</div>';
+    html+=played.map(m=>{
+      const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
+      const sc = m.score ? esc(m.score) : (m.games_a+'-'+m.games_b);
+      return `<div class="upc"><div class="who">
+        <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
+        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
+        <div class="rsc">${sc}</div></div>`;
+    }).join('');
   }
   el.innerHTML=html;
 }
