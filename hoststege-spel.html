@@ -669,6 +669,9 @@ async function saveM(id){
   if(!w){ alert('Fyll i set-resultaten så vinnaren blir tydlig (bäst av 3, tredje = super-tiebreak).'); return; }
   let ga=0, gb=0; sets.forEach(s=>{ if(!s.super){ ga+=s.a; gb+=s.b; } });
   const score=sets.map(s=>s.a+'-'+s.b).join(' ');
+  const wName = w===m.a_id ? m.a_name : m.b_name;
+  const ok = confirm('Resultatet du vill rapportera:\n\n'+m.a_name+' – '+m.b_name+'\n'+score+'\n\nVinnare: '+wName+'\n\nÄr detta rätt? (kan bara rapporteras en gång)');
+  if(!ok) return;
   const cmEl=document.getElementById('cm'+id);
   const cm = cmEl ? cmEl.value : (m.comment||'');
   try{ await BTS.hostPoolReport(id,ga,gb,cm,ME.id,ME.pin,score,sets,w);
