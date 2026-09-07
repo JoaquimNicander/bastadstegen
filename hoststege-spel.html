@@ -170,6 +170,13 @@
   .upc .mine-badge{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#3a1400;background:var(--clay);padding:4px 9px;border-radius:100px}
   .upc .who .pl .rwin{color:var(--clay)}
   .upc .rsc{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#fff;white-space:nowrap}
+  details.mgrp{border:1px solid var(--border2);border-radius:12px;margin-bottom:9px;overflow:hidden;background:var(--card2)}
+  details.mgrp>summary{cursor:pointer;padding:13px 15px;font-family:'Anton',sans-serif;font-size:16px;letter-spacing:.5px;color:#fff;list-style:none;display:flex;align-items:center;gap:9px}
+  details.mgrp>summary::-webkit-details-marker{display:none}
+  details.mgrp>summary::before{content:'▸';color:var(--clay);font-size:12px;transition:transform .15s}
+  details.mgrp[open]>summary::before{transform:rotate(90deg)}
+  details.mgrp>summary .mtn{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);font-weight:400;letter-spacing:0}
+  .mgrp-in{padding:0 10px 10px}
   .cmini{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13.5px;font-weight:700}
   .cmini-ok{color:#9be29b} .cmini-no{color:#ff7a6d}
   .clink{background:none;border:0;color:var(--clay);font:inherit;font-size:13px;font-weight:700;text-decoration:underline;cursor:pointer;padding:2px 4px}
@@ -492,16 +499,20 @@ function renderUpcoming(el){
         <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
   }
-  else { // spelade
+  else { // spelade — grupperat per spelomgång, hopfällbart
     if(!played.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher spelade ännu.</div>'; }
-    else html+=played.map(m=>{
-      const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
-      const sc = m.score ? esc(m.score) : (m.games_a+'-'+m.games_b);
-      return `<div class="upc"><div class="who">
-        <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
-        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
-        <div class="rsc">${sc}</div></div>`;
-    }).join('');
+    else{
+      const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
+        return `<div class="upc"><div class="who">
+          <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
+          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
+          <div class="rsc">${sc}</div></div>`; };
+      const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
+      days.forEach((d,i)=>{
+        const dm=played.filter(x=>(x.matchday||0)===d);
+        html+=`<details class="mgrp" ${i===0?'open':''}><summary>Spelomgång ${d||'?'} <span class="mtn">${dm.length} matcher</span></summary><div class="mgrp-in">${dm.map(resCard).join('')}</div></details>`;
+      });
+    }
   }
   el.innerHTML=nav+html;
 }
