@@ -427,12 +427,13 @@ function matchCard(m){
     ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
     : `<input class="cmt" id="cm${m.id}" maxlength="160" placeholder="(Ev kommentar om matchen)" value="${escAttr(m.comment)}">`;
   const si=(k,ph)=>`<input type="number" min="0" inputmode="numeric" id="${k}${m.id}" placeholder="${ph}" oninput="autoWinM(${m.id})">`;
+  const tbi=(k)=>`<input type="number" min="0" inputmode="numeric" id="${k}${m.id}" class="tbin" placeholder="0">`;
   return `<div class="match" id="m${m.id}">${names}
     <div class="sets">
-      <div class="setrow"><span class="setlbl">Set 1</span>${si('s1a','')}<span class="vs">–</span>${si('s1b','')}
-        <input type="number" min="0" inputmode="numeric" id="tb1${m.id}" class="tbin" placeholder="TB" title="Motståndarens poäng i tiebreaket" style="display:none"></div>
-      <div class="setrow"><span class="setlbl">Set 2</span>${si('s2a','')}<span class="vs">–</span>${si('s2b','')}
-        <input type="number" min="0" inputmode="numeric" id="tb2${m.id}" class="tbin" placeholder="TB" title="Motståndarens poäng i tiebreaket" style="display:none"></div>
+      <div class="setrow"><span class="setlbl">Set 1</span>${si('s1a','')}<span class="vs">–</span>${si('s1b','')}</div>
+      <div class="setrow tbrow" id="tbrow1${m.id}" style="display:none"><span class="setlbl">Tiebreak</span>${tbi('tb1a',m.id)}<span class="vs">–</span>${tbi('tb1b',m.id)}</div>
+      <div class="setrow"><span class="setlbl">Set 2</span>${si('s2a','')}<span class="vs">–</span>${si('s2b','')}</div>
+      <div class="setrow tbrow" id="tbrow2${m.id}" style="display:none"><span class="setlbl">Tiebreak</span>${tbi('tb2a',m.id)}<span class="vs">–</span>${tbi('tb2b',m.id)}</div>
       <div class="setrow"><span class="setlbl">Super&nbsp;TB</span>${si('stba','')}<span class="vs">–</span>${si('stbb','')}</div>
     </div>
     <div class="awin" id="aw${m.id}"></div>
@@ -631,7 +632,11 @@ function openProfile(id){
 }
 function flipScore(score, isA){
   if(isA || !score) return score||'';
-  return String(score).trim().split(/\s+/).map(s=>{ const mm=s.match(/^(\d+)-(\d+)(\(.*\))?$/); return mm ? (mm[2]+'-'+mm[1]+(mm[3]||'')) : s; }).join(' ');
+  return String(score).trim().split(/\s+/).map(s=>{
+    const mm=s.match(/^(\d+)-(\d+)(\(.*\))?$/); if(!mm) return s;
+    let paren=mm[3]||''; const pm=paren.match(/^\((\d+)-(\d+)\)$/); if(pm) paren='('+pm[2]+'-'+pm[1]+')';
+    return mm[2]+'-'+mm[1]+paren;
+  }).join(' ');
 }
 async function fillMatches(id){
   const el=document.getElementById('pmatches'); if(!el) return;
@@ -681,19 +686,20 @@ function isTB(a,b){ return (a===7&&b===6)||(a===6&&b===7); }
 function hostSets(id){
   const g=k=>{const e=document.getElementById(k+id);return e&&e.value!==''?parseInt(e.value):null;};
   const out=[];
-  if(g('s1a')!=null&&g('s1b')!=null){ const o={a:g('s1a'),b:g('s1b')}; if(isTB(o.a,o.b)&&g('tb1')!=null)o.tb=g('tb1'); out.push(o); }
-  if(g('s2a')!=null&&g('s2b')!=null){ const o={a:g('s2a'),b:g('s2b')}; if(isTB(o.a,o.b)&&g('tb2')!=null)o.tb=g('tb2'); out.push(o); }
+  if(g('s1a')!=null&&g('s1b')!=null){ const o={a:g('s1a'),b:g('s1b')}; if(isTB(o.a,o.b)&&g('tb1a')!=null&&g('tb1b')!=null){o.tba=g('tb1a');o.tbb=g('tb1b');} out.push(o); }
+  if(g('s2a')!=null&&g('s2b')!=null){ const o={a:g('s2a'),b:g('s2b')}; if(isTB(o.a,o.b)&&g('tb2a')!=null&&g('tb2b')!=null){o.tba=g('tb2a');o.tbb=g('tb2b');} out.push(o); }
   if(g('stba')!=null&&g('stbb')!=null) out.push({a:g('stba'),b:g('stbb'),super:true});
   return out;
 }
-function setStr(s){ let str=s.a+'-'+s.b; if(!s.super && s.tb!=null && isTB(s.a,s.b)) str+='('+s.tb+')'; return str; }
+function setStr(s){ let str=s.a+'-'+s.b; if(!s.super && s.tba!=null && s.tbb!=null && isTB(s.a,s.b)) str+='('+s.tba+'-'+s.tbb+')'; return str; }
 function setsWinner(sets,aId,bId){ let a=0,b=0; sets.forEach(s=>{ if(s.a>s.b)a++; else if(s.b>s.a)b++; }); return a>b?aId:(b>a?bId:null); }
 function toggleTB(id){
   const g=k=>{const e=document.getElementById(k+id);return e&&e.value!==''?parseInt(e.value):null;};
-  [['s1a','s1b','tb1'],['s2a','s2b','tb2']].forEach(([ka,kb,kt])=>{
-    const el=document.getElementById(kt+id); if(!el) return;
+  [['s1a','s1b','tbrow1',['tb1a','tb1b']],['s2a','s2b','tbrow2',['tb2a','tb2b']]].forEach(([ka,kb,krow,fields])=>{
+    const row=document.getElementById(krow+id); if(!row) return;
     const a=g(ka), b=g(kb), on=(a!=null&&b!=null&&isTB(a,b));
-    el.style.display=on?'':'none'; if(!on) el.value='';
+    row.style.display=on?'':'none';
+    if(!on) fields.forEach(f=>{ const e=document.getElementById(f+id); if(e) e.value=''; });
   });
 }
 function autoWinM(id){
