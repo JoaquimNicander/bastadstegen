@@ -542,8 +542,8 @@ function render(){
       return `<div class="prow ${zone}" onclick="openProfile(${r.player_id})">
         <div class="rnum">${r.rank}</div>
         <div class="pinfo"><div class="pname">${esc(r.name)}</div>
-          <div class="pmeta">${r.spelade} matcher · ${r.vinster} vinster</div>${fhtml}</div>
-        <div class="pdiff">${r.diff>0?'+':''}${r.diff}</div>
+          <div class="pmeta">${r.vinster} v · ${r.spelade} m · ${r.diff>0?'+':''}${r.diff} gem</div>${fhtml}</div>
+        <div class="pdiff">${r.poang??0}<span style="font-size:11px;color:var(--muted2)"> p</span></div>
         <i class="prow-arrow">›</i></div>`;
     }).join('');
     const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
