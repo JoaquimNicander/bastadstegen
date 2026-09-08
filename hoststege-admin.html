@@ -318,7 +318,14 @@ function resEditor(m){
   const sup=s.find(x=>x&&x.super); const vsa=sup?sup.a:'', vsb=sup?sup.b:'';
   const inp=(k,v)=>`<input id="${k}_${m.id}" type="number" min="0" inputmode="numeric" value="${v}" style="width:38px;text-align:center;font:inherit;padding:5px 2px;border:1px solid var(--line);border-radius:7px">`;
   const done=m.status==='done';
+  let repInfo='';
+  if(done){
+    const who = m.reporter_name ? esc(m.reporter_name) : (m.reported_at?'Admin':'okänd');
+    let when=''; if(m.reported_at){ const d=new Date(m.reported_at); when=' · '+d.toLocaleDateString('sv-SE',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}); }
+    repInfo=`<div class="state" style="padding:2px 2px 8px">📝 Rapporterad av <b>${who}</b>${when}</div>`;
+  }
   return `<details class="resacc"><summary>🎾 Resultat ${done?`<span class="cnt">· nu: ${esc(m.score||(m.games_a+'-'+m.games_b))}</span>`:'<span class="cnt">· ej rapporterat</span>'}</summary>
+    ${repInfo}
     <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;padding:10px 2px 4px;font-size:12px">
       <span class="state">Set 1</span>${inp('r1a',v1a)}<span>-</span>${inp('r1b',v1b)}
       <span class="state" style="margin-left:6px">Set 2</span>${inp('r2a',v2a)}<span>-</span>${inp('r2b',v2b)}
