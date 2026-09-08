@@ -89,6 +89,7 @@
   .cmt{width:100%;font:inherit;font-size:14px;padding:10px 12px;margin-top:9px;background:#0a2016;border:1px solid var(--border2);border-radius:10px;color:var(--white)}
   .cmt::placeholder{color:var(--muted2)}
   .mcmt{font-size:13px;color:var(--cream);background:var(--card2);border-left:3px solid var(--clay);border-radius:6px;padding:8px 11px;margin-top:9px;font-style:italic}
+  .mcmt .mcmt-by{font-style:normal;font-weight:700;color:var(--clay);white-space:nowrap}
   .mmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;
     font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted2)}
   .mmeta a{color:var(--clay);text-decoration:none}
@@ -399,6 +400,11 @@ function dayDate(dm){
   if(ds.length===1){ const d=new Date(ds[0]+'T00:00:00'); return ' · '+d.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}); }
   return '';
 }
+function commentQuote(m){
+  if(!m.comment) return '';
+  const by = m.reporter_name ? ` <span class="mcmt-by">— ${esc(String(m.reporter_name).split(' ')[0])}</span>` : '';
+  return `<div class="mcmt">”${esc(m.comment)}”${by}</div>`;
+}
 function matchCard(m){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
@@ -407,7 +413,7 @@ function matchCard(m){
     const res = m.score ? esc(m.score) : (m.games_a+' – '+m.games_b);
     return `<div class="match">${names}
       <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
-      ${m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:''}
+      ${commentQuote(m)}
       <div class="mmeta"><span>${whenLabel(m)}</span>${mine?'<span class="cx" style="font-size:11px;color:var(--muted2);font-weight:400">Fel? Kontakta Admin</span>':''}</div></div>`;
   }
   if(!mine){
@@ -521,10 +527,11 @@ function renderUpcoming(el){
     if(!played.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher spelade ännu.</div>'; }
     else{
       const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
-        return `<div class="upc"><div class="who">
+        return `<div class="upc" style="flex-wrap:wrap"><div class="who">
           <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
           <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
-          <div class="rsc">${sc}</div></div>`; };
+          <div class="rsc">${sc}</div>
+          ${m.comment?`<div style="flex-basis:100%">${commentQuote(m)}</div>`:''}</div>`; };
       const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
       days.forEach((d,i)=>{
         const dm=played.filter(x=>(x.matchday||0)===d);
