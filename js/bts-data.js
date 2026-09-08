@@ -704,6 +704,12 @@ const BTS = {
     });
     if (error) throw error;
   },
+  async hostOpenNext(adminPw) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_open_next', { p_admin_pw: adminPw });
+    if (error) throw error;
+    return data;
+  },
   async hostPoolAdvance(adminPw, fromRound) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pool_advance', { p_admin_pw: adminPw, p_from_round: fromRound });

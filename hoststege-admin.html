@@ -130,6 +130,8 @@ function render(){
 
     <div class="card">
       <h3>Kommande spelomgång (veckobekräftelse)</h3>
+      <button class="btn go" style="width:100%;margin-bottom:12px" onclick="openNext()">Öppna nästa söndags spelomgång →</button>
+      <div class="state" id="onmsg" style="margin:-6px 0 12px"></div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
         <label class="state">Spelomgång:</label>
         <input id="wk" type="number" min="1" value="${ACT.week}" style="width:70px;font:inherit;padding:9px;border:1px solid var(--line);border-radius:9px">
@@ -390,6 +392,12 @@ function confirmSummary(){
       <div><b style="color:var(--up)">Spelar:</b> ${list(play)}</div>
       <div style="margin-top:6px"><b>Kan inte:</b> ${list(cant)}</div>
       <div style="margin-top:6px"><b>Ej svarat:</b> ${list(no)}</div></div>`;
+}
+async function openNext(){
+  if(!confirm('Öppna nästa söndags spelomgång? Nästa spelomgång aktiveras och matcherna får kommande söndag + kl 15:00 (du justerar tid/bana och skickar bekräftelse efteråt).')) return;
+  const m=document.getElementById('onmsg'); m.textContent='Öppnar…';
+  try{ const r=await BTS.hostOpenNext(PW); m.textContent='✓ '+r; await load(); }
+  catch(e){ m.textContent='Fel: '+(e.message||e); }
 }
 async function setWeek(){
   const w=parseInt(document.getElementById('wk').value); if(!w) return;
