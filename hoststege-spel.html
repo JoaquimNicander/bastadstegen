@@ -546,7 +546,8 @@ function render(){
         <div class="pdiff">${r.poang??0}<span style="font-size:11px;color:var(--muted2)"> p</span></div>
         <i class="prow-arrow">›</i></div>`;
     }).join('');
-    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab);
+    // visa bara aktuell + tidigare spelomgångar (ej framtida som inte öppnats än)
+    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab && (m.matchday||0)<=WEEK);
     const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
     const mrows=days.map(d=>{
       const dm=gm.filter(m=>(m.matchday||0)===d);
