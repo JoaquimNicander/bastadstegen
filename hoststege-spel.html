@@ -455,15 +455,18 @@ function renderUpcoming(el){
   const dn={H:'Herr',D:'Dam'};
   const cnum=m=>{ const x=String(m.court||'').match(/\d+/); return x?parseInt(x[0]):9999; };
   const tkey=m=>String(m.start_time||'');
-  const sched=MATCHES.filter(m=>m.status!=='done' && m.play_date)
+  const today=new Date().toISOString().slice(0,10);
+  const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
+  const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)<=WEEK);
+  const sched=opened.filter(upcoming)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
       || (cnum(a)-cnum(b))
       || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0));
-  const later=MATCHES.filter(m=>m.status!=='done' && m.defer_note && !(m.play_date && String(m.start_time||'').trim()));
-  const pending=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)===WEEK
-    && !(m.play_date && String(m.start_time||'').trim()) && !m.defer_note);
+  const later=opened.filter(m=> m.defer_note && !upcoming(m));                 // uppskjutna – boka tid
+  const overdue=opened.filter(m=> m.play_date && m.play_date<today && !m.defer_note); // passerat datum, ej spelad
+  const undated=opened.filter(m=> !m.play_date && !m.defer_note);             // ingen tid/besked än
   const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
-  const ospelade = later.length + pending.length;
+  const ospelade = later.length + overdue.length + undated.length;
 
   const tabs=[['kommande','Kommande',sched.length],['ospelade','Ospelade',ospelade],['spelade','Spelade',played.length]];
   const nav='<div class="mtabs">'+tabs.map(t=>`<button class="mtab ${MTAB===t[0]?'on':''}" onclick="setMatchTab('${t[0]}')">${t[1]} <span class="mtn">${t[2]}</span></button>`).join('')+'</div>';
@@ -472,7 +475,7 @@ function renderUpcoming(el){
   let html='';
 
   if(MTAB==='kommande'){
-    if(!sched.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher är schemalagda med tid ännu.<br>Håll utkik! 🎾</div>'; }
+    if(!sched.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
     else{
       if(ME && mineIds.size){
         html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
@@ -495,10 +498,17 @@ function renderUpcoming(el){
         return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
         <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
-    if(pending.length){
+    if(overdue.length){
+      html+='<div class="upc-day" style="color:#e6a23c">⏰ Ospelade – boka ny tid</div>';
+      html+=overdue.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+        const d=new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
+        return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
+        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · skulle spelats ${d} — spela när det passar</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+    }
+    if(undated.length){
       html+='<div class="upc-day" style="color:#e6a23c">⚠️ Inte klara ännu</div>';
-      html+='<div class="state" style="margin:-4px 0 9px;font-size:12px;color:var(--muted2)">Dessa saknar tid/bana eller besked. Hör av dig till din motståndare eller klubben så får vi igång dem.</div>';
-      html+=pending.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+      html+='<div class="state" style="margin:-4px 0 9px;font-size:12px;color:var(--muted2)">Dessa saknar tid eller besked. Hör av dig till din motståndare eller klubben så får vi igång dem.</div>';
+      html+=undated.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
         const pa=ATT[m.a_id], pb=ATT[m.b_id];
         let why='Väntar på tid & bana';
         if(pa===false||pb===false) why='Någon kan inte just nu';
