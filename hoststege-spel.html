@@ -153,6 +153,8 @@
   .mtab .mtn{font-family:'Space Mono',monospace;font-size:11px;opacity:.8}
   .upc-day{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay);margin:20px 0 9px}
   .upc-day:first-child{margin-top:2px}
+  .upc-date{margin:22px 0 12px;font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;line-height:1.1}
+  .upc-date .upc-note{display:block;margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.5px;text-transform:none;color:var(--clay);font-weight:400}
   .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:13px 14px;margin-bottom:9px}
   .upc.mine{border-color:var(--clay);background:#241811}
   .upc .t{flex:0 0 auto;text-align:center;min-width:66px}
@@ -475,7 +477,8 @@ function renderUpcoming(el){
       let lastD='';
       sched.filter(m=>!mineIds.has(m.id)).forEach(m=>{
         if(m.play_date!==lastD){ const d=new Date(m.play_date+'T00:00:00');
-          html+=`<div class="upc-day">${d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'})}</div>`; lastD=m.play_date; }
+          const ds=d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+          html+=`<div class="upc-date">${ds.charAt(0).toUpperCase()+ds.slice(1)}<span class="upc-note">⏱ Exakta tider &amp; banor meddelas i veckan</span></div>`; lastD=m.play_date; }
         html+=upcCard(m,false);
       });
     }
