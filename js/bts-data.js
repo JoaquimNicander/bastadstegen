@@ -713,6 +713,18 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
+  async hostReactionsRound(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_reactions_round', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostReact(commentId, emoji, playerId, pin) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_react', { p_comment_id: commentId, p_player_id: playerId, p_pin: pin || '', p_emoji: emoji });
+    if (error) throw error;
+    return data; // 'added' | 'removed'
+  },
   async hostAddComment(matchId, body, playerId, pin) {
     _assert();
     const { error } = await _sb.rpc('bts_host_match_comment', { p_match_id: matchId, p_player_id: playerId, p_pin: pin || '', p_body: body });

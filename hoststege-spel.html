@@ -108,7 +108,19 @@
   details.cwrap>summary .cmore{margin-left:auto;color:var(--clay);font-weight:700;white-space:nowrap;flex:0 0 auto}
   details.cwrap>summary .cmore::after{content:'Se mer'}
   details.cwrap[open]>summary .cmore::after{content:'Dölj'}
-  details.cwrap-in,.cwrap-in{padding:0 11px 11px;display:flex;flex-direction:column;gap:6px}
+  details.cwrap-in,.cwrap-in{padding:0 11px 11px;display:flex;flex-direction:column;gap:10px}
+  .rrow{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;position:relative}
+  .rchip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--border2);border-radius:100px;padding:3px 9px 3px 7px;font-size:13px;cursor:pointer;user-select:none;transition:transform .08s;line-height:1}
+  .rchip:hover{transform:translateY(-1px)}
+  .rchip .n{font-size:11.5px;font-weight:700;color:var(--muted);font-family:'Space Mono',monospace}
+  .rchip.on{background:rgba(255,140,66,.16);border-color:var(--clay)}
+  .rchip.on .n{color:var(--clay)}
+  .raddbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:100px;background:transparent;border:1px dashed var(--border2);color:var(--muted2);font-size:14px;cursor:pointer;line-height:1;padding:0}
+  .raddbtn:hover{border-color:var(--clay);color:var(--clay)}
+  .rpick{position:absolute;bottom:34px;left:0;z-index:6;display:none;gap:2px;background:#0a2016;border:1px solid var(--border2);border-radius:100px;padding:5px 7px;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+  .rpick.open{display:flex}
+  .rpick button{background:none;border:0;font-size:20px;cursor:pointer;padding:3px 4px;border-radius:100px;transition:transform .1s;line-height:1}
+  .rpick button:hover{transform:scale(1.3) translateY(-2px)}
   .mmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;
     font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted2)}
   .mmeta a{color:var(--clay);text-decoration:none}
@@ -256,7 +268,8 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={};
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={};
+const REMOJI=['🎾','👍','❤️','🏆','🥇','🔥'];
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
@@ -269,6 +282,7 @@ async function load(){
   try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
   try{ const sa=BTS.hostPlayerStatsAll?await BTS.hostPlayerStatsAll():[]; STATS={}; sa.forEach(x=>{STATS[x.player_id]={m:x.matcher,v:x.vinster};}); }catch(e){ STATS={}; }
   try{ const cc=BTS.hostCommentsRound?await BTS.hostCommentsRound(ROUND):[]; CMTS={}; cc.forEach(c=>{ (CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c); }); }catch(e){ CMTS={}; }
+  try{ const rr=BTS.hostReactionsRound?await BTS.hostReactionsRound(ROUND):[]; REACTS={}; rr.forEach(r=>{ (REACTS[r.comment_id]=REACTS[r.comment_id]||[]).push(r); }); }catch(e){ REACTS={}; }
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
@@ -442,7 +456,7 @@ function commentBlock(m){
   const n = all.length;
   if(!n && !mine) return '';
   let inner='';
-  all.forEach(c=>{ inner+=`<div class="cbubble"><span class="cby">${esc(String(c.name||'').split(' ')[0])}</span> ${esc(c.body)}</div>`; });
+  all.forEach(c=>{ inner+=`<div><div class="cbubble"><span class="cby">${esc(String(c.name||'').split(' ')[0])}</span> ${esc(c.body)}</div>${reactRow(c.id)}</div>`; });
   if(mine){ inner+=`<div class="caddrow"><input class="cadd" id="ca${m.id}" maxlength="300" placeholder="${n?'Svara…':'Skriv en kommentar…'}" onkeydown="if(event.key==='Enter')addComment(${m.id})"><button class="csend" onclick="addComment(${m.id})">→</button></div>`; }
   const label = n ? `${n} kommentar${n>1?'er':''}` : 'Skriv en kommentar';
   const pv = n ? `<span class="cpv">”${esc(String(all[0].body))}”</span>` : '';
@@ -456,6 +470,37 @@ async function addComment(id){
     const cc=await BTS.hostCommentsRound(ROUND); CMTS={}; cc.forEach(c=>{(CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c);}); render(); }
   catch(e){ alert('Kunde inte spara: '+(e.message||e)); el.disabled=false; }
 }
+// === Reaktioner (bara positiva, öppet för alla inloggade) ===
+function reactRowInner(cid){
+  const list=REACTS[cid]||[]; const by={};
+  list.forEach(r=>{ (by[r.emoji]=by[r.emoji]||{n:0,mine:false}); by[r.emoji].n++; if(ME&&Number(r.player_id)===Number(ME.id)) by[r.emoji].mine=true; });
+  const emojis=Object.keys(by).sort((a,b)=>REMOJI.indexOf(a)-REMOJI.indexOf(b));
+  const chips=emojis.map(e=>`<span class="rchip ${by[e].mine?'on':''}" ${ME?`onclick="react(${cid},'${e}')"`:''}>${e} <span class="n">${by[e].n}</span></span>`).join('');
+  const add = ME ? `<button class="raddbtn" title="Reagera" onclick="openPick(this,${cid})">＋</button><div class="rpick"></div>` : '';
+  return chips+add;
+}
+function reactRow(cid){
+  if(!cid) return '';
+  const inner=reactRowInner(cid);
+  if(!inner) return '';               // inga reaktioner och ej inloggad
+  return `<div class="rrow" data-cid="${cid}">${inner}</div>`;
+}
+function openPick(btn,cid){
+  const row=btn.closest('.rrow'); const pop=row.querySelector('.rpick');
+  document.querySelectorAll('.rpick.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
+  if(!pop.dataset.built){ pop.innerHTML=REMOJI.map(e=>`<button onclick="react(${cid},'${e}')">${e}</button>`).join(''); pop.dataset.built='1'; }
+  pop.classList.toggle('open');
+}
+async function react(cid, e){
+  if(!ME){ alert('Logga in för att reagera.'); return; }
+  try{ await BTS.hostReact(cid, e, ME.id, ME.pin);
+    const rr=await BTS.hostReactionsRound(ROUND); REACTS={}; rr.forEach(r=>{(REACTS[r.comment_id]=REACTS[r.comment_id]||[]).push(r);});
+    // uppdatera bara den berörda raden så tråden hålls öppen
+    const row=document.querySelector(`.rrow[data-cid="${cid}"]`);
+    if(row) row.innerHTML=reactRowInner(cid); else render();
+  }catch(err){ alert('Kunde inte spara reaktion: '+(err.message||err)); }
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('.rrow')) document.querySelectorAll('.rpick.open').forEach(p=>p.classList.remove('open')); });
 function matchCard(m){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
