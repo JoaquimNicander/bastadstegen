@@ -610,6 +610,12 @@ const BTS = {
     const { error } = await _sb.rpc('bts_host_confirm', { p_player_id: playerId, p_pin: pin || '', p_playing: playing });
     if (error) throw error;
   },
+  async hostReminderCount(adminPw, target, channel) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_reminder_count', { p_admin_pw: adminPw, p_target: target, p_channel: channel });
+    if (error) throw error;
+    return data || 0;
+  },
   async hostAttendance(round, week) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_attendance', { p_round: round, p_week: week });
@@ -631,7 +637,7 @@ const BTS = {
     const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
-      body: JSON.stringify({ mode: 'host_reminder', adminPw, template, target, channel: opts.channel || 'auto', customText: opts.customText || '', test: !!opts.test, testPhone: opts.testPhone || '', testEmail: opts.testEmail || '' }),
+      body: JSON.stringify({ mode: 'host_reminder', adminPw, template, target, channel: opts.channel || 'auto', onlyPlayerId: opts.onlyPlayerId || null, customText: opts.customText || '', test: !!opts.test, testPhone: opts.testPhone || '', testEmail: opts.testEmail || '' }),
     });
     const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
