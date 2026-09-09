@@ -695,6 +695,29 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
+  async hostCommentsRound(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_comments_round', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostMatchComments(matchId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_host_match_comments', { p_match_id: matchId });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostAddComment(matchId, body, playerId, pin) {
+    _assert();
+    const { error } = await _sb.rpc('bts_host_match_comment', { p_match_id: matchId, p_player_id: playerId, p_pin: pin || '', p_body: body });
+    if (error) throw error;
+    // meddela motståndaren (blockerar inte)
+    fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({ mode: 'host_comment_notify', matchId, playerId, pin: pin || '', body }),
+    }).catch(()=>{});
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });

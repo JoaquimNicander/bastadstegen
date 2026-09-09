@@ -92,6 +92,12 @@
   .cmt::placeholder{color:var(--muted2)}
   .mcmt{font-size:13px;color:var(--cream);background:var(--card2);border-left:3px solid var(--clay);border-radius:6px;padding:8px 11px;margin-top:9px;font-style:italic}
   .mcmt .mcmt-by{font-style:normal;font-weight:700;color:var(--clay);white-space:nowrap}
+  .cthread{margin-top:9px;display:flex;flex-direction:column;gap:6px}
+  .cbubble{font-size:13px;color:var(--cream);background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:7px 11px;line-height:1.45}
+  .cbubble .cby{font-weight:700;color:var(--clay);margin-right:5px}
+  .caddrow{display:flex;gap:6px;margin-top:2px}
+  .cadd{flex:1;min-width:0;background:#0a2016;border:1px solid var(--border2);border-radius:9px;color:#fff;font:inherit;font-size:13px;padding:9px 11px}
+  .csend{flex:0 0 auto;background:var(--clay);color:#3a1400;border:0;border-radius:9px;font-weight:800;font-size:15px;padding:0 15px;cursor:pointer}
   .mmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:9px;
     font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted2)}
   .mmeta a{color:var(--clay);text-decoration:none}
@@ -239,7 +245,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={};
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={};
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
 function onToggle(key,el){ if(el.open) OPEN.add(key); else OPEN.delete(key); }
@@ -251,6 +257,7 @@ async function load(){
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
   try{ const sa=BTS.hostPlayerStatsAll?await BTS.hostPlayerStatsAll():[]; STATS={}; sa.forEach(x=>{STATS[x.player_id]={m:x.matcher,v:x.vinster};}); }catch(e){ STATS={}; }
+  try{ const cc=BTS.hostCommentsRound?await BTS.hostCommentsRound(ROUND):[]; CMTS={}; cc.forEach(c=>{ (CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c); }); }catch(e){ CMTS={}; }
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
@@ -407,6 +414,22 @@ function commentQuote(m){
   const by = m.reporter_name ? ` <span class="mcmt-by">— ${esc(String(m.reporter_name).split(' ')[0])}</span>` : '';
   return `<div class="mcmt">”${esc(m.comment)}”${by}</div>`;
 }
+function commentThread(m){
+  const mine = !!(ME && (ME.id===m.a_id||ME.id===m.b_id));
+  const list = CMTS[m.id]||[];
+  let h='';
+  list.forEach(c=>{ h+=`<div class="cbubble"><span class="cby">${esc(String(c.name).split(' ')[0])}</span> ${esc(c.body)}</div>`; });
+  if(mine){ h+=`<div class="caddrow"><input class="cadd" id="ca${m.id}" maxlength="300" placeholder="Skriv en kommentar…" onkeydown="if(event.key==='Enter')addComment(${m.id})"><button class="csend" onclick="addComment(${m.id})">→</button></div>`; }
+  return h ? `<div class="cthread">${h}</div>` : '';
+}
+async function addComment(id){
+  if(!ME){ alert('Logga in för att kommentera.'); return; }
+  const el=document.getElementById('ca'+id); const body=(el.value||'').trim(); if(!body) return;
+  el.disabled=true;
+  try{ await BTS.hostAddComment(id, body, ME.id, ME.pin);
+    const cc=await BTS.hostCommentsRound(ROUND); CMTS={}; cc.forEach(c=>{(CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c);}); render(); }
+  catch(e){ alert('Kunde inte spara: '+(e.message||e)); el.disabled=false; }
+}
 function matchCard(m){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
@@ -416,6 +439,7 @@ function matchCard(m){
     return `<div class="match">${names}
       <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
       ${commentQuote(m)}
+      ${commentThread(m)}
       <div class="mmeta"><span>${whenLabel(m)}</span>${mine?'<span class="cx" style="font-size:11px;color:var(--muted2);font-weight:400">Fel? Kontakta Admin</span>':''}</div></div>`;
   }
   if(!mine){
