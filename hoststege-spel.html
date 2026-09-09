@@ -560,7 +560,7 @@ function renderUpcoming(el){
           <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
           <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
           <div class="rsc">${sc}</div>
-          ${m.comment?`<div style="flex-basis:100%">${commentQuote(m)}</div>`:''}</div>`; };
+          <div style="flex-basis:100%">${commentQuote(m)}${commentThread(m)}</div></div>`; };
       const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
       days.forEach((d,i)=>{
         const dm=played.filter(x=>(x.matchday||0)===d);
