@@ -115,6 +115,8 @@
   .rchip .n{font-size:11.5px;font-weight:700;color:var(--muted);font-family:'Space Mono',monospace}
   .rchip.on{background:rgba(255,140,66,.16);border-color:var(--clay)}
   .rchip.on .n{color:var(--clay)}
+  .rquick{display:inline-flex;align-items:center;justify-content:center;height:26px;min-width:26px;padding:0 6px;border-radius:100px;background:var(--card2);border:1px solid var(--border);font-size:15px;cursor:pointer;line-height:1;transition:transform .08s,border-color .15s;opacity:.9}
+  .rquick:hover{transform:translateY(-1px);border-color:var(--clay);opacity:1}
   .raddbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:100px;background:transparent;border:1px dashed var(--border2);color:var(--muted2);font-size:14px;cursor:pointer;line-height:1;padding:0}
   .raddbtn:hover{border-color:var(--clay);color:var(--clay)}
   .rpick{position:absolute;bottom:34px;left:0;z-index:6;display:none;gap:2px;background:#0a2016;border:1px solid var(--border2);border-radius:100px;padding:5px 7px;box-shadow:0 8px 22px rgba(0,0,0,.45)}
@@ -476,8 +478,12 @@ function reactRowInner(cid){
   list.forEach(r=>{ (by[r.emoji]=by[r.emoji]||{n:0,mine:false}); by[r.emoji].n++; if(ME&&Number(r.player_id)===Number(ME.id)) by[r.emoji].mine=true; });
   const emojis=Object.keys(by).sort((a,b)=>REMOJI.indexOf(a)-REMOJI.indexOf(b));
   const chips=emojis.map(e=>`<span class="rchip ${by[e].mine?'on':''}" ${ME?`onclick="react(${cid},'${e}')"`:''}>${e} <span class="n">${by[e].n}</span></span>`).join('');
-  const add = ME ? `<button class="raddbtn" title="Reagera" onclick="openPick(this,${cid})">＋</button><div class="rpick"></div>` : '';
-  return chips+add;
+  let quick='', add='';
+  if(ME){
+    quick=REMOJI.slice(0,3).filter(e=>!by[e]).map(e=>`<button class="rquick" title="Reagera ${e}" onclick="react(${cid},'${e}')">${e}</button>`).join('');
+    add=`<button class="raddbtn" title="Fler" onclick="openPick(this,${cid})">＋</button><div class="rpick"></div>`;
+  }
+  return chips+quick+add;
 }
 function reactRow(cid){
   if(!cid) return '';
@@ -488,7 +494,7 @@ function reactRow(cid){
 function openPick(btn,cid){
   const row=btn.closest('.rrow'); const pop=row.querySelector('.rpick');
   document.querySelectorAll('.rpick.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
-  if(!pop.dataset.built){ pop.innerHTML=REMOJI.map(e=>`<button onclick="react(${cid},'${e}')">${e}</button>`).join(''); pop.dataset.built='1'; }
+  if(!pop.dataset.built){ pop.innerHTML=REMOJI.slice(3).map(e=>`<button onclick="react(${cid},'${e}')">${e}</button>`).join(''); pop.dataset.built='1'; }
   pop.classList.toggle('open');
 }
 async function react(cid, e){
