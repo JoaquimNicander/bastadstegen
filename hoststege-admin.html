@@ -308,12 +308,13 @@ function attMark(pid){
 }
 function schedIsDone(m){ return !!(m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim()); }
 function schedChip(m){
+  if(m.status==='done') return '<span class="schip done">✓ Spelad</span>';
   if(m.defer_note) return '<span class="schip done">✓ Spelas senare</span>';
   return schedIsDone(m) ? '<span class="schip done">✓ Schemalagd</span>' : '<span class="schip todo">Ej klar</span>';
 }
-function schedBorder(m){ return (schedIsDone(m)||m.defer_note) ? 'var(--up)' : '#e6a23c'; }
+function schedBorder(m){ return (m.status==='done'||schedIsDone(m)||m.defer_note) ? 'var(--up)' : '#e6a23c'; }
 function schedRow(m){
-  const green = schedIsDone(m) || m.defer_note;
+  const green = m.status==='done' || schedIsDone(m) || m.defer_note;
   return `<div id="schrow_${m.id}" style="padding:9px 15px;border-top:1px solid var(--line);border-left:4px solid ${schedBorder(m)};${green?'':'background:#fffdf8'}">
     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
       <div style="flex:1 1 150px;font-size:13.5px;font-weight:600">${esc(m.a_name)}${attMark(m.a_id)} <span style="color:var(--muted)">–</span> ${esc(m.b_name)}${attMark(m.b_id)} <span id="chip_${m.id}">${schedChip(m)}</span></div>
