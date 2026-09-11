@@ -569,11 +569,11 @@ function renderUpcoming(el){
   const today=new Date().toISOString().slice(0,10);
   const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
   const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)<=WEEK);
-  const sched=opened.filter(upcoming)
+  const sched=opened.filter(m=> upcoming(m) && !m.defer_note)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
-      || (cnum(a)-cnum(b))
-      || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0));
-  const later=opened.filter(m=> m.defer_note && !upcoming(m));                 // uppskjutna – boka tid
+      || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0)
+      || (cnum(a)-cnum(b)));
+  const later=opened.filter(m=> m.defer_note);                 // uppskjutna / kan inte – boka tid
   const overdue=opened.filter(m=> m.play_date && m.play_date<today && !m.defer_note); // passerat datum, ej spelad
   const undated=opened.filter(m=> !m.play_date && !m.defer_note);             // ingen tid/besked än
   const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
