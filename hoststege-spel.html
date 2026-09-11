@@ -200,6 +200,8 @@
   .upc .who .pl .upl:active{color:var(--clay)}
   .upc .who .gp{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);text-transform:uppercase;margin-top:4px;letter-spacing:.5px}
   .upc .who .gp .din{color:var(--clay);font-weight:700}
+  .upc.tbd{opacity:.82}
+  .upc .who .upc-tbd{margin-top:5px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.3px;color:#e6a23c}
   .upc .ct{flex:0 0 auto;text-align:center;background:#0a2016;border:1px solid var(--border2);border-radius:11px;padding:6px 11px;min-width:58px}
   .upc.mine .ct{border-color:var(--clay)}
   .upc .ct .ct-l{display:block;font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
@@ -553,13 +555,13 @@ function upcCard(m, mine){
   const cnum = m.court ? (String(m.court).replace(/^\s*bana\s*/i,'').trim() || String(m.court)) : '';
   const court = cnum ? `<div class="ct"><span class="ct-l">Bana</span><span class="ct-n">${esc(cnum)}</span></div>` : '';
   const gp = `${mine?'<span class="din">DIN MATCH · </span>':''}${dn[m.division]||m.division} · Grupp ${esc(m.label)}`;
-  const timeCell = (m.start_time && String(m.start_time).trim())
-    ? `<div class="hh">${esc(m.start_time)}</div>`
-    : `<div class="hh-tbd">⏱</div>`;
-  return `<div class="upc ${mine?'mine':''}">
+  const tbd = !(m.start_time && String(m.start_time).trim());
+  const timeCell = tbd ? `<div class="hh-tbd">⏱</div>` : `<div class="hh">${esc(m.start_time)}</div>`;
+  const tbdNote = tbd ? `<div class="upc-tbd">Ej tidssatt än — väntar på att båda bekräftar spel</div>` : '';
+  return `<div class="upc ${mine?'mine':''}${tbd?' tbd':''}">
     <div class="t">${timeCell}</div>
     <div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-      <div class="gp">${gp}</div></div>
+      <div class="gp">${gp}</div>${tbdNote}</div>
     ${court}</div>`;
 }
 function renderUpcoming(el){
@@ -569,9 +571,10 @@ function renderUpcoming(el){
   const today=new Date().toISOString().slice(0,10);
   const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
   const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)<=WEEK);
+  const tk=m=>(String(m.start_time||'').trim()||'99:99');   // otidssatta sorteras sist
   const sched=opened.filter(m=> upcoming(m) && !m.defer_note)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
-      || (tkey(a)<tkey(b)?-1:tkey(a)>tkey(b)?1:0)
+      || (tk(a)<tk(b)?-1:tk(a)>tk(b)?1:0)
       || (cnum(a)-cnum(b)));
   const later=opened.filter(m=> m.defer_note);                 // uppskjutna / kan inte – boka tid
   const overdue=opened.filter(m=> m.play_date && m.play_date<today && !m.defer_note); // passerat datum, ej spelad
