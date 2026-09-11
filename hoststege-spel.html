@@ -189,6 +189,9 @@
   .upc-day:first-child{margin-top:2px}
   .upc-date{margin:22px 0 12px;font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.5px;color:#fff;line-height:1.1}
   .upc-date .upc-note{display:block;margin-top:6px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.5px;text-transform:none;color:var(--clay);font-weight:400}
+  .upc-info{display:flex;gap:10px;align-items:flex-start;background:rgba(255,140,66,.11);border:1px solid rgba(255,140,66,.38);border-radius:12px;padding:13px 15px;margin:2px 0 16px;color:var(--cream);font-size:14px;line-height:1.5}
+  .upc-info .ico{flex:0 0 auto;font-size:17px;line-height:1.3}
+  .upc-info b{color:var(--clay)}
   .upc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--border2);border-radius:13px;padding:13px 14px;margin-bottom:9px}
   .upc.mine{border-color:var(--clay);background:#241811}
   .upc .t{flex:0 0 auto;text-align:center;min-width:66px}
@@ -588,6 +591,7 @@ function renderUpcoming(el){
   if(MTAB==='kommande'){
     if(!sched.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
     else{
+      html+='<div class="upc-info"><span class="ico">🎾</span><div><b>Din match hamnar här</b> så fort både du och din motspelare bekräftat spel.</div></div>';
       if(ME && mineIds.size){
         html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
         html+=sched.filter(m=>mineIds.has(m.id)).map(m=>upcCard(m,true)).join('');
