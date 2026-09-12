@@ -722,6 +722,8 @@ function render(){
       </details></div>`;
   }).join('');
 }
+function wtnBadge(wtn){ const w=(wtn||'').toString().trim(); if(!w) return '';
+  return `<div style="margin-top:5px"><span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #e3e3e8;padding:2px 8px 2px 6px;border-radius:100px;box-shadow:0 1px 3px rgba(0,0,0,.15)"><img src="wtn-mark.png" style="height:12px;width:auto;display:block"><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#1B2A4A">${esc(w)}</span></span></div>`; }
 function renderPlayers(el){
   if(!PROFILES.length){ el.innerHTML='<div class="state">Inga spelare ännu.</div>'; return; }
   const card=p=>{
@@ -731,6 +733,7 @@ function renderPlayers(el){
       <div class="pav">${av}</div>
       <div class="pn">${esc(p.name)}</div>
       <div class="pg">${grp}</div>
+      ${wtnBadge(p.wtn)}
       <div class="ps">${(STATS[p.player_id]||{m:0}).m} matcher · ${(STATS[p.player_id]||{v:0}).v} vinster</div></div>`;
   };
   el.innerHTML='<div class="pgrid">'+PROFILES.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(card).join('')+'</div>';
@@ -743,13 +746,13 @@ function openProfile(id){
   const av=p.photo_url?`<img src="${escAttr(p.photo_url)}" alt="">`:esc((p.name||'?').trim().charAt(0)||'?');
   const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
   const facts=[['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Underlag',p.fav_surface],
-    ['Spelar sedan',p.since_year],['WTN',p.wtn],['Ålder',ageFrom(p.born)],['I höst',p.spelade+' m · '+p.vinster+' v']].filter(f=>f[1]);
+    ['Spelar sedan',p.since_year],['Ålder',ageFrom(p.born)],['I höst',p.spelade+' m · '+p.vinster+' v']].filter(f=>f[1]);
   const contactHtml = ME
     ? `<div class="pbio" id="pcontact" style="font-style:normal">Laddar kontakt…</div>`
     : `<div class="pbio" id="pcontact" style="font-style:normal;color:var(--muted2)">🔒 Logga in för att se kontaktuppgifter</div>`;
   document.getElementById('profmodal').innerHTML=`<div class="pbox">
     <div class="ph"><button class="pclose" onclick="closeProfile()" aria-label="Stäng">×</button>
-      <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div></div>
+      <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div>${wtnBadge(p.wtn)}</div>
     <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
     ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
     <div class="pstats" id="pstats"></div>
