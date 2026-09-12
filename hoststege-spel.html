@@ -581,8 +581,12 @@ function renderUpcoming(el){
   const undated=opened.filter(m=> !m.play_date && !m.defer_note);             // ingen tid/besked än
   const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
   const ospelade = later.length + overdue.length + undated.length;
+  // Mina matcher: alla mina ospelade matcher i hela omgången (även framtida spelomgångar)
+  const mineRemain = ME ? MATCHES.filter(m=>m.status!=='done' && (m.a_id===ME.id||m.b_id===ME.id))
+    .sort((a,b)=> ((a.matchday||999)-(b.matchday||999)) || (a.id-b.id)) : [];
 
   const tabs=[['kommande','Kommande',sched.length],['ospelade','Ospelade',ospelade],['spelade','Spelade',played.length]];
+  if(ME) tabs.push(['mina','Mina matcher',mineRemain.length]);
   const nav='<div class="mtabs">'+tabs.map(t=>`<button class="mtab ${MTAB===t[0]?'on':''}" onclick="setMatchTab('${t[0]}')">${t[1]} <span class="mtn">${t[2]}</span></button>`).join('')+'</div>';
 
   const mineIds = ME ? new Set(sched.filter(m=>m.a_id===ME.id||m.b_id===ME.id).map(m=>m.id)) : new Set();
@@ -631,7 +635,7 @@ function renderUpcoming(el){
         <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
   }
-  else { // spelade — grupperat per spelomgång, hopfällbart
+  else if(MTAB==='spelade'){ // spelade — grupperat per spelomgång, hopfällbart
     if(!played.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga matcher spelade ännu.</div>'; }
     else{
       const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
@@ -645,6 +649,29 @@ function renderUpcoming(el){
         const dm=played.filter(x=>(x.matchday||0)===d);
         html+=`<details class="mgrp" ${i===0?'open':''}><summary>Spelomgång ${d||'?'} <span class="mtn">${dm.length} matcher</span></summary><div class="mgrp-in">${dm.map(resCard).join('')}</div></details>`;
       });
+    }
+  }
+  if(MTAB==='mina'){
+    if(!ME){
+      html+='<div class="state" style="text-align:center;padding:26px 10px">Logga in för att se dina matcher.</div>';
+    } else if(!mineRemain.length){
+      html+='<div class="state" style="text-align:center;padding:26px 10px">Du har inga kvarvarande matcher i omgången — snyggt spelat! 🎾<br>Spelade matcher hittar du under fliken Spelade.</div>';
+    } else {
+      html+='<div style="display:flex;gap:10px;align-items:flex-start;background:rgba(255,140,66,.11);border:1px solid rgba(255,140,66,.38);border-radius:12px;padding:13px 15px;margin:2px 0 16px;font-size:14px;line-height:1.5"><span style="font-size:17px">🎾</span><div><b style="color:var(--clay)">Kan du inte kommande söndag?</b> Spela ikapp när det passar er — rapportera matchen här så räknas den direkt och du slipper den senare.</div></div>';
+      const thisWk=mineRemain.filter(m=>(m.matchday||0)>0 && (m.matchday||0)<=WEEK);
+      const laterWk=mineRemain.filter(m=>!( (m.matchday||0)>0 && (m.matchday||0)<=WEEK ));
+      if(thisWk.length){
+        html+='<div class="upc-day" style="color:#9be29b">⭐ Kommande söndag</div>';
+        html+=thisWk.map(matchCard).join('');
+      }
+      if(laterWk.length){
+        html+='<div class="upc-day">Senare i omgången — spela när ni vill</div>';
+        let lastMd=null;
+        laterWk.forEach(m=>{ const md=m.matchday||0;
+          if(md!==lastMd){ html+=`<div class="upc-day" style="color:var(--muted2);margin-top:12px">${md?('Spelomgång '+md):'Ej inplanerad än'}</div>`; lastMd=md; }
+          html+=matchCard(m);
+        });
+      }
     }
   }
   el.innerHTML=nav+html;
