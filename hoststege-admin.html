@@ -156,6 +156,7 @@ function render(){
           <select id="remTmpl" onchange="remReset()" style="width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
             <option value="confirm">Bekräfta spel</option>
             <option value="report">Rapportera resultat</option>
+            <option value="general">Allmänt meddelande</option>
           </select>
         </div>
         <div style="flex:1 1 190px">
@@ -456,6 +457,7 @@ function remChan(){ return document.getElementById('remChannel').value; }
 function remOnly(){ const e=document.getElementById('remOnly'); return e&&e.value?parseInt(e.value):null; }
 function remDefault(tmpl){
   const wk=(ACT&&ACT.week)||1;
+  if(tmpl==='general') return 'Hej {namn}! ';
   return tmpl==='report'
     ? 'Hej {namn}! Glöm inte att rapportera dina höststege-matcher:'
     : 'Hej {namn}! Kom ihåg att bekräfta om du spelar kommande söndag (spelomgång '+wk+') i höststegen:';
@@ -471,7 +473,9 @@ function remPreview(){
 }
 function remReset(){
   const ta=document.getElementById('remCustom'); if(ta){ ta.value=remDefault(remTmpl()); }
-  remPreview();
+  // Allmänt meddelande går rimligtvis till alla — förvälj det
+  if(remTmpl()==='general'){ const tg=document.getElementById('remTarget'); if(tg){ tg.value='all'; } }
+  remPreview(); remCount();
 }
 async function remCount(){
   const span=document.getElementById('remCnt'); if(!span) return;
