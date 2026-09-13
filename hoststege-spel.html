@@ -570,7 +570,7 @@ function renderUpcoming(el){
   const tkey=m=>String(m.start_time||'');
   const today=new Date().toISOString().slice(0,10);
   const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
-  const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)<=WEEK);
+  const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)>0 && (m.matchday||0)<=WEEK);
   const tk=m=>(String(m.start_time||'').trim()||'99:99');   // otidssatta sorteras sist
   const sched=opened.filter(m=> upcoming(m) && !m.defer_note)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
@@ -706,7 +706,7 @@ function render(){
         <i class="prow-arrow">›</i></div>`;
     }).join('');
     // visa bara aktuell + tidigare spelomgångar (ej framtida som inte öppnats än)
-    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab && (m.matchday||0)<=WEEK);
+    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab && (m.matchday||0)>0 && (m.matchday||0)<=WEEK);
     const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
     const mrows=days.map(d=>{
       const dm=gm.filter(m=>(m.matchday||0)===d);
