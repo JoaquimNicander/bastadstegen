@@ -756,7 +756,8 @@ function openProfile(id){
     ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
     <div class="pstats" id="pstats"></div>
     <div class="pmatches" id="pmatches"></div>
-    ${contactHtml}</div>`;
+    ${contactHtml}
+    ${(ME && ME.id===id) ? `<a href="rapportera.html#profil" class="repbtn" style="display:block;text-align:center;text-decoration:none;margin-top:14px">✏️ Redigera min profil →</a>` : ''}</div>`;
   document.getElementById('profmodal').classList.add('open');
   fillStats(id);
   fillMatches(id);
