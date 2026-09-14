@@ -456,12 +456,11 @@ function commentBlock(m){
   const list = CMTS[m.id]||[];
   const legacy = (!list.length && m.comment) ? [{name:m.reporter_name||'', body:m.comment}] : [];
   const all = list.length ? list : legacy;
-  const mine = !!(ME && (ME.id===m.a_id||ME.id===m.b_id));
   const n = all.length;
-  if(!n && !mine) return '';
+  if(!n && !ME) return '';   // öppet forum: alla inloggade kan kommentera vilken match som helst
   let inner='';
   all.forEach(c=>{ inner+=`<div><div class="cbubble"><span class="cby">${esc(String(c.name||'').split(' ')[0])}</span> ${esc(c.body)}</div>${reactRow(c.id)}</div>`; });
-  if(mine){ inner+=`<div class="caddrow"><input class="cadd" id="ca${m.id}" maxlength="300" placeholder="${n?'Svara…':'Skriv en kommentar…'}" onkeydown="if(event.key==='Enter')addComment(${m.id})"><button class="csend" onclick="addComment(${m.id})">→</button></div>`; }
+  if(ME){ inner+=`<div class="caddrow"><input class="cadd" id="ca${m.id}" maxlength="300" placeholder="${n?'Skriv en kommentar…':'Först att kommentera…'}" onkeydown="if(event.key==='Enter')addComment(${m.id})"><button class="csend" onclick="addComment(${m.id})">→</button></div>`; }
   const label = n ? `${n} kommentar${n>1?'er':''}` : 'Skriv en kommentar';
   const pv = n ? `<span class="cpv">”${esc(String(all[0].body))}”</span>` : '';
   return `<details class="cwrap"><summary><span class="cico">💬</span><span class="cnt">${label}</span>${pv}<span class="cmore"></span></summary><div class="cwrap-in">${inner}</div></details>`;
