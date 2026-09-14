@@ -278,6 +278,9 @@ function schedCard(){
       <button class="btn" style="padding:7px 11px;font-size:13px" onclick="fillWeekDate()">Sätt på alla (${dayM.length})</button>
     </div>
     <div class="wkhead"><b>Spelomgång ${SCHEDWK}</b> <span class="cnt">${dayM.length} matcher · ${setD} schemalagda · ${doneD} spelade</span></div>
+    ${ SCHEDWK>ACT.week
+      ? `<div style="margin:2px 0 12px"><div class="state" style="color:#b8860b;margin-bottom:6px">◷ Utkast — spelomgång ${SCHEDWK} syns inte för spelarna än. Granska matcherna nedan och publicera när du är klar.</div><button class="btn go" style="width:100%" onclick="publishWeek(${SCHEDWK})">Publicera spelomgång ${SCHEDWK} →</button></div>`
+      : `<div class="state" style="color:#1f7a3d;font-weight:700;margin:2px 0 12px">✓ Publicerad — spelomgång ${SCHEDWK} syns för spelarna.</div>` }
     ${rows}</div>`;
 }
 function setSchedWk(md){ SCHEDWK=md; render(); const c=document.querySelector('.wknav'); if(c) c.scrollIntoView({block:'center'}); }
@@ -440,6 +443,11 @@ async function openNext(){
   const m=document.getElementById('onmsg'); m.textContent='Öppnar…';
   try{ const r=await BTS.hostOpenNext(PW); m.textContent='✓ '+r; await load(); }
   catch(e){ m.textContent='Fel: '+(e.message||e); }
+}
+async function publishWeek(md){
+  if(!confirm('Publicera spelomgång '+md+'?\n\nMatcherna blir synliga för spelarna och de kan börja bekräfta spel. (Du kan skicka bekräftelse-utskick efteråt.)')) return;
+  try{ await BTS.hostSetWeek(PW, md); alert('Spelomgång '+md+' publicerad ✓ — nu synlig för spelarna.'); await load(); }
+  catch(e){ alert('Fel: '+(e.message||e)); }
 }
 async function setWeek(){
   const w=parseInt(document.getElementById('wk').value); if(!w) return;
