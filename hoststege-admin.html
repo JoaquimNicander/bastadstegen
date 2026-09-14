@@ -221,7 +221,7 @@ function render(){
 
     <div class="card">
       <h3>Lägg till spelare (börjar längst ner)</h3>
-      <div class="state">Lägger spelaren i bottengruppen i vald stege för aktuell omgång och skapar deras matcher.</div>
+      <div class="state">Lägger spelaren längst ner i vald stege för aktuell omgång och skapar deras matcher.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
         <select id="lateDiv" style="flex:0 0 110px;font:inherit;padding:10px;border:1px solid var(--line);border-radius:9px">
           <option value="H">Herr</option><option value="D">Dam</option>
@@ -242,7 +242,7 @@ async function addLate(){
   const s=document.getElementById('lates');
   if(!pid){ s.textContent='Välj en spelare.'; return; }
   s.textContent='Lägger till…';
-  try{ await BTS.hostPoolAddLate(PW,pid,div); s.textContent='Tillagd i bottengruppen ✓'; await load(); }
+  try{ await BTS.hostPoolAddLate(PW,pid,div); s.textContent='Tillagd längst ner ✓'; await load(); }
   catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
 
