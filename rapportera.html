@@ -843,7 +843,7 @@ function renderApp(){
         </select>
       </div>
       <div class="form-row"><label class="form-label">På stegen sedan</label><input class="form-input" id="p-since" type="text" value="${prof.since||''}" placeholder="2020"></div>
-      <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input class="form-input" id="p-wtn" type="text" value="${prof.wtn||''}" placeholder="t.ex. 18.4"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt WTN så visas en badge på ditt spelarkort. Har du inget? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--o1,#FF8C42)">Skaffa här →</a></div></div>
+      <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input class="form-input" id="p-wtn" type="text" inputmode="decimal" value="${prof.wtn||''}" placeholder="t.ex. 24.6"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt <b>ranking-tal</b> (t.ex. 24.6) — <b>inte</b> den långa id-koden (MUN…). Då visas en badge på ditt spelarkort. Har du inget? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--o1,#FF8C42)">Skaffa här →</a></div></div>
       <div class="form-row"><label class="form-label">Om mig</label><textarea class="form-textarea" id="p-bio" placeholder="Berätta något kul om dig själv...">${prof.bio||''}</textarea></div>
       <button class="save-btn" onclick="saveMyProfile(this)">Spara profil →</button>
       <div class="pin-row">
@@ -1091,6 +1091,16 @@ async function saveMyProfile(btn){
     wtn:document.getElementById('p-wtn')?.value||'',
     bio:document.getElementById('p-bio')?.value||'',
   };
+  // Enkel koll: WTN ska vara ranking-talet (t.ex. 24.6), inte den långa id-koden (MUN…)
+  { let w=(data.wtn||'').trim().replace(',', '.');
+    if(w){
+      if(!/^\d{1,2}(\.\d)?$/.test(w) || parseFloat(w)<1 || parseFloat(w)>40){
+        alert('WTN ska vara ditt ranking-tal (t.ex. 24.6, mellan 1 och 40) — inte den långa id-koden (MUN…). Rätta fältet och spara igen.');
+        return;
+      }
+      data.wtn=w;
+    }
+  }
   // Behåll localStorage som offline-fallback
   saveProfileData(me.name,{email,...data});
   const orig=btn?btn.textContent:'';
