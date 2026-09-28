@@ -172,6 +172,16 @@
   .pmopp{flex:1;min-width:0;font-size:14px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pmsc{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:13px;color:var(--cream)}
   .pmd{flex:0 0 auto;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);min-width:44px;text-align:right}
+  .surf{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+        font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px;
+        line-height:1;border-radius:7px;padding:4px 8px 4px 5px;border:1px solid transparent;white-space:nowrap}
+  .surf .court{display:block;flex:none;border-radius:2px}
+  .surf.clay{background:rgba(208,96,42,.14);border-color:rgba(208,96,42,.45);color:#F2AE8C}
+  .surf.hard{background:rgba(49,118,188,.14);border-color:rgba(49,118,188,.45);color:#9EC7EE}
+  .surf-sm{font-size:9px;gap:6px;padding:3px 7px 3px 4px}
+  .pmrow .surf{width:92px;justify-content:center;margin-left:8px}
+  .gp .surf{margin-left:8px;vertical-align:-3px}
+  @media(min-width:380px){ .pmsc{min-width:92px;text-align:right} }
   .confirmbar{margin:14px 0 0}
   .cnote{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--cream);margin-bottom:8px}
   .cbx{background:var(--card);border:1px solid var(--clay);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -230,6 +240,17 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="court" viewBox="0 0 128 64">
+    <rect width="128" height="64" fill="currentColor"/>
+    <g fill="none" stroke="#fff" stroke-width="3" vector-effect="non-scaling-stroke">
+      <rect x="7" y="7" width="114" height="50"/>
+      <line x1="7" y1="15" x2="121" y2="15"/><line x1="7" y1="49" x2="121" y2="49"/>
+      <line x1="34" y1="15" x2="34" y2="49"/><line x1="94" y1="15" x2="94" y2="49"/>
+      <line x1="34" y1="32" x2="94" y2="32"/><line x1="64" y1="7" x2="64" y2="57"/>
+    </g>
+  </symbol>
+</defs></svg>
 <div class="hero">
   <img class="herobg" src="host-banner.webp" alt="Höstbana med fallande löv" fetchpriority="high">
   <div class="veil"></div>
@@ -640,7 +661,7 @@ function renderUpcoming(el){
       const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
         return `<div class="upc" style="flex-wrap:wrap"><div class="who">
           <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
-          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}</div></div>
+          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}${surfaceBadge(m.surface, true)}</div></div>
           <div class="rsc">${sc}</div>
           <div style="flex-basis:100%">${commentBlock(m)}</div></div>`; };
       const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
@@ -771,6 +792,16 @@ function flipScore(score, isA){
     return mm[2]+'-'+mm[1]+paren;
   }).join(' ');
 }
+function surfaceBadge(s, small){
+  if(s !== 'grus' && s !== 'hard') return '';
+  var clay = s === 'grus';
+  var col = clay ? '#D0602A' : '#3176BC';
+  var w = small ? 22 : 26, h = small ? 11 : 13;
+  return '<span class="surf ' + (clay ? 'clay' : 'hard') + (small ? ' surf-sm' : '') + '">'
+       + '<svg class="court" width="' + w + '" height="' + h + '" style="color:' + col + '">'
+       + '<use href="#court"></use></svg>'
+       + '<span class="surf-l">' + (clay ? 'CLAY' : 'HARD') + '</span></span>';
+}
 async function fillMatches(id){
   const el=document.getElementById('pmatches'); if(!el) return;
   try{
@@ -784,7 +815,7 @@ async function fillMatches(id){
         <span class="pmres ${m.won?'v':'f'}">${m.won?'V':'F'}</span>
         <span class="pmopp">${esc(m.opp||'')}</span>
         <span class="pmsc">${esc(sc)}</span>
-        <span class="pmd">${d}</span></div>`;
+        <span class="pmd">${d}</span>${surfaceBadge(m.surface)}</div>`;
     });
     el.innerHTML=h;
   }catch(e){ el.innerHTML=''; }
