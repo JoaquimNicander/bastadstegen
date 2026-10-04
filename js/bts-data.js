@@ -512,7 +512,7 @@ const BTS = {
   // Personligt betalningsunderlag (Sommarstegen) via token
   async underlagGet(token) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_underlag_get', { p_token: token });
+    const { data, error } = await _sb.rpc('bts_underlag_card', { p_token: token });
     if (error) throw error;
     return (data && data[0]) || null;
   },
@@ -524,16 +524,16 @@ const BTS = {
     return data === true;
   },
   // Publik statustavla (bara namn + betald-status)
-  async underlagBoard() {
+  async underlagBoard(season) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_underlag_board');
+    const { data, error } = await _sb.rpc('bts_underlag_board_s', { p_season: season || 'sommar2026' });
     if (error) throw error;
     return data || [];
   },
   // Kontoret: hela listan med betalstatus (öppen länk med hemlig nyckel)
-  async underlagOffice(key) {
+  async underlagOffice(key, season) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_underlag_office', { p_key: key });
+    const { data, error } = await _sb.rpc('bts_underlag_office_list', { p_key: key, p_season: season || null });
     if (error) throw error;
     return data || [];
   },

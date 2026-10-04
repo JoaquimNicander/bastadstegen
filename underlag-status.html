@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Avstämning betalningar · Sommarstegen 2026</title>
+<title>Avstämning betalningar · Båstad Stegen</title>
 <style>
   :root{ --green:#0D2E20; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62; --gold:#F4B740;
     --line:#e7dfd2; --ok:#1c7a3f; --okbg:#e7f6ec; --okln:#bfe6cc; }
@@ -60,10 +60,10 @@
     <div class="head">
       <div class="ball"></div>
       <div class="kick">Avstämning betalningar</div>
-      <h1>Sommarstegen 2026</h1>
+      <h1 id="sTitel">Sommarstegen 2026</h1>
     </div>
     <div class="body" id="body"><div class="state">Laddar…</div></div>
-    <div class="foot">Båstad Tennissällskap · Sommarstegen 2026</div>
+    <div class="foot">Båstad Tennissällskap · <span id="sFoot">Sommarstegen 2026</span></div>
   </div>
 </div>
 
@@ -77,7 +77,12 @@ const today=()=> new Date().toLocaleDateString('sv-SE');
 (async function(){
   const el=document.getElementById('body');
   try{
-    const rows=await BTS.underlagBoard();
+    const SE=new URLSearchParams(location.search).get('s')||'sommar2026';
+    const SET={host2026:'Höststegen 2026',sommar2026:'Sommarstegen 2026'}[SE]||'Båstad Stegen';
+    document.title='Avstämning betalningar · '+SET;
+    const t1=document.getElementById('sTitel'); if(t1) t1.textContent=SET;
+    const t2=document.getElementById('sFoot'); if(t2) t2.textContent=SET;
+    const rows=await BTS.underlagBoard(SE);
     const total=rows.length;
     const done=rows.filter(r=>r.paid||r.marked_paid).length;
     const sum=rows.reduce((a,r)=>a+Number(r.belopp||0),0);

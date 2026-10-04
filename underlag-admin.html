@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Kontor · Betalstatus · Sommarstegen 2026</title>
+<title>Kontor · Betalstatus · Båstad Stegen</title>
 <style>
   :root{ --green:#0D2E20; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62; --orange:#E8520A; --line:#e7dfd2; --ok:#1c7a3f; --okbg:#e7f6ec; --okln:#bfe6cc; }
   *{box-sizing:border-box}
@@ -28,30 +28,44 @@
   .state{text-align:center;color:var(--muted);padding:40px}
   .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap}
   .print{background:var(--green);color:#fff;border:0;border-radius:9px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}
+  .seasons{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+  .seasons a{display:inline-block;padding:8px 15px;border-radius:100px;font-size:13px;font-weight:700;
+    text-decoration:none;background:var(--cream);border:1px solid var(--line);color:var(--muted)}
+  .seasons a.on{background:var(--green);border-color:var(--green);color:#fff}
+  @media print{ .seasons{display:none} }
   @media print{ .print{display:none} body{background:#fff} th{ -webkit-print-color-adjust:exact;print-color-adjust:exact } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Betalstatus — Sommarstegen 2026 <span style="font-size:13px;color:#8a8577">· kontor</span></h1>
+  <h1 id="rubrik">Betalstatus <span style="font-size:13px;color:#8a8577">· kontor</span></h1>
   <p class="sub">Vem har tryckt "Jag har betalat" och vem inte. Bocka av inbetalningar när de landat på kontot.</p>
+  <div class="seasons" id="seasons"></div>
   <div id="app"><div class="state">Laddar…</div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/bts-data.js"></script>
 <script>
-let KEY='', ROWS=[];
+let KEY='', ROWS=[], SEASON='sommar2026';
+const SEASONS=[{k:'host2026',t:'Höststegen 2026'},{k:'sommar2026',t:'Sommarstegen 2026'}];
+const seasonTitle=k=>(SEASONS.find(x=>x.k===k)||{}).t||k;
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const kr=n=>Number(n||0).toLocaleString('sv-SE');
 function fmtDate(s){ if(!s) return ''; const d=new Date(s); return d.toLocaleDateString('sv-SE')+' '+d.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'}); }
 
 (async function(){
-  KEY=new URLSearchParams(location.search).get('k')||'';
+  const q=new URLSearchParams(location.search);
+  KEY=q.get('k')||'';
+  SEASON=q.get('s')||'sommar2026';
   const app=document.getElementById('app');
   if(!KEY){ app.innerHTML='<div class="state">Länken saknar kod. Använd den fullständiga länken du fått.</div>'; return; }
+  document.getElementById('rubrik').innerHTML='Betalstatus — '+esc(seasonTitle(SEASON))+' <span style="font-size:13px;color:#8a8577">· kontor</span>';
+  document.title='Kontor · Betalstatus · '+seasonTitle(SEASON);
+  document.getElementById('seasons').innerHTML=SEASONS.map(x=>
+    `<a class="${x.k===SEASON?'on':''}" href="?k=${encodeURIComponent(KEY)}&s=${x.k}">${esc(x.t)}</a>`).join('');
   try{
-    ROWS=await BTS.underlagOffice(KEY);
+    ROWS=await BTS.underlagOffice(KEY, SEASON);
     render();
   }catch(e){
     app.innerHTML='<div class="state">'+(/ogiltig/i.test(e.message||'')?'Ogiltig länk.':'Kunde inte ladda: '+esc(e.message||e))+'</div>';

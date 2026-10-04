@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Ditt betalningsunderlag · Sommarstegen 2026</title>
+<title>Ditt betalningsunderlag · Båstad Stegen</title>
 <style>
   :root{ --green:#0D2E20; --green2:#123c2a; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62;
     --orange:#E8520A; --line:#e7dfd2; }
@@ -54,21 +54,40 @@
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function token(){ return new URLSearchParams(location.search).get('t')||''; }
 
+const SEASONS={
+  sommar2026:{
+    titel:'Sommarstegen 2026',
+    lead:u=>`Tack för en grym sommar på banorna. Här är ditt underlag — ${u.tillfallen} speltillfällen à ${u.price} kr.`,
+    ref:'Sommarstegen'
+  },
+  host2026:{
+    titel:'Höststegen 2026',
+    lead:u=>`Här är ditt underlag för höststegen — ${u.tillfallen} spelomgångar à ${u.price} kr.`,
+    ref:'Höststegen',
+    enkelrad:u=>`${u.tillfallen} spelomgångar à ${u.price} kr`
+  }
+};
+function season(u){ return SEASONS[u.season] || SEASONS.sommar2026; }
+
 function render(u){
   const first=(u.name||'').split(' ')[0];
+  const S=season(u);
+  document.title='Ditt betalningsunderlag · '+S.titel;
   const dates=(u.dates||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const rows=dates.map(d=>`<div class="r"><span class="d">${esc(d)}</span><span>${u.price} kr</span></div>`).join('');
+  const rows=dates.length
+    ? dates.map(d=>`<div class="r"><span class="d">${esc(d)}</span><span>${u.price} kr</span></div>`).join('')
+    : `<div class="r"><span class="d">${esc((S.enkelrad?S.enkelrad(u):u.tillfallen+' tillfällen à '+u.price+' kr'))}</span><span>${u.belopp} kr</span></div>`;
   document.getElementById('app').className='';
   document.getElementById('app').innerHTML = `
   <div class="card">
     <div class="head">
       <div class="ball"></div>
       <div class="kick">Betalningsunderlag</div>
-      <h1>Sommarstegen 2026</h1>
+      <h1>${esc(S.titel)}</h1>
     </div>
     <div class="body">
       <p class="hi">Hej ${esc(first)}!</p>
-      <p class="lead">Tack för en grym sommar på banorna. Här är ditt underlag — ${u.tillfallen} speltillfällen à ${u.price} kr.</p>
+      <p class="lead">${esc(S.lead(u))}</p>
       <div class="paidbadge" id="paid">✓ Registrerad som betald — tack!</div>
       <div class="spec">
         ${rows}
@@ -77,12 +96,12 @@ function render(u){
       <div class="pay">
         <div class="lbl">Betala enkelt med Swish</div>
         <div class="swish">123 264 8400</div>
-        <div class="ref">Ange meddelande: <b>Sommarstegen</b></div>
+        <div class="ref">Ange meddelande: <b>${esc(S.ref)}</b></div>
       </div>
       <div id="paidbox"></div>
       <p class="lead" style="font-size:13px">Har du frågor? Skicka ett SMS till <b>072-078 78 45</b> så hör vi av oss.</p>
     </div>
-    <div class="foot">Båstad Tennissällskap · Sommarstegen 2026</div>
+    <div class="foot">Båstad Tennissällskap · ${esc(S.titel)}</div>
   </div>`;
   if(u.paid){ document.getElementById('paid').style.display='block'; }
   window.__u=u; renderPaid();
