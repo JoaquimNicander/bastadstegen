@@ -61,6 +61,8 @@
   .wobox .wobtns{display:flex;gap:8px;flex-wrap:wrap}
   .wolink{color:var(--muted2)!important}
   .wobadge-sm{font-size:9px;letter-spacing:1.5px;padding:2px 7px;margin-left:7px;vertical-align:1px}
+  .tabn{display:inline-block;min-width:17px;padding:1px 5px;margin-left:5px;border-radius:100px;
+    background:var(--clay);color:#3a1400;font-size:10px;font-weight:800;vertical-align:1px}
   .grp{margin:20px 0 0}
   .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
@@ -291,6 +293,7 @@
       <button class="tab" data-div="D" id="tab-D">Dam</button>
       <button class="tab" data-div="M" id="tab-M">Matcher</button>
       <button class="tab" data-div="S" id="tab-S">Spelare</button>
+      <button class="tab" data-div="P" id="tab-P">Spelpool</button>
     </div>
   </div>
 </div>
@@ -342,10 +345,10 @@ async function load(){
   await loadPool();
   await reloadWO();
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
-  { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]) DIV=map[h]; }
+  { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P'}; if(map[h]) DIV=map[h]; }
   renderLogin(); renderConfirm(); renderPool(); render();
 }
-window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]){ DIV=map[h]; render(); } });
+window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P'}; if(map[h]){ DIV=map[h]; render(); } });
 function renderLogin(){
   const el=document.getElementById('loginbar'); if(!el) return;
   if(ME){
@@ -519,11 +522,9 @@ async function loadPool(){
   else { POOLST={eligible:false,in_pool:false,antal:POOL.length,motstandare:null}; }
 }
 
-function renderPool(){
-  const el=document.getElementById('pool'); if(!el) return;
-  const mine = ME ? POOL.filter(p=>Number(p.player_id)===ME.id) : [];
-  const others = ME ? POOL.filter(p=>Number(p.player_id)!==ME.id) : POOL;
-  if(!POOL.length && !(ME && POOLST.eligible)){ el.innerHTML=''; return; }
+function poolInner(){
+  const mine = ME ? POOL.filter(function(p){ return Number(p.player_id)===ME.id; }) : [];
+  const others = ME ? POOL.filter(function(p){ return Number(p.player_id)!==ME.id; }) : POOL;
 
   let call='';
   if(ME && POOLST.eligible && !POOLST.in_pool){
@@ -549,14 +550,24 @@ function renderPool(){
         const btn = ME ? '<button class="pbtn" id="ask-' + p.player_id + '" onclick="askPool(' + p.player_id + ')">Fr\u00e5ga om match</button>' : '';
         return '<div class="poolrow"><div class="pn">' + esc(p.name) + note + '</div>' + btn + '</div>';
       }).join('')
-    : '<div class="poolmsg">' + (POOL.length ? 'Bara du st\u00e5r i poolen just nu.' : 'Ingen st\u00e5r i spelpoolen just nu.') + '</div>';
+    : '<div class="poolmsg">' + (POOL.length ? 'Bara du st\u00e5r i poolen just nu.' : 'Ingen st\u00e5r i spelpoolen just nu. Hamnar du utan motst\u00e5ndare dyker du upp h\u00e4r.') + '</div>';
 
-  el.innerHTML = '<div class="pool"><h3>Spelpoolen \u00b7 s\u00f6ndag</h3>'
+  return '<div class="pool"><h3>Spelpoolen \u00b7 s\u00f6ndag</h3>'
     + '<div class="psub">Spelare vars motst\u00e5ndare l\u00e4mnat \u00e5terbud och som \u00e4nd\u00e5 vill spela. Tr\u00e4ningsmatcher r\u00e4knas inte i stegen.</div>'
     + call + rows
     + (ME ? '' : '<div class="poolmsg">Logga in f\u00f6r att fr\u00e5ga n\u00e5gon om en tr\u00e4ningsmatch.</div>')
     + '</div>';
 }
+
+function renderPool(){
+  const tb=document.getElementById('tab-P');
+  if(tb) tb.innerHTML = 'Spelpool' + (POOL.length ? ' <span class="tabn">' + POOL.length + '</span>' : '');
+  const el=document.getElementById('pool'); if(!el) return;
+  if(DIV==='P'){ el.innerHTML=''; const b=document.getElementById('body'); if(b) renderPoolPage(b); return; }
+  el.innerHTML = (ME && (POOLST.eligible || POOLST.in_pool)) ? poolInner() : '';
+}
+
+function renderPoolPage(el){ el.innerHTML = poolInner(); }
 
 async function joinPool(){
   if(!ME) return;
@@ -890,8 +901,10 @@ function setMatchTab(t){ MTAB=t; render(); }
 function render(){
   renderConfirm();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
-  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S'||DIV==='M')?'none':'';
+  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S'||DIV==='M'||DIV==='P')?'none':'';
   const el=document.getElementById('body');
+  renderPool();
+  if(DIV==='P'){ renderPoolPage(el); return; }
   if(DIV==='S'){ renderPlayers(el); return; }
   if(DIV==='M'){ renderUpcoming(el); return; }
   const rows=ST.filter(r=>r.division===DIV);
