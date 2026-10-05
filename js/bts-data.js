@@ -643,6 +643,36 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
+  // ── Spelpoolen (söndag): för den vars motståndare lämnat återbud ──
+  async poolList() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_pool_list');
+    if (error) throw error;
+    return data || [];
+  },
+  async poolStatus(playerId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_pool_status', { p_player_id: playerId });
+    if (error) throw error;
+    return (data && data[0]) || { eligible: false, in_pool: false, antal: 0, motstandare: null };
+  },
+  async poolSet(playerId, pin, inPool, note) {
+    _assert();
+    const { error } = await _sb.rpc('bts_pool_set', {
+      p_player_id: playerId, p_pin: pin || '', p_in: !!inPool, p_note: note || null });
+    if (error) throw error;
+  },
+  // Mejl ut ur poolen (aldrig SMS — det kostar pengar i det här projektet)
+  async poolMail(payload) {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/pool-mail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify(payload),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
   async hostCantNotify(playerId, pin, week) {
     const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
       method: 'POST',

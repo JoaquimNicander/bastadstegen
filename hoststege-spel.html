@@ -35,6 +35,22 @@
   .lin{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:10px}
   .lin .lbtn{background:none;border:1px solid var(--border2);color:var(--muted);border-radius:8px;font:inherit;font-size:11px;padding:7px 12px;cursor:pointer}
   .lerr{color:var(--clay);font-size:12px;margin-top:6px}
+  /* Spelpoolen */
+  .poolbar{margin:0 0 18px}
+  .pool{background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:16px 18px}
+  .pool h3{margin:0 0 3px;font-size:17px;color:var(--white)}
+  .pool .psub{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:14px}
+  .poolcall{background:rgba(255,140,66,.12);border:1px solid rgba(255,140,66,.35);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+  .poolcall .pch{color:var(--white);font-weight:700;margin-bottom:3px}
+  .poolcall .pcs{color:var(--muted);font-size:13.5px;line-height:1.5;margin-bottom:11px}
+  .poolrow{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--border)}
+  .poolrow .pn{flex:1;min-width:0;color:var(--cream);font-weight:600;font-size:14.5px}
+  .poolrow .pnote{display:block;color:var(--muted);font-weight:400;font-size:12.5px;margin-top:2px}
+  .pbtn{background:var(--clay);color:#3a1400;border:0;border-radius:8px;font:inherit;font-weight:700;font-size:13px;padding:9px 14px;cursor:pointer;white-space:nowrap}
+  .pbtn.ghost{background:none;border:1px solid var(--border2);color:var(--muted);font-weight:600}
+  .pbtn:disabled{opacity:.55;cursor:default}
+  .poolnote{width:100%;font:inherit;font-size:14px;padding:10px 12px;background:#0a2016;border:1px solid var(--border2);border-radius:9px;color:#fff;box-sizing:border-box;margin:0 0 10px}
+  .poolmsg{color:var(--muted);font-size:13px;margin-top:9px;line-height:1.5}
   .grp{margin:20px 0 0}
   .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
@@ -270,6 +286,7 @@
 </div>
 <div class="wrap">
   <div class="confirmbar" id="confirmbar"></div>
+  <div class="poolbar" id="pool"></div>
   <div id="body"><div class="state">Laddar…</div></div>
   <div class="legend">
     <span><b style="background:#F5EDE3"></b>Går upp</span>
@@ -294,6 +311,7 @@
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
 let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={};
+let POOL=[], POOLST={eligible:false,in_pool:false,antal:0,motstandare:null};
 const REMOJI=['🎾','👍','❤️','🏆','🥇','🔥'];
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
@@ -310,9 +328,10 @@ async function load(){
   try{ const rr=BTS.hostReactionsRound?await BTS.hostReactionsRound(ROUND):[]; REACTS={}; rr.forEach(r=>{ (REACTS[r.comment_id]=REACTS[r.comment_id]||[]).push(r); }); }catch(e){ REACTS={}; }
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
+  await loadPool();
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
   { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]) DIV=map[h]; }
-  renderLogin(); renderConfirm(); render();
+  renderLogin(); renderConfirm(); renderPool(); render();
 }
 window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]){ DIV=map[h]; render(); } });
 function renderLogin(){
@@ -347,7 +366,7 @@ async function doLogin(){
     goReport();
   }catch(e){ if(err) err.textContent='Kunde inte logga in.'; }
 }
-function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); renderConfirm(); render(); }
+function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); renderConfirm(); renderPool(); render(); }
 function renderConfirm(){
   const el=document.getElementById('confirmbar'); if(!el) return;
   const canConfirm = ME && ST.some(r=>r.player_id===ME.id);
@@ -391,6 +410,7 @@ async function confirmPlay(playing){
   try{ await BTS.hostConfirm(ME.id, ME.pin, playing);
     const ar=await BTS.hostAttendance(ROUND,WEEK); ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;});
     CONFIRM_EDIT=false; renderConfirm(); render();
+    loadPool().then(renderPool);
     if(playing===false) openCant();
   }catch(e){ alert('Kunde inte spara: '+(e.message||e)); }
 }
@@ -441,6 +461,94 @@ async function sendReschedule(mid){
     s.innerHTML='✓ Ny tid inlagd och meddelad.';
   }catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
+async function loadPool(){
+  try{ POOL = await BTS.poolList(); }catch(e){ POOL=[]; }
+  if(ME){ try{ POOLST = await BTS.poolStatus(ME.id); }
+          catch(e){ POOLST={eligible:false,in_pool:false,antal:POOL.length,motstandare:null}; } }
+  else { POOLST={eligible:false,in_pool:false,antal:POOL.length,motstandare:null}; }
+}
+
+function renderPool(){
+  const el=document.getElementById('pool'); if(!el) return;
+  const mine = ME ? POOL.filter(p=>Number(p.player_id)===ME.id) : [];
+  const others = ME ? POOL.filter(p=>Number(p.player_id)!==ME.id) : POOL;
+  if(!POOL.length && !(ME && POOLST.eligible)){ el.innerHTML=''; return; }
+
+  let call='';
+  if(ME && POOLST.eligible && !POOLST.in_pool){
+    const opp = POOLST.motstandare ? esc(POOLST.motstandare) : 'Din motst\u00e5ndare';
+    call = '<div class="poolcall">'
+      + '<div class="pch">' + opp + ' kan inte spela p\u00e5 s\u00f6ndag</div>'
+      + '<div class="pcs">Vill du spela \u00e4nd\u00e5? St\u00e4ll dig i spelpoolen s\u00e5 ser andra i samma l\u00e4ge att du \u00e4r sugen \u2014 och de f\u00e5r ett mejl om att du st\u00e5r d\u00e4r.</div>'
+      + '<input id="pool-note" class="poolnote" type="text" maxlength="80" placeholder="Valfritt: t.ex. kan efter 13, g\u00e4rna inomhus">'
+      + '<button class="pbtn" onclick="joinPool()">St\u00e4ll mig i spelpoolen \u2192</button>'
+      + '<div class="poolmsg" id="pool-msg"></div></div>';
+  } else if(ME && POOLST.in_pool){
+    const n = mine.length && mine[0].note ? '<div class="pcs">Din notering: \u201d' + esc(mine[0].note) + '\u201d</div>' : '';
+    call = '<div class="poolcall">'
+      + '<div class="pch">\u2713 Du st\u00e5r i spelpoolen</div>' + n
+      + '<div class="pcs">Hittat n\u00e5gon att spela med? Ta bort dig s\u00e5 vet de andra.</div>'
+      + '<button class="pbtn ghost" onclick="leavePool()">Ta bort mig ur poolen</button>'
+      + '<div class="poolmsg" id="pool-msg"></div></div>';
+  }
+
+  const rows = others.length
+    ? others.map(function(p){
+        const note = p.note ? '<span class="pnote">' + esc(p.note) + '</span>' : '';
+        const btn = ME ? '<button class="pbtn" id="ask-' + p.player_id + '" onclick="askPool(' + p.player_id + ')">Fr\u00e5ga om match</button>' : '';
+        return '<div class="poolrow"><div class="pn">' + esc(p.name) + note + '</div>' + btn + '</div>';
+      }).join('')
+    : '<div class="poolmsg">' + (POOL.length ? 'Bara du st\u00e5r i poolen just nu.' : 'Ingen st\u00e5r i spelpoolen just nu.') + '</div>';
+
+  el.innerHTML = '<div class="pool"><h3>Spelpoolen \u00b7 s\u00f6ndag</h3>'
+    + '<div class="psub">Spelare vars motst\u00e5ndare l\u00e4mnat \u00e5terbud och som \u00e4nd\u00e5 vill spela. Tr\u00e4ningsmatcher r\u00e4knas inte i stegen.</div>'
+    + call + rows
+    + (ME ? '' : '<div class="poolmsg">Logga in f\u00f6r att fr\u00e5ga n\u00e5gon om en tr\u00e4ningsmatch.</div>')
+    + '</div>';
+}
+
+async function joinPool(){
+  if(!ME) return;
+  const n=document.getElementById('pool-note');
+  const note = n ? (n.value||'').trim() : '';
+  const s=document.getElementById('pool-msg'); if(s) s.textContent='Sparar\u2026';
+  try{
+    await BTS.poolSet(ME.id, ME.pin, true, note);
+    await loadPool(); renderPool();
+    const s2=document.getElementById('pool-msg'); if(s2) s2.textContent='Meddelar \u00f6vriga i poolen\u2026';
+    try{
+      const r=await BTS.poolMail({mode:'joined', playerId:ME.id, pin:ME.pin});
+      const s3=document.getElementById('pool-msg');
+      if(s3) s3.textContent = r.notified ? ('\u2713 ' + r.notified + ' i poolen har f\u00e5tt mejl om att du vill spela.') : '\u2713 Du st\u00e5r i poolen.';
+    }catch(e){
+      const s3=document.getElementById('pool-msg');
+      if(s3) s3.textContent='Du st\u00e5r i poolen (kunde inte mejla \u00f6vriga just nu).';
+    }
+  }catch(e){
+    const s2=document.getElementById('pool-msg'); if(s2) s2.textContent='Fel: '+(e.message||e);
+  }
+}
+
+async function leavePool(){
+  if(!ME) return;
+  const s=document.getElementById('pool-msg'); if(s) s.textContent='Sparar\u2026';
+  try{ await BTS.poolSet(ME.id, ME.pin, false, null); await loadPool(); renderPool(); }
+  catch(e){ const s2=document.getElementById('pool-msg'); if(s2) s2.textContent='Fel: '+(e.message||e); }
+}
+
+async function askPool(id){
+  if(!ME) return;
+  const b=document.getElementById('ask-'+id);
+  if(b){ b.disabled=true; b.textContent='Skickar\u2026'; }
+  try{
+    await BTS.poolMail({mode:'ask', playerId:ME.id, pin:ME.pin, targetId:id});
+    if(b) b.textContent='\u2713 Mejl skickat';
+  }catch(e){
+    if(b){ b.disabled=false; b.textContent='Fr\u00e5ga om match'; }
+    alert('Kunde inte skicka: '+(e.message||e));
+  }
+}
+
 function zonesFor(rows){
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
   const top=Math.min(...levels), bot=Math.max(...levels);
