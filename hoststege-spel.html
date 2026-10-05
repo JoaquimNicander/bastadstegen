@@ -60,6 +60,7 @@
   .wobox .wos{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:9px}
   .wobox .wobtns{display:flex;gap:8px;flex-wrap:wrap}
   .wolink{color:var(--muted2)!important}
+  .wobadge-sm{font-size:9px;letter-spacing:1.5px;padding:2px 7px;margin-left:7px;vertical-align:1px}
   .grp{margin:20px 0 0}
   .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
@@ -850,7 +851,7 @@ function renderUpcoming(el){
       const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
         return `<div class="upc" style="flex-wrap:wrap"><div class="who">
           <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
-          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}${surfaceBadge(m.surface, true)}</div></div>
+          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}${surfaceBadge(m.surface, true)}${woBadge(m.score, true)}</div></div>
           <div class="rsc">${sc}</div>
           <div style="flex-basis:100%">${commentBlock(m)}</div></div>`; };
       const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
@@ -981,6 +982,9 @@ function flipScore(score, isA){
     return mm[2]+'-'+mm[1]+paren;
   }).join(' ');
 }
+function woBadge(score, small){
+  return /^VO/.test(String(score||'')) ? '<span class="wobadge'+(small?' wobadge-sm':'')+'">VO</span>' : '';
+}
 function surfaceBadge(s, small){
   if(s !== 'grus' && s !== 'hard') return '';
   var clay = s === 'grus';
@@ -1004,7 +1008,7 @@ async function fillMatches(id){
         <span class="pmres ${m.won?'v':'f'}">${m.won?'V':'F'}</span>
         <span class="pmopp">${esc(m.opp||'')}</span>
         <span class="pmsc">${esc(sc)}</span>
-        <span class="pmd">${d}</span>${surfaceBadge(m.surface)}</div>`;
+        <span class="pmd">${d}</span>${woBadge(m.score, true)}${surfaceBadge(m.surface)}</div>`;
     });
     el.innerHTML=h;
   }catch(e){ el.innerHTML=''; }
