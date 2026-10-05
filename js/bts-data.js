@@ -643,6 +643,31 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
+  // ── VO (walkover) med bekräftelse från båda spelarna ──
+  async woPending(round) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_wo_pending', { p_round: round });
+    if (error) throw error;
+    return data || [];
+  },
+  async woPropose(matchId, playerId, pin, winnerId) {
+    _assert();
+    const { error } = await _sb.rpc('bts_wo_propose', {
+      p_match_id: matchId, p_player_id: playerId, p_pin: pin || '', p_winner_id: winnerId });
+    if (error) throw error;
+  },
+  async woConfirm(matchId, playerId, pin) {
+    _assert();
+    const { error } = await _sb.rpc('bts_wo_confirm', {
+      p_match_id: matchId, p_player_id: playerId, p_pin: pin || '' });
+    if (error) throw error;
+  },
+  async woCancel(matchId, playerId, pin) {
+    _assert();
+    const { error } = await _sb.rpc('bts_wo_cancel', {
+      p_match_id: matchId, p_player_id: playerId, p_pin: pin || '' });
+    if (error) throw error;
+  },
   // ── Spelpoolen (söndag): för den vars motståndare lämnat återbud ──
   async poolList() {
     _assert();

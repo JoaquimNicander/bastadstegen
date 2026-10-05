@@ -51,6 +51,15 @@
   .pbtn:disabled{opacity:.55;cursor:default}
   .poolnote{width:100%;font:inherit;font-size:14px;padding:10px 12px;background:#0a2016;border:1px solid var(--border2);border-radius:9px;color:#fff;box-sizing:border-box;margin:0 0 10px}
   .poolmsg{color:var(--muted);font-size:13px;margin-top:9px;line-height:1.5}
+  /* VO */
+  .wobadge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;
+    background:rgba(255,140,66,.16);border:1px solid rgba(255,140,66,.45);color:var(--clay);
+    padding:3px 9px;border-radius:100px;vertical-align:3px;margin-left:9px}
+  .wobox{background:rgba(255,140,66,.1);border:1px solid rgba(255,140,66,.35);border-radius:11px;padding:13px 14px;margin:10px 0 2px}
+  .wobox .wot{color:var(--white);font-weight:700;font-size:14.5px;margin-bottom:8px}
+  .wobox .wos{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:9px}
+  .wobox .wobtns{display:flex;gap:8px;flex-wrap:wrap}
+  .wolink{color:var(--muted2)!important}
   .grp{margin:20px 0 0}
   .ghead{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;padding:0 2px}
   .ghead h2{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:2px;color:var(--white);margin:0}
@@ -312,6 +321,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
 let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={};
 let POOL=[], POOLST={eligible:false,in_pool:false,antal:0,motstandare:null};
+let WOP={}, WOPICK=0;
 const REMOJI=['🎾','👍','❤️','🏆','🥇','🔥'];
 function expandConfirm(){ CONFIRM_EDIT=true; renderConfirm(); }
 const OPEN=new Set();
@@ -329,6 +339,7 @@ async function load(){
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   await loadPool();
+  await reloadWO();
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
   { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D'}; if(map[h]) DIV=map[h]; }
   renderLogin(); renderConfirm(); renderPool(); render();
@@ -461,6 +472,45 @@ async function sendReschedule(mid){
     s.innerHTML='✓ Ny tid inlagd och meddelad.';
   }catch(e){ s.textContent='Fel: '+(e.message||e); }
 }
+async function reloadWO(){
+  try{ const w = await BTS.woPending(ROUND); WOP={}; w.forEach(function(x){ WOP[x.match_id]=x; }); }
+  catch(e){ WOP={}; }
+}
+
+async function proposeWO(id, winnerId){
+  if(!ME) return;
+  const m=MATCHES.find(function(x){ return x.id===id; }); if(!m) return;
+  const wName = winnerId===m.a_id ? m.a_name : m.b_name;
+  const oppId = ME.id===m.a_id ? m.b_id : m.a_id;
+  if(!confirm('L\u00e4gga in VO p\u00e5 ' + m.a_name + ' \u2013 ' + m.b_name + '?\n\nVinnare: ' + wName
+      + '\nResultat: 6-0 6-0\n\nMotst\u00e5ndaren m\u00e5ste bekr\u00e4fta innan det registreras.')) return;
+  try{
+    await BTS.woPropose(id, ME.id, ME.pin, winnerId);
+    WOPICK=0;
+    try{ await BTS.poolMail({mode:'wo_propose', playerId:ME.id, pin:ME.pin, targetId:oppId, winnerName:wName}); }catch(e){}
+    await reloadWO(); render();
+  }catch(e){ alert('Kunde inte l\u00e4gga in VO: '+(e.message||e)); }
+}
+
+async function confirmWO(id){
+  if(!ME) return;
+  const w=WOP[id]; if(!w) return;
+  if(!confirm('Bekr\u00e4fta VO?\n\nVinnare: ' + w.winner_name + '\nResultat: 6-0 6-0')) return;
+  try{
+    await BTS.woConfirm(id, ME.id, ME.pin);
+    try{ await BTS.poolMail({mode:'wo_done', playerId:ME.id, pin:ME.pin, targetId:w.proposed_by, winnerName:w.winner_name}); }catch(e){}
+    const res = await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
+    ST=res[0]; MATCHES=res[1];
+    await reloadWO(); render();
+  }catch(e){ alert('Kunde inte bekr\u00e4fta: '+(e.message||e)); }
+}
+
+async function cancelWO(id){
+  if(!ME) return;
+  try{ await BTS.woCancel(id, ME.id, ME.pin); await reloadWO(); render(); }
+  catch(e){ alert('Kunde inte avbryta: '+(e.message||e)); }
+}
+
 async function loadPool(){
   try{ POOL = await BTS.poolList(); }catch(e){ POOL=[]; }
   if(ME){ try{ POOLST = await BTS.poolStatus(ME.id); }
@@ -642,7 +692,8 @@ function matchCard(m){
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
   const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
   if(m.status==='done'){
-    const res = m.score ? esc(m.score) : (m.games_a+' – '+m.games_b);
+    const isWO = /^VO/.test(String(m.score||''));
+    const res = (m.score ? esc(m.score) : (m.games_a+' – '+m.games_b)) + (isWO?'<span class="wobadge">VO</span>':'');
     return `<div class="match">${names}
       <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
       ${commentBlock(m)}
@@ -652,6 +703,36 @@ function matchCard(m){
     return `<div class="match">${names}
       <div class="result" style="color:var(--muted2);font-size:16px;letter-spacing:0">Ej spelad</div>
       <div class="mmeta"><span>${whenLabel(m)}</span></div></div>`;
+  }
+  const wp = WOP[m.id];
+  if(wp){
+    const minePropose = ME && Number(wp.proposed_by)===ME.id;
+    const other = ME && ME.id===m.a_id ? m.b_name : m.a_name;
+    const head = minePropose
+      ? 'Du har lagt in VO \u2014 ' + esc(wp.winner_name) + ' vann'
+      : esc(wp.proposed_by_name) + ' har lagt in VO \u2014 ' + esc(wp.winner_name) + ' vann';
+    const btns = minePropose
+      ? '<button class="pbtn ghost" onclick="cancelWO(' + m.id + ')">\u00c5ngra VO</button>'
+      : '<button class="pbtn" onclick="confirmWO(' + m.id + ')">Bekr\u00e4fta VO</button>'
+        + '<button class="pbtn ghost" onclick="cancelWO(' + m.id + ')">Avbryt</button>';
+    const sub = minePropose
+      ? 'V\u00e4ntar p\u00e5 att ' + esc(other) + ' bekr\u00e4ftar. Resultatet blir 6-0 6-0.'
+      : 'Resultatet blir 6-0 6-0 \u2014 3 po\u00e4ng till vinnaren, 1 till f\u00f6rloraren. Registreras f\u00f6rst n\u00e4r du bekr\u00e4ftat.';
+    return '<div class="match" id="m' + m.id + '">' + names
+      + '<div class="wobox"><div class="wot">' + head + '</div>'
+      + '<div class="wobtns">' + btns + '</div>'
+      + '<div class="wos">' + sub + '</div></div>'
+      + '<div class="mmeta"><span>' + whenLabel(m) + '</span></div></div>';
+  }
+  if(WOPICK===m.id){
+    return '<div class="match" id="m' + m.id + '">' + names
+      + '<div class="wobox"><div class="wot">Vem vann p\u00e5 VO?</div>'
+      + '<div class="wobtns">'
+      + '<button class="pbtn" onclick="proposeWO(' + m.id + ',' + m.a_id + ')">' + esc(m.a_name) + '</button>'
+      + '<button class="pbtn" onclick="proposeWO(' + m.id + ',' + m.b_id + ')">' + esc(m.b_name) + '</button>'
+      + '<button class="pbtn ghost" onclick="WOPICK=0;render()">Avbryt</button></div>'
+      + '<div class="wos">Resultatet blir 6-0 6-0. Motst\u00e5ndaren m\u00e5ste bekr\u00e4fta innan det registreras.</div></div>'
+      + '<div class="mmeta"><span>' + whenLabel(m) + '</span></div></div>';
   }
   const cmtField = m._noComment
     ? (m.comment?`<div class="mcmt">💬 ${esc(m.comment)}</div>`:'')
@@ -669,7 +750,7 @@ function matchCard(m){
     <div class="awin" id="aw${m.id}"></div>
     ${cmtField}
     <button class="sv wide" onclick="saveM(${m.id})">Spara resultat</button>
-    <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a></div></div>`;
+    <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a><a href="#" class="wolink" onclick="event.preventDefault();WOPICK=${m.id};render()">VO</a></div></div>`;
 }
 function whenLabel(m){
   if(m.defer_note) return `<span class="later">⏳ Spelas senare: ${esc(m.defer_note)}</span>`;
