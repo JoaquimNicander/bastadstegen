@@ -632,8 +632,10 @@ function commentThread(m){
 // Hopfällbar kommentarstråd: dold som standard, visar antal + skymt av första.
 function commentBlock(m){
   const list = CMTS[m.id]||[];
-  const legacy = (!list.length && m.comment) ? [{name:m.reporter_name||'', body:m.comment}] : [];
-  const all = list.length ? list : legacy;
+  // Rapportkommentaren (skriven i resultatrutan) ar forsta inlagget i traden,
+  // inte ett alternativ till den. id=null => ingen reaktionsrad.
+  const legacy = m.comment ? [{id:null, name:m.reporter_name||'', body:m.comment}] : [];
+  const all = legacy.concat(list);
   const n = all.length;
   if(!n && !ME) return '';   // öppet forum: alla inloggade kan kommentera vilken match som helst
   let inner='';
@@ -643,13 +645,16 @@ function commentBlock(m){
   const pv = n ? `<span class="cpv">”${esc(String(all[0].body))}”</span>` : '';
   return `<details class="cwrap"><summary><span class="cico">💬</span><span class="cnt">${label}</span>${pv}<span class="cmore"></span></summary><div class="cwrap-in">${inner}</div></details>`;
 }
+const CSENDING = {};
 async function addComment(id){
   if(!ME){ alert('Logga in för att kommentera.'); return; }
+  if(CSENDING[id]) return;                 // redan på väg – ignorera dubbeltryck
   const el=document.getElementById('ca'+id); const body=(el.value||'').trim(); if(!body) return;
-  el.disabled=true;
+  CSENDING[id]=true; el.disabled=true; el.value='';
   try{ await BTS.hostAddComment(id, body, ME.id, ME.pin);
     const cc=await BTS.hostCommentsRound(ROUND); CMTS={}; cc.forEach(c=>{(CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c);}); render(); }
-  catch(e){ alert('Kunde inte spara: '+(e.message||e)); el.disabled=false; }
+  catch(e){ alert('Kunde inte spara: '+(e.message||e)); el.value=body; el.disabled=false; }
+  finally{ delete CSENDING[id]; }
 }
 // === Reaktioner (bara positiva, öppet för alla inloggade) ===
 function reactRowInner(cid){
