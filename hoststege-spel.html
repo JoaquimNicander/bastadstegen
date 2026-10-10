@@ -66,6 +66,9 @@
   .wobox .wos{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:9px}
   .wobox .wobtns{display:flex;gap:8px;flex-wrap:wrap}
   .wolink{color:var(--muted2)!important}
+  .trnbadge{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;
+    text-transform:uppercase;color:#bfe3bf;background:rgba(120,190,120,.14);border:1px solid rgba(120,190,120,.42);
+    border-radius:100px;padding:2px 8px;vertical-align:1px}
   .wobadge-sm{font-size:9px;letter-spacing:1.5px;padding:2px 7px;margin-left:7px;vertical-align:1px}
   .tabn{display:inline-block;min-width:16px;padding:1px 5px;margin-left:5px;border-radius:100px;
     background:var(--clay);color:#3a1400;font-size:9.5px;font-weight:800;line-height:1.5}
@@ -687,6 +690,11 @@ function matchCard(m){
   const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id;
   const mine = !!(ME && (ME.id===m.a_id || ME.id===m.b_id));
   const names=`<div class="names"><span class="a ${aw?'win':''}">${esc(m.a_name)}</span><span class="b ${bw?'win':''}">${esc(m.b_name)}</span></div>`;
+  if(isTrn(m)){
+    return `<div class="match">${names}
+      <div class="result" style="color:var(--muted2);font-size:15px;letter-spacing:0">Tr\u00e4ningsmatch \u2013 inget resultat rapporteras</div>
+      <div class="mmeta"><span>${whenLabel(m)}</span></div></div>`;
+  }
   if(m.status==='done'){
     const isWO = /^VO/.test(String(m.score||''));
     const res = (m.score ? esc(m.score) : (m.games_a+' – '+m.games_b)) + (isWO?'<span class="wobadge">VO</span>':'');
@@ -735,11 +743,19 @@ function whenLabel(m){
   return 'Tid ej satt';
 }
 function upcName(id,name){ return `<span class="upl" onclick="event.stopPropagation();openProfile(${id})">${esc(name)}</span>`; }
+// Traningsmatch: label 'T' = syns i schemat men raknas inte i stegen.
+function isTrn(m){ return String((m&&m.label)||'')==='T'; }
+function grpLine(m){
+  const dn={H:'Herr',D:'Dam'};
+  return isTrn(m)
+    ? '<span class="trnbadge">Träningsmatch</span> \u00b7 r\u00e4knas inte i stegen'
+    : `${dn[m.division]||m.division} \u00b7 Grupp ${esc(m.label)}`;
+}
 function upcCard(m, mine){
   const dn={H:'Herr',D:'Dam'};
   const cnum = m.court ? (String(m.court).replace(/^\s*bana\s*/i,'').trim() || String(m.court)) : '';
   const court = cnum ? `<div class="ct"><span class="ct-l">Bana</span><span class="ct-n">${esc(cnum)}</span></div>` : '';
-  const gp = `${mine?'<span class="din">DIN MATCH · </span>':''}${dn[m.division]||m.division} · Grupp ${esc(m.label)}`;
+  const gp = `${mine?'<span class="din">DIN MATCH · </span>':''}${grpLine(m)}`;
   const tbd = !(m.start_time && String(m.start_time).trim());
   const timeCell = tbd ? `<div class="hh-tbd">⏱</div>` : `<div class="hh">${esc(m.start_time)}</div>`;
   const tbdNote = tbd ? `<div class="upc-tbd">Ej tidssatt än — väntar på att båda bekräftar spel</div>` : '';
@@ -761,13 +777,13 @@ function renderUpcoming(el){
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
       || (tk(a)<tk(b)?-1:tk(a)>tk(b)?1:0)
       || (cnum(a)-cnum(b)));
-  const later=opened.filter(m=> m.defer_note);                 // uppskjutna / kan inte – boka tid
-  const overdue=opened.filter(m=> m.play_date && m.play_date<today && !m.defer_note); // passerat datum, ej spelad
-  const undated=opened.filter(m=> !m.play_date && !m.defer_note);             // ingen tid/besked än
+  const later=opened.filter(m=> m.defer_note && !isTrn(m));                 // uppskjutna / kan inte – boka tid
+  const overdue=opened.filter(m=> m.play_date && m.play_date<today && !m.defer_note && !isTrn(m)); // passerat datum, ej spelad
+  const undated=opened.filter(m=> !m.play_date && !m.defer_note && !isTrn(m));             // ingen tid/besked än
   const played=MATCHES.filter(m=>m.status==='done').sort((a,b)=> (b.matchday||0)-(a.matchday||0) || (b.play_date||'').localeCompare(a.play_date||''));
   const ospelade = later.length + overdue.length + undated.length;
   // Mina matcher: alla mina ospelade matcher i hela omgången (även framtida spelomgångar)
-  const mineRemain = ME ? MATCHES.filter(m=>m.status!=='done' && (m.a_id===ME.id||m.b_id===ME.id))
+  const mineRemain = ME ? MATCHES.filter(m=>m.status!=='done' && !isTrn(m) && (m.a_id===ME.id||m.b_id===ME.id))
     .sort((a,b)=> ((a.matchday||999)-(b.matchday||999)) || (a.id-b.id)) : [];
 
   const tabs=[['kommande','Kommande',sched.length],['ospelade','Ospelade',ospelade],['spelade','Spelade',played.length]];
@@ -799,14 +815,14 @@ function renderUpcoming(el){
       html+='<div class="upc-day">⏳ Att boka tid</div>';
       html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
         return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+        <div class="gp">${grpLine(m)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
     if(overdue.length){
       html+='<div class="upc-day" style="color:#e6a23c">⏰ Ospelade – boka ny tid</div>';
       html+=overdue.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
         const d=new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
         return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · skulle spelats ${d} — spela när det passar</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+        <div class="gp">${grpLine(m)} · skulle spelats ${d} — spela när det passar</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
     if(undated.length){
       html+='<div class="upc-day" style="color:#e6a23c">⚠️ Inte klara ännu</div>';
@@ -817,7 +833,7 @@ function renderUpcoming(el){
         if(pa===false||pb===false) why='Någon kan inte just nu';
         else if(pa==null||pb==null) why='Väntar på bekräftelse';
         return `<div class="upc ${mine?'mine':''}"><div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-        <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
+        <div class="gp">${grpLine(m)} · ${why}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
   }
   else if(MTAB==='spelade'){ // spelade — grupperat per spelomgång, hopfällbart
@@ -826,7 +842,7 @@ function renderUpcoming(el){
       const resCard=m=>{ const aw=m.winner_id===m.a_id, bw=m.winner_id===m.b_id; const sc=m.score?esc(m.score):(m.games_a+'-'+m.games_b);
         return `<div class="upc" style="flex-wrap:wrap"><div class="who">
           <div class="pl"><span class="${aw?'rwin':''}">${upcName(m.a_id,m.a_name)}</span> <span style="color:var(--muted2)">–</span> <span class="${bw?'rwin':''}">${upcName(m.b_id,m.b_name)}</span></div>
-          <div class="gp">${dn[m.division]||m.division} · Grupp ${esc(m.label)}${surfaceBadge(m.surface, true)}${woBadge(m.score, true)}</div></div>
+          <div class="gp">${grpLine(m)}${surfaceBadge(m.surface, true)}${woBadge(m.score, true)}</div></div>
           <div class="rsc">${sc}</div>
           <div style="flex-basis:100%">${commentBlock(m)}</div></div>`; };
       const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
