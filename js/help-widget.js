@@ -27,7 +27,11 @@
     + 'background:#0D2A1D;border:1px solid #2A5A42;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,.55);'
     + 'font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#F5EDE3}'
     + '.bh-panel.on{display:flex}'
-    + '.bh-head{padding:13px 16px;border-bottom:1px solid #1C3A2B;background:#133124}'
+    + '.bh-head{padding:11px 15px;border-bottom:1px solid #1C3A2B;background:#133124;'
+    + 'display:flex;align-items:center;gap:11px}'
+    + '.bh-ava{flex:0 0 auto;width:42px;height:42px;border-radius:50%;object-fit:cover;object-position:50% 18%;'
+    + 'background:#0D2A1D;border:1.5px solid #2A5A42}'
+    + '.bh-htxt{min-width:0}'
     + '.bh-head b{display:block;font-size:14px;letter-spacing:.3px}'
     + '.bh-head span{display:block;font-size:11px;color:rgba(255,255,255,.5);margin-top:2px}'
     + '.bh-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}'
@@ -50,18 +54,19 @@
 
   var fab = document.createElement('button');
   fab.className = 'bh-fab'; fab.type = 'button';
-  fab.setAttribute('aria-label', 'Fråga om stegen');
+  fab.setAttribute('aria-label', 'Fråga Jörn Hälberg');
   fab.textContent = '💬';
 
   var panel = document.createElement('div');
   panel.className = 'bh-panel';
   panel.innerHTML =
-      '<div class="bh-head"><b>Fråga om stegen</b><span>Poäng, VO, spelpoolen, betalning …</span></div>'
+      '<div class="bh-head"><img class="bh-ava" src="jorn.png" alt="" width="42" height="42">'
+    + '<div class="bh-htxt"><b>Jörn Hälberg</b><span>Stegens orakel · frågor om stegen</span></div></div>'
     + '<div class="bh-body" id="bhBody"></div>'
     + '<div class="bh-chips" id="bhChips"></div>'
     + '<div class="bh-foot"><input class="bh-in" id="bhIn" maxlength="600" placeholder="Skriv din fråga…" autocomplete="off">'
     + '<button class="bh-send" id="bhSend" type="button">→</button></div>'
-    + '<div class="bh-note">Svaren kommer från en AI och kan bli fel. Vid tveksamhet – hör av dig till Joaquim.</div>';
+    + '<div class="bh-note">Jörn är en AI och kan ha fel. Vid tveksamhet – hör av dig till Joaquim.</div>';
 
   document.body.appendChild(fab); document.body.appendChild(panel);
 
@@ -90,8 +95,8 @@
   function greet() {
     if (greeted) return; greeted = true;
     var u = me();
-    add(u ? 'Hej! Fråga mig om stegen – jag ser din grupp, dina matcher och var du ligger i tabellen.'
-          : 'Hej! Fråga mig om hur stegen fungerar. Logga in på sidan så kan jag även svara på dina egna matcher.');
+    add(u ? 'Jörn Hälberg här. Jag ser din grupp, dina matcher och var du ligger i tabellen. Fråga på.'
+          : 'Jörn Hälberg här, stegens orakel. Fråga mig om reglerna – logga in på sidan så kan jag även svara på dina egna matcher.');
     setChips(u ? ['När spelar jag?', 'Hur ligger jag till?', 'Vad händer om jag förlorar?', 'Hur funkar VO?']
                : ['Hur räknas poängen?', 'Hur funkar VO?', 'Vad är spelpoolen?', 'Vad kostar det?']);
   }
