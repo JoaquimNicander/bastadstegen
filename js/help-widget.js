@@ -11,7 +11,7 @@
   function me() {
     try {
       var v = JSON.parse(localStorage.getItem('bts_host_me') || 'null');
-      if (v && v.id && v.pin) return { id: v.id, pin: v.pin };
+      if (v && v.id && v.pin) return { id: v.id, pin: v.pin, name: v.name || '' };
     } catch (e) {}
     return null;
   }
@@ -95,10 +95,30 @@
   function greet() {
     if (greeted) return; greeted = true;
     var u = me();
-    add(u ? 'Jörn Hälberg här. Jag ser din grupp, dina matcher och var du ligger i tabellen. Fråga på.'
-          : 'Jörn Hälberg här, stegens orakel. Fråga mig om reglerna – logga in på sidan så kan jag även svara på dina egna matcher.');
     setChips(u ? ['När spelar jag?', 'Hur ligger jag till?', 'Vad händer om jag förlorar?', 'Hur funkar VO?']
                : ['Hur räknas poängen?', 'Hur funkar VO?', 'Vad är spelpoolen?', 'Vad kostar det?']);
+
+    if (!u) {
+      add('Jörn Hälberg här, stegens orakel. Fråga mig om reglerna – logga in på sidan så kan jag även svara på dina egna matcher.');
+      return;
+    }
+
+    // Inloggad: hämta en personlig hälsning. Visa något direkt så det inte känns dött.
+    var fnamn = (u.name || '').split(' ')[0];
+    var b = add(fnamn ? 'Hej ' + fnamn + '…' : 'Hej…');
+    fetch(URL_ASSIST, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'greet', playerId: u.id, pin: u.pin })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d && d.answer) { b.textContent = d.answer; HIST.push({ role: 'assistant', content: d.answer }); }
+        else { b.textContent = 'Jörn Hälberg här. Jag ser din grupp, dina matcher och var du ligger i tabellen. Fråga på.'; }
+      })
+      .catch(function () {
+        b.textContent = 'Jörn Hälberg här. Jag ser din grupp, dina matcher och var du ligger i tabellen. Fråga på.';
+      })
+      .then(function () { body.scrollTop = body.scrollHeight; });
   }
 
   function ask() {
