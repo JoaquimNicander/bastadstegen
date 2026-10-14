@@ -773,6 +773,25 @@ const BTS = {
       body: JSON.stringify({ mode: 'host_comment_notify', matchId, playerId, pin: pin || '', body }),
     }).catch(()=>{});
   },
+  // ── Spelförfrågan (fristående, token i länken) ──────────────────────
+  async pollCard(token) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_card', { p_token: token });
+    if (error) throw error;
+    return data;
+  },
+  async pollSvara(token, svar) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_svara', { p_token: token, p_svar: svar });
+    if (error) throw error;
+    return data;
+  },
+  async pollLista(key, poll) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_lista', { p_key: key, p_poll: poll || 'omg2' });
+    if (error) throw error;
+    return data || [];
+  },
   async hostPinOk(playerId, pin) {
     _assert();
     const { data, error } = await _sb.rpc('bts_host_pin_ok', { p_player_id: playerId, p_pin: pin || '' });

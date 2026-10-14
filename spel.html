@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Kan du spela? · Båstad Stegen</title>
+<style>
+  :root{ --green:#0D2E20; --green2:#123c2a; --line:#1C3A2B; --line2:#2A5A42;
+         --cream:#F5EDE3; --muted:rgba(245,237,227,.6); --clay:#FF8C42; --lime:#D7F23C; }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--green);color:var(--cream);
+       font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5;
+       display:flex;align-items:center;justify-content:center;padding:24px 18px}
+  .wrap{width:100%;max-width:430px;text-align:center}
+
+  .kick{font-family:'Space Mono',ui-monospace,monospace;font-size:11px;letter-spacing:3px;
+        text-transform:uppercase;color:var(--clay);font-weight:700}
+  h1{margin:14px 0 0;font-size:30px;line-height:1.15;letter-spacing:-.6px;font-weight:800}
+  .when{margin:22px auto 0;display:inline-block;border:1px solid var(--line2);border-radius:14px;
+        padding:14px 22px;background:rgba(255,255,255,.03)}
+  .when .d{font-size:19px;font-weight:700;letter-spacing:-.2px}
+  .when .t{font-size:13px;color:var(--muted);margin-top:2px}
+
+  .btns{display:flex;gap:12px;margin:30px 0 0}
+  .b{flex:1;border:none;border-radius:16px;padding:22px 10px;font-size:17px;font-weight:800;
+     font-family:inherit;cursor:pointer;transition:transform .12s, filter .12s}
+  .b:active{transform:scale(.97)}
+  .b.ja{background:var(--lime);color:#17301a}
+  .b.nej{background:transparent;color:var(--cream);border:1.5px solid var(--line2)}
+  .b.nej:hover{border-color:var(--clay);color:var(--clay)}
+  .b[disabled]{opacity:.5;cursor:default}
+
+  .note{margin-top:22px;font-size:12.5px;color:var(--muted)}
+  .state{padding:40px 0;color:var(--muted)}
+  .err{color:#ffb3a0;font-size:14px;margin-top:16px;min-height:20px}
+
+  /* Svarat-läge */
+  .done .mark{width:74px;height:74px;border-radius:50%;margin:0 auto;display:flex;
+       align-items:center;justify-content:center;font-size:34px}
+  .done.ja .mark{background:var(--lime);color:#17301a}
+  .done.nej .mark{background:rgba(255,255,255,.06);border:1.5px solid var(--line2);color:var(--cream)}
+  .done h2{margin:20px 0 0;font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .done p{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
+  .change{margin-top:26px;background:none;border:none;color:var(--clay);font-size:13.5px;
+          font-family:inherit;text-decoration:underline;cursor:pointer}
+  .foot{margin-top:38px;font-size:11.5px;color:rgba(245,237,227,.38);line-height:1.7}
+  .foot a{color:inherit}
+</style>
+</head>
+<body>
+  <div class="wrap" id="app"><div class="state">Hämtar…</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const TOKEN = new URLSearchParams(location.search).get('t') || '';
+const app = document.getElementById('app');
+let CARD = null;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function first(n){ return String(n||'').split(' ')[0]; }
+
+function datumText(d){
+  if(!d) return '';
+  const dt = new Date(d+'T00:00:00');
+  const s = dt.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+function renderFraga(){
+  app.innerHTML =
+      '<div class="kick">Höststegen 2026</div>'
+    + '<h1>Hej ' + esc(first(CARD.namn)) + '!<br>Kan du spela?</h1>'
+    + '<div class="when"><div class="d">' + esc(datumText(CARD.speldag)) + '</div>'
+    + '<div class="t">Start kl ' + esc(CARD.starttid) + '</div></div>'
+    + '<div class="btns">'
+    + '<button class="b ja" id="bJa">Ja, jag kan</button>'
+    + '<button class="b nej" id="bNej">Nej</button>'
+    + '</div>'
+    + '<div class="err" id="err"></div>'
+    + '<div class="note">Svaret används när spelordningen sätts på lördag. Du kan ändra dig här fram till dess.</div>'
+    + foot();
+  document.getElementById('bJa').onclick  = () => svara('ja');
+  document.getElementById('bNej').onclick = () => svara('nej');
+}
+
+function renderSvarat(){
+  const ja = CARD.svar === 'ja';
+  app.innerHTML =
+      '<div class="done ' + (ja?'ja':'nej') + '">'
+    + '<div class="mark">' + (ja?'✓':'–') + '</div>'
+    + '<h2>' + (ja ? 'Tack – du är med!' : 'Tack för beskedet') + '</h2>'
+    + '<p>' + (ja
+        ? 'Du är anmäld till ' + esc(datumText(CARD.speldag)).toLowerCase() + ', start kl ' + esc(CARD.starttid)
+          + '. Din match dyker upp i stegen så fort spelordningen är satt.'
+        : 'Du står över den här omgången. Hör av dig om något ändras.')
+    + '</p>'
+    + '<button class="change" id="bChange">Ändra mitt svar</button>'
+    + '</div>' + foot();
+  document.getElementById('bChange').onclick = () => renderFraga();
+}
+
+function foot(){
+  return '<div class="foot">Båstad Stegen · Frågor? Joaquim Nicander<br>'
+       + '<a href="tel:0720787845">0720-787845</a> · '
+       + '<a href="mailto:joaquim@cxdesign.se">joaquim@cxdesign.se</a></div>';
+}
+
+async function svara(v){
+  const err = document.getElementById('err');
+  document.getElementById('bJa').disabled = true;
+  document.getElementById('bNej').disabled = true;
+  if(err) err.textContent = '';
+  try {
+    CARD = await BTS.pollSvara(TOKEN, v);
+    renderSvarat();
+  } catch(e) {
+    if(err) err.textContent = (e && e.message) ? e.message : 'Kunde inte spara – försök igen.';
+    document.getElementById('bJa').disabled = false;
+    document.getElementById('bNej').disabled = false;
+  }
+}
+
+(async function(){
+  if(!TOKEN){ app.innerHTML = '<div class="state">Länken saknar kod. Använd länken du fick i SMS eller mejl.</div>'; return; }
+  try {
+    CARD = await BTS.pollCard(TOKEN);
+    if(!CARD){ app.innerHTML = '<div class="state">Länken gäller inte längre.</div>'; return; }
+    CARD.svar ? renderSvarat() : renderFraga();
+  } catch(e) {
+    app.innerHTML = '<div class="state">Kunde inte hämta frågan just nu. Ladda om sidan.</div>';
+  }
+})();
+</script>
+</body>
+</html>

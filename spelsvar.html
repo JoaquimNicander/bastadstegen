@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Svar · Kan du spela? · Båstad Stegen</title>
+<style>
+  :root{ --green:#0D2E20; --card:#0D2A1D; --card2:#133124; --line:#1C3A2B; --line2:#2A5A42;
+         --cream:#F5EDE3; --muted:rgba(245,237,227,.62); --muted2:rgba(245,237,227,.42);
+         --clay:#FF8C42; --lime:#D7F23C; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--green);color:var(--cream);padding:20px 14px 60px;
+       font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.3px}
+  .sub{font-family:ui-monospace,monospace;font-size:11.5px;letter-spacing:1.5px;
+       text-transform:uppercase;color:var(--clay);margin-bottom:7px}
+  .meta{font-size:13px;color:var(--muted);margin-top:4px}
+
+  .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0 6px}
+  .s{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center}
+  .s .n{font-size:30px;font-weight:800;line-height:1}
+  .s .l{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted2);margin-top:5px}
+  .s.ja .n{color:var(--lime)} .s.nej .n{color:var(--clay)}
+
+  .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;display:flex;margin:14px 0 24px}
+  .bar i{display:block;height:100%}
+  .bar .pja{background:var(--lime)} .bar .pnej{background:var(--clay)}
+
+  h2{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted2);
+     margin:26px 0 9px;font-weight:700}
+  .row{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--card);
+       border:1px solid var(--line);border-radius:11px;margin-bottom:6px}
+  .row .nm{flex:1;min-width:0;font-size:14.5px;font-weight:600}
+  .row .gp{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted2);
+           letter-spacing:.5px;white-space:nowrap}
+  .row .tm{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted2);white-space:nowrap}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .dot.ja{background:var(--lime)} .dot.nej{background:var(--clay)}
+  .dot.tyst{background:var(--line2)}
+  .row.tyst{opacity:.72}
+  .warn{font-size:11px;color:var(--clay);white-space:nowrap}
+
+  .state{text-align:center;padding:40px 10px;color:var(--muted)}
+  .refresh{font-size:11.5px;color:var(--muted2);text-align:center;margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="state">Hämtar…</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const Q = new URLSearchParams(location.search);
+const KEY = Q.get('k') || '';
+const POLL = Q.get('p') || 'omg2';
+const app = document.getElementById('app');
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function klocka(t){
+  if(!t) return '';
+  const d = new Date(t);
+  return d.toLocaleDateString('sv-SE',{day:'numeric',month:'short'}) + ' ' +
+         d.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit'});
+}
+
+function rad(r){
+  const sv = r.svar || 'tyst';
+  const grp = (r.division && r.grupp) ? (r.division + ' ' + r.grupp) : '';
+  const utan = (!r.har_mobil && !r.har_mejl) ? '<span class="warn">ingen kontakt</span>'
+             : (!r.har_mobil ? '<span class="warn">bara mejl</span>' : '');
+  return '<div class="row ' + (r.svar?'':'tyst') + '">'
+       + '<span class="dot ' + sv + '"></span>'
+       + '<span class="nm">' + esc(r.namn) + '</span>'
+       + utan
+       + '<span class="gp">' + esc(grp) + '</span>'
+       + '<span class="tm">' + esc(klocka(r.svarat_at)) + '</span>'
+       + '</div>';
+}
+
+function render(rows){
+  const ja  = rows.filter(r=>r.svar==='ja');
+  const nej = rows.filter(r=>r.svar==='nej');
+  const tyst= rows.filter(r=>!r.svar);
+  const tot = rows.length || 1;
+
+  let h = '<div class="sub">Höststegen · spelförfrågan</div>'
+        + '<h1>Kan du spela söndag?</h1>'
+        + '<div class="meta">' + rows.length + ' tillfrågade · ' + (ja.length+nej.length) + ' har svarat</div>'
+        + '<div class="sum">'
+        + '<div class="s ja"><div class="n">' + ja.length + '</div><div class="l">Kan spela</div></div>'
+        + '<div class="s nej"><div class="n">' + nej.length + '</div><div class="l">Kan inte</div></div>'
+        + '<div class="s"><div class="n">' + tyst.length + '</div><div class="l">Inget svar</div></div>'
+        + '</div>'
+        + '<div class="bar">'
+        + '<i class="pja" style="width:' + (100*ja.length/tot) + '%"></i>'
+        + '<i class="pnej" style="width:' + (100*nej.length/tot) + '%"></i>'
+        + '</div>';
+
+  if(ja.length)  h += '<h2>Kan spela · ' + ja.length + '</h2>'  + ja.map(rad).join('');
+  if(nej.length) h += '<h2>Kan inte · ' + nej.length + '</h2>' + nej.map(rad).join('');
+  if(tyst.length)h += '<h2>Väntar på svar · ' + tyst.length + '</h2>' + tyst.map(rad).join('');
+
+  h += '<div class="refresh">Uppdateras automatiskt var 30:e sekund</div>';
+  app.innerHTML = h;
+}
+
+async function ladda(){
+  try {
+    const rows = await BTS.pollLista(KEY, POLL);
+    if(!rows.length){ app.innerHTML = '<div class="state">Ogiltig länk, eller ingen förfrågan utskickad än.</div>'; return; }
+    render(rows);
+  } catch(e) {
+    app.innerHTML = '<div class="state">Kunde inte hämta svaren: ' + esc(e.message||e) + '</div>';
+  }
+}
+
+if(!KEY){ app.innerHTML = '<div class="state">Länken saknar kod.</div>'; }
+else { ladda(); setInterval(ladda, 30000); }
+</script>
+</body>
+</html>
