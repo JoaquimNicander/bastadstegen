@@ -12,8 +12,17 @@
   html,body{height:100%}
   body{margin:0;background:var(--green);color:var(--cream);
        font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5;
-       display:flex;align-items:center;justify-content:center;padding:24px 18px}
+       display:flex;align-items:flex-start;justify-content:center;padding:0 18px 44px}
   .wrap{width:100%;max-width:430px;text-align:center}
+
+  .hero{position:relative;margin:0 -18px 0;height:230px;overflow:hidden}
+  .hero img.bg{width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block}
+  .hero::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,46,32,.28) 0%,rgba(13,46,32,.55) 45%,var(--green) 100%)}
+  .hero .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);z-index:2;
+    width:168px;max-width:62%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+  @media (max-width:360px){ .hero{height:196px} }
+  .kick{margin-top:4px}
 
   .kick{font-family:'Space Mono',ui-monospace,monospace;font-size:11px;letter-spacing:3px;
         text-transform:uppercase;color:var(--clay);font-weight:700}
@@ -70,8 +79,8 @@ function datumText(d){
 }
 
 function renderFraga(){
-  app.innerHTML =
-      '<div class="kick">Höststegen 2026</div>'
+  app.innerHTML = hero()
+    + '<div class="kick">Höststegen 2026</div>'
     + '<h1>Hej ' + esc(first(CARD.namn)) + '!<br>Kan du spela?</h1>'
     + '<div class="when"><div class="d">' + esc(datumText(CARD.speldag)) + '</div>'
     + '<div class="t">Start kl ' + esc(CARD.starttid) + '</div></div>'
@@ -80,7 +89,6 @@ function renderFraga(){
     + '<button class="b nej" id="bNej">Nej</button>'
     + '</div>'
     + '<div class="err" id="err"></div>'
-    + '<div class="note">Svaret används när spelordningen sätts på lördag. Du kan ändra dig här fram till dess.</div>'
     + foot();
   document.getElementById('bJa').onclick  = () => svara('ja');
   document.getElementById('bNej').onclick = () => svara('nej');
@@ -88,8 +96,8 @@ function renderFraga(){
 
 function renderSvarat(){
   const ja = CARD.svar === 'ja';
-  app.innerHTML =
-      '<div class="done ' + (ja?'ja':'nej') + '">'
+  app.innerHTML = hero()
+    + '<div class="done ' + (ja?'ja':'nej') + '">'
     + '<div class="mark">' + (ja?'✓':'–') + '</div>'
     + '<h2>' + (ja ? 'Tack – du är med!' : 'Tack för beskedet') + '</h2>'
     + '<p>' + (ja
@@ -100,6 +108,13 @@ function renderSvarat(){
     + '<button class="change" id="bChange">Ändra mitt svar</button>'
     + '</div>' + foot();
   document.getElementById('bChange').onclick = () => renderFraga();
+}
+
+function hero(){
+  return '<div class="hero">'
+       + '<img class="bg" src="spel-host.jpg" alt="" width="1000" height="417">'
+       + '<img class="logo" src="spel-logga.png" alt="Båstad Stegen">'
+       + '</div>';
 }
 
 function foot(){
