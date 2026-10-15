@@ -41,6 +41,16 @@
   .b.nej:hover{border-color:var(--clay);color:var(--clay)}
   .b[disabled]{opacity:.5;cursor:default}
 
+  .dl{margin-top:16px;font-size:14px;font-weight:700;color:var(--lime)}
+  .dl span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:3px}
+
+  .info{margin:30px 0 0;text-align:left;border:1px solid var(--line);border-radius:14px;
+        padding:17px 18px;background:rgba(255,255,255,.025)}
+  .info h3{margin:0 0 9px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
+        color:var(--clay);font-weight:700;font-family:'Space Mono',ui-monospace,monospace}
+  .info p{margin:0 0 11px;font-size:13.5px;color:rgba(245,237,227,.78);line-height:1.62}
+  .info p:last-child{margin:0}
+
   .note{margin-top:22px;font-size:12.5px;color:var(--muted)}
   .state{padding:40px 0;color:var(--muted)}
   .err{color:#ffb3a0;font-size:14px;margin-top:16px;min-height:20px}
@@ -84,12 +94,14 @@ function renderFraga(){
     + '<h1>Hej ' + esc(first(CARD.namn)) + '!<br>Kan du spela?</h1>'
     + '<div class="when"><div class="d">' + esc(datumText(CARD.speldag)) + '</div>'
     + '<div class="t">Start kl ' + esc(CARD.starttid) + '</div></div>'
+    + '<div class="dl">Svara senast fredag 16 oktober kl 16.00'
+    + '<span>Då sätter vi spelordningen och bokar banor</span></div>'
     + '<div class="btns">'
     + '<button class="b ja" id="bJa">Ja, jag kan</button>'
     + '<button class="b nej" id="bNej">Nej</button>'
     + '</div>'
     + '<div class="err" id="err"></div>'
-    + foot();
+    + info() + foot();
   document.getElementById('bJa').onclick  = () => svara('ja');
   document.getElementById('bNej').onclick = () => svara('nej');
 }
@@ -106,7 +118,7 @@ function renderSvarat(){
         : 'Du står över den här omgången. Hör av dig om något ändras.')
     + '</p>'
     + '<button class="change" id="bChange">Ändra mitt svar</button>'
-    + '</div>' + foot();
+    + '</div>' + info() + foot();
   document.getElementById('bChange').onclick = () => renderFraga();
 }
 
@@ -115,6 +127,17 @@ function hero(){
        + '<img class="bg" src="spel-host.jpg" alt="" width="1000" height="417">'
        + '<img class="logo" src="spel-logga.png" alt="Båstad Stegen">'
        + '</div>';
+}
+
+function info(){
+  return '<div class="info"><h3>Varför vi frågar</h3>'
+       + '<p>Omg\u00e5ngen blev f\u00f6rsenad \u2014 det har blivit m\u00e5nga inst\u00e4llda matcher. '
+       + 'N\u00e4r vi vet vilka som kan s\u00e4tter vi spelordningen s\u00e5 att s\u00e5 m\u00e5nga som m\u00f6jligt '
+       + 'faktiskt f\u00e5r spela \u2014 och kan ge klubben besked i tid om hur m\u00e5nga banor vi beh\u00f6ver.</p>'
+       + '<p>Hinner du spela ikapp dina matcher i veckan? Allt som blir klart f\u00f6re l\u00f6rdag '
+       + 'hj\u00e4lper oss att komma ig\u00e5ng i tid.</p>'
+       + '<p>Inf\u00f6r n\u00e4sta omg\u00e5ng s\u00e4tter vi stoppet \u00e4nnu tidigare, s\u00e5 att vi slipper samma '
+       + 'sl\u00e4pighet en g\u00e5ng till.</p></div>';
 }
 
 function foot(){
