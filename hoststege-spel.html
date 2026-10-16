@@ -602,7 +602,7 @@ function zonesFor(rows){
   const levels=[...new Set(ST.filter(r=>r.division===DIV).map(r=>r.level))];
   const top=Math.min(...levels), bot=Math.max(...levels);
   const lvl=rows[0].level, n=rows.length, z={};
-  rows.forEach(r=>{ let v=''; if(lvl===top){ v=r.rank>3?'down':''; } else if(lvl===bot){ v=r.rank<=2?'up':''; }
+  rows.forEach(r=>{ let v=''; if(lvl===top){ v=r.rank>n-2?'down':''; } else if(lvl===bot){ v=r.rank<=2?'up':''; }
     else { v=r.rank<=2?'up':(r.rank>n-2?'down':''); } z[r.player_id]=v; });
   return z;
 }
