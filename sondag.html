@@ -11,7 +11,16 @@ body{margin:0;background:var(--bg);color:var(--cream);line-height:1.5;
  font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
  padding:0 16px calc(48px + env(safe-area-inset-bottom,0px))}
 .wrap{max-width:640px;margin:0 auto}
-header{padding:38px 0 26px;text-align:center}
+.hero{position:relative;margin:0 -16px;height:220px;overflow:hidden}
+.hero img.bg{width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block}
+.hero::after{content:'';position:absolute;inset:0;
+ background:linear-gradient(180deg,rgba(8,32,21,.25) 0%,rgba(8,32,21,.55) 45%,var(--bg) 100%)}
+.hero .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);z-index:2;
+ width:168px;max-width:62%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
+@media (max-width:380px){ .hero{height:186px} }
+.intro{margin:20px auto 0;max-width:46ch;color:var(--muted);font-size:15px;text-align:left}
+.intro b{color:var(--cream)}
+header{padding:0 0 26px;text-align:center}
 .kick{font-family:var(--mono);font-size:11px;letter-spacing:3.4px;text-transform:uppercase;
  color:var(--clay);font-weight:700}
 h1{margin:12px 0 0;font-size:clamp(30px,8vw,42px);line-height:1.05;letter-spacing:-1px;font-weight:800}
@@ -43,14 +52,43 @@ h1{margin:12px 0 0;font-size:clamp(30px,8vw,42px);line-height:1.05;letter-spacin
 .info p{margin:0 0 10px;font-size:14px;color:var(--muted)}
 .info p:last-child{margin:0}
 .info b{color:var(--cream)}
+.gsec{margin-top:40px}
+.gsec>h2{font-family:var(--mono);font-size:11px;letter-spacing:2.4px;text-transform:uppercase;
+ color:var(--clay);font-weight:700;margin:0 0 6px}
+.gsec>.lead{color:var(--muted);font-size:14.5px;margin:0 0 20px;max-width:58ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.grp .top{background:var(--card2);padding:10px 15px;border-bottom:1px solid var(--line);
+ display:flex;align-items:baseline;gap:9px}
+.grp .top b{font-size:19px;font-weight:800}
+.grp .top i{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:1.4px;
+ text-transform:uppercase;color:var(--faint)}
+.grp .top .ok{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--lime)}
+.grp ol{margin:0;padding:11px 15px 14px;list-style:none;display:flex;flex-direction:column;gap:6px}
+.grp li{font-size:14.5px;display:flex;align-items:baseline;gap:7px}
+.tg{font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;
+ padding:2px 5px;border-radius:4px;flex:none}
+.up{background:rgba(215,242,60,.14);color:var(--lime)}
+.dn{background:rgba(255,140,66,.14);color:var(--clay)}
+.ny{background:rgba(245,237,227,.1);color:var(--cream)}
+.op{border:1px dashed var(--line2);color:var(--faint)}
+.opn{color:var(--faint);font-style:italic}
 footer{margin-top:30px;text-align:center;font-size:12.5px;color:var(--faint);line-height:1.8}
 footer a{color:var(--muted)}
 </style></head><body><div class="wrap">
+
+<div class="hero">
+  <img class="bg" src="spel-host.jpg" alt="" width="1000" height="417">
+  <img class="logo" src="spel-logga.png" alt="Båstad Stegen">
+</div>
 
 <header>
   <div class="kick">Höststegen 2026 · omgång 2</div>
   <h1>Söndag<br>18 oktober</h1>
   <div class="start">Första matcherna 15.00</div>
+  <p class="intro">En ny omgång börjar, och grupperna är omgjorda. <b>Två spelare har lämnat
+     stegen</b> och <b>två som stått i kö kommer in</b> längst ner i grupp E. Här är
+     söndagens tider och banor — och längre ner hur de nya grupperna ser ut.</p>
 </header>
 
 <div class="slot">
@@ -87,12 +125,67 @@ footer a{color:var(--muted)}
     <div class="p">Joaquim Nicander – James Ljungström</div><div class="g">Herr C</div></div></div>
 </div>
 
+<div class="gsec">
+  <h2>Nya grupperna</h2>
+  <p class="lead">Två spelare har lämnat stegen, och två som stått i kö kommer in längst ner
+     i grupp E. Då går inte två upp och två ner jämnt ut längre. Uppflyttningen ligger fast —
+     <b>topp två går upp från varje grupp, precis som vanligt</b> — och i stället flyttas
+     färre ner den här omgången: A två, B och C en var, D ingen. Rena siffror, så att varje
+     grupp blir sex spelare igen.</p>
+  <div class="grid">
+
+    <div class="grp"><div class="top"><b>A</b><i>Högsta</i></div><ol>
+      <li>John Lundqvist</li><li>John Hänsel</li><li>Johan Ludvigsson</li><li>Anders Nilsson</li>
+      <li><span class="tg up">Upp</span>John Andersson</li>
+      <li><span class="tg op">Öppen</span><span class="opn">tvåan i grupp B</span></li>
+    </ol></div>
+
+    <div class="grp"><div class="top"><b>B</b></div><ol>
+      <li><span class="tg dn">Ner</span>Andreas Almroth</li>
+      <li><span class="tg dn">Ner</span>Philip Pahlett</li>
+      <li><span class="tg up">Upp</span>Niklas Strömberg</li>
+      <li><span class="tg up">Upp</span>Mats Ljungström</li>
+      <li><span class="tg op">Öppen</span><span class="opn">två som stannar i B</span></li>
+    </ol></div>
+
+    <div class="grp"><div class="top"><b>C</b></div><ol>
+      <li>Rasmus Winther</li><li>Peter Widén</li><li>Joaquim Nicander</li>
+      <li><span class="tg up">Upp</span>Anders Garpered</li>
+      <li><span class="tg up">Upp</span>James Ljungström</li>
+      <li><span class="tg op">Öppen</span><span class="opn">nedflyttad från B</span></li>
+    </ol></div>
+
+    <div class="grp"><div class="top"><b>D</b><span class="ok">Klar</span></div><ol>
+      <li>Lars Paulsson</li><li>Anders Schillström</li><li>Roger Edmark</li>
+      <li><span class="tg dn">Ner</span>Oscar Hänsel</li>
+      <li><span class="tg up">Upp</span>Morten Erichsen</li>
+      <li><span class="tg up">Upp</span>Kim Storbacka</li>
+    </ol></div>
+
+    <div class="grp"><div class="top"><b>E</b><i>Lägsta</i><span class="ok">Klar</span></div><ol>
+      <li>Thomas Cronqvist</li><li>Jeff Bork</li><li>Peter Orell</li><li>Jan Andresen</li>
+      <li><span class="tg ny">Ny</span>Igor Mirkovic</li>
+      <li><span class="tg ny">Ny</span>Knut Peyron</li>
+    </ol></div>
+
+    <div class="grp"><div class="top"><b>Dam A</b><span class="ok">Oförändrad</span></div><ol>
+      <li>Lotta Olmarker</li><li>Sofie Persson</li><li>Ulrica Nilsson</li><li>Helen Johansson</li>
+      <li>Gina Schillström</li><li>Camilla Salen Sjögren</li><li>Ann-Christine Thurn</li>
+      <li>Åsa Kockum</li><li>Kristina Hallquist</li><li>Jocela Lundqvist</li><li>Johanna Winther</li>
+    </ol></div>
+
+  </div>
+</div>
+
 <div class="info">
   <h2>Att veta</h2>
   <p><b>Står du inte här?</b> Då har du antingen svarat nej på spelförfrågan, eller så väntar
      din match på att grupp B ska bli färdigspelad. Du hör av oss så fort den är klar.</p>
-  <p><b>Grupperna är nya.</b> Upp- och nedflyttningen efter omgång 1 är gjord, och hela
-     omgång 2 läggs in i stegen inom kort. Tiderna här gäller oavsett.</p>
+  <p><b>Fyra platser är inte klara än.</b> Grupp B har tre matcher kvar att spela, och de
+     avgör vem som går upp tillsammans med John Andersson och vem som åker ner. Det påverkar
+     en plats i A, två i B och en i C. Resten är satt.</p>
+  <p><b>Tabellerna uppdateras senare.</b> Hela omgång 2 läggs in i stegen när grupp B är
+     färdigspelad. Tiderna här gäller oavsett.</p>
   <p><b>Kan du inte?</b> Hör av dig till din motståndare direkt, och till Joaquim.</p>
 </div>
 
