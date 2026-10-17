@@ -95,8 +95,8 @@
   function greet() {
     if (greeted) return; greeted = true;
     var u = me();
-    setChips(u ? ['När spelar jag?', 'Hur ligger jag till?', 'Vad händer om jag förlorar?', 'Hur funkar VO?']
-               : ['Hur räknas poängen?', 'Hur funkar VO?', 'Vad är spelpoolen?', 'Vad kostar det?']);
+    setChips(u ? ['När spelar jag?', 'Hur ligger jag till?', 'Vad händer om jag förlorar?', 'Hur funkar w.o.?']
+               : ['Hur räknas poängen?', 'Hur funkar w.o.?', 'Vad är spelpoolen?', 'Vad kostar det?']);
 
     if (!u) {
       add('Jörn Hälberg här, stegens orakel. Fråga mig om reglerna – logga in på sidan så kan jag även svara på dina egna matcher.');

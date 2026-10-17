@@ -659,7 +659,7 @@ function renderApp(){
       <div class="confirm-card">
         <div class="confirm-title">Motståndaren rapporterade!</div>
         <div class="confirm-sub">Omgång ${round}</div>
-        <div class="confirm-score">${pending.wo?'WO':setsToStr(pending.sets)}</div>
+        <div class="confirm-score">${pending.wo?'w.o.':setsToStr(pending.sets)}</div>
         <div style="font-size:14px;color:var(--muted);margin-top:4px">Rapporterat av ${pending.reporter}</div>
         <div style="font-size:15px;color:var(--muted);margin-top:12px;line-height:1.5">
           <strong style="color:var(--white)">${pending.winnerName}</strong> vann enligt rapporten. Stämmer det?
@@ -696,7 +696,7 @@ function renderApp(){
           vs <strong style="color:var(--white)">${match.opp.name}</strong><br>
           ${myReport.status==='confirmed'?'✓ Bekräftad av '+match.opp.name:'Väntar på att '+match.opp.name+' bekräftar…'}
         </div>
-        <div><div class="success-score">${myReport.wo?'WO':setsToStr(myReport.sets)}</div></div>
+        <div><div class="success-score">${myReport.wo?'w.o.':setsToStr(myReport.sets)}</div></div>
         <div><span class="status-tag ${myReport.status}">${myReport.status==='confirmed'?'Bekräftad':'Väntar'}</span></div>
       </div>
       ${wtnReminder}
@@ -941,7 +941,7 @@ function submitResult(e){
 
   const winnerId=winnerName===me.name?me.id:match.opp.id;
   const winnerPos=winnerName===me.name?match.myPos:(meIsA?match.posB:match.posA);
-  const score=isWO?'WO':isRet?((setsToStr(sets)?setsToStr(sets)+' ':'')+'RET'):setsToStr(sets);
+  const score=isWO?'w.o.':isRet?((setsToStr(sets)?setsToStr(sets)+' ':'')+'RET'):setsToStr(sets);
   // Visa bekräftelse-rutan innan något skickas
   pendingSubmit={match,round,meIsA,winnerName,winnerId,winnerPos,sets,isWO,isRet,retiredById,note,score};
   showConfirmModal();
@@ -953,7 +953,7 @@ function showConfirmModal(){
   closeConfirmModal();
   const typeLabel=ps.isWO?'WALKOVER':ps.isRet?'AVBRUTEN – SKADA':'FÄRDIGSPELAD';
   const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#FF8C42';
-  const scoreDisp=ps.isWO?'WO':(setsToStr(ps.sets)||'—');
+  const scoreDisp=ps.isWO?'w.o.':(setsToStr(ps.sets)||'—');
   const breaker=ps.retiredById===me.id?me.name:ps.match.opp.name;
   const extra=ps.isRet?`<div style="font-size:13px;color:var(--muted);margin-top:8px">${breaker} bröt${ps.note?(' · '+ps.note):''}</div>`:'';
   const ov=document.createElement('div');

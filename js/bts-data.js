@@ -143,7 +143,7 @@ const BTS = {
       player_a_id: playerAId, player_b_id: playerBId,
       pos_a: posA ?? null, pos_b: posB ?? null,
       winner_id: winnerId, sets, wo,
-      score: score ?? (wo ? 'WO' : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      score: score ?? (wo ? 'w.o.' : sets.map(s => `${s.a}-${s.b}`).join(' ')),
       status: 'reported', reporter_id: reporterId, play_date: playDate ?? null,
     };
     // Uppdatera om matchen redan finns (samma tävling/omgång/spelare), annars skapa.
@@ -158,7 +158,7 @@ const BTS = {
     const { error } = await _sb.rpc('bts_report_result', {
       p_match_id: matchId, p_player_id: playerId, p_pin: pin,
       p_winner_id: winnerId, p_sets: sets, p_wo: wo,
-      p_score: score ?? (wo ? 'WO' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_score: score ?? (wo ? 'w.o.' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
       p_retired_by: retiredBy, p_note: note,
     });
     if (error) throw error;
@@ -206,7 +206,7 @@ const BTS = {
       p_admin_pw: adminPw, p_match_id: matchId, p_comp: competitionId, p_round: round,
       p_pos_a: posA ?? null, p_pos_b: posB ?? null, p_player_a: playerAId ?? null, p_player_b: playerBId ?? null,
       p_winner_id: winnerId, p_sets: sets, p_wo: wo,
-      p_score: score ?? (wo ? 'WO' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
+      p_score: score ?? (wo ? 'w.o.' : retiredBy ? (sets.map(s => `${s.a}-${s.b}`).join(' ') + ' RET') : sets.map(s => `${s.a}-${s.b}`).join(' ')),
       p_retired_by: retiredBy, p_note: note,
     });
     if (error) throw error;
@@ -643,7 +643,7 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
-  // ── VO (walkover): en spelare lägger in, motståndaren får mejl ──
+  // ── w.o. (walkover): en spelare lägger in, motståndaren får mejl ──
   async woReport(matchId, playerId, pin, winnerId) {
     _assert();
     const { error } = await _sb.rpc('bts_wo_report', {

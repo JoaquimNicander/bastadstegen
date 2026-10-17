@@ -744,7 +744,7 @@ function renderSetInputs(key, saved){
   if(saved && !saved._editing){
     return `
     <div class="match-card-body">
-      <span class="saved-score">${saved.wo?'WO':setsToScoreString(saved.sets)}</span>
+      <span class="saved-score">${saved.wo?'w.o.':setsToScoreString(saved.sets)}</span>
       <div class="saved-badge" style="margin-left:auto">
         ${saved.status==='reported'?'<span style="color:#F5EDE3">⏳ Väntar på bekräftelse</span>'
           :saved.status==='disputed'?'<span style="color:#EF5350">⚠️ Bestridd</span>'
@@ -764,7 +764,7 @@ function renderSetInputs(key, saved){
 
   if(isWO){
     return `<div class="match-card-body" id="body-${key}">
-      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px">WO — ingen poäng registreras</div>
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--clay);letter-spacing:1px">w.o. — ingen poäng registreras</div>
     </div>`;
   }
 
@@ -838,16 +838,16 @@ function renderMatchInput(){
       footer=`<div class="match-card-footer" id="footer-${key}">
         ${isWO?`
           <select class="winner-select" id="winner-${key}">
-            <option value="">Vinnare (WO)...</option>
-            <option value="wo-${posA}" ${winnerVal=='wo-'+posA?'selected':''}>WO → ${pA.name}</option>
-            <option value="wo-${posB}" ${winnerVal=='wo-'+posB?'selected':''}>WO → ${pB.name}</option>
+            <option value="">Vinnare (w.o.)...</option>
+            <option value="wo-${posA}" ${winnerVal=='wo-'+posA?'selected':''}>w.o. → ${pA.name}</option>
+            <option value="wo-${posB}" ${winnerVal=='wo-'+posB?'selected':''}>w.o. → ${pB.name}</option>
           </select>`:`
           <select class="winner-select" id="winner-${key}" onchange="woState['${key}_winner']=parseInt(this.value)||this.value">
             <option value="">Vinnare...</option>
             <option value="${posA}" ${winnerVal==posA?'selected':''}>${pA.name}</option>
             <option value="${posB}" ${winnerVal==posB?'selected':''}>${pB.name}</option>
           </select>`}
-        <button class="wo-btn${isWO?' active':''}" onclick="toggleWO('${key}')">${isWO?'✕ WO':'WO'}</button>
+        <button class="wo-btn${isWO?' active':''}" onclick="toggleWO('${key}')">${isWO?'✕ w.o.':'w.o.'}</button>
         <div id="auto-winner-hint-${key}" class="auto-winner-hint"></div>
         <button class="save-match-btn" onclick="saveMatch('${key}',${posA},${posB})">Spara →</button>
       </div>`;
@@ -943,13 +943,13 @@ function saveMatch(key,posA,posB){
 
   const winnerPlayer=playerAtRank(winnerPos);
   if(!roundResults[currentRound]) roundResults[currentRound]={};
-  roundResults[currentRound][key]={posA,posB,winner:winnerPos,winnerName:winnerPlayer.name,sets,score:isWO?'WO':setsToScoreString(sets),wo:isWO};
+  roundResults[currentRound][key]={posA,posB,winner:winnerPos,winnerName:winnerPlayer.name,sets,score:isWO?'w.o.':setsToScoreString(sets),wo:isWO};
   delete woState[key+'_wo']; delete woState[key+'_stb']; delete woState[key+'_winner'];
 
   // ── Skriv till databasen (admin = direkt bekräftad, lösenordsskyddat) ──
   if(ADB){
     const id=matchIdFor(currentRound,key);
-    const score=isWO?'WO':setsToScoreString(sets);
+    const score=isWO?'w.o.':setsToScoreString(sets);
     (async()=>{
       let okSaved=false;
       try{
@@ -1393,7 +1393,7 @@ function renderResultOverride(){
     <tr>
       <td style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);width:50px">${key}</td>
       <td style="font-size:13px"><strong>${r.winnerName||'?'}</strong> vann</td>
-      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green)">${r.wo?'WO':r.score||''}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:10px;color:var(--green)">${r.wo?'w.o.':r.score||''}</td>
       <td><button class="action-btn del" onclick="deleteResult('${key}')">✕ Ta bort</button></td>
     </tr>`).join('');
 }

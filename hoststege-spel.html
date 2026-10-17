@@ -57,7 +57,7 @@
   .pbtn:disabled{opacity:.55;cursor:default}
   .poolnote{width:100%;font:inherit;font-size:14px;padding:10px 12px;background:#0a2016;border:1px solid var(--border2);border-radius:9px;color:#fff;box-sizing:border-box;margin:0 0 10px}
   .poolmsg{color:var(--muted);font-size:13px;margin-top:9px;line-height:1.5}
-  /* VO */
+  /* w.o. */
   .wobadge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;
     background:rgba(255,140,66,.16);border:1px solid rgba(255,140,66,.45);color:var(--clay);
     padding:3px 9px;border-radius:100px;vertical-align:3px;margin-left:9px}
@@ -490,7 +490,7 @@ async function proposeWO(id, winnerId){
   const m=MATCHES.find(function(x){ return x.id===id; }); if(!m) return;
   const wName = winnerId===m.a_id ? m.a_name : m.b_name;
   const oppId = ME.id===m.a_id ? m.b_id : m.a_id;
-  if(!confirm('L\u00e4gga in VO p\u00e5 ' + m.a_name + ' \u2013 ' + m.b_name + '?\n\nVinnare: ' + wName
+  if(!confirm('L\u00e4gga in w.o. p\u00e5 ' + m.a_name + ' \u2013 ' + m.b_name + '?\n\nVinnare: ' + wName
       + '\nResultat: 6-0 6-0\n\nRegistreras direkt. Motst\u00e5ndaren f\u00e5r ett mejl, och fel r\u00e4ttas av Admin.')) return;
   try{
     await BTS.woReport(id, ME.id, ME.pin, winnerId);
@@ -499,7 +499,7 @@ async function proposeWO(id, winnerId){
     const res = await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND)]);
     ST=res[0]; MATCHES=res[1];
     render();
-  }catch(e){ alert('Kunde inte l\u00e4gga in VO: '+(e.message||e)); }
+  }catch(e){ alert('Kunde inte l\u00e4gga in w.o.: '+(e.message||e)); }
 }
 
 async function loadPool(){
@@ -701,8 +701,8 @@ function matchCard(m){
       <div class="mmeta"><span>${whenLabel(m)}</span></div></div>`;
   }
   if(m.status==='done'){
-    const isWO = /^VO/.test(String(m.score||''));
-    const res = (m.score ? esc(m.score) : (m.games_a+' – '+m.games_b)) + (isWO?'<span class="wobadge">VO</span>':'');
+    const isWO = /^(w\.o\.|VO|WO)/i.test(String(m.score||''));
+    const res = (m.score ? esc(m.score) : (m.games_a+' – '+m.games_b)) + (isWO?'<span class="wobadge">w.o.</span>':'');
     return `<div class="match">${names}
       <div class="result" ${m.score?'style="font-size:20px;letter-spacing:1px"':''}>${res}</div>
       ${commentBlock(m)}
@@ -715,7 +715,7 @@ function matchCard(m){
   }
   if(WOPICK===m.id){
     return '<div class="match" id="m' + m.id + '">' + names
-      + '<div class="wobox"><div class="wot">Vem vann p\u00e5 VO?</div>'
+      + '<div class="wobox"><div class="wot">Vem vann p\u00e5 w.o.?</div>'
       + '<div class="wobtns">'
       + '<button class="pbtn" onclick="proposeWO(' + m.id + ',' + m.a_id + ')">' + esc(m.a_name) + '</button>'
       + '<button class="pbtn" onclick="proposeWO(' + m.id + ',' + m.b_id + ')">' + esc(m.b_name) + '</button>'
@@ -739,7 +739,7 @@ function matchCard(m){
     <div class="awin" id="aw${m.id}"></div>
     ${cmtField}
     <button class="sv wide" onclick="saveM(${m.id})">Spara resultat</button>
-    <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a><a href="#" class="wolink" onclick="event.preventDefault();WOPICK=${m.id};render()">VO</a></div></div>`;
+    <div class="mmeta"><span>${whenLabel(m)}</span><a href="#" onclick="deferM(event,${m.id})">Spela senare</a><a href="#" class="wolink" onclick="event.preventDefault();WOPICK=${m.id};render()">w.o.</a></div></div>`;
 }
 function whenLabel(m){
   if(m.defer_note) return `<span class="later">⏳ Spelas senare: ${esc(m.defer_note)}</span>`;
@@ -981,7 +981,7 @@ function flipScore(score, isA){
   }).join(' ');
 }
 function woBadge(score, small){
-  return /^VO/.test(String(score||'')) ? '<span class="wobadge'+(small?' wobadge-sm':'')+'">VO</span>' : '';
+  return /^(w\.o\.|VO|WO)/i.test(String(score||'')) ? '<span class="wobadge'+(small?' wobadge-sm':'')+'">w.o.</span>' : '';
 }
 function surfaceBadge(s, small){
   if(s !== 'grus' && s !== 'hard') return '';
