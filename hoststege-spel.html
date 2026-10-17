@@ -197,8 +197,8 @@
   .pstats:empty{display:none}
   .pst-h{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
   .pst-row{display:flex;gap:1px;background:var(--border);border-radius:10px;overflow:hidden}
-  .pst{flex:1;background:var(--card);padding:11px 6px;text-align:center}
-  .pst .pn{font-family:'Anton',sans-serif;font-size:25px;color:var(--clay);line-height:1}
+  .pst{flex:1;background:var(--card);padding:11px 4px;text-align:center;min-width:0}
+  .pst .pn{font-family:'Anton',sans-serif;font-size:22px;color:var(--clay);line-height:1}
   .pst .pk{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);margin-top:4px}
   .pst-extra{font-size:12.5px;color:var(--cream);margin-top:11px;text-align:center}
   .pmatches{padding:14px 16px;border-top:1px solid var(--border)}
@@ -776,7 +776,8 @@ function renderUpcoming(el){
   const tkey=m=>String(m.start_time||'');
   const today=new Date().toISOString().slice(0,10);
   const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
-  const opened=MATCHES.filter(m=>m.status!=='done' && (m.matchday||0)>0 && (m.matchday||0)<=WEEK);
+  // öppen = spelomgången är igång ELLER matchen har fått ett datum satt av admin
+  const opened=MATCHES.filter(m=>m.status!=='done' && (((m.matchday||0)>0 && (m.matchday||0)<=WEEK) || !!m.play_date));
   const tk=m=>(String(m.start_time||'').trim()||'99:99');   // otidssatta sorteras sist
   const sched=opened.filter(m=> upcoming(m) && !m.defer_note)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
@@ -913,8 +914,9 @@ function render(){
         <div class="pdiff">${r.poang??0}<span style="font-size:11px;color:var(--muted2)"> p</span></div>
         <i class="prow-arrow">›</i></div>`;
     }).join('');
-    // visa bara aktuell + tidigare spelomgångar (ej framtida som inte öppnats än)
-    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab && (m.matchday||0)>0 && (m.matchday||0)<=WEEK);
+    // aktuell + tidigare spelomgångar, plus allt som är spelat eller har fått ett datum
+    const gm=MATCHES.filter(m=>m.division===DIV && m.label===lab
+      && ( ((m.matchday||0)>0 && (m.matchday||0)<=WEEK) || m.status==='done' || !!m.play_date ));
     const days=[...new Set(gm.map(m=>m.matchday||0))].sort((a,b)=>a-b);
     const mrows=days.map(d=>{
       const dm=gm.filter(m=>(m.matchday||0)===d);
@@ -1014,13 +1016,20 @@ async function fillMatches(id){
 async function fillStats(id){
   const el=document.getElementById('pstats'); if(!el) return;
   try{
-    const s=await BTS.hostPlayerStats(id);
+    const [s,g]=await Promise.all([
+      BTS.hostPlayerStats(id),
+      BTS.hostPlayerGem(id).catch(()=>null)
+    ]);
     if(!s || !s.matcher){ el.innerHTML=''; return; }
     const pct=s.matcher?Math.round(s.vinster/s.matcher*100):0;
+    const d=g?g.gem_diff:null;
+    const dTxt=(d===null||d===undefined)?'–':(d>0?'+'+d:String(d));
     let h='<div class="pst-h">Statistik · genom åren</div><div class="pst-row">'
       +`<div class="pst"><div class="pn">${s.matcher}</div><div class="pk">Matcher</div></div>`
       +`<div class="pst"><div class="pn">${s.vinster}</div><div class="pk">Vinster</div></div>`
-      +`<div class="pst"><div class="pn">${pct}%</div><div class="pk">Vinst</div></div></div>`;
+      +`<div class="pst"><div class="pn">${pct}%</div><div class="pk">Vinst</div></div>`
+      +`<div class="pst"><div class="pn">${dTxt}</div><div class="pk">Gem</div></div></div>`;
+    if(g) h+=`<div class="pst-extra">Gem totalt: <b>${g.gem_for}</b> vunna · <b>${g.gem_mot}</b> förlorade</div>`;
     if(s.topp_motstandare) h+=`<div class="pst-extra">🎾 Flest möten: <b>${esc(s.topp_motstandare)}</b> · ${s.topp_antal} ggr</div>`;
     el.innerHTML=h;
   }catch(e){ el.innerHTML=''; }

@@ -709,6 +709,12 @@ const BTS = {
     if (error) throw error;
     return (data && data[0]) || null;
   },
+  async hostPlayerGem(playerId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_player_gem', { p_player_id: playerId });
+    if (error) throw error;
+    return (data && data[0]) || null;
+  },
   async hostPlayerStatsAll() {
     _assert();
     const { data, error } = await _sb.rpc('bts_player_stats_all');
