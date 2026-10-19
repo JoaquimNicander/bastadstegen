@@ -721,6 +721,18 @@ const BTS = {
     if (error) throw error;
     return data || [];
   },
+  async hostPlayerFeed(playerId, limit) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_player_feed', { p_player_id: playerId, p_limit: limit || 10 });
+    if (error) throw error;
+    return data || [];
+  },
+  async hostMatchThread(matchId) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_match_thread', { p_match_id: matchId });
+    if (error) throw error;
+    return data || [];
+  },
   async hostPlayerMatches(playerId, limit) {
     _assert();
     const { data, error } = await _sb.rpc('bts_player_matches', { p_player_id: playerId, p_limit: limit || 8 });

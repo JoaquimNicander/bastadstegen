@@ -273,6 +273,82 @@
   .sitefoot .ff-admin{font-size:13px;color:var(--muted2);margin-top:8px}
   .sitefoot .ff-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
   .sitefoot .ff-links a{color:#fff;text-decoration:none;font-weight:700;font-size:14px;background:var(--card);border:1px solid var(--border2);border-radius:100px;padding:9px 16px}
+  /* ===== Spelarkort: matchflöde ===== */
+  .pf-hd{display:flex;align-items:center;gap:13px;padding:16px 46px 16px 16px;position:relative}
+  .pf-hd .wtnwrap{flex:none}
+  .pf-hd .wtnwrap>div{margin-top:0 !important}
+  .pf-feed+.pfacts,.pf-feed+.pbio,.pf-strip+.pfacts{border-top:1px solid var(--border)}
+  .pf-av{width:52px;height:52px;border-radius:50%;flex:none;background:#0a2016;overflow:hidden;
+   border:2px solid var(--clay);display:grid;place-items:center;font-family:'Anton',sans-serif;
+   font-size:20px;color:var(--clay)}
+  .pf-av img{width:100%;height:100%;object-fit:cover}
+  .pf-nm{font-size:19px;font-weight:800;line-height:1.12;letter-spacing:-.3px;color:#fff}
+  .pf-meta{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.5px;
+   text-transform:uppercase;color:var(--clay);margin-top:4px}
+  .pf-close{position:absolute;right:8px;top:4px;background:none;border:0;color:var(--muted2);
+   font-size:26px;cursor:pointer;line-height:1}
+  .pf-strip{display:flex;gap:8px;overflow-x:auto;padding:14px 16px;
+   border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+   scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .pf-strip::-webkit-scrollbar{display:none}
+  .pf-strip:empty{display:none}
+  .pf-chip{flex:none;background:var(--card2);border:1px solid rgba(255,255,255,.05);
+   border-radius:13px;padding:10px 14px;min-width:82px}
+  .pf-chip .n{font-family:'Anton',sans-serif;font-size:20px;color:var(--clay);line-height:1}
+  .pf-chip .k{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1.2px;
+   text-transform:uppercase;color:var(--muted2);margin-top:5px}
+  .pf-feed{padding:6px 0 10px}
+  .pf-feed:empty{display:none}
+  .pf-m{position:relative;padding:15px 16px 15px 0;margin-left:16px}
+  .pf-m+.pf-m::before{content:'';position:absolute;top:0;left:0;right:16px;height:1px;
+   background:var(--border)}
+  .pf-top{display:flex;gap:13px;align-items:flex-start}
+  .pf-edge{flex:none;width:3px;border-radius:999px;align-self:stretch;margin:2px 0}
+  .pf-edge.w{background:#C8E64A} .pf-edge.l{background:#E8625F}
+  .pf-body{flex:1;min-width:0}
+  .pf-opp{font-size:16.5px;font-weight:700;line-height:1.2;letter-spacing:-.2px;color:#fff}
+  .pf-when{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted2);
+   margin-top:5px;letter-spacing:.3px}
+  .pf-sc{flex:none;text-align:right;max-width:46%}
+  .pf-sc .s{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:.5px;
+   white-space:nowrap;line-height:1.1;color:var(--cream)}
+  .pf-sc .s.long{font-size:12.5px;letter-spacing:.1px;white-space:normal;line-height:1.35}
+  .pf-sc .r{font-family:'Space Mono',monospace;font-size:8.5px;letter-spacing:1.6px;
+   margin-top:6px;opacity:.9}
+  .pf-sc .r.w{color:#C8E64A} .pf-sc .r.l{color:#E8625F}
+  .pf-tags{display:flex;align-items:center;gap:8px;margin:13px 0 0 16px;flex-wrap:wrap}
+  .pf-tag{display:inline-flex;align-items:center;gap:9px;flex:none;height:38px;
+   border:1px solid;border-radius:12px;padding:0 13px;font-size:13.5px;font-weight:700;
+   line-height:1;font-family:inherit;background:transparent}
+  .pf-tag .ico{flex:none;display:block}
+  .pf-tag.surf{font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:1.5px;
+   padding-left:7px;width:auto}
+  .pf-tag.surf .court{border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+  .pf-tag.surf.clay{border-color:rgba(208,96,42,.5);color:#F0A684;
+   background:linear-gradient(180deg,rgba(208,96,42,.16),rgba(208,96,42,.07))}
+  .pf-tag.surf.hard{border-color:rgba(49,118,188,.5);color:#9CC6EE;
+   background:linear-gradient(180deg,rgba(49,118,188,.16),rgba(49,118,188,.07))}
+  .pf-tag.cmt{cursor:pointer;border-color:var(--border2);color:var(--cream);
+   background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))}
+  .pf-tag.cmt .ico{color:var(--clay)}
+  .pf-tag.cmt:active{transform:translateY(1px)}
+  .pf-tag.cmt[aria-expanded="true"]{border-color:var(--clay);color:var(--clay);
+   background:rgba(255,140,66,.10)}
+  .pf-tag.cmt.none{border-style:dashed;border-color:var(--border);color:var(--muted2);
+   font-weight:500;background:transparent}
+  .pf-tag.cmt.none .ico{color:var(--muted2)}
+  .pf-thread{margin:12px 0 2px 16px;display:none;flex-direction:column;gap:10px}
+  .pf-thread.open{display:flex}
+  .pf-cb{font-size:14px;background:var(--card2);border:1px solid rgba(255,255,255,.05);
+   border-radius:13px;padding:11px 14px;line-height:1.5;color:var(--cream)}
+  .pf-cb .by{font-weight:700;color:var(--clay);margin-right:6px}
+  .pf-add{display:flex;gap:8px;margin-top:2px}
+  .pf-add input{flex:1;min-width:0;background:var(--card2);
+   border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 13px;
+   color:var(--cream);font-size:14px;font-family:inherit}
+  .pf-add input:focus{outline:none;border-color:rgba(255,140,66,.5)}
+  .pf-add button{flex:none;background:var(--clay);color:#1B0C02;border:0;border-radius:12px;
+   width:46px;font-size:18px;font-weight:700;cursor:pointer}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clay);color:#3a1400;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
 </style>
@@ -287,6 +363,13 @@
       <line x1="34" y1="15" x2="34" y2="49"/><line x1="94" y1="15" x2="94" y2="49"/>
       <line x1="34" y1="32" x2="94" y2="32"/><line x1="64" y1="7" x2="64" y2="57"/>
     </g>
+  </symbol>
+  <symbol id="bubble" viewBox="0 0 24 24">
+    <path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9.8L5 20.5V17H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+      fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+    <circle cx="8" cy="10.5" r="1.15" fill="currentColor"/>
+    <circle cx="12" cy="10.5" r="1.15" fill="currentColor"/>
+    <circle cx="16" cy="10.5" r="1.15" fill="currentColor"/>
   </symbol>
 </defs></svg>
 <div class="hero">
@@ -955,24 +1038,127 @@ function openProfile(id){
   const p=PROFILES.find(x=>x.player_id===id); if(!p) return;
   const av=p.photo_url?`<img src="${escAttr(p.photo_url)}" alt="">`:esc((p.name||'?').trim().charAt(0)||'?');
   const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
-  const facts=[['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],['Underlag',p.fav_surface],
-    ['Spelar sedan',p.since_year],['Ålder',ageFrom(p.born)],['I höst',p.spelade+' m · '+p.vinster+' v']].filter(f=>f[1]);
+  const facts=[['Hemort',p.hometown],['Spelhand',p.hand],['Favoritslag',p.fav_shot],
+    ['Underlag',p.fav_surface]].filter(f=>f[1]);
+  PF_P = p;
   const contactHtml = ME
     ? `<div class="pbio" id="pcontact" style="font-style:normal">Laddar kontakt…</div>`
     : `<div class="pbio" id="pcontact" style="font-style:normal;color:var(--muted2)">🔒 Logga in för att se kontaktuppgifter</div>`;
   document.getElementById('profmodal').innerHTML=`<div class="pbox">
-    <div class="ph"><button class="pclose" onclick="closeProfile()" aria-label="Stäng">×</button>
-      <div class="pav-lg">${av}</div><h3>${esc(p.name)}</h3><div class="pgr">${grp}</div>${wtnBadge(p.wtn)}</div>
-    <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
+    <div class="pf-hd">
+      <button class="pf-close" onclick="closeProfile()" aria-label="Stäng">×</button>
+      <div class="pf-av">${av}</div>
+      <div style="min-width:0;flex:1">
+        <div class="pf-nm">${esc(p.name)}</div>
+        <div class="pf-meta">${grp}</div>
+      </div>
+      <div class="wtnwrap">${wtnBadge(p.wtn)}</div>
+    </div>
+    <div class="pf-strip" id="pstats"></div>
+    <div class="pf-feed" id="pmatches"></div>
     ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
-    <div class="pstats" id="pstats"></div>
-    <div class="pmatches" id="pmatches"></div>
+    <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
     ${contactHtml}
     ${(ME && ME.id===id) ? `<a href="rapportera.html#profil" class="repbtn" style="display:block;text-align:center;text-decoration:none;margin-top:14px">✏️ Redigera min profil →</a>` : ''}</div>`;
   document.getElementById('profmodal').classList.add('open');
   fillStats(id);
   fillMatches(id);
   if(ME) fillContact(id);
+}
+function flipScore(score, isA){
+  if(isA || !score) return score||'';
+  return String(score).trim().split(/\s+/).map(s=>{
+    const mm=s.match(/^(\d+)-(\d+)(\(.*\))?$/); if(!mm) return s;
+    let paren=mm[3]||''; const pm=paren.match(/^\((\d+)-(\d+)\)$/); if(pm) paren='('+pm[2]+'-'+pm[1]+')';
+    return mm[2]+'-'+mm[1]+paren;
+  }).join(' ');
+}
+function woBadge(score, small){
+  return /^(w\.o\.|VO|WO)/i.test(String(score||'')) ? '<span class="wobadge'+(small?' wobadge-sm':'')+'">w.o.</span>' : '';
+}
+function surfaceBadge(s, small){
+  if(s !== 'grus' && s !== 'hard') return '';
+  var clay = s === 'grus';
+  var col = clay ? '#D0602A' : '#3176BC';
+  var w = small ? 22 : 26, h = small ? 11 : 13;
+  return '<span class="surf ' + (clay ? 'clay' : 'hard') + (small ? ' surf-sm' : '') + '">'
+       + '<svg class="court" width="' + w + '" height="' + h + '" style="color:' + col + '">'
+       + '<use href="#court"></use></svg>'
+       + '<span class="surf-l">' + (clay ? 'CLAY' : 'HARD') + '</span></span>';
+}
+function pfSurfTag(sf){
+  if(sf!=='grus' && sf!=='hard') return '';
+  const clay = sf==='grus', col = clay ? '#C25A28' : '#2F6FB4';
+  return `<span class="pf-tag surf ${clay?'clay':'hard'}">`
+    + `<svg class="ico court" width="42" height="21" style="color:${col}"><use href="#court"></use></svg>`
+    + `<span>${clay?'GRUS':'HARD'}</span></span>`;
+}
+function pfCmtTag(mid,n){
+  if(!mid) return '';
+  const lbl = n ? (n+' kommentar'+(n>1?'er':'')) : 'Kommentera';
+  return `<button class="pf-tag cmt${n?'':' none'}" aria-expanded="false" onclick="pfThread(${mid},this)">`
+    + `<svg class="ico" width="19" height="19"><use href="#bubble"></use></svg>`
+    + `<span>${lbl}</span></button>`;
+}
+async function pfThread(mid, btn){
+  const box=document.getElementById('pfth'+mid); if(!box) return;
+  const open = box.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open?'true':'false');
+  if(!open || box.dataset.loaded) return;
+  box.innerHTML='<div class="pf-cb" style="opacity:.6">Laddar…</div>';
+  try{
+    const list=await BTS.hostMatchThread(mid);
+    let h=list.map(c=>`<div class="pf-cb"><span class="by">${esc(String(c.name||'').split(' ')[0])}</span>${esc(c.body||'')}</div>`).join('');
+    if(ME) h+=`<div class="pf-add"><input id="pfca${mid}" maxlength="300" placeholder="${list.length?'Skriv en kommentar…':'Först att kommentera…'}" onkeydown="if(event.key==='Enter')pfAdd(${mid})"><button onclick="pfAdd(${mid})">→</button></div>`;
+    else if(!list.length) h='<div class="pf-cb" style="opacity:.6">Logga in för att kommentera.</div>';
+    box.innerHTML=h; box.dataset.loaded='1';
+  }catch(e){ box.innerHTML='<div class="pf-cb" style="opacity:.6">Kunde inte hämta kommentarer.</div>'; }
+}
+async function pfAdd(mid){
+  if(!ME) return;
+  const el=document.getElementById('pfca'+mid); if(!el) return;
+  const body=(el.value||'').trim(); if(!body) return;
+  el.disabled=true;
+  try{
+    await BTS.hostAddComment(mid, body, ME.id, ME.pin);
+    const box=document.getElementById('pfth'+mid); if(box) delete box.dataset.loaded;
+    const btn=document.querySelector(`.pf-tag.cmt[onclick*="pfThread(${mid},"]`);
+    if(box){ box.classList.remove('open'); }
+    if(btn){ await pfThread(mid, btn); btn.classList.remove('none');
+      const lab=btn.querySelector('span:last-child');
+      const n=(document.getElementById('pfth'+mid).querySelectorAll('.pf-cb').length);
+      if(lab) lab.textContent = n+' kommentar'+(n>1?'er':''); }
+  }catch(e){ alert('Kunde inte spara: '+(e.message||e)); el.value=body; }
+  finally{ el.disabled=false; }
+}
+async function fillMatches(id){
+  const el=document.getElementById('pmatches'); if(!el) return;
+  try{
+    const ms=await BTS.hostPlayerFeed(id, 10);
+    if(!ms || !ms.length){ el.innerHTML=''; return; }
+    let h='';
+    ms.forEach(m=>{
+      const sc=flipScore(m.score, m.is_a);
+      const d=m.play_date?new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'}):'';
+      const long = String(sc).length>12 ? ' long' : '';
+      h+=`<div class="pf-m">
+        <div class="pf-top">
+          <span class="pf-edge ${m.won?'w':'l'}"></span>
+          <div class="pf-body">
+            <div class="pf-opp">${esc(m.opp||'')}</div>
+            <div class="pf-when">${d}</div>
+          </div>
+          <div class="pf-sc">
+            <div class="s${long}">${esc(sc)}</div>
+            <div class="r ${m.won?'w':'l'}">${m.won?'VINST':'FÖRLUST'}</div>
+          </div>
+        </div>
+        <div class="pf-tags">${pfSurfTag(m.surface)}${pfCmtTag(m.match_id, m.cmts)}</div>
+        ${m.match_id?`<div class="pf-thread" id="pfth${m.match_id}"></div>`:''}
+      </div>`;
+    });
+    el.innerHTML=h;
+  }catch(e){ el.innerHTML=''; }
 }
 function flipScore(score, isA){
   if(isA || !score) return score||'';
@@ -1013,25 +1199,31 @@ async function fillMatches(id){
     el.innerHTML=h;
   }catch(e){ el.innerHTML=''; }
 }
+let PF_P = null;
+function pfChip(n,k){ return `<div class="pf-chip"><div class="n">${n}</div><div class="k">${k}</div></div>`; }
 async function fillStats(id){
   const el=document.getElementById('pstats'); if(!el) return;
+  const p = PF_P || {};
   try{
     const [s,g]=await Promise.all([
       BTS.hostPlayerStats(id),
       BTS.hostPlayerGem(id).catch(()=>null)
     ]);
-    if(!s || !s.matcher){ el.innerHTML=''; return; }
-    const pct=s.matcher?Math.round(s.vinster/s.matcher*100):0;
-    const d=g?g.gem_diff:null;
-    const dTxt=(d===null||d===undefined)?'–':(d>0?'+'+d:String(d));
-    let h='<div class="pst-h">Statistik · genom åren</div><div class="pst-row">'
-      +`<div class="pst"><div class="pn">${s.matcher}</div><div class="pk">Matcher</div></div>`
-      +`<div class="pst"><div class="pn">${s.vinster}</div><div class="pk">Vinster</div></div>`
-      +`<div class="pst"><div class="pn">${pct}%</div><div class="pk">Vinst</div></div>`
-      +`<div class="pst"><div class="pn">${dTxt}</div><div class="pk">Gem</div></div></div>`;
-    if(g) h+=`<div class="pst-extra">Gem totalt: <b>${g.gem_for}</b> vunna · <b>${g.gem_mot}</b> förlorade</div>`;
-    if(s.topp_motstandare) h+=`<div class="pst-extra">🎾 Flest möten: <b>${esc(s.topp_motstandare)}</b> · ${s.topp_antal} ggr</div>`;
+    let h='';
+    if(s && s.matcher){
+      const pct=Math.round(s.vinster/s.matcher*100);
+      const d=g?g.gem_diff:null;
+      h+=pfChip(s.matcher,'Matcher')+pfChip(s.vinster,'Vinster')+pfChip(pct+'%','Vinst');
+      if(d!==null && d!==undefined) h+=pfChip((d>0?'+':'')+d,'Gem');
+    }
+    if(p.spelade!=null) h+=pfChip(p.spelade+' / '+p.vinster,'I höst');
+    const alder=ageFrom(p.born); if(alder) h+=pfChip(parseInt(alder,10),'År');
+    if(p.since_year) h+=pfChip(p.since_year,'Sedan');
     el.innerHTML=h;
+    if(s && s.topp_motstandare){
+      const m=document.getElementById('pmatches');
+      if(m) m.dataset.topp = s.topp_motstandare+' · '+s.topp_antal+' ggr';
+    }
   }catch(e){ el.innerHTML=''; }
 }
 async function fillContact(id){
