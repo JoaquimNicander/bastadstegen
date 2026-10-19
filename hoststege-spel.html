@@ -170,7 +170,14 @@
   .legend b{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:5px}
   .state{text-align:center;color:var(--muted2);padding:26px;font-size:14px}
   .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:8px}
-  .pcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;cursor:pointer}
+  .pcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px 0;
+    text-align:center;cursor:pointer;display:flex;flex-direction:column}
+  .pcard .spacer{flex:1;min-height:10px}
+  .shelf{margin:0 -12px;padding:9px 8px 10px;display:flex;align-items:flex-end;justify-content:center;
+    gap:7px;min-height:46px;border-top:1px solid var(--border);
+    background:linear-gradient(180deg,rgba(232,184,75,.07),rgba(232,184,75,0));border-radius:0 0 11px 11px}
+  .pcard.nocup{padding-bottom:14px}
+  .shelf .more{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#E8B84B;padding-bottom:7px}
   .pcard:active{transform:scale(.98)}
   .pav{width:64px;height:64px;border-radius:50%;margin:0 auto 8px;background:var(--card2);border:1.5px solid var(--border2);
     display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:22px;color:var(--muted);overflow:hidden}
@@ -356,6 +363,11 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#F6DA8C"/><stop offset=".5" stop-color="#E8B84B"/>
+    <stop offset="1" stop-color="#AE7E24"/></linearGradient>
+  <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#4A3609"/><stop offset="1" stop-color="#241A03"/></linearGradient>
   <symbol id="court" viewBox="0 0 128 64">
     <rect width="128" height="64" fill="currentColor"/>
     <g fill="none" stroke="#fff" stroke-width="3" vector-effect="non-scaling-stroke">
@@ -417,7 +429,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={};
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={}, TROPHY={};
 let POOL=[], POOLST={eligible:false,in_pool:false,antal:0,motstandare:null};
 let WOPICK=0;
 const REMOJI=['🎾','👍','❤️','🏆','🥇','🔥'];
@@ -431,6 +443,9 @@ async function load(){
   document.getElementById('rndbadge').textContent='Omgång '+ROUND;
   [ST,MATCHES,PLAYERS]=await Promise.all([BTS.hostPoolStandings(ROUND), BTS.hostPoolMatches(ROUND), BTS.getPlayers()]);
   try{ PROFILES = BTS.hostPoolProfiles ? (await BTS.hostPoolProfiles(ROUND)) : []; }catch(e){ PROFILES=[]; }
+  try{ const tr=BTS.hostTrophies?await BTS.hostTrophies():[]; TROPHY={};
+       tr.sort((x,y)=>(x.round-y.round)||String(x.label).localeCompare(y.label))
+         .forEach(t=>{ (TROPHY[t.player_id]=TROPHY[t.player_id]||[]).push(t.label); }); }catch(e){ TROPHY={}; }
   try{ const sa=BTS.hostPlayerStatsAll?await BTS.hostPlayerStatsAll():[]; STATS={}; sa.forEach(x=>{STATS[x.player_id]={m:x.matcher,v:x.vinster};}); }catch(e){ STATS={}; }
   try{ const cc=BTS.hostCommentsRound?await BTS.hostCommentsRound(ROUND):[]; CMTS={}; cc.forEach(c=>{ (CMTS[c.match_id]=CMTS[c.match_id]||[]).push(c); }); }catch(e){ CMTS={}; }
   try{ const rr=BTS.hostReactionsRound?await BTS.hostReactionsRound(ROUND):[]; REACTS={}; rr.forEach(r=>{ (REACTS[r.comment_id]=REACTS[r.comment_id]||[]).push(r); }); }catch(e){ REACTS={}; }
@@ -1018,17 +1033,38 @@ function render(){
 }
 function wtnBadge(wtn){ const w=(wtn||'').toString().trim(); if(!w) return '';
   return `<div style="margin-top:5px"><span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #e3e3e8;padding:2px 8px 2px 6px;border-radius:100px;box-shadow:0 1px 3px rgba(0,0,0,.15)"><img src="wtn-mark.png" style="height:12px;width:auto;display:block"><span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;color:#1B2A4A">${esc(w)}</span></span></div>`; }
+function cup(letter,h){
+  const vw=40, vh=54, w=Math.round(h*vw/vh);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" style="display:block" aria-hidden="true">`
+    + `<path d="M10 2h20v11a10 10 0 0 1-20 0V2z" fill="url(#g)"/>`
+    + `<path d="M10 4H6.5A3.5 3.5 0 0 0 3 7.5C3 11.6 5.8 14.4 9.8 15M30 4h3.5A3.5 3.5 0 0 1 37 7.5C37 11.6 34.2 14.4 30.2 15" fill="none" stroke="url(#g)" stroke-width="2.4" stroke-linecap="round"/>`
+    + `<rect x="17.5" y="23" width="5" height="6" fill="#AE7E24"/>`
+    + `<rect x="5.5" y="30" width="29" height="20" rx="3" fill="url(#gp)" stroke="url(#g)" stroke-width="1.6"/>`
+    + `<text x="20" y="45.5" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="16" fill="url(#g)">${esc(letter)}</text>`
+    + `</svg>`;
+}
+function shelf(list){
+  const t=list||[];
+  if(!t.length) return '';
+  const show=t.slice(0,4).map(l=>cup(l,34)).join('');
+  const more=t.length>4?`<span class="more">+${t.length-4}</span>`:'';
+  const txt=t.length===1?'1 gruppseger':t.length+' gruppsegrar';
+  return `<div class="shelf" title="${txt}">${show}${more}</div>`;
+}
 function renderPlayers(el){
   if(!PROFILES.length){ el.innerHTML='<div class="state">Inga spelare ännu.</div>'; return; }
   const card=p=>{
     const av=p.photo_url?`<img src="${escAttr(p.photo_url)}" alt="">`:esc((p.name||'?').trim().charAt(0)||'?');
     const grp=(p.division==='H'?'Herr':'Dam')+' · Grupp '+esc(p.label);
-    return `<div class="pcard" onclick="openProfile(${p.player_id})">
+    const cups=shelf(TROPHY[p.player_id]);
+    return `<div class="pcard${cups?'':' nocup'}" onclick="openProfile(${p.player_id})">
       <div class="pav">${av}</div>
       <div class="pn">${esc(p.name)}</div>
       <div class="pg">${grp}</div>
       ${wtnBadge(p.wtn)}
-      <div class="ps">${(STATS[p.player_id]||{m:0}).m} matcher · ${(STATS[p.player_id]||{v:0}).v} vinster</div></div>`;
+      <div class="ps">${(STATS[p.player_id]||{m:0}).m} matcher · ${(STATS[p.player_id]||{v:0}).v} vinster</div>
+      <div class="spacer"></div>
+      ${cups}</div>`;
   };
   el.innerHTML='<div class="pgrid">'+PROFILES.slice().sort((a,b)=>a.name.localeCompare(b.name,'sv')).map(card).join('')+'</div>';
 }

@@ -715,6 +715,12 @@ const BTS = {
     if (error) throw error;
     return (data && data[0]) || null;
   },
+  async hostTrophies() {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_trophies');
+    if (error) throw error;
+    return data || [];
+  },
   async hostPlayerStatsAll() {
     _assert();
     const { data, error } = await _sb.rpc('bts_player_stats_all');
