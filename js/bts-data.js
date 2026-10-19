@@ -804,11 +804,35 @@ const BTS = {
     if (error) throw error;
     return data;
   },
-  async pollSvara(token, svar) {
+  async pollSvara(token, svar, onskemal) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_poll_svara', { p_token: token, p_svar: svar });
+    const { data, error } = await _sb.rpc('bts_poll_svara', { p_token: token, p_svar: svar, p_onskemal: onskemal || '' });
     if (error) throw error;
     return data;
+  },
+  async pollInvite(o) {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        mode: 'poll_invite',
+        adminPw: o.adminPw,
+        poll: o.poll || 'omg3',
+        channel: o.channel || 'mail',
+        only: o.only || 'alla',
+        reminder: !!o.reminder,
+        dryRun: !!o.dryRun,
+      }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
+  async pollListaV2(key, poll) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_lista_v2', { p_key: key, p_poll: poll || 'omg3' });
+    if (error) throw error;
+    return data || [];
   },
   async pollLista(key, poll) {
     _assert();

@@ -41,6 +41,10 @@
   .dot.tyst{background:var(--line2)}
   .row.tyst{opacity:.72}
   .warn{font-size:11px;color:var(--clay);white-space:nowrap}
+  .row.has{display:block}
+  .row .top{display:flex;align-items:center;gap:11px}
+  .wishline{margin:8px 0 0 20px;padding-left:10px;border-left:2px solid var(--clay);
+       font-size:12.5px;color:rgba(245,237,227,.75);font-style:italic;line-height:1.5}
 
   .state{text-align:center;padding:40px 10px;color:var(--muted)}
   .refresh{font-size:11.5px;color:var(--muted2);text-align:center;margin-top:26px}
@@ -54,7 +58,7 @@
 <script>
 const Q = new URLSearchParams(location.search);
 const KEY = Q.get('k') || '';
-const POLL = Q.get('p') || 'omg2';
+const POLL = Q.get('p') || 'omg3';
 const app = document.getElementById('app');
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -70,13 +74,16 @@ function rad(r){
   const grp = (r.division && r.grupp) ? (r.division + ' ' + r.grupp) : '';
   const utan = (!r.har_mobil && !r.har_mejl) ? '<span class="warn">ingen kontakt</span>'
              : (!r.har_mobil ? '<span class="warn">bara mejl</span>' : '');
-  return '<div class="row ' + (r.svar?'':'tyst') + '">'
-       + '<span class="dot ' + sv + '"></span>'
-       + '<span class="nm">' + esc(r.namn) + '</span>'
-       + utan
-       + '<span class="gp">' + esc(grp) + '</span>'
-       + '<span class="tm">' + esc(klocka(r.svarat_at)) + '</span>'
-       + '</div>';
+  const top = '<span class="dot ' + sv + '"></span>'
+            + '<span class="nm">' + esc(r.namn) + '</span>'
+            + utan
+            + '<span class="gp">' + esc(grp) + '</span>'
+            + '<span class="tm">' + esc(klocka(r.svarat_at)) + '</span>';
+  const onsk = (r.onskemal || '').trim();
+  if(!onsk) return '<div class="row ' + (r.svar?'':'tyst') + '">' + top + '</div>';
+  return '<div class="row has ' + (r.svar?'':'tyst') + '">'
+       + '<div class="top">' + top + '</div>'
+       + '<div class="wishline">' + esc(onsk) + '</div></div>';
 }
 
 function render(rows){
@@ -84,10 +91,12 @@ function render(rows){
   const nej = rows.filter(r=>r.svar==='nej');
   const tyst= rows.filter(r=>!r.svar);
   const tot = rows.length || 1;
+  const onsk = rows.filter(r=>(r.onskemal||'').trim()).length;
 
   let h = '<div class="sub">Höststegen · spelförfrågan</div>'
         + '<h1>Kan du spela söndag?</h1>'
-        + '<div class="meta">' + rows.length + ' tillfrågade · ' + (ja.length+nej.length) + ' har svarat</div>'
+        + '<div class="meta">' + rows.length + ' tillfrågade · ' + (ja.length+nej.length) + ' har svarat'
+        + (onsk ? ' · ' + onsk + ' med önskemål' : '') + '</div>'
         + '<div class="sum">'
         + '<div class="s ja"><div class="n">' + ja.length + '</div><div class="l">Kan spela</div></div>'
         + '<div class="s nej"><div class="n">' + nej.length + '</div><div class="l">Kan inte</div></div>'
@@ -108,7 +117,7 @@ function render(rows){
 
 async function ladda(){
   try {
-    const rows = await BTS.pollLista(KEY, POLL);
+    const rows = BTS.pollListaV2 ? await BTS.pollListaV2(KEY, POLL) : await BTS.pollLista(KEY, POLL);
     if(!rows.length){ app.innerHTML = '<div class="state">Ogiltig länk, eller ingen förfrågan utskickad än.</div>'; return; }
     render(rows);
   } catch(e) {

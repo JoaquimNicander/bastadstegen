@@ -44,6 +44,21 @@
   .dl{margin-top:16px;font-size:14px;font-weight:700;color:var(--lime)}
   .dl span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:3px}
 
+  .wish{margin-top:22px;text-align:left}
+  .wish label{display:block;font-family:'Space Mono',ui-monospace,monospace;font-size:9.5px;
+        letter-spacing:1.6px;text-transform:uppercase;color:var(--clay);font-weight:700;margin-bottom:7px}
+  .wish textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line2);
+        border-radius:13px;color:var(--cream);font-family:inherit;font-size:14.5px;line-height:1.5;
+        padding:12px 13px;resize:none;min-height:62px}
+  .wish textarea::placeholder{color:rgba(245,237,227,.33)}
+  .wish textarea:focus{outline:none;border-color:var(--clay)}
+  .wish .hint{font-size:11.5px;color:rgba(245,237,227,.42);margin-top:6px}
+  .echo{margin:20px 0 0;text-align:left;border-left:2px solid var(--clay);
+        background:rgba(255,255,255,.03);border-radius:0 11px 11px 0;padding:11px 13px;
+        font-size:13.5px;color:rgba(245,237,227,.8);font-style:italic}
+  .echo b{display:block;font-family:'Space Mono',ui-monospace,monospace;font-size:9px;
+        letter-spacing:1.5px;text-transform:uppercase;color:rgba(245,237,227,.42);
+        font-style:normal;margin-bottom:4px;font-weight:700}
   .info{margin:30px 0 0;text-align:left;border:1px solid var(--line);border-radius:14px;
         padding:17px 18px;background:rgba(255,255,255,.025)}
   .info h3{margin:0 0 9px;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;
@@ -94,8 +109,12 @@ function renderFraga(){
     + '<h1>Hej ' + esc(first(CARD.namn)) + '!<br>Kan du spela?</h1>'
     + '<div class="when"><div class="d">' + esc(datumText(CARD.speldag)) + '</div>'
     + '<div class="t">Start kl ' + esc(CARD.starttid) + '</div></div>'
-    + '<div class="dl">Svara senast fredag 16 oktober kl 16.00'
-    + '<span>Då sätter vi spelordningen och bokar banor</span></div>'
+    + '<div class="dl">Svara senast ' + esc(CARD.svarstopp || 'fredag kl 16.00')
+    + '<span>På torsdag sätter vi matcherna – då ser du vem du möter</span></div>'
+    + '<div class="wish"><label>Önskemål om tid eller annat</label>'
+    + '<textarea id="wish" maxlength="400" placeholder="T.ex. &quot;kan bara 15.00&quot; eller &quot;helst grus&quot;. Frivilligt.">'
+    + esc(CARD.onskemal || '') + '</textarea>'
+    + '<div class="hint">Vi försöker ta hänsyn, men kan inte lova.</div></div>'
     + '<div class="btns">'
     + '<button class="b ja" id="bJa">Ja, jag kan</button>'
     + '<button class="b nej" id="bNej">Nej</button>'
@@ -114,9 +133,10 @@ function renderSvarat(){
     + '<h2>' + (ja ? 'Tack – du är med!' : 'Tack för beskedet') + '</h2>'
     + '<p>' + (ja
         ? 'Du är anmäld till ' + esc(datumText(CARD.speldag)).toLowerCase() + ', start kl ' + esc(CARD.starttid)
-          + '. Din match dyker upp i stegen så fort spelordningen är satt.'
+          + '. På torsdag sätter vi matcherna, då ser du din motståndare i stegen.'
         : 'Du står över den här omgången. Hör av dig om något ändras.')
     + '</p>'
+    + (CARD.onskemal ? '<div class="echo"><b>Ditt önskemål</b>' + esc(CARD.onskemal) + '</div>' : '')
     + '<button class="change" id="bChange">Ändra mitt svar</button>'
     + '</div>' + info() + foot();
   document.getElementById('bChange').onclick = () => renderFraga();
@@ -130,14 +150,11 @@ function hero(){
 }
 
 function info(){
-  return '<div class="info"><h3>Varför vi frågar</h3>'
-       + '<p>Omg\u00e5ngen blev f\u00f6rsenad \u2014 det har blivit m\u00e5nga inst\u00e4llda matcher. '
-       + 'N\u00e4r vi vet vilka som kan s\u00e4tter vi spelordningen s\u00e5 att s\u00e5 m\u00e5nga som m\u00f6jligt '
-       + 'faktiskt f\u00e5r spela \u2014 och kan ge klubben besked i tid om hur m\u00e5nga banor vi beh\u00f6ver.</p>'
-       + '<p>Hinner du spela ikapp dina matcher i veckan? Allt som blir klart f\u00f6re l\u00f6rdag '
-       + 'hj\u00e4lper oss att komma ig\u00e5ng i tid.</p>'
-       + '<p>Inf\u00f6r n\u00e4sta omg\u00e5ng s\u00e4tter vi stoppet \u00e4nnu tidigare, s\u00e5 att vi slipper samma '
-       + 'sl\u00e4pighet en g\u00e5ng till.</p></div>';
+  return '<div class="info"><h3>Så funkar det</h3>'
+       + '<p>Svara nu \u2014 ja eller nej. P\u00e5 torsdag parar vi ihop matcherna och l\u00e4gger upp '
+       + 'spelordningen, s\u00e5 du vet vem du m\u00f6ter och n\u00e4r i god tid f\u00f6re s\u00f6ndag.</p>'
+       + '<p>Hinner du spela ikapp matcher i veckan? Allt som blir klart f\u00f6re l\u00f6rdag '
+       + 'hj\u00e4lper oss att komma ig\u00e5ng i tid.</p></div>';
 }
 
 function foot(){
@@ -152,7 +169,8 @@ async function svara(v){
   document.getElementById('bNej').disabled = true;
   if(err) err.textContent = '';
   try {
-    CARD = await BTS.pollSvara(TOKEN, v);
+    const w = document.getElementById('wish');
+    CARD = await BTS.pollSvara(TOKEN, v, w ? w.value : '');
     renderSvarat();
   } catch(e) {
     if(err) err.textContent = (e && e.message) ? e.message : 'Kunde inte spara – försök igen.';

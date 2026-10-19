@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Spelförfrågan · utskick · Båstad Stegen</title>
+<style>
+  :root{ --green:#0D2E20; --card:#0D2A1D; --card2:#133124; --line:#1C3A2B; --line2:#2A5A42;
+         --cream:#F5EDE3; --muted:rgba(245,237,227,.62); --muted2:rgba(245,237,227,.42);
+         --clay:#FF8C42; --lime:#D7F23C; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--green);color:var(--cream);padding:22px 14px 60px;
+       font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.55}
+  .wrap{max-width:560px;margin:0 auto}
+  .kick{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;
+        color:var(--clay);font-weight:700}
+  h1{margin:4px 0 0;font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .meta{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:14px;
+       padding:16px 16px 18px;margin-top:20px}
+  label{display:block;font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:1.5px;
+        text-transform:uppercase;color:var(--clay);font-weight:700;margin-bottom:7px}
+  input,select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line2);
+       border-radius:11px;color:var(--cream);font-family:inherit;font-size:15px;padding:11px 12px}
+  input:focus,select:focus{outline:none;border-color:var(--clay)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
+  .btns{display:flex;gap:11px;margin-top:18px}
+  button{flex:1;border:none;border-radius:13px;padding:15px 10px;font-size:15px;font-weight:800;
+         font-family:inherit;cursor:pointer}
+  button[disabled]{opacity:.45;cursor:default}
+  .test{background:transparent;color:var(--cream);border:1.5px solid var(--line2)}
+  .send{background:var(--clay);color:#3a1400}
+  .out{margin-top:18px;font-size:14px;white-space:pre-wrap;word-break:break-word;
+       background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;display:none}
+  .out.on{display:block}
+  .ok{color:var(--lime)} .bad{color:#ffb3a0}
+  .warn{margin-top:16px;font-size:12.5px;color:var(--muted2);border-left:2px solid var(--clay);
+        padding-left:11px;line-height:1.6}
+  a{color:var(--clay)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kick">Höststegen · admin</div>
+  <h1>Skicka spelförfrågan</h1>
+  <div class="meta" id="meta">Hämtar förfrågan…</div>
+
+  <div class="box">
+    <label>Adminlösenord</label>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="••••••••">
+    <div class="row2">
+      <div><label>Förfrågan</label><input type="text" id="poll" value="omg3"></div>
+      <div><label>Kanal</label>
+        <select id="chan">
+          <option value="mail" selected>Bara mejl</option>
+          <option value="bada">Mejl + SMS</option>
+          <option value="sms">Bara SMS</option>
+        </select></div>
+    </div>
+    <div class="row2">
+      <div><label>Mottagare</label>
+        <select id="only">
+          <option value="alla" selected>Alla</option>
+          <option value="tysta">Bara de som inte svarat</option>
+        </select></div>
+      <div><label>Påminnelse?</label>
+        <select id="pam">
+          <option value="0" selected>Nej, första utskicket</option>
+          <option value="1">Ja, påminnelse</option>
+        </select></div>
+    </div>
+    <div class="btns">
+      <button class="test" id="bTest">Testkör</button>
+      <button class="send" id="bSend">Skicka på riktigt</button>
+    </div>
+    <div class="out" id="out"></div>
+    <div class="warn">Testkör skickar ingenting — den räknar bara mottagarna och visar
+      ett exempel. SMS kostar pengar, så kanalen står på <b>bara mejl</b>.</div>
+  </div>
+
+  <div class="meta" style="margin-top:22px">
+    Svaren kommer in på <a href="spelsvar.html" id="lnkSvar">svarssidan</a>.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const out = $('out');
+
+function show(html, cls){ out.className = 'out on' + (cls ? ' ' + cls : ''); out.innerHTML = html; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+try { const p = localStorage.getItem('bts_admin_pw'); if(p) $('pw').value = p; } catch(e){}
+
+async function kor(dry){
+  const pw = $('pw').value.trim();
+  if(!pw){ show('Fyll i adminlösenordet.', 'bad'); return; }
+  const poll = $('poll').value.trim() || 'omg3';
+  const chan = $('chan').value;
+  const only = $('only').value;
+  const pam  = $('pam').value === '1';
+
+  if(!dry){
+    const txt = 'Skicka spelförfrågan "' + poll + '" via ' +
+      (chan === 'mail' ? 'mejl' : chan === 'sms' ? 'SMS' : 'mejl och SMS') +
+      ' till ' + (only === 'alla' ? 'alla' : 'de som inte svarat') + '?';
+    if(!confirm(txt)) return;
+  }
+
+  $('bTest').disabled = true; $('bSend').disabled = true;
+  show(dry ? 'Testkör…' : 'Skickar…');
+  try {
+    try { localStorage.setItem('bts_admin_pw', pw); } catch(e){}
+    const j = await BTS.pollInvite({ adminPw: pw, poll, channel: chan, only, reminder: pam, dryRun: dry });
+    let h = '<b class="ok">' + (dry ? 'Testkörning klar' : 'Utskick klart') + '</b><br>'
+          + 'Mottagare i listan: ' + j.antal + '<br>'
+          + 'Mejl: ' + j.email.sent + ' ' + (dry ? 'skulle gå ut' : 'skickade')
+          + ' · ' + j.email.skipped + ' utan mejladress<br>'
+          + 'SMS: ' + j.sms.sent + ' ' + (dry ? 'skulle gå ut' : 'skickade')
+          + ' · ' + j.sms.skipped + ' hoppades över';
+    if(j.exempel) h += '<br><br><i>Exempeltext:</i><br>' + esc(j.exempel);
+    if(j.errors && j.errors.length) h += '<br><br><b class="bad">Fel:</b><br>' + esc(j.errors.join('\n'));
+    show(h);
+  } catch(e) {
+    show('<b class="bad">Gick inte:</b> ' + esc(e.message || e), 'bad');
+  }
+  $('bTest').disabled = false; $('bSend').disabled = false;
+}
+
+$('bTest').onclick = () => kor(true);
+$('bSend').onclick = () => kor(false);
+$('poll').oninput = () => { $('lnkSvar').href = 'spelsvar.html?p=' + encodeURIComponent($('poll').value.trim()); };
+$('poll').oninput();
+$('meta').textContent = 'Testkör först, titta på siffrorna, skicka sedan.';
+</script>
+</body>
+</html>
