@@ -275,8 +275,6 @@
   .sitefoot .ff-links a{color:#fff;text-decoration:none;font-weight:700;font-size:14px;background:var(--card);border:1px solid var(--border2);border-radius:100px;padding:9px 16px}
   /* ===== Spelarkort: matchflöde ===== */
   .pf-hd{display:flex;align-items:center;gap:13px;padding:16px 46px 16px 16px;position:relative}
-  .pf-hd .wtnwrap{flex:none}
-  .pf-hd .wtnwrap>div{margin-top:0 !important}
   .pf-feed+.pfacts,.pf-feed+.pbio,.pf-strip+.pfacts{border-top:1px solid var(--border)}
   .pf-av{width:52px;height:52px;border-radius:50%;flex:none;background:#0a2016;overflow:hidden;
    border:2px solid var(--clay);display:grid;place-items:center;font-family:'Anton',sans-serif;
@@ -297,7 +295,10 @@
   .pf-chip .n{font-family:'Anton',sans-serif;font-size:20px;color:var(--clay);line-height:1}
   .pf-chip .k{font-family:'Space Mono',monospace;font-size:7.5px;letter-spacing:1.2px;
    text-transform:uppercase;color:var(--muted2);margin-top:5px}
-  .pf-feed{padding:6px 0 10px}
+  .pf-feed{padding:0 0 10px;border-top:1px solid var(--border)}
+  .pf-feed .pf-head{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;
+   text-transform:uppercase;color:var(--muted2);padding:14px 16px 2px}
+  .pfacts .pfact:last-child:nth-child(odd){grid-column:1 / -1}
   .pf-feed:empty{display:none}
   .pf-m{position:relative;padding:15px 16px 15px 0;margin-left:16px}
   .pf-m+.pf-m::before{content:'';position:absolute;top:0;left:0;right:16px;height:1px;
@@ -1045,19 +1046,17 @@ function openProfile(id){
     ? `<div class="pbio" id="pcontact" style="font-style:normal">Laddar kontakt…</div>`
     : `<div class="pbio" id="pcontact" style="font-style:normal;color:var(--muted2)">🔒 Logga in för att se kontaktuppgifter</div>`;
   document.getElementById('profmodal').innerHTML=`<div class="pbox">
-    <div class="pf-hd">
-      <button class="pf-close" onclick="closeProfile()" aria-label="Stäng">×</button>
-      <div class="pf-av">${av}</div>
-      <div style="min-width:0;flex:1">
-        <div class="pf-nm">${esc(p.name)}</div>
-        <div class="pf-meta">${grp}</div>
-      </div>
-      <div class="wtnwrap">${wtnBadge(p.wtn)}</div>
+    <div class="ph">
+      <button class="pclose" onclick="closeProfile()" aria-label="Stäng">×</button>
+      <div class="pav-lg">${av}</div>
+      <h3>${esc(p.name)}</h3>
+      <div class="pgr">${grp}</div>
+      ${wtnBadge(p.wtn)}
     </div>
     <div class="pf-strip" id="pstats"></div>
-    <div class="pf-feed" id="pmatches"></div>
-    ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
     <div class="pfacts">${facts.map(f=>`<div class="pfact"><div class="k">${esc(f[0])}</div><div class="v">${esc(f[1])}</div></div>`).join('')}</div>
+    ${p.bio?`<div class="pbio">”${esc(p.bio)}”</div>`:''}
+    <div class="pf-feed" id="pmatches"></div>
     ${contactHtml}
     ${(ME && ME.id===id) ? `<a href="rapportera.html#profil" class="repbtn" style="display:block;text-align:center;text-decoration:none;margin-top:14px">✏️ Redigera min profil →</a>` : ''}</div>`;
   document.getElementById('profmodal').classList.add('open');
@@ -1136,7 +1135,7 @@ async function fillMatches(id){
   try{
     const ms=await BTS.hostPlayerFeed(id, 10);
     if(!ms || !ms.length){ el.innerHTML=''; return; }
-    let h='';
+    let h='<div class="pf-head">Senaste matcher</div>';
     ms.forEach(m=>{
       const sc=flipScore(m.score, m.is_a);
       const d=m.play_date?new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'}):'';
@@ -1156,45 +1155,6 @@ async function fillMatches(id){
         <div class="pf-tags">${pfSurfTag(m.surface)}${pfCmtTag(m.match_id, m.cmts)}</div>
         ${m.match_id?`<div class="pf-thread" id="pfth${m.match_id}"></div>`:''}
       </div>`;
-    });
-    el.innerHTML=h;
-  }catch(e){ el.innerHTML=''; }
-}
-function flipScore(score, isA){
-  if(isA || !score) return score||'';
-  return String(score).trim().split(/\s+/).map(s=>{
-    const mm=s.match(/^(\d+)-(\d+)(\(.*\))?$/); if(!mm) return s;
-    let paren=mm[3]||''; const pm=paren.match(/^\((\d+)-(\d+)\)$/); if(pm) paren='('+pm[2]+'-'+pm[1]+')';
-    return mm[2]+'-'+mm[1]+paren;
-  }).join(' ');
-}
-function woBadge(score, small){
-  return /^(w\.o\.|VO|WO)/i.test(String(score||'')) ? '<span class="wobadge'+(small?' wobadge-sm':'')+'">w.o.</span>' : '';
-}
-function surfaceBadge(s, small){
-  if(s !== 'grus' && s !== 'hard') return '';
-  var clay = s === 'grus';
-  var col = clay ? '#D0602A' : '#3176BC';
-  var w = small ? 22 : 26, h = small ? 11 : 13;
-  return '<span class="surf ' + (clay ? 'clay' : 'hard') + (small ? ' surf-sm' : '') + '">'
-       + '<svg class="court" width="' + w + '" height="' + h + '" style="color:' + col + '">'
-       + '<use href="#court"></use></svg>'
-       + '<span class="surf-l">' + (clay ? 'CLAY' : 'HARD') + '</span></span>';
-}
-async function fillMatches(id){
-  const el=document.getElementById('pmatches'); if(!el) return;
-  try{
-    const ms=await BTS.hostPlayerMatches(id, 8);
-    if(!ms || !ms.length){ el.innerHTML=''; return; }
-    let h='<div class="pst-h">Senaste matcher</div>';
-    ms.forEach(m=>{
-      const sc=flipScore(m.score, m.is_a);
-      const d=m.play_date?new Date(m.play_date+'T00:00:00').toLocaleDateString('sv-SE',{day:'numeric',month:'short'}):'';
-      h+=`<div class="pmrow">
-        <span class="pmres ${m.won?'v':'f'}">${m.won?'V':'F'}</span>
-        <span class="pmopp">${esc(m.opp||'')}</span>
-        <span class="pmsc">${esc(sc)}</span>
-        <span class="pmd">${d}</span>${woBadge(m.score, true)}${surfaceBadge(m.surface)}</div>`;
     });
     el.innerHTML=h;
   }catch(e){ el.innerHTML=''; }
