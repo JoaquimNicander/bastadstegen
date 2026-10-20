@@ -950,10 +950,19 @@ function renderUpcoming(el){
           <div class="gp">${grpLine(m)}${surfaceBadge(m.surface, true)}${woBadge(m.score, true)}</div></div>
           <div class="rsc">${sc}</div>
           <div style="flex-basis:100%">${commentBlock(m)}</div></div>`; };
-      const days=[...new Set(played.map(m=>m.matchday||0))].sort((a,b)=>b-a);
+      // Gruppera på speldatum, inte matchday: herr och dam numrerar sina
+      // spelomgångar olika, så matchday blandar ihop två skalor.
+      const dayLbl=d=>{ if(!d) return 'Utan datum';
+        const dt=new Date(d+'T00:00:00');
+        const t=dt.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+        return t.charAt(0).toUpperCase()+t.slice(1); };
+      const byDate=[...played].sort((a,b)=> String(b.play_date||'').localeCompare(String(a.play_date||'')));
+      const days=[...new Set(byDate.map(m=>m.play_date||''))];
       days.forEach((d,i)=>{
-        const dm=played.filter(x=>(x.matchday||0)===d);
-        html+=`<details class="mgrp" ${i===0?'open':''}><summary>Spelomgång ${d||'?'} <span class="mtn">${dm.length} matcher</span></summary><div class="mgrp-in">${dm.map(resCard).join('')}</div></details>`;
+        const dm=byDate.filter(x=>(x.play_date||'')===d);
+        const h=dm.filter(x=>x.division==='H').length, dd=dm.length-h;
+        const mix=(h&&dd)?` <span class="mtn">${h} herr · ${dd} dam</span>`:` <span class="mtn">${dm.length} matcher</span>`;
+        html+=`<details class="mgrp" ${i<2?'open':''}><summary>${dayLbl(d)}${mix}</summary><div class="mgrp-in">${dm.map(resCard).join('')}</div></details>`;
       });
     }
   }
