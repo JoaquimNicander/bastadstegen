@@ -876,7 +876,7 @@ function renderUpcoming(el){
   const today=new Date().toISOString().slice(0,10);
   const upcoming=m=> m.play_date && m.play_date>=today;   // datum idag eller framåt
   // öppen = spelomgången är igång ELLER matchen har fått ett datum satt av admin
-  const opened=MATCHES.filter(m=>m.status!=='done' && (((m.matchday||0)>0 && (m.matchday||0)<=WEEK) || !!m.play_date));
+  const opened=MATCHES.filter(m=>m.status!=='done' && (((m.matchday||0)>0 && (m.matchday||0)<=WEEK) || !!m.play_date || !!m.defer_note));
   const tk=m=>(String(m.start_time||'').trim()||'99:99');   // otidssatta sorteras sist
   const sched=opened.filter(m=> upcoming(m) && !m.defer_note)
     .sort((a,b)=> (a.play_date<b.play_date?-1:a.play_date>b.play_date?1:0)
@@ -899,7 +899,8 @@ function renderUpcoming(el){
   let html='';
 
   if(MTAB==='kommande'){
-    if(!sched.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
+    if(!sched.length && !later.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
+    else if(!sched.length){ /* bara otidsatta – de listas nedan */ }
     else{
       if(ME && mineIds.size){
         html+='<div class="upc-day" style="color:#9be29b">⭐ Dina matcher</div>';
@@ -912,6 +913,16 @@ function renderUpcoming(el){
           html+=`<div class="upc-date">${ds.charAt(0).toUpperCase()+ds.slice(1)}<span class="upc-note">🎾 Din match hamnar här så fort både du och din motspelare bekräftat spel</span></div>`; lastD=m.play_date; }
         html+=upcCard(m,false);
       });
+    }
+    // Matcher som ska spelas men saknar tid – visas även här, eftersom det är
+    // Kommande alla går in och tittar på.
+    if(later.length){
+      html+=`<div class="upc-date" style="color:#E8B84B">Utan tid – boka själva`
+        +`<span class="upc-note">Matcherna gäller, men har ingen bana. Hör av dig till din motspelare.</span></div>`;
+      html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+        return `<div class="upc ${mine?'mine':''}" style="border-left:3px solid #E8B84B"><div class="who">
+        <div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
+        <div class="gp">${grpLine(m)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
     }
   }
   else if(MTAB==='ospelade'){
@@ -961,7 +972,7 @@ function renderUpcoming(el){
       days.forEach((d,i)=>{
         const dm=byDate.filter(x=>(x.play_date||'')===d);
         const h=dm.filter(x=>x.division==='H').length, dd=dm.length-h;
-        const mix=(h&&dd)?` <span class="mtn">${h} herr · ${dd} dam</span>`:` <span class="mtn">${dm.length} matcher</span>`;
+        const mix=(h&&dd)?` <span class="mtn">${h} herr · ${dd} dam</span>`:` <span class="mtn">${dm.length} ${dm.length===1?'match':'matcher'}</span>`;
         html+=`<details class="mgrp" ${i<2?'open':''}><summary>${dayLbl(d)}${mix}</summary><div class="mgrp-in">${dm.map(resCard).join('')}</div></details>`;
       });
     }
