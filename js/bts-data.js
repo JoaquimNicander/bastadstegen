@@ -810,6 +810,22 @@ const BTS = {
     if (error) throw error;
     return data;
   },
+  async underlagPaminnelse(o) {
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
+      body: JSON.stringify({
+        mode: 'underlag_paminnelse',
+        adminPw: o.adminPw,
+        season: o.season || 'host2026',
+        skipTokens: o.skipTokens || [],
+        dryRun: !!o.dryRun,
+      }),
+    });
+    const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
+    if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
+    return j;
+  },
   async pollInvite(o) {
     const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
       method: 'POST',

@@ -82,6 +82,20 @@
   <div class="meta" style="margin-top:22px">
     Svaren kommer in på <a href="spelsvar.html" id="lnkSvar">svarssidan</a>.
   </div>
+
+  <h2 style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:2.4px;
+      text-transform:uppercase;color:var(--clay);font-weight:700;margin:34px 0 0">Betalningspåminnelse</h2>
+  <div class="box" style="margin-top:12px">
+    <div class="meta" style="margin:0 0 14px">Går bara till dem som <b>inte</b> är avprickade
+      som betalda av klubben. Bara mejl. Gina Schillström och Jan Andresen hoppas över.</div>
+    <label>Adminlösenord</label>
+    <input type="password" id="pw2" autocomplete="current-password" placeholder="••••••••">
+    <div class="btns">
+      <button class="test" id="bTest2">Testkör</button>
+      <button class="send" id="bSend2">Skicka påminnelser</button>
+    </div>
+    <div class="out" id="out2"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -129,6 +143,33 @@ async function kor(dry){
   }
   $('bTest').disabled = false; $('bSend').disabled = false;
 }
+
+// ── Betalningspåminnelse ──────────────────────────────────────────────
+const SKIP = ['UAkQv8ZY','uiDVn79J'];   // Gina Schillström, Jan Andresen
+function show2(html, cls){ const o=$('out2'); o.className='out on'+(cls?' '+cls:''); o.innerHTML=html; }
+async function paminn(dry){
+  const pw = $('pw2').value.trim() || $('pw').value.trim();
+  if(!pw){ show2('Fyll i adminlösenordet.', 'bad'); return; }
+  if(!dry && !confirm('Skicka betalningspåminnelse via mejl till alla obetalda?')) return;
+  $('bTest2').disabled = true; $('bSend2').disabled = true;
+  show2(dry ? 'Testkör…' : 'Skickar…');
+  try {
+    try { localStorage.setItem('bts_admin_pw', pw); } catch(e){}
+    const j = await BTS.underlagPaminnelse({ adminPw: pw, season: 'host2026', skipTokens: SKIP, dryRun: dry });
+    let h = '<b class="ok">' + (dry ? 'Testkörning klar' : 'Påminnelser skickade') + '</b><br>'
+          + 'Mottagare: ' + j.antal + '<br>'
+          + 'Utestående: ' + j.summa + ' kr<br>'
+          + (dry ? '' : ('Mejl skickade: ' + j.email.sent + ' · misslyckade: ' + j.email.failed + '<br>'));
+    if(j.mottagare && j.mottagare.length) h += '<br>' + esc(j.mottagare.join(', '));
+    if(j.errors && j.errors.length) h += '<br><br><b class="bad">Fel:</b><br>' + esc(j.errors.join('\n'));
+    show2(h);
+  } catch(e) {
+    show2('<b class="bad">Gick inte:</b> ' + esc(e.message || e), 'bad');
+  }
+  $('bTest2').disabled = false; $('bSend2').disabled = false;
+}
+$('bTest2').onclick = () => paminn(true);
+$('bSend2').onclick = () => paminn(false);
 
 $('bTest').onclick = () => kor(true);
 $('bSend').onclick = () => kor(false);
