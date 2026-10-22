@@ -899,7 +899,7 @@ function renderUpcoming(el){
   let html='';
 
   if(MTAB==='kommande'){
-    if(!sched.length && !later.length){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
+    if(!sched.length && !later.some(m=>upcoming(m))){ html+='<div class="state" style="text-align:center;padding:26px 10px">Inga kommande matcher just nu.<br>Nästa spelomgång dyker upp här när den öppnas. 🎾</div>'; }
     else if(!sched.length){ /* bara otidsatta – de listas nedan */ }
     else{
       if(ME && mineIds.size){
@@ -914,12 +914,14 @@ function renderUpcoming(el){
         html+=upcCard(m,false);
       });
     }
-    // Matcher som ska spelas men saknar tid – visas även här, eftersom det är
-    // Kommande alla går in och tittar på.
-    if(later.length){
-      html+=`<div class="upc-date" style="color:#E8B84B">Utan tid – boka själva`
-        +`<span class="upc-note">Matcherna gäller, men har ingen bana. Hör av dig till din motspelare.</span></div>`;
-      html+=later.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
+    // Matcher som hör till den här spelomgången men inte fått tid och bana.
+    // Hör hemma under Kommande – det är där alla tittar – medan äldre
+    // eftersläpning bara ligger under Ospelade.
+    const laterNu = later.filter(m=>upcoming(m));
+    if(laterNu.length){
+      html+=`<div class="upc-date" style="color:#E8B84B">Utan tid – kom överens själva`
+        +`<span class="upc-note">Hör till den här omgången men har ingen bana. Hör av dig till din motspelare.</span></div>`;
+      html+=laterNu.map(m=>{ const mine=ME&&(m.a_id===ME.id||m.b_id===ME.id);
         return `<div class="upc ${mine?'mine':''}" style="border-left:3px solid #E8B84B"><div class="who">
         <div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
         <div class="gp">${grpLine(m)} · ${esc(m.defer_note)}</div></div>${mine?'<span class="mine-badge">Din</span>':''}</div>`; }).join('');
