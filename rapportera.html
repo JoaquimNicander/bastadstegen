@@ -11,14 +11,20 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0D2E20;--surface:#0D2A1D;--card:#0D2A1D;--card2:#133124;
-  --border:#1C3A2B;--border2:#2A5A42;
-  --green:#FF8C42;--yellow:#F5EDE3;--clay:#FF8C42;
+  --bg:#0A2B48;--surface:#092742;--card:#092742;--card2:#113655;
+  --border:#1B3E5C;--border2:#2A5F86;
+  --green:#E8520A;--yellow:#F5EDE3;--clay:#E8520A;
+  --clay-t:#FF9A5A;--clayg:linear-gradient(145deg,#F97A2B 0%,#D4480A 100%);
   --white:#F5EDE3;--muted:rgba(240,245,240,0.5);--muted2:rgba(240,245,240,0.3);
-  --red:#EF5350;--blue:#FF8C42;
+  --red:#EF5350;--blue:#E8520A;
 }
 html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:16px}
+.courtbg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.courtbg .cb{position:absolute;left:-12%;top:-10%;width:124%;height:120%;transform:rotate(-17deg);opacity:.13}
+.courtbg svg{width:100%;height:100%;display:block}
+@media (max-width:520px){ .courtbg .cb{left:-26%;width:152%} }
+
 
 /* ── SOMMARSTEGE-CTA (visas mellan säsonger när inget är lottat) ── */
 .ss-wrap{max-width:520px;margin:0 auto}
@@ -45,7 +51,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min
 
 /* ── PROFIL-FÖRHANDSVISNING (liknar det publika spelarkortet) ── */
 .pf-card{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:22px 18px;margin-bottom:18px}
-.pf-avatar{width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--clay);box-shadow:0 0 0 4px rgba(255,140,66,.12)}
+.pf-avatar{width:104px;height:104px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--clay);box-shadow:0 0 0 4px rgba(249,122,43,.12)}
 .pf-avatar.empty{display:flex;align-items:center;justify-content:center;border:2px dashed var(--border2);box-shadow:none;background:rgba(255,255,255,.03)}
 .pf-avatar.empty span{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
 .pf-name{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;color:var(--white);margin-top:14px}
@@ -53,7 +59,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min
 .pf-hint{font-size:12px;color:var(--muted);margin-top:8px}
 
 /* ── LOGIN ── */
-.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#0D2A1D 0%,var(--bg) 70%)}
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at top,#092742 0%,var(--bg) 70%)}
 .login-box{background:var(--surface);border:1px solid var(--border2);padding:36px 28px;width:100%;max-width:380px;text-align:center}
 .login-logo-wrap{margin-bottom:24px}
 .login-logo-wrap svg{width:200px;height:auto;display:block;margin:0 auto}
@@ -67,7 +73,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min
 }
 .login-select:focus,.login-input:focus{border-color:var(--green)}
 .login-btn{
-  width:100%;padding:16px;background:var(--green);color:#000;
+  width:100%;padding:16px;background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);
   font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;
   border:none;cursor:pointer;letter-spacing:1px;transition:background 0.2s;
   border-radius:0;min-height:52px;
@@ -79,7 +85,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min
 .link-back:hover{color:var(--white)}
 
 /* ── HEADER ── */
-header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50}
+header{background:linear-gradient(180deg,#0A2B48,var(--surface));border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:50}
 .header-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
 .header-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .header-logo-img{width:34px;height:34px;object-fit:contain}
@@ -110,7 +116,7 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
 .section-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 
 /* ── NOTIFICATION ── */
-.notif-banner{background:rgba(255,140,66,0.08);border:1px solid rgba(255,140,66,0.25);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.notif-banner{background:rgba(249,122,43,0.08);border:1px solid rgba(249,122,43,0.25);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
 .notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
 .notif-text{font-size:15px;line-height:1.5}
 .notif-text strong{color:var(--white)}
@@ -196,7 +202,7 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
 
 /* ── SUBMIT BUTTON ── */
 .submit-btn{
-  width:100%;padding:18px;background:var(--green);color:#000;
+  width:100%;padding:18px;background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);
   font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;
   border:none;cursor:pointer;transition:all 0.2s;min-height:58px;
   position:relative;overflow:hidden;
@@ -214,7 +220,7 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
 .confirm-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
 .confirm-score{font-family:'Space Mono',monospace;font-size:15px;color:var(--green);font-weight:700;letter-spacing:1px;margin-bottom:4px}
 .confirm-btns{display:flex;gap:8px;margin-top:16px}
-.btn-confirm{flex:1;padding:16px;background:var(--green);color:#000;font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;min-height:52px}
+.btn-confirm{flex:1;padding:16px;background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;border:none;cursor:pointer;min-height:52px}
 .btn-dispute{flex:1;padding:16px;background:none;color:var(--red);font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;border:2px solid var(--red);cursor:pointer;min-height:52px}
 
 /* ── SUCCESS ── */
@@ -245,7 +251,7 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
 }
 .form-textarea:focus{border-color:var(--green)}
 .save-btn{
-  background:var(--green);color:#000;border:none;font-family:'Outfit',sans-serif;
+  background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);border:none;font-family:'Outfit',sans-serif;
   font-size:15px;font-weight:700;padding:14px 24px;cursor:pointer;
   letter-spacing:0.5px;transition:all 0.2s;margin-top:6px;min-height:48px;
 }
@@ -261,6 +267,16 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
 </style>
 </head>
 <body>
+<div class="courtbg" aria-hidden="true"><div class="cb">
+<svg viewBox="0 0 1097 2377" preserveAspectRatio="xMidYMid meet">
+ <g fill="none" stroke="#DCEBFA" stroke-width="9">
+  <rect x="5" y="5" width="1087" height="2367"/>
+  <line x1="137" y1="5" x2="137" y2="2372"/><line x1="960" y1="5" x2="960" y2="2372"/>
+  <line x1="137" y1="548" x2="960" y2="548"/><line x1="137" y1="1829" x2="960" y2="1829"/>
+  <line x1="548" y1="548" x2="548" y2="1829"/>
+  <line x1="5" y1="1188" x2="1092" y2="1188"/>
+ </g></svg></div></div>
+
 
 <!-- LOGIN -->
 <div class="login-screen" id="login-screen">
@@ -273,7 +289,7 @@ header{background:linear-gradient(180deg,#0D2E20,var(--surface));border-bottom:1
             <path d="M-10 -9 C -3 -3,-3 3,-10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
             <path d="M10 -9 C 3 -3,3 3,10 9" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>
           <g class="bl-words">
-            <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#FF8C42">BÅSTAD</text>
+            <text x="4" y="100" font-family="'Anton',sans-serif" font-size="96" fill="#FF9A5A">BÅSTAD</text>
             <text x="4" y="176" font-family="'Anton',sans-serif" font-size="96" fill="#ffffff">STEGEN</text>
           </g>
         </svg>
@@ -843,7 +859,7 @@ function renderApp(){
         </select>
       </div>
       <div class="form-row"><label class="form-label">På stegen sedan</label><input class="form-input" id="p-since" type="text" value="${prof.since||''}" placeholder="2020"></div>
-      <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input class="form-input" id="p-wtn" type="text" inputmode="decimal" value="${prof.wtn||''}" placeholder="t.ex. 24.6"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt <b>ranking-tal</b> (t.ex. 24.6) — <b>inte</b> den långa id-koden (MUN…). Då visas en badge på ditt spelarkort. Har du inget? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--o1,#FF8C42)">Skaffa här →</a></div></div>
+      <div class="form-row"><label class="form-label">WTN — World Tennis Number</label><input class="form-input" id="p-wtn" type="text" inputmode="decimal" value="${prof.wtn||''}" placeholder="t.ex. 24.6"><div class="muted" style="font-size:11px;margin-top:4px">Fyll i ditt <b>ranking-tal</b> (t.ex. 24.6) — <b>inte</b> den långa id-koden (MUN…). Då visas en badge på ditt spelarkort. Har du inget? <a href="https://worldtennisnumber.com/eng/recreational" target="_blank" style="color:var(--o1,#FF9A5A)">Skaffa här →</a></div></div>
       <div class="form-row"><label class="form-label">Om mig</label><textarea class="form-textarea" id="p-bio" placeholder="Berätta något kul om dig själv...">${prof.bio||''}</textarea></div>
       <button class="save-btn" onclick="saveMyProfile(this)">Spara profil →</button>
       <div class="pin-row">
@@ -952,7 +968,7 @@ function showConfirmModal(){
   const ps=pendingSubmit; if(!ps)return;
   closeConfirmModal();
   const typeLabel=ps.isWO?'WALKOVER':ps.isRet?'AVBRUTEN – SKADA':'FÄRDIGSPELAD';
-  const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#FF8C42';
+  const typeColor=ps.isWO?'var(--clay)':ps.isRet?'var(--yellow)':'#FF9A5A';
   const scoreDisp=ps.isWO?'w.o.':(setsToStr(ps.sets)||'—');
   const breaker=ps.retiredById===me.id?me.name:ps.match.opp.name;
   const extra=ps.isRet?`<div style="font-size:13px;color:var(--muted);margin-top:8px">${breaker} bröt${ps.note?(' · '+ps.note):''}</div>`:'';
@@ -960,16 +976,16 @@ function showConfirmModal(){
   ov.id='confirm-overlay';
   ov.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.62);display:flex;align-items:center;justify-content:center;padding:20px';
   ov.onclick=e=>{ if(e.target===ov) closeConfirmModal(); };
-  ov.innerHTML=`<div style="width:340px;max-width:100%;background:#0D2A1D;border:1px solid rgba(193,125,75,0.35);border-radius:18px;overflow:hidden;color:var(--white)">
+  ov.innerHTML=`<div style="width:340px;max-width:100%;background:#092742;border:1px solid rgba(193,125,75,0.35);border-radius:18px;overflow:hidden;color:var(--white)">
     <div style="background:var(--card);padding:16px;text-align:center;border-bottom:1px solid rgba(193,125,75,0.15)">
       <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--clay)">Innan du skickar</div>
       <div style="font-size:19px;font-weight:700;margin-top:4px">Stämmer det här?</div>
     </div>
     <div style="padding:20px">
       <div style="text-align:center;margin-bottom:14px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:${typeColor};border:1px solid ${typeColor};padding:4px 10px;border-radius:6px">${typeLabel}</span></div>
-      <div style="background:#0D2E20;border:1px solid rgba(245,237,227,0.35);border-radius:13px;padding:18px;text-align:center;margin-bottom:16px">
+      <div style="background:#0A2B48;border:1px solid rgba(245,237,227,0.35);border-radius:13px;padding:18px;text-align:center;margin-bottom:16px">
         <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:6px">Vinnare</div>
-        <div style="font-size:21px;font-weight:700;color:#FF8C42">${ps.winnerName}</div>
+        <div style="font-size:21px;font-weight:700;color:#FF9A5A">${ps.winnerName}</div>
         <div style="font-family:'Space Mono',monospace;font-size:16px;letter-spacing:1px;margin-top:8px">${scoreDisp}</div>
         ${extra}
       </div>
@@ -1068,7 +1084,7 @@ function undoReport(){
 function launchConfetti(){
   const wrap=document.getElementById('confetti-wrap');
   wrap.classList.remove('hidden');wrap.innerHTML='';
-  const colors=['#FF8C42','#F5EDE3','#FF8C42','#FF8C42','#F5EDE3'];
+  const colors=['#FF9A5A','#F5EDE3','#FF9A5A','#FF9A5A','#F5EDE3'];
   for(let i=0;i<40;i++){
     const p=document.createElement('div');p.className='confetti-piece';
     p.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation-delay:${Math.random()*0.5}s;animation-duration:${0.9+Math.random()*0.6}s`;
