@@ -50,7 +50,7 @@
     <label>Adminlösenord</label>
     <input type="password" id="pw" autocomplete="current-password" placeholder="••••••••">
     <div class="row2">
-      <div><label>Förfrågan</label><input type="text" id="poll" value="omg3"></div>
+      <div><label>Förfrågan</label><input type="text" id="poll" value="sondag1nov"></div>
       <div><label>Kanal</label>
         <select id="chan">
           <option value="mail" selected>Bara mejl</option>
@@ -112,7 +112,7 @@ try { const p = localStorage.getItem('bts_admin_pw'); if(p) $('pw').value = p; }
 async function kor(dry){
   const pw = $('pw').value.trim();
   if(!pw){ show('Fyll i adminlösenordet.', 'bad'); return; }
-  const poll = $('poll').value.trim() || 'omg3';
+  const poll = $('poll').value.trim() || 'sondag1nov';
   const chan = $('chan').value;
   const only = $('only').value;
   const pam  = $('pam').value === '1';

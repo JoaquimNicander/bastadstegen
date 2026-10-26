@@ -833,7 +833,7 @@ const BTS = {
       body: JSON.stringify({
         mode: 'poll_invite',
         adminPw: o.adminPw,
-        poll: o.poll || 'omg3',
+        poll: o.poll || 'sondag1nov',
         channel: o.channel || 'mail',
         only: o.only || 'alla',
         reminder: !!o.reminder,
@@ -846,7 +846,7 @@ const BTS = {
   },
   async pollListaV2(key, poll) {
     _assert();
-    const { data, error } = await _sb.rpc('bts_poll_lista_v2', { p_key: key, p_poll: poll || 'omg3' });
+    const { data, error } = await _sb.rpc('bts_poll_lista_v2', { p_key: key, p_poll: poll || 'sondag1nov' });
     if (error) throw error;
     return data || [];
   },
