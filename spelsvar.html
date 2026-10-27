@@ -6,12 +6,17 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Svar · Kan du spela? · Båstad Stegen</title>
 <style>
-  :root{ --green:#0D2E20; --card:#0D2A1D; --card2:#133124; --line:#1C3A2B; --line2:#2A5A42;
+  :root{ --green:#0A2B48; --card:#092742; --card2:#113655; --line:#1B3E5C; --line2:#2A5F86;
          --cream:#F5EDE3; --muted:rgba(245,237,227,.62); --muted2:rgba(245,237,227,.42);
-         --clay:#FF8C42; --lime:#D7F23C; }
+         --clay:#FF9A5A; --clay-d:#E8520A; --lime:#D7F23C; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--green);color:var(--cream);padding:20px 14px 60px;
        font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5}
+  .courtbg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .courtbg .cb{position:absolute;left:-12%;top:-10%;width:124%;height:120%;transform:rotate(-17deg);opacity:.13}
+  .courtbg svg{width:100%;height:100%;display:block}
+  @media (max-width:520px){ .courtbg .cb{left:-26%;width:152%} }
+
   .wrap{max-width:720px;margin:0 auto}
   h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.3px}
   .sub{font-family:ui-monospace,monospace;font-size:11.5px;letter-spacing:1.5px;
@@ -26,7 +31,7 @@
 
   .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;display:flex;margin:14px 0 24px}
   .bar i{display:block;height:100%}
-  .bar .pja{background:var(--lime)} .bar .pnej{background:var(--clay)}
+  .bar .pja{background:var(--lime)} .bar .pnej{background:var(--clay-d)}
 
   h2{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted2);
      margin:26px 0 9px;font-weight:700}
@@ -37,7 +42,7 @@
            letter-spacing:.5px;white-space:nowrap}
   .row .tm{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted2);white-space:nowrap}
   .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
-  .dot.ja{background:var(--lime)} .dot.nej{background:var(--clay)}
+  .dot.ja{background:var(--lime)} .dot.nej{background:var(--clay-d)}
   .dot.tyst{background:var(--line2)}
   .row.tyst{opacity:.72}
   .warn{font-size:11px;color:var(--clay);white-space:nowrap}
@@ -51,6 +56,16 @@
 </style>
 </head>
 <body>
+<div class="courtbg" aria-hidden="true"><div class="cb">
+<svg viewBox="0 0 1097 2377" preserveAspectRatio="xMidYMid meet">
+ <g fill="none" stroke="#DCEBFA" stroke-width="9">
+  <rect x="5" y="5" width="1087" height="2367"/>
+  <line x1="137" y1="5" x2="137" y2="2372"/><line x1="960" y1="5" x2="960" y2="2372"/>
+  <line x1="137" y1="548" x2="960" y2="548"/><line x1="137" y1="1829" x2="960" y2="1829"/>
+  <line x1="548" y1="548" x2="548" y2="1829"/>
+  <line x1="5" y1="1188" x2="1092" y2="1188"/>
+ </g></svg></div></div>
+
 <div class="wrap" id="app"><div class="state">Hämtar…</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

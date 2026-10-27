@@ -87,7 +87,24 @@
       text-transform:uppercase;color:var(--clay);font-weight:700;margin:34px 0 0">Betalningspåminnelse</h2>
   <div class="box" style="margin-top:12px">
     <div class="meta" style="margin:0 0 14px">Går bara till dem som <b>inte</b> är avprickade
-      som betalda av klubben. Bara mejl. Gina Schillström och Jan Andresen hoppas över.</div>
+      som betalda av klubben. Gina Schillström och Jan Andresen hoppas över.</div>
+    <label>Mottagare</label>
+    <select id="grupp2">
+      <option value="alla" selected>Alla obetalda (utom överhoppade)</option>
+      <option value="avhopp">Bara avhoppade – Zetterberg, Olmarker (750 kr)</option>
+      <option value="nya">Bara nya – Knut Peyron, Igor Mirkovic (1500 kr)</option>
+    </select>
+    <label>Personlig rad (valfri)</label>
+    <textarea id="intro2" rows="3" placeholder="Läggs överst i mejlet, direkt under hälsningen."
+      style="width:100%;box-sizing:border-box;font:inherit;font-size:14px;padding:10px 12px;
+      background:#071F36;border:1px solid var(--line2);border-radius:9px;color:#fff;margin-bottom:12px"></textarea>
+    <label>Kanal</label>
+    <select id="chan2">
+      <option value="mail" selected>Bara mejl</option>
+      <option value="sms">Bara sms</option>
+      <option value="auto">Sms om mobil finns, annars mejl</option>
+    </select>
+    <div class="meta" style="margin:6px 0 14px">Sms kostar pengar — ett per mottagare.</div>
     <label>Adminlösenord</label>
     <input type="password" id="pw2" autocomplete="current-password" placeholder="••••••••">
     <div class="btns">
@@ -145,21 +162,33 @@ async function kor(dry){
 }
 
 // ── Betalningspåminnelse ──────────────────────────────────────────────
-const SKIP = ['UAkQv8ZY','uiDVn79J'];   // Gina Schillström, Jan Andresen
+const SKIP = ['UAkQv8ZY','uiDVn79J',          // Gina Schillström, Jan Andresen
+              'nIt0zZw8','BhdbHT2E',          // Zetterberg, Olmarker – avhoppade, 1/3, eget utskick
+              'Ex57bfD6','QIDLRORM'];         // Knut Peyron, Igor Mirkovic – nya, 2/3, eget utskick
 function show2(html, cls){ const o=$('out2'); o.className='out on'+(cls?' '+cls:''); o.innerHTML=html; }
 async function paminn(dry){
   const pw = $('pw2').value.trim() || $('pw').value.trim();
   if(!pw){ show2('Fyll i adminlösenordet.', 'bad'); return; }
-  if(!dry && !confirm('Skicka betalningspåminnelse via mejl till alla obetalda?')) return;
+  const ch = $('chan2').value;
+  const grp = $('grupp2').value;
+  const intro = $('intro2').value.trim();
+  const ONLY = { avhopp:['nIt0zZw8','BhdbHT2E'], nya:['Ex57bfD6','QIDLRORM'] }[grp] || [];
+  const chTxt = ch === 'sms' ? 'sms' : ch === 'auto' ? 'sms/mejl' : 'mejl';
+  const vilka = grp==='alla' ? 'alla obetalda' : (grp==='avhopp' ? 'Zetterberg och Olmarker' : 'Knut och Igor');
+  if(!dry && !confirm('Skicka via ' + chTxt + ' till ' + vilka + '?')) return;
   $('bTest2').disabled = true; $('bSend2').disabled = true;
   show2(dry ? 'Testkör…' : 'Skickar…');
   try {
     try { localStorage.setItem('bts_admin_pw', pw); } catch(e){}
-    const j = await BTS.underlagPaminnelse({ adminPw: pw, season: 'host2026', skipTokens: SKIP, dryRun: dry });
+    const j = await BTS.underlagPaminnelse({ adminPw: pw, season: 'host2026', skipTokens: SKIP, onlyTokens: ONLY, intro: intro, channel: ch, dryRun: dry });
     let h = '<b class="ok">' + (dry ? 'Testkörning klar' : 'Påminnelser skickade') + '</b><br>'
           + 'Mottagare: ' + j.antal + '<br>'
           + 'Utestående: ' + j.summa + ' kr<br>'
-          + (dry ? '' : ('Mejl skickade: ' + j.email.sent + ' · misslyckade: ' + j.email.failed + '<br>'));
+          + (j.viaSms != null ? ('Via sms: ' + j.viaSms + ' · via mejl: ' + j.viaMejl + '<br>') : '')
+          + (dry ? '' : ('Sms skickade: ' + j.sms.sent + ' · misslyckade: ' + j.sms.failed + '<br>'
+                       + 'Mejl skickade: ' + j.email.sent + ' · misslyckade: ' + j.email.failed + '<br>'));
+    if(dry && j.exempelSms) h += '<br><b>Så här blir sms:et:</b><br>' + esc(j.exempelSms) + '<br>';
+    if(dry && j.utanKontakt && j.utanKontakt.length) h += '<br><b class="bad">Utan kontaktuppgift:</b> ' + esc(j.utanKontakt.join(', ')) + '<br>';
     if(j.mottagare && j.mottagare.length) h += '<br>' + esc(j.mottagare.join(', '));
     if(j.errors && j.errors.length) h += '<br><br><b class="bad">Fel:</b><br>' + esc(j.errors.join('\n'));
     show2(h);
@@ -168,6 +197,12 @@ async function paminn(dry){
   }
   $('bTest2').disabled = false; $('bSend2').disabled = false;
 }
+const INTRO_TXT = {
+  avhopp: 'Så tråkigt att du inte längre kan spela stegen — hoppas du är tillbaka till våren! '
+        + 'Här kommer underlaget för de omgångar du hann vara med på.',
+  nya:    'Kul att du är med i stegen och lirar! Här kommer ditt underlag för betalning.'
+};
+$('grupp2').onchange = () => { $('intro2').value = INTRO_TXT[$('grupp2').value] || ''; };
 $('bTest2').onclick = () => paminn(true);
 $('bSend2').onclick = () => paminn(false);
 

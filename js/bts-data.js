@@ -819,6 +819,9 @@ const BTS = {
         adminPw: o.adminPw,
         season: o.season || 'host2026',
         skipTokens: o.skipTokens || [],
+        onlyTokens: o.onlyTokens || [],
+        intro: o.intro || '',
+        channel: o.channel || 'mail',
         dryRun: !!o.dryRun,
       }),
     });
