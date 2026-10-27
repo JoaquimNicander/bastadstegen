@@ -6,12 +6,23 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Spelförfrågan · utskick · Båstad Stegen</title>
 <style>
-  :root{ --green:#0D2E20; --card:#0D2A1D; --card2:#133124; --line:#1C3A2B; --line2:#2A5A42;
+  :root{ --green:#0A2B48; --card:#092742; --card2:#113655; --line:#1B3E5C; --line2:#2A5F86;
          --cream:#F5EDE3; --muted:rgba(245,237,227,.62); --muted2:rgba(245,237,227,.42);
-         --clay:#FF8C42; --lime:#D7F23C; }
+         --clay:#FF9A5A; --clay-d:#E8520A;
+         --clayg:linear-gradient(145deg,#F97A2B 0%,#D4480A 100%); --lime:#D7F23C; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--green);color:var(--cream);padding:22px 14px 60px;
        font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.55}
+  .courtbg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .courtbg .cb{position:absolute;left:-14%;top:-10%;width:128%;height:120%;transform:rotate(-17deg);opacity:.12}
+  .courtbg svg{width:100%;height:100%;display:block}
+  .hero{position:relative;margin:-22px -14px 18px;height:clamp(150px,34vw,210px);overflow:hidden;background:#061A2E}
+  .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .hero .veil{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,
+     rgba(5,20,36,.42) 0%,rgba(10,43,72,0) 38%,rgba(10,43,72,.5) 76%,var(--green) 100%)}
+  .hero img.logo{position:absolute;left:14px;top:10px;z-index:3;height:clamp(104px,24vw,138px);width:auto;
+     filter:drop-shadow(0 3px 12px rgba(0,0,0,.6))}
+
   .wrap{max-width:560px;margin:0 auto}
   .kick{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;
         color:var(--clay);font-weight:700}
@@ -23,14 +34,14 @@
         text-transform:uppercase;color:var(--clay);font-weight:700;margin-bottom:7px}
   input,select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line2);
        border-radius:11px;color:var(--cream);font-family:inherit;font-size:15px;padding:11px 12px}
-  input:focus,select:focus{outline:none;border-color:var(--clay)}
+  input:focus,select:focus{outline:none;border-color:var(--clay-d)}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
   .btns{display:flex;gap:11px;margin-top:18px}
   button{flex:1;border:none;border-radius:13px;padding:15px 10px;font-size:15px;font-weight:800;
          font-family:inherit;cursor:pointer}
   button[disabled]{opacity:.45;cursor:default}
   .test{background:transparent;color:var(--cream);border:1.5px solid var(--line2)}
-  .send{background:var(--clay);color:#3a1400}
+  .send{background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5)}
   .out{margin-top:18px;font-size:14px;white-space:pre-wrap;word-break:break-word;
        background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;display:none}
   .out.on{display:block}
@@ -41,7 +52,22 @@
 </style>
 </head>
 <body>
+<div class="courtbg" aria-hidden="true"><div class="cb">
+<svg viewBox="0 0 1097 2377" preserveAspectRatio="xMidYMid meet">
+ <g fill="none" stroke="#DCEBFA" stroke-width="9">
+  <rect x="5" y="5" width="1087" height="2367"/>
+  <line x1="137" y1="5" x2="137" y2="2372"/><line x1="960" y1="5" x2="960" y2="2372"/>
+  <line x1="137" y1="548" x2="960" y2="548"/><line x1="137" y1="1829" x2="960" y2="1829"/>
+  <line x1="548" y1="548" x2="548" y2="1829"/>
+  <line x1="5" y1="1188" x2="1092" y2="1188"/>
+ </g></svg></div></div>
+
 <div class="wrap">
+  <div class="hero">
+    <img class="bg" src="host-hall-poster.jpg" alt="">
+    <div class="veil"></div>
+    <img class="logo" src="mail-logga-orange-tight.png" alt="Båstad Stegen">
+  </div>
   <div class="kick">Höststegen · admin</div>
   <h1>Skicka spelförfrågan</h1>
   <div class="meta" id="meta">Hämtar förfrågan…</div>
