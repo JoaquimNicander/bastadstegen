@@ -6,15 +6,16 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Ditt betalningsunderlag · Båstad Stegen</title>
 <style>
-  :root{ --green:#0D2E20; --green2:#123c2a; --cream:#FAF6EF; --ink:#12241b; --muted:#5d6b62;
-    --orange:#E8520A; --line:#e7dfd2; }
+  :root{ --green:#0A2B48; --green2:#113655; --cream:#FAF8F4; --ink:#0E2A45; --muted:#5A6B7C;
+    --orange:#E8520A; --line:#DDE5EE; }
   *{box-sizing:border-box}
-  body{margin:0;background:#eef0ea;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);
+  body{margin:0;background:#E8EEF4;font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);
     padding:22px 14px;line-height:1.5}
   .card{max-width:520px;margin:0 auto;background:var(--cream);border-radius:18px;overflow:hidden;
-    box-shadow:0 20px 50px rgba(0,0,0,.14);border:1px solid #e4ddd0}
-  .head{background:var(--green);color:#fff;padding:26px 26px 22px;position:relative}
-  .head .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#F4B740;font-weight:700}
+    box-shadow:0 20px 50px rgba(0,0,0,.14);border:1px solid #D9E2EC}
+  .head{background:var(--green);color:#fff;position:relative;font-size:0;line-height:0}
+  .head img.herobg{display:block;width:100%;height:auto;border:0}
+  .head .kick{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#FF9A5A;font-weight:700}
   .head h1{margin:6px 0 0;font-size:23px;font-weight:800;letter-spacing:-.4px}
   .head .ball{position:absolute;right:22px;top:22px;width:44px;height:44px;border-radius:50%;
     background:radial-gradient(circle at 35% 30%,#eaff70,#c7e600);box-shadow:0 0 22px rgba(199,230,0,.5)}
@@ -34,13 +35,13 @@
   .pay .ref b{background:#FDEBD8;color:#b9440a;padding:2px 9px;border-radius:6px}
   .paidbadge{display:none;text-align:center;background:#e7f6ec;color:#1c7a3f;border:1px solid #bfe6cc;
     border-radius:10px;padding:10px;font-weight:700;margin:0 0 16px}
-  .paybtn{display:block;width:100%;background:#0D2E20;color:#fff;border:0;border-radius:12px;padding:15px;
+  .paybtn{display:block;width:100%;background:#0A2B48;color:#fff;border:0;border-radius:12px;padding:15px;
     font-size:15px;font-weight:800;cursor:pointer;margin:2px 0 4px;font-family:inherit}
   .paybtn:active{transform:translateY(1px)} .paybtn:disabled{opacity:.6;cursor:default}
   .paiddone{background:#e7f6ec;color:#1c7a3f;border:1px solid #bfe6cc;border-radius:12px;padding:14px;
     text-align:center;font-weight:700;margin:2px 0 4px}
-  .paidsub{color:#5d6b62;font-size:12.5px;text-align:center;margin:2px 0 2px}
-  .foot{background:var(--green);color:#cbd8ce;padding:16px 26px;font-size:12px;text-align:center}
+  .paidsub{color:#5A6B7C;font-size:12.5px;text-align:center;margin:2px 0 2px}
+  .foot{background:var(--green);color:#C2D8EC;padding:16px 26px;font-size:12px;text-align:center}
   .state{max-width:520px;margin:40px auto;text-align:center;color:#556}
   @media(max-width:520px){ .head h1{font-size:20px} .pay .swish{font-size:23px} }
 </style>
@@ -81,9 +82,7 @@ function render(u){
   document.getElementById('app').innerHTML = `
   <div class="card">
     <div class="head">
-      <div class="ball"></div>
-      <div class="kick">Betalningsunderlag</div>
-      <h1>${esc(S.titel)}</h1>
+      <img class="herobg" src="mail-hero-host2026.jpg" alt="Båstad Stegen — betalningsunderlag">
     </div>
     <div class="body">
       <p class="hi">Hej ${esc(first)}!</p>
