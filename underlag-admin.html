@@ -77,11 +77,12 @@ function render(){
   const confirmed=ROWS.filter(r=>r.paid).length;
   const sum=ROWS.reduce((a,r)=>a+Number(r.belopp||0),0);
   const utest=ROWS.filter(r=>!r.paid).reduce((a,r)=>a+Number(r.belopp||0),0);
-  const rows=ROWS.map(r=>{
+  const sorted=[...ROWS].sort((x,y)=>(x.paid?1:0)-(y.paid?1:0) || String(x.name).localeCompare(String(y.name),'sv'));
+  const rows=sorted.map(r=>{
     const mk = r.marked_paid ? `<span class="tag yes">✓ Ja</span> <span class="when">${esc(fmtDate(r.marked_paid_at))}</span>` : `<span class="tag no">– Nej</span>`;
     const cb = `<label style="cursor:pointer"><input type="checkbox" ${r.paid?'checked':''} onchange="setPaid('${r.token}',this.checked)"> bekräftad</label>`;
     const contact = esc(r.email||'') + (r.email&&r.phone?' · ':'') + esc(r.phone||'');
-    return `<tr class="${r.marked_paid?'done':''}"><td>${esc(r.name)}</td><td class="r">${kr(r.belopp)} kr</td><td>${mk}</td><td>${cb}</td><td style="font-size:12px;color:#5d6b62">${contact}</td></tr>`;
+    return `<tr class="${r.paid?'done':''}"><td>${esc(r.name)}</td><td class="r">${kr(r.belopp)} kr</td><td>${mk}</td><td>${cb}</td><td style="font-size:12px;color:#5d6b62">${contact}</td></tr>`;
   }).join('');
   document.getElementById('app').innerHTML=`
     <div class="toolbar">
@@ -89,13 +90,13 @@ function render(){
       <button class="print" onclick="window.print()">Skriv ut / spara PDF</button>
     </div>
     <div class="kpis">
-      <div class="kpi"><div class="n">${marked}</div><div class="l">Markerat betalat</div></div>
-      <div class="kpi ok"><div class="n">${confirmed}</div><div class="l">Bekräftade</div></div>
+      <div class="kpi ok"><div class="n">${confirmed} av ${ROWS.length}</div><div class="l">Betalda</div></div>
+      <div class="kpi"><div class="n">${ROWS.length - confirmed}</div><div class="l">Kvar att betala</div></div>
       <div class="kpi out"><div class="n">${kr(utest)} kr</div><div class="l">Summa utestående</div></div>
       <div class="kpi"><div class="n">${kr(sum)} kr</div><div class="l">Totalt</div></div>
     </div>
     <table>
-      <thead><tr><th>Namn</th><th class="r">Belopp</th><th>Markerat</th><th>Bekräftad</th><th>Kontakt</th></tr></thead>
+      <thead><tr><th>Namn</th><th class="r">Belopp</th><th>Spelaren säger</th><th>Bekräftad</th><th>Kontakt</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="status" id="status"></div>`;
