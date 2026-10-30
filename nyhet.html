@@ -7,48 +7,63 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box}
-  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:#0D2E20;color:#F5EDE3;min-height:100vh}
-  a{color:#F4B740}
+  body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:#0A2B48;color:#F5EDE3;min-height:100vh}
+  .courtbg{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .courtbg .cb{position:absolute;left:-14%;top:-10%;width:128%;height:120%;transform:rotate(-17deg);opacity:.12}
+  .courtbg svg{width:100%;height:100%;display:block}
+  @media (max-width:520px){ .courtbg .cb{left:-26%;width:152%} }
+
+  a{color:#FF9A5A}
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;max-width:660px;margin:0 auto}
   .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
   .wrap{max-width:600px;margin:0 auto;padding:14px 14px 60px}
 
-  .article{background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B}
-  .article .banner{line-height:0;background:#E8520A}
+  .article{background:#092742;border-radius:16px;overflow:hidden;border:1px solid #1B3E5C}
+  .article .banner{line-height:0;background:#0A2B48}
   .article .banner img{display:block;width:100%;height:auto;border:0}
-  .article .body{background:#FAF6EF;padding:34px 32px 32px}
+  .article .body{background:#FAF8F4;padding:34px 32px 32px}
   .kicker{font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#C24E12;font-weight:700}
-  .headline{font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0D2E20;font-weight:700;letter-spacing:-.4px;margin-top:12px}
+  .headline{font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0A2B48;font-weight:700;letter-spacing:-.4px;margin-top:12px}
   .rule{height:3px;width:52px;background:#E8520A;margin:18px 0 24px;border-radius:2px}
   .content{font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.72;color:#2C2C28}
-  .content h2{font-size:21px;line-height:1.2;color:#0D2E20;font-weight:700;margin:28px 0 12px}
+  .content h2{font-size:21px;line-height:1.2;color:#0A2B48;font-weight:700;margin:28px 0 12px}
   .content p{margin:0 0 16px}
   .content img{display:block;width:100%;max-width:484px;height:auto;border-radius:12px;margin:18px 0}
   .content a{color:#C24E12;font-weight:700}
   .cta{display:inline-block;background:#E8520A;color:#fff;font-weight:700;text-decoration:none;font-size:15px;padding:15px 30px;border-radius:10px;margin-top:22px}
-  .footimg{line-height:0}
-  .footimg img{display:block;width:100%;height:auto;border:0}
+  .foot{background:#061F36;color:#6E8CA9;padding:16px 28px;font-size:12px;text-align:center}
+  .foot a{color:#9FC0DD;text-decoration:none}
 
   .section{margin-top:24px}
-  .sec-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9A8F86;margin-bottom:12px}
+  .sec-title{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8FB4D4;margin-bottom:12px}
   .reactions{display:flex;flex-wrap:wrap;gap:8px}
-  .react{display:flex;align-items:center;gap:6px;background:#10231a;border:1px solid #1C3A2B;border-radius:22px;padding:8px 14px;cursor:pointer;font-size:17px;user-select:none;transition:all .12s}
-  .react .c{font-family:'Space Mono',monospace;font-size:13px;color:#9A8F86}
-  .react.on{background:rgba(255,140,66,.16);border-color:#FF8C42}
-  .react.on .c{color:#F4B740}
+  .react{display:flex;align-items:center;gap:6px;background:#071F36;border:1px solid #1B3E5C;border-radius:22px;padding:8px 14px;cursor:pointer;font-size:17px;user-select:none;transition:all .12s}
+  .react .c{font-family:'Space Mono',monospace;font-size:13px;color:#8FB4D4}
+  .react.on{background:rgba(255,140,66,.16);border-color:#FF9A5A}
+  .react.on .c{color:#FF9A5A}
 
-  .cform input,.cform textarea{width:100%;background:#10231a;border:1px solid #1C3A2B;color:#F5EDE3;font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none;margin-bottom:8px}
+  .cform input,.cform textarea{width:100%;background:#071F36;border:1px solid #1B3E5C;color:#F5EDE3;font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none;margin-bottom:8px}
   .cform textarea{min-height:80px;line-height:1.5;resize:vertical}
   .cform button{background:#E8520A;color:#fff;border:none;border-radius:9px;font:inherit;font-weight:700;font-size:14px;padding:11px 20px;cursor:pointer}
-  .comment{background:#10231a;border:1px solid #1C3A2B;border-radius:11px;padding:12px 14px;margin-bottom:9px}
+  .comment{background:#071F36;border:1px solid #1B3E5C;border-radius:11px;padding:12px 14px;margin-bottom:9px}
   .comment .cn{font-weight:700;font-size:14px;color:#F5EDE3}
-  .comment .cd{font-size:11px;color:#9A8F86;margin-left:6px}
-  .comment .cb{font-size:14px;line-height:1.55;color:#DCD5CB;margin-top:5px;white-space:pre-wrap}
-  .muted{color:#9A8F86;font-size:13px}
-  .status{font-size:13px;margin-top:8px;min-height:16px;color:#9A8F86}
+  .comment .cd{font-size:11px;color:#8FB4D4;margin-left:6px}
+  .comment .cb{font-size:14px;line-height:1.55;color:#DDE5EE;margin-top:5px;white-space:pre-wrap}
+  .muted{color:#8FB4D4;font-size:13px}
+  .status{font-size:13px;margin-top:8px;min-height:16px;color:#8FB4D4}
 </style>
 </head>
 <body>
+<div class="courtbg" aria-hidden="true"><div class="cb">
+<svg viewBox="0 0 1097 2377" preserveAspectRatio="xMidYMid meet">
+ <g fill="none" stroke="#DCEBFA" stroke-width="9">
+  <rect x="5" y="5" width="1087" height="2367"/>
+  <line x1="137" y1="5" x2="137" y2="2372"/><line x1="960" y1="5" x2="960" y2="2372"/>
+  <line x1="137" y1="548" x2="960" y2="548"/><line x1="137" y1="1829" x2="960" y2="1829"/>
+  <line x1="548" y1="548" x2="548" y2="1829"/>
+  <line x1="5" y1="1188" x2="1092" y2="1188"/>
+ </g></svg></div></div>
+
 <div class="topbar">
   <a href="index.html">← Startsida</a>
   <a href="sommarstege.html">Sommarstegen</a>
@@ -79,8 +94,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/bts-data.js"></script>
 <script>
-const HEADER_URL="https://bastadstegen.se/mail-header.png";
-const FOOTER_URL="https://bastadstegen.se/mail-footer.png";
+const HEADER_URL="https://bastadstegen.se/mail-hero-nyhet.jpg";
 const EMOJIS=['👍','❤️','🎾','🏆','🔥','😂','👏'];
 const NUM=parseInt(new URLSearchParams(location.search).get('n'));
 
@@ -123,7 +137,7 @@ async function loadArticle(){
         <div class="content">${blocksHtml(a.blocks)}</div>
         ${cta}
       </div>
-      <div class="footimg"><img src="${FOOTER_URL}" alt="Båstad Tennissällskap"></div>
+      <div class="foot">Båstad Tennissällskap · <a href="https://bastadstegen.se">bastadstegen.se</a></div>
     </div>`;
   document.getElementById('engagement').style.display='block';
   if(savedName) document.getElementById('c-name').value=savedName;
