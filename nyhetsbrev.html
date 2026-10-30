@@ -7,24 +7,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0D2E20; --card:#0D2A1D; --border:#1C3A2B; --cream:#F5EDE3;
-    --muted:#9A8F86; --clay:#FF8C42; --orange:#E8520A; --sun:#F4B740;
+    --bg:#0A2B48; --card:#092742; --border:#1B3E5C; --cream:#F5EDE3;
+    --muted:#8FB4D4; --clay:#FF9A5A; --orange:#E8520A; --sun:#FF9A5A;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--cream);min-height:100vh}
   a{color:var(--sun)}
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px}
   .topbar a{color:#fff;text-decoration:none;font-size:13px;border:1px solid rgba(255,255,255,.28);padding:7px 13px;border-radius:8px;background:rgba(0,0,0,.18)}
-  .hero{text-align:center;padding:26px 20px 22px;background:linear-gradient(165deg,#FF8C42 0%,#FF8C42 42%,#7A2400 72%,var(--bg) 100%)}
-  .hero h1{font-family:'Anton',sans-serif;font-size:40px;letter-spacing:2px;margin:0;color:#fff}
-  .hero .tag{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5A1800;margin-top:6px}
+  .hero{position:relative;height:clamp(150px,30vw,210px);overflow:hidden;background:#061A2E}
+  .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .hero .veil{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,
+    rgba(5,20,36,.40) 0%,rgba(10,43,72,0) 38%,rgba(10,43,72,.5) 76%,var(--bg) 100%)}
+  .hero img.logo{position:absolute;left:18px;top:10px;z-index:3;height:clamp(100px,22vw,132px);width:auto;
+    filter:drop-shadow(0 3px 12px rgba(0,0,0,.6))}
+  .hero .txt{position:absolute;left:18px;bottom:16px;z-index:3;text-align:left}
+  .hero h1{font-family:'Anton',sans-serif;font-size:clamp(26px,6vw,34px);letter-spacing:1.5px;margin:0;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+  .hero .tag{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:2.2px;text-transform:uppercase;color:#FF9A5A;margin-top:4px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
   .wrap{max-width:1080px;margin:0 auto;padding:22px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
   @media(max-width:880px){ .grid{grid-template-columns:1fr} }
   .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
   .label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
   .label:first-child{margin-top:0}
-  input[type=text],textarea{width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none}
+  input[type=text],textarea{width:100%;background:#071F36;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none}
   input[type=text]:focus,textarea:focus{border-color:var(--clay)}
   input[type=file]{font-size:13px;color:var(--muted);max-width:100%}
   input[type=file]::file-selector-button{background:transparent;border:1px solid var(--border2);color:var(--cream);border-radius:8px;padding:9px 15px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;margin-right:10px;transition:background .15s}
@@ -40,7 +46,7 @@
   .thumb{position:relative;width:78px;height:78px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .thumb button{position:absolute;top:2px;right:2px;width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:12px;cursor:pointer;line-height:1}
-  .blk{background:#10231a;border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-top:10px;transition:border-color .12s,box-shadow .12s}
+  .blk{background:#071F36;border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-top:10px;transition:border-color .12s,box-shadow .12s}
   .blk.dragging{opacity:.45}
   .blk.dragover{border-color:var(--clay);box-shadow:0 -2px 0 var(--clay)}
   .blk-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -50,7 +56,7 @@
   .blk-type{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sun)}
   .blk-tools button{background:transparent;border:1px solid var(--border);color:var(--cream);border-radius:7px;width:28px;height:28px;font-size:13px;cursor:pointer;margin-left:4px}
   .blk-tools button:disabled{opacity:.35;cursor:not-allowed}
-  .statebar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#10231a;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;flex-wrap:wrap}
+  .statebar{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#071F36;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;flex-wrap:wrap}
   .statebar .chip{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
   .statebar .dot{width:9px;height:9px;border-radius:50%;background:var(--sun)}
   .statebar .dot.pub{background:var(--green)}
@@ -70,8 +76,13 @@
   <a href="statistik.html">📊 Statistik</a>
 </div>
 <div class="hero">
-  <h1>NYHETSBREV</h1>
-  <div class="tag">Båstad Stegen · utskick</div>
+  <img class="bg" src="host-hall-poster.jpg" alt="">
+  <div class="veil"></div>
+  <img class="logo" src="mail-logga-orange-tight.png" alt="Båstad Stegen">
+  <div class="txt">
+    <div class="tag">Båstad Stegen · utskick</div>
+    <h1>NYHETSBREV</h1>
+  </div>
 </div>
 
 <!-- LOGIN -->
@@ -138,7 +149,7 @@
         <button class="btn alt" id="btn-test" onclick="sendTest()">Testa till mig</button>
       </div>
       <div class="label" style="margin-top:16px">Mottagare</div>
-      <select id="aud-mode" style="width:100%;background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none">
+      <select id="aud-mode" style="width:100%;background:#071F36;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:14px;padding:11px 13px;border-radius:9px;outline:none">
         <option value="everyone" id="aud-everyone">Alla som varit med (spelare + gäster + Speed Tennis)</option>
         <option value="off">Bara spelarna på stegen</option>
         <option value="hoststege" id="aud-host">Alla i höststegen (herr + dam)</option>
@@ -211,10 +222,10 @@ function paras(txt, name){
 }
 function blocksToHtml(name){
   return blocks.map(b=>{
-    if(b.type==='heading') return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:21px;line-height:1.2;color:#0D2E20;font-weight:700;margin:28px 0 12px;">${esc(b.text||'Rubrik')}</div>`;
-    if(b.type==='image') return b.url?`<img src="${b.url}" style="display:block;border:0;width:100%;max-width:484px;height:auto;border-radius:12px;margin:18px 0;">`:`<div style="border:1px dashed #C9BFB0;border-radius:12px;padding:26px;text-align:center;color:#9A8F86;font-family:Arial;font-size:13px;margin:18px 0;">Ingen bild vald än</div>`;
+    if(b.type==='heading') return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:21px;line-height:1.2;color:#0A2B48;font-weight:700;margin:28px 0 12px;">${esc(b.text||'Rubrik')}</div>`;
+    if(b.type==='image') return b.url?`<img src="${b.url}" style="display:block;border:0;width:100%;max-width:484px;height:auto;border-radius:12px;margin:18px 0;">`:`<div style="border:1px dashed #C2D8EC;border-radius:12px;padding:26px;text-align:center;color:#8FB4D4;font-family:Arial;font-size:13px;margin:18px 0;">Ingen bild vald än</div>`;
     if(b.type==='button') return `<div style="margin:20px 0;"><a href="${esc(b.url||'#')}" style="display:inline-block;background:#E8520A;color:#fff;font-family:Arial;font-weight:700;text-decoration:none;font-size:15px;padding:14px 28px;border-radius:10px;">${esc(b.text||'Knapptext')} →</a></div>`;
-    if(b.type==='divider') return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:26px 0;"><tr><td style="border-top:2px solid #D8CEBD;line-height:0;font-size:0;">&nbsp;</td></tr></table>`;
+    if(b.type==='divider') return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:26px 0;"><tr><td style="border-top:2px solid #DDE5EE;line-height:0;font-size:0;">&nbsp;</td></tr></table>`;
     if(b.type==='spacer'){ const h={small:12,medium:28,large:52}[b.text]||28; return `<div style="height:${h}px;line-height:${h}px;font-size:0;">&nbsp;</div>`; }
     return paras(b.text||'Text…', name);
   }).join('');
@@ -270,7 +281,7 @@ function renderBlocks(){
       const sz=b.text||'medium';
       const opt=(v,t)=>`<option value="${v}" ${sz===v?'selected':''}>${t}</option>`;
       inner=`<div class="row"><span class="hint" style="margin:0">Höjd:</span>
-        <select onchange="setText('${b.id}',this.value)" style="background:#10231a;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:13px;padding:8px 10px;border-radius:8px">
+        <select onchange="setText('${b.id}',this.value)" style="background:#071F36;border:1px solid var(--border);color:var(--cream);font:inherit;font-size:13px;padding:8px 10px;border-radius:8px">
         ${opt('small','Litet')}${opt('medium','Mellan')}${opt('large','Stort')}</select></div>`;
     } else {
       inner=`<textarea id="ta-${b.id}" placeholder="Skriv text… (tom rad = nytt stycke, [förnamn] fylls i)" oninput="setText('${b.id}',this.value)">${esc(b.text||'')}</textarea>`;
@@ -282,15 +293,15 @@ function renderBlocks(){
 function tmplHtml(){
   const kicker=document.getElementById('kicker').value.trim();
   const headline=document.getElementById('headline').value.trim()||'Din rubrik hamnar här';
-  const bodyHtml=blocks.length?blocksToHtml('Anna'):'<p style="margin:0;color:#9A8F86">Lägg till innehåll nedan…</p>';
+  const bodyHtml=blocks.length?blocksToHtml('Anna'):'<p style="margin:0;color:#8FB4D4">Lägg till innehåll nedan…</p>';
   const kickerHtml=kicker?`<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#C24E12;font-weight:700;">${esc(kicker)}</div>`:'';
   return `
-  <div style="background:#0D2E20;padding:14px;border-radius:14px;">
-    <div style="max-width:560px;margin:0 auto;background:#0D2A1D;border-radius:16px;overflow:hidden;border:1px solid #1C3A2B;">
+  <div style="background:#0A2B48;padding:14px;border-radius:14px;">
+    <div style="max-width:560px;margin:0 auto;background:#092742;border-radius:16px;overflow:hidden;border:1px solid #1B3E5C;">
       <div style="line-height:0;background:#E8520A;"><img src="${headerUrl||HEADER_URL}" style="display:block;width:100%;height:auto;border:0;"></div>
-      <div style="background:#FAF6EF;padding:34px 32px 32px;">
+      <div style="background:#FAF8F4;padding:34px 32px 32px;">
         ${kickerHtml}
-        <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0D2E20;font-weight:700;letter-spacing:-0.4px;margin-top:${kicker?'12px':'0'};">${esc(headline)}</div>
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.14;color:#0A2B48;font-weight:700;letter-spacing:-0.4px;margin-top:${kicker?'12px':'0'};">${esc(headline)}</div>
         <div style="height:3px;width:52px;background:#E8520A;margin:18px 0 24px;border-radius:2px;"></div>
         <div style="font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:1.72;color:#2C2C28;">${bodyHtml}</div>
       </div>
@@ -415,7 +426,7 @@ async function loadDrafts(){
     if(!list.length){ box.innerHTML='<div class="hint">Inga sparade brev än.</div>'; return; }
     box.innerHTML=list.map(d=>{
       const pub=d.status==='published';
-      const tag=pub?`<span style="color:#7BC67B">● publicerad (nyhet ${d.num})</span>`:'<span style="color:#F4B740">○ utkast</span>';
+      const tag=pub?`<span style="color:#7BC67B">● publicerad (nyhet ${d.num})</span>`:'<span style="color:#FF9A5A">○ utkast</span>';
       const link=pub?` · <a href="nyhet.html?n=${d.num}" target="_blank">öppna sida</a>`:'';
       return `<div class="blk" style="margin-top:8px">
         <div class="blk-head">
