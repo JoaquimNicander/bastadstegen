@@ -6,19 +6,25 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Kan du spela? · Båstad Stegen</title>
 <style>
-  :root{ --green:#0D2E20; --green2:#123c2a; --line:#1C3A2B; --line2:#2A5A42;
-         --cream:#F5EDE3; --muted:rgba(245,237,227,.6); --clay:#FF8C42; --lime:#D7F23C; }
+  :root{ --green:#0A2B48; --green2:#113655; --line:#1B3E5C; --line2:#2A5F86;
+         --cream:#F5EDE3; --muted:rgba(226,238,250,.62); --clay:#FF9A5A;
+         --clay-s:#E8520A; --clayg:linear-gradient(145deg,#F97A2B 0%,#D4480A 100%);
+         --lime:#FF9A5A; }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:var(--green);color:var(--cream);
        font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;line-height:1.5;
        display:flex;align-items:flex-start;justify-content:center;padding:0 18px 44px}
   .wrap{width:100%;max-width:430px;text-align:center}
+  .courtbg{position:fixed;inset:0;overflow:hidden;z-index:-1;pointer-events:none;opacity:.13}
+  .courtbg .cb{position:absolute;left:50%;top:50%;width:150%;height:210%;
+    transform:translate(-50%,-50%) rotate(-17deg)}
+  .courtbg svg{width:100%;height:100%}
 
   .hero{position:relative;margin:0 -18px 0;height:230px;overflow:hidden}
   .hero img.bg{width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block}
   .hero::after{content:'';position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(13,46,32,.28) 0%,rgba(13,46,32,.55) 45%,var(--green) 100%)}
+    background:linear-gradient(180deg,rgba(5,20,36,.30) 0%,rgba(5,20,36,.58) 45%,var(--green) 100%)}
   .hero .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);z-index:2;
     width:168px;max-width:62%;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
   @media (max-width:360px){ .hero{height:196px} }
@@ -36,12 +42,12 @@
   .b{flex:1;border:none;border-radius:16px;padding:22px 10px;font-size:17px;font-weight:800;
      font-family:inherit;cursor:pointer;transition:transform .12s, filter .12s}
   .b:active{transform:scale(.97)}
-  .b.ja{background:var(--lime);color:#17301a}
+  .b.ja{background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5)}
   .b.nej{background:transparent;color:var(--cream);border:1.5px solid var(--line2)}
   .b.nej:hover{border-color:var(--clay);color:var(--clay)}
   .b[disabled]{opacity:.5;cursor:default}
 
-  .dl{margin-top:16px;font-size:14px;font-weight:700;color:var(--lime)}
+  .dl{margin-top:16px;font-size:14px;font-weight:700;color:var(--clay)}
   .dl span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:3px}
 
   .wish{margin-top:22px;text-align:left}
@@ -73,7 +79,7 @@
   /* Svarat-läge */
   .done .mark{width:74px;height:74px;border-radius:50%;margin:0 auto;display:flex;
        align-items:center;justify-content:center;font-size:34px}
-  .done.ja .mark{background:var(--lime);color:#17301a}
+  .done.ja .mark{background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5)}
   .done.nej .mark{background:rgba(255,255,255,.06);border:1.5px solid var(--line2);color:var(--cream)}
   .done h2{margin:20px 0 0;font-size:24px;font-weight:800;letter-spacing:-.4px}
   .done p{margin:10px 0 0;font-size:14.5px;color:var(--muted)}
@@ -84,6 +90,16 @@
 </style>
 </head>
 <body>
+  <div class="courtbg" aria-hidden="true"><div class="cb">
+    <svg viewBox="0 0 1097 2377" preserveAspectRatio="xMidYMid meet">
+      <g fill="none" stroke="#DCEBFA" stroke-width="9">
+        <rect x="5" y="5" width="1087" height="2367"/>
+        <line x1="137" y1="5" x2="137" y2="2372"/><line x1="960" y1="5" x2="960" y2="2372"/>
+        <line x1="137" y1="548" x2="960" y2="548"/><line x1="137" y1="1829" x2="960" y2="1829"/>
+        <line x1="548" y1="548" x2="548" y2="1829"/>
+        <line x1="5" y1="1188" x2="1092" y2="1188"/>
+      </g></svg>
+  </div></div>
   <div class="wrap" id="app"><div class="state">Hämtar…</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -144,7 +160,7 @@ function renderSvarat(){
 
 function hero(){
   return '<div class="hero">'
-       + '<img class="bg" src="spel-host.jpg" alt="" width="1000" height="417">'
+       + '<img class="bg" src="host-hall-poster.jpg" alt="" width="1000" height="417">'
        + '<img class="logo" src="spel-logga.png" alt="Båstad Stegen">'
        + '</div>';
 }
