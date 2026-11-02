@@ -172,6 +172,9 @@ async function kor(dry){
   try {
     try { localStorage.setItem('bts_admin_pw', pw); } catch(e){}
     const j = await BTS.pollInvite({ adminPw: pw, poll, channel: chan, only, reminder: pam, dryRun: dry });
+    // Skarpt utskick → stämpla förfrågan som utskickad. Först då dyker
+    // rutan "spelar du på söndag?" upp på matchsidan.
+    if(!dry){ try{ await BTS.pollMarkeraUtskickad(pw, poll); }catch(e){} }
     let h = '<b class="ok">' + (dry ? 'Testkörning klar' : 'Utskick klart') + '</b><br>'
           + 'Mottagare i listan: ' + j.antal + '<br>'
           + 'Mejl: ' + j.email.sent + ' ' + (dry ? 'skulle gå ut' : 'skickade')

@@ -449,7 +449,7 @@
 <script>
 const esc=s=>String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const escAttr=s=>esc(s).replace(/"/g,'&quot;');
-let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={}, TROPHY={};
+let ROUND=1, INFO=null, ST=[], MATCHES=[], DIV='H', PLAYERS=[], PROFILES=[], ME=null, WEEK=1, ATT={}, NOTE='', POLL=null, CONFIRM_EDIT=false, MTAB='kommande', STATS={}, CMTS={}, REACTS={}, TROPHY={};
 let POOL=[], POOLST={eligible:false,in_pool:false,antal:0,motstandare:null};
 let WOPICK=0;
 const REMOJI=['🎾','👍','❤️','🏆','🥇','🔥'];
@@ -472,6 +472,7 @@ async function load(){
   try{ const a=BTS.hostActive?await BTS.hostActive():{week:1,note:''}; WEEK=a.week||1; NOTE=a.note||'';
        const ar=BTS.hostAttendance?await BTS.hostAttendance(ROUND,WEEK):[]; ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;}); }catch(e){ ATT={}; }
   await loadPool();
+  await loadPoll();
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
   { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P'}; if(map[h]) DIV=map[h]; }
   renderLogin(); renderConfirm(); renderPool(); render();
@@ -506,39 +507,59 @@ async function doLogin(){
     localStorage.setItem('bts_host_me', JSON.stringify(ME));
     if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); }
     renderLogin(); render();
+    loadPoll().then(renderConfirm);
     goReport();
   }catch(e){ if(err) err.textContent='Kunde inte logga in.'; }
 }
-function logout(){ ME=null; localStorage.removeItem('bts_host_me'); renderLogin(); renderConfirm(); renderPool(); render(); }
+function logout(){ ME=null; POLL=null; localStorage.removeItem('bts_host_me'); renderLogin(); renderConfirm(); renderPool(); render(); }
+async function loadPoll(){
+  POLL=null;
+  if(!ME || !BTS.pollAktuell) return;
+  try{ POLL = await BTS.pollAktuell(ME.id, ME.pin); }catch(e){ POLL=null; }
+}
+const VECKODAG=['söndag','måndag','tisdag','onsdag','torsdag','fredag','lördag'];
+const MANAD=['jan','feb','mars','april','maj','juni','juli','aug','sep','okt','nov','dec'];
+function speldagText(d){
+  const dt=new Date(String(d)+'T12:00:00'); if(isNaN(dt)) return String(d||'');
+  return VECKODAG[dt.getDay()]+' '+dt.getDate()+' '+MANAD[dt.getMonth()];
+}
 function renderConfirm(){
   const el=document.getElementById('confirmbar'); if(!el) return;
-  const canConfirm = ME && ST.some(r=>r.player_id===ME.id);
+  const inLadder = ME && ST.some(r=>r.player_id===ME.id);
   const noteHtml = NOTE ? `<div class="cnote">📍 ${esc(NOTE)}</div>` : '';
-  if(canConfirm){
-    const st=ATT[ME.id]; const yes=st===true, no=st===false; const answered=yes||no;
-    const myM=MATCHES.filter(m=>(m.matchday||0)===WEEK && (m.a_id===ME.id||m.b_id===ME.id));
-    const locked=myM.some(m=>m.status==='done' || m.defer_note || (m.play_date && String(m.start_time||'').trim()));
-    if(answered && !CONFIRM_EDIT){
-      el.innerHTML = noteHtml + `<div class="cmini">${yes
-          ? '<span class="cmini-ok">✓ Du spelar spelomgång '+WEEK+'</span>'
-          : '<span class="cmini-no">✕ Du kan inte spelomgång '+WEEK+'</span>'}
-        ${locked ? '<span class="clocked">🔒 Matchen är satt – kontakta Admin för ändring</span>' : '<button class="clink" onclick="expandConfirm()">Ändra</button>'}</div>
-        <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
-    } else if(answered && CONFIRM_EDIT && locked){
-      CONFIRM_EDIT=false;
-      el.innerHTML = noteHtml + `<div class="cmini"><span class="clocked">🔒 Din match är satt – kontakta Admin om något ändras</span></div>
-        <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
-    } else {
-      el.innerHTML = noteHtml + `<div class="cbx">
-        <div class="ctxt">Spelomgång ${WEEK} · spelar du kommande söndag?</div>
-        <div class="cbtns">
-          <button class="cyes ${yes?'on':''}" onclick="confirmPlay(true)">✓ Jag spelar</button>
-          <button class="cno ${no?'on':''}" onclick="confirmPlay(false)">Kan inte</button>
-        </div></div>
-        <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
-    }
-  } else {
+
+  // Inte inloggad → bara inloggningsknappen.
+  if(!inLadder){
     el.innerHTML = noteHtml + `<button class="repbtn" onclick="focusLogin()">Logga in för att rapportera &amp; bekräfta →</button>`;
+    return;
+  }
+
+  // Ingen utskickad spelförfrågan som ligger framåt i tiden → ingen ruta alls.
+  if(!POLL || !POLL.poll_key){
+    el.innerHTML = noteHtml + `<button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
+    return;
+  }
+
+  const dag = speldagText(POLL.speldag);
+  const yes = POLL.svar === 'ja', no = POLL.svar === 'nej';
+  const answered = yes || no;
+
+  if(answered && !CONFIRM_EDIT){
+    el.innerHTML = noteHtml + `<div class="cmini">${yes
+        ? '<span class="cmini-ok">✓ Du har svarat att du spelar '+dag+'</span>'
+        : '<span class="cmini-no">✕ Du har svarat att du inte kan '+dag+'</span>'}
+      <button class="clink" onclick="expandConfirm()">Ändra</button></div>
+      <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
+  } else {
+    el.innerHTML = noteHtml + `<div class="cbx">
+      <div class="ctxt">Spelar du ${dag}${POLL.starttid?' från '+esc(POLL.starttid):''}?</div>
+      <div class="cbtns">
+        <button class="cyes ${yes?'on':''}" onclick="confirmPlay(true)">✓ Jag spelar</button>
+        <button class="cno ${no?'on':''}" onclick="confirmPlay(false)">Kan inte</button>
+      </div>
+      ${POLL.svarstopp?`<div class="cnote" style="margin-top:8px">Svara senast ${esc(POLL.svarstopp)}</div>`:''}
+      </div>
+      <button class="repbtn" onclick="goReport()">Rapportera dina matcher →</button>`;
   }
 }
 function focusLogin(){ const s=document.getElementById('me-name'); if(s){ s.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>s.focus(),300); } }
@@ -549,9 +570,10 @@ function goReport(){
     if(h) h.scrollIntoView({behavior:'smooth',block:'start'}); },60);
 }
 async function confirmPlay(playing){
-  if(!ME) return;
-  try{ await BTS.hostConfirm(ME.id, ME.pin, playing);
-    const ar=await BTS.hostAttendance(ROUND,WEEK); ATT={}; ar.forEach(x=>{ATT[x.player_id]=x.playing;});
+  if(!ME || !POLL || !POLL.poll_key) return;
+  try{
+    POLL = await BTS.pollSvaraPin(ME.id, ME.pin, POLL.poll_key, playing?'ja':'nej', '');
+    MATCHES = await BTS.hostPoolMatches(ROUND);
     CONFIRM_EDIT=false; renderConfirm(); render();
     loadPool().then(renderPool);
     if(playing===false) openCant();
@@ -559,7 +581,11 @@ async function confirmPlay(playing){
 }
 function myWeekMatches(){
   if(!ME) return [];
-  return MATCHES.filter(m=>(m.matchday||0)===WEEK && (m.a_id===ME.id||m.b_id===ME.id) && m.status!=='done');
+  // Matchen som hör till spelförfrågans speldag – inte den gamla veckoräknaren.
+  const dag = POLL && POLL.speldag ? String(POLL.speldag) : '';
+  const mine = MATCHES.filter(m=>(m.a_id===ME.id||m.b_id===ME.id) && m.status!=='done');
+  const onDay = dag ? mine.filter(m=>String(m.play_date||'')===dag) : [];
+  return onDay.length ? onDay : (dag ? [] : mine.filter(m=>(m.matchday||0)===WEEK));
 }
 function openCant(){
   const mm=myWeekMatches();
@@ -589,7 +615,8 @@ function openCant(){
   </div>`;
   document.getElementById('cantmodal').classList.add('open');
   // skicka aviseringen automatiskt
-  BTS.hostCantNotify(ME.id, ME.pin, WEEK).then(r=>{
+  const cantWeek = mm.length ? (mm[0].matchday||WEEK) : WEEK;
+  BTS.hostCantNotify(ME.id, ME.pin, cantWeek).then(r=>{
     const el=document.getElementById('cant-nmsg'); if(el) el.innerHTML='✓ Motståndaren och klubben är meddelade.';
   }).catch(e=>{ const el=document.getElementById('cant-nmsg'); if(el) el.textContent='Kunde inte skicka avisering: '+(e.message||e); });
 }

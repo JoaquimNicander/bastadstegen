@@ -102,6 +102,8 @@ header{background:linear-gradient(180deg,#0A2B48,var(--surface));border-bottom:1
 .season-bar-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:6px;height:40px}
 .season-chip{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;transition:all 0.2s;white-space:nowrap;background:none;min-height:32px}
 .season-chip.active{border-color:var(--green);color:var(--green);background:rgba(245,237,227,0.08)}
+.season-chip.link{display:inline-flex;align-items:center;text-decoration:none}
+.season-chip.now{border-color:var(--clay);color:var(--clay);background:rgba(193,125,75,0.12)}
 .season-readonly-badge{font-family:'Space Mono',monospace;font-size:10px;color:var(--clay);letter-spacing:1px;background:rgba(193,125,75,0.1);border:1px solid rgba(193,125,75,0.25);padding:3px 10px;white-space:nowrap}
 
 /* ── MAIN ── */
@@ -323,7 +325,7 @@ header{background:linear-gradient(180deg,#0A2B48,var(--surface));border-bottom:1
       </div>
     </a>
     <div class="header-actions">
-      <a href="stegen.html" class="btn-sm">Stegen</a>
+      <a href="hoststege-spel.html" class="btn-sm">Till stegen</a>
       <button class="btn-sm" onclick="logout()">Logga ut</button>
     </div>
   </div>
@@ -383,6 +385,10 @@ const DEFAULT_SEASONS=[
   {id:'ST2026',name:'Sommartermin 2026',short:'ST 2026',start:'2026-06-21',end:'2026-12-20'},
 ];
 function getSeasons(){try{return JSON.parse(localStorage.getItem('bts_seasons')||'null')||DEFAULT_SEASONS}catch(e){return DEFAULT_SEASONS}}
+// Höststegen bor i ett eget system (grupper i stället för stege), så den
+// kan inte visas här – men den ska synas bland säsongerna och vara den
+// man kommer till som standard.
+const EXTRA_LADDERS=[{short:'HT 2026',name:'Höststegen 2026',url:'hoststege-spel.html'}];
 function getActiveSeason(){
   const override=localStorage.getItem('bts_active_season');
   if(override)return override;
@@ -529,8 +535,9 @@ function renderSeasonBar(){
   const bar=document.getElementById('season-bar');
   bar.innerHTML=seasons.map(s=>{
     const isPast=today>s.end;
-    return `<button class="season-chip${s.id===currentSeason?' active':''}${isPast?' past':''}" onclick="switchSeason('${s.id}')">${s.short}${isPast?' ✓':s.id===activeSeason?' ★':''}</button>`;
-  }).join('');
+    return `<button class="season-chip${s.id===currentSeason?' active':''}${isPast?' past':''}" onclick="switchSeason('${s.id}')">${s.short} ✓</button>`;
+  }).join('')
+  + EXTRA_LADDERS.map(x=>`<a class="season-chip link now" href="${x.url}" title="${x.name}">${x.short} ★</a>`).join('');
   if(currentSeason!==activeSeason) bar.innerHTML+=`<span class="season-readonly-badge">Arkiv</span>`;
 }
 

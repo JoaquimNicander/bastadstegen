@@ -804,6 +804,29 @@ const BTS = {
     if (error) throw error;
     return data;
   },
+  // Aktuell, utskickad spelförfrågan för en inloggad spelare (null = ingen).
+  async pollAktuell(playerId, pin) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_aktuell', { p_player_id: playerId, p_pin: pin });
+    if (error) throw error;
+    return data;
+  },
+  // Svara på spelförfrågan direkt från matchsidan, inloggad med PIN.
+  async pollSvaraPin(playerId, pin, pollKey, svar, onskemal) {
+    _assert();
+    const { data, error } = await _sb.rpc('bts_poll_svara_pin', {
+      p_player_id: playerId, p_pin: pin, p_poll_key: pollKey,
+      p_svar: svar, p_onskemal: onskemal || '' });
+    if (error) throw error;
+    return data;
+  },
+  // Stämplas när utskicket körts skarpt – först då syns rutan på sajten.
+  async pollMarkeraUtskickad(adminPw, poll) {
+    _assert();
+    const { error } = await _sb.rpc('bts_poll_markera_utskickad', { p_admin_pw: adminPw, p_poll: poll });
+    if (error) throw error;
+    return true;
+  },
   async pollSvara(token, svar, onskemal) {
     _assert();
     const { data, error } = await _sb.rpc('bts_poll_svara', { p_token: token, p_svar: svar, p_onskemal: onskemal || '' });
