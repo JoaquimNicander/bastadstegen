@@ -680,11 +680,11 @@ const BTS = {
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));
     return j;
   },
-  async hostCantNotify(playerId, pin, week) {
+  async hostCantNotify(playerId, pin, week, matchId) {
     const r = await fetch(`${SUPABASE_URL}/functions/v1/send-message`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY },
-      body: JSON.stringify({ mode: 'host_cant', playerId, pin: pin || '', week: week || null }),
+      body: JSON.stringify({ mode: 'host_cant', playerId, pin: pin || '', week: week || null, matchId: matchId || null }),
     });
     const t = await r.text(); let j; try { j = JSON.parse(t); } catch (e) { j = { error: t }; }
     if (!r.ok || j.error) throw new Error(j.error || ('HTTP ' + r.status));

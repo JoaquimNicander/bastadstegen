@@ -236,6 +236,9 @@
   .gp .surf{margin-left:8px;vertical-align:-3px}
   @media(min-width:380px){ .pmsc{min-width:92px;text-align:right} }
   .confirmbar{margin:14px 0 0}
+  .cantbtn{margin-top:9px;background:none;border:1px solid var(--border2);color:var(--muted2);
+    font:inherit;font-size:12.5px;padding:6px 13px;border-radius:8px;cursor:pointer;transition:all .15s}
+  .cantbtn:hover{border-color:var(--clay);color:var(--clay-t)}
   .cnote{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:13px;color:var(--cream);margin-bottom:8px}
   .cbx{background:var(--cardt);border:1px solid var(--clay);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .ctxt{font-weight:700;font-size:14px;color:#fff}
@@ -587,8 +590,9 @@ function myWeekMatches(){
   const onDay = dag ? mine.filter(m=>String(m.play_date||'')===dag) : [];
   return onDay.length ? onDay : (dag ? [] : mine.filter(m=>(m.matchday||0)===WEEK));
 }
-function openCant(){
-  const mm=myWeekMatches();
+function openCant(matchId){
+  const one = matchId ? MATCHES.filter(function(x){ return x.id===matchId; }) : null;
+  const mm = (one && one.length) ? one : myWeekMatches();
   const opp=mm.length ? mm.map(m=>m.a_id===ME.id?m.b_name:m.a_name).join(', ') : '';
   const mid=mm.length?mm[0].id:0;
   const rescheduleBox = mm.length ? `
@@ -616,7 +620,9 @@ function openCant(){
   document.getElementById('cantmodal').classList.add('open');
   // skicka aviseringen automatiskt
   const cantWeek = mm.length ? (mm[0].matchday||WEEK) : WEEK;
-  BTS.hostCantNotify(ME.id, ME.pin, cantWeek).then(r=>{
+  const cantId = mm.length ? mm[0].id : 0;
+  BTS.hostCantNotify(ME.id, ME.pin, cantWeek, cantId).then(r=>{
+    MATCHES=[]; BTS.hostPoolMatches(ROUND).then(function(x){ MATCHES=x; render(); });
     const el=document.getElementById('cant-nmsg'); if(el) el.innerHTML='✓ Motståndaren och klubben är meddelade.';
   }).catch(e=>{ const el=document.getElementById('cant-nmsg'); if(el) el.textContent='Kunde inte skicka avisering: '+(e.message||e); });
 }
@@ -910,10 +916,12 @@ function upcCard(m, mine){
   const tbd = !(m.start_time && String(m.start_time).trim());
   const timeCell = tbd ? `<div class="hh-tbd">⏱</div>` : `<div class="hh">${esc(m.start_time)}</div>`;
   const tbdNote = tbd ? `<div class="upc-tbd">Ej tidssatt än — väntar på att båda bekräftar spel</div>` : '';
+  const cant = mine && m.status!=='done' && !m.defer_note
+    ? `<button class="cantbtn" onclick="event.stopPropagation();openCant(${m.id})">Kan inte spela</button>` : '';
   return `<div class="upc ${mine?'mine':''}${tbd?' tbd':''}">
     <div class="t">${timeCell}</div>
     <div class="who"><div class="pl">${upcName(m.a_id,m.a_name)} <span style="color:var(--muted2)">–</span> ${upcName(m.b_id,m.b_name)}</div>
-      <div class="gp">${gp}</div>${tbdNote}</div>
+      <div class="gp">${gp}</div>${tbdNote}${cant}</div>
     ${court}</div>`;
 }
 function renderUpcoming(el){
