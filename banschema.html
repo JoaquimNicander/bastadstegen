@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banschema · Båstad Stegen</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --bg:#0A2B48; --card:#092742; --card2:#113655; --border:#1B3E5C; --border2:#2A5F86;
+    --clay:#E8520A; --clay-t:#FF9A5A; --cream:#F5EDE3; --white:#fff;
+    --muted:rgba(255,255,255,.66); --muted2:rgba(255,255,255,.46);
+    --fri:#0B2742; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--cream);font-family:'Outfit',-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:16px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 14px 50px}
+  header{padding:26px 0 14px}
+  .kick{font-family:'Space Mono',monospace;font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--clay-t)}
+  h1{font-family:'Anton',Impact,sans-serif;font-size:34px;letter-spacing:.5px;margin:6px 0 0;color:var(--white);font-weight:400}
+  .sub{color:var(--muted);font-size:14px;margin-top:6px}
+  .datebar{display:flex;gap:8px;overflow-x:auto;margin:18px 0 6px;padding-bottom:4px}
+  .dchip{flex:0 0 auto;background:none;border:1px solid var(--border2);color:var(--muted);font:inherit;font-size:13px;
+    padding:8px 14px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .dchip.on{border-color:var(--clay);color:var(--white);background:rgba(232,82,10,.16)}
+  .sum{display:flex;gap:18px;flex-wrap:wrap;margin:16px 0 18px;font-size:13.5px;color:var(--muted)}
+  .sum b{color:var(--white);font-weight:700}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .d-bok{background:var(--clay)} .d-av{background:none;border:1px dashed var(--clay-t)} .d-fri{background:none;border:1px dashed var(--border2)}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:640px}
+  th,td{padding:0}
+  thead th{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--muted2);
+    text-transform:uppercase;padding:0 0 10px;text-align:center;font-weight:400}
+  thead th.c0{text-align:left;padding-left:2px}
+  td.bana{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;color:var(--muted);
+    white-space:nowrap;padding-right:12px;width:1%;vertical-align:middle}
+  td.bana b{display:block;font-family:'Anton',sans-serif;font-size:21px;color:var(--white);letter-spacing:.5px;font-weight:400;line-height:1}
+  td.slot{padding:0 5px 8px 0}
+  .cell{min-height:70px;border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .cell.bok{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--clay);color:var(--cream)}
+  .cell.bok .pl{font-weight:700;font-size:13.5px;line-height:1.3;color:var(--white)}
+  .cell.bok .gr{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted2)}
+  .cell.av{background:var(--fri);border:1px dashed var(--clay-t);color:var(--muted)}
+  .cell.av .pl{font-size:13px;line-height:1.3;text-decoration:line-through;color:var(--muted2)}
+  .cell.av .tag{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--clay-t);margin-top:2px}
+  .cell.fri{background:var(--fri);border:1px dashed var(--border2);color:var(--muted2);
+    align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+  .foot{margin-top:26px;color:var(--muted2);font-size:12.5px;line-height:1.6}
+  .foot a{color:var(--clay-t)}
+  .empty{padding:40px 0;color:var(--muted);text-align:center}
+  @media(max-width:560px){ h1{font-size:27px} .cell{min-height:62px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kick">Båstad Stegen</div>
+    <h1>Banschema</h1>
+    <div class="sub" id="sub">Laddar…</div>
+    <div class="datebar" id="datebar"></div>
+  </header>
+  <div class="sum" id="sum"></div>
+  <div class="scroll"><div id="grid"></div></div>
+  <div class="foot">
+    Avbokade tider är frisläppta — spelarna gör upp om ny tid själva.<br>
+    Uppdateras direkt när någon avbokar i stegen. <a href="hoststege-spel.html">Till stegen →</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/bts-data.js"></script>
+<script>
+let ALL=[], DATES=[], CUR='';
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function kort(n){ const p=String(n||'').trim().split(/\s+/); if(p.length<2) return p[0]||''; return p[0]+' '+p[p.length-1][0]+'.'; }
+function dagText(d){ const dt=new Date(d+'T00:00:00');
+  const s=dt.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+  return s.charAt(0).toUpperCase()+s.slice(1); }
+function kortDag(d){ const dt=new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}); }
+function banaNr(c){ const m=String(c||'').match(/\d+/); return m?parseInt(m[0]):99; }
+
+async function load(){
+  const info=await BTS.hostPoolInfo();
+  const ms=await BTS.hostPoolMatches(info.current_round);
+  ALL=ms.filter(m=>m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim());
+  DATES=[...new Set(ALL.map(m=>m.play_date))].sort();
+  const idag=new Date().toISOString().slice(0,10);
+  CUR = DATES.find(d=>d>=idag) || DATES[DATES.length-1] || '';
+  render();
+}
+
+function render(){
+  const db=document.getElementById('datebar');
+  db.innerHTML = DATES.map(d=>'<button class="dchip'+(d===CUR?' on':'')+'" onclick="pick(\''+d+'\')">'+esc(kortDag(d))+'</button>').join('');
+  const rows=ALL.filter(m=>m.play_date===CUR);
+  document.getElementById('sub').textContent = CUR ? dagText(CUR) : 'Inga tider utlagda';
+  if(!rows.length){ document.getElementById('grid').innerHTML='<div class="empty">Inga banor bokade den här dagen.</div>';
+    document.getElementById('sum').innerHTML=''; return; }
+
+  const times=[...new Set(rows.map(m=>m.start_time))].sort();
+  const courts=[...new Set(rows.map(m=>m.court))].sort((a,b)=>banaNr(a)-banaNr(b));
+  const at={}; rows.forEach(m=>{ at[m.court+'|'+m.start_time]=m; });
+
+  let bok=0, av=0;
+  rows.forEach(m=>{ if(m.defer_note) av++; else bok++; });
+  const fri = courts.length*times.length - rows.length;
+  document.getElementById('sum').innerHTML =
+    '<span><span class="dot d-bok"></span><b>'+bok+'</b> bokade</span>'+
+    '<span><span class="dot d-av"></span><b>'+av+'</b> avbokade</span>'+
+    '<span><span class="dot d-fri"></span><b>'+(fri+av)+'</b> lediga banor</span>';
+
+  let h='<table><thead><tr><th class="c0">Bana</th>';
+  times.forEach(t=>{ h+='<th>'+esc(t)+'</th>'; });
+  h+='</tr></thead><tbody>';
+  courts.forEach(c=>{
+    h+='<tr><td class="bana"><b>'+banaNr(c)+'</b></td>';
+    times.forEach(t=>{
+      const m=at[c+'|'+t];
+      h+='<td class="slot">'+cell(m)+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('grid').innerHTML=h;
+}
+
+function cell(m){
+  if(!m) return '<div class="cell fri">Ledig</div>';
+  const namn=esc(kort(m.a_name))+' – '+esc(kort(m.b_name));
+  const grp=(m.division==='D'?'Dam':'Herr')+' · Grupp '+esc(m.label);
+  if(m.defer_note) return '<div class="cell av"><div class="pl">'+namn+'</div><div class="tag">Avbokad · banan ledig</div></div>';
+  return '<div class="cell bok"><div class="pl">'+namn+'</div><div class="gr">'+grp+'</div></div>';
+}
+
+function pick(d){ CUR=d; render(); }
+BTS.ready().then(load).catch(e=>{ document.getElementById('sub').textContent='Kunde inte ladda schemat.'; console.error(e); });
+</script>
+</body>
+</html>

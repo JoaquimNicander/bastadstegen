@@ -370,6 +370,37 @@
    width:46px;font-size:18px;font-weight:700;cursor:pointer}
   .repbtn{display:block;width:100%;margin-top:8px;background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:15px;cursor:pointer}
   .repbtn:active{transform:scale(.99)}
+
+/* ---- Beläggning: banschema ---- */
+.bl-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 2px}
+.bl-head h2{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.5px;color:#fff;margin:0;font-weight:400}
+.bl-sub{color:var(--muted2);font-size:12.5px}
+.bl-dates{display:flex;gap:8px;overflow-x:auto;margin:12px 0 4px;padding-bottom:4px}
+.bl-chip{flex:0 0 auto;background:none;border:1px solid var(--border2);color:var(--muted);font:inherit;font-size:12.5px;
+  padding:7px 13px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.bl-chip.on{border-color:var(--clay);color:#fff;background:rgba(232,82,10,.16)}
+.bl-sum{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 14px;font-size:12.5px;color:var(--muted2)}
+.bl-sum b{color:#fff;font-weight:700}
+.bl-dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.bl-d1{background:var(--clay)} .bl-d2{background:none;border:1px dashed var(--clay-t)} .bl-d3{background:none;border:1px dashed var(--border2)}
+.bl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:0 14px}
+.bl-tab{border-collapse:separate;border-spacing:0;width:100%;min-width:560px}
+.bl-tab thead th{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;color:var(--muted2);
+  text-transform:uppercase;padding:0 0 9px;text-align:center;font-weight:400}
+.bl-tab thead th.c0{text-align:left}
+.bl-tab td.bn{font-family:'Anton',sans-serif;font-size:19px;color:#fff;font-weight:400;padding-right:11px;width:1%;vertical-align:middle;line-height:1}
+.bl-tab td.sl{padding:0 5px 7px 0}
+.bl-cell{min-height:64px;border-radius:10px;padding:8px 9px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.bl-bok{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--clay)}
+.bl-bok .p{font-weight:700;font-size:12.5px;line-height:1.3;color:#fff}
+.bl-bok .g{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2)}
+.bl-av{background:rgba(232,82,10,.07);border:1px dashed var(--clay-t);position:relative}
+.bl-av .t{font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--clay-t);font-weight:700}
+.bl-av .p{font-size:11.5px;line-height:1.3;color:var(--muted2);text-decoration:line-through}
+.bl-av .w{font-size:10.5px;color:var(--clay-t);opacity:.85}
+.bl-fri{background:rgba(255,255,255,.02);border:1px dashed var(--border2);align-items:center;justify-content:center;
+  font-family:'Space Mono',monospace;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2)}
+.bl-note{margin-top:14px;color:var(--muted2);font-size:12px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -422,6 +453,7 @@
       <button class="tab" data-div="D" id="tab-D">Dam</button>
       <button class="tab" data-div="M" id="tab-M">Matcher</button>
       <button class="tab" data-div="S" id="tab-S">Spelare</button>
+      <button class="tab" data-div="B" id="tab-B">Beläggning</button>
       <button class="tab" data-div="P" id="tab-P">Pool</button>
     </div>
   </div>
@@ -965,7 +997,7 @@ function renderUpcoming(el){
       sched.filter(m=>!mineIds.has(m.id)).forEach(m=>{
         if(m.play_date!==lastD){ const d=new Date(m.play_date+'T00:00:00');
           const ds=d.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
-          html+=`<div class="upc-date">${ds.charAt(0).toUpperCase()+ds.slice(1)}<span class="upc-note">🎾 Din match hamnar här så fort både du och din motspelare bekräftat spel</span></div>`; lastD=m.play_date; }
+          html+=`<div class="upc-date">${ds.charAt(0).toUpperCase()+ds.slice(1)}</div>`; lastD=m.play_date; }
         html+=upcCard(m,false);
       });
     }
@@ -1059,16 +1091,70 @@ function renderUpcoming(el){
   }
   el.innerHTML=nav+html;
 }
+
+/* ---- Beläggning ---- */
+let BLDAG='';
+function blNr(c){ const m=String(c||'').match(/\d+/); return m?parseInt(m[0]):99; }
+function blKort(n){ const p=String(n||'').trim().split(/\s+/); if(p.length<2) return p[0]||''; return p[0]+' '+p[p.length-1][0]+'.'; }
+function blDag(d){ const dt=new Date(d+'T00:00:00'); const t=dt.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'}); return t.charAt(0).toUpperCase()+t.slice(1); }
+function blChip(d){ const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}); }
+function blPick(d){ BLDAG=d; render(); }
+function renderBelaggning(el){
+  const bokade=MATCHES.filter(m=>m.play_date && String(m.start_time||'').trim() && String(m.court||'').trim());
+  if(!bokade.length){ el.innerHTML='<div class="state">Inga banor utlagda ännu.</div>'; return; }
+  const dagar=[...new Set(bokade.map(m=>m.play_date))].sort();
+  const idag=new Date().toISOString().slice(0,10);
+  if(!dagar.includes(BLDAG)) BLDAG = dagar.find(d=>d>=idag) || dagar[dagar.length-1];
+  const rows=bokade.filter(m=>m.play_date===BLDAG);
+  const tider=[...new Set(rows.map(m=>m.start_time))].sort();
+  const banor=[...new Set(rows.map(m=>m.court))].sort((a,b)=>blNr(a)-blNr(b));
+  const at={}; rows.forEach(m=>{ at[m.court+'|'+m.start_time]=m; });
+  let bok=0,av=0; rows.forEach(m=>{ if(m.defer_note && m.status!=='done') av++; else bok++; });
+  const tomma = banor.length*tider.length - rows.length;
+
+  let h='<div class="bl-head"><h2>Beläggning</h2><span class="bl-sub">'+esc(blDag(BLDAG))+'</span></div>';
+  h+='<div class="bl-dates">'+dagar.map(d=>'<button class="bl-chip'+(d===BLDAG?' on':'')+'" onclick="blPick(\''+d+'\')">'+esc(blChip(d))+'</button>').join('')+'</div>';
+  h+='<div class="bl-sum">'
+    +'<span><span class="bl-dot bl-d1"></span><b>'+bok+'</b> spelas</span>'
+    +'<span><span class="bl-dot bl-d2"></span><b>'+av+'</b> avbokade</span>'
+    +'<span><span class="bl-dot bl-d3"></span><b>'+(tomma+av)+'</b> lediga banor</span></div>';
+  h+='<div class="bl-scroll"><table class="bl-tab"><thead><tr><th class="c0">Bana</th>';
+  tider.forEach(t=>{ h+='<th>'+esc(t)+'</th>'; });
+  h+='</tr></thead><tbody>';
+  banor.forEach(c=>{
+    h+='<tr><td class="bn">'+blNr(c)+'</td>';
+    tider.forEach(t=>{
+      const m=at[c+'|'+t];
+      h+='<td class="sl">'+blCell(m)+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="bl-note">Avbokade tider är frisläppta — spelarna kommer överens om en ny tid själva. '
+    +'Kan du inte spela trycker du <b>Kan inte spela</b> på din match, så uppdateras schemat direkt.</div>';
+  el.innerHTML=h;
+}
+function blCell(m){
+  if(!m) return '<div class="bl-cell bl-fri">Ledig</div>';
+  const namn=esc(blKort(m.a_name))+' – '+esc(blKort(m.b_name));
+  if(m.defer_note && m.status!=='done'){
+    return '<div class="bl-cell bl-av"><div class="t">✕ Avbokad</div><div class="p">'+namn+'</div><div class="w">Banan är ledig</div></div>';
+  }
+  const grp=(m.division==='D'?'Dam':'Herr')+' · Grupp '+esc(m.label);
+  return '<div class="bl-cell bl-bok"><div class="p">'+namn+'</div><div class="g">'+grp+'</div></div>';
+}
+
 function setMatchTab(t){ MTAB=t; render(); }
 function render(){
   renderConfirm();
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.div===DIV));
-  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S'||DIV==='M'||DIV==='P')?'none':'';
+  const lg=document.querySelector('.legend'); if(lg) lg.style.display = (DIV==='S'||DIV==='M'||DIV==='P'||DIV==='B')?'none':'';
   const el=document.getElementById('body');
   renderPool();
   if(DIV==='P'){ renderPoolPage(el); return; }
   if(DIV==='S'){ renderPlayers(el); return; }
   if(DIV==='M'){ renderUpcoming(el); return; }
+  if(DIV==='B'){ renderBelaggning(el); return; }
   const rows=ST.filter(r=>r.division===DIV);
   if(!rows.length){ el.innerHTML='<div class="state">Inga grupper i den här stegen ännu.</div>'; return; }
   const levels=rows.map(r=>r.level), top=Math.min(...levels), bot=Math.max(...levels);
