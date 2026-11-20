@@ -509,10 +509,10 @@ async function load(){
   await loadPool();
   await loadPoll();
   if(ME){ const row=ST.find(r=>r.player_id===ME.id); if(row){ DIV=row.division; OPEN.add(row.division+'-'+row.label); } }
-  { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P'}; if(map[h]) DIV=map[h]; }
+  { const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P',belaggning:'B',banor:'B',banschema:'B'}; if(map[h]) DIV=map[h]; }
   renderLogin(); renderConfirm(); renderPool(); render();
 }
-window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P'}; if(map[h]){ DIV=map[h]; render(); } });
+window.addEventListener('hashchange',()=>{ const h=(location.hash||'').replace('#','').toLowerCase(); const map={matcher:'M',spelare:'S',herr:'H',dam:'D',pool:'P',spelpool:'P',belaggning:'B',banor:'B',banschema:'B'}; if(map[h]){ DIV=map[h]; render(); } });
 function renderLogin(){
   const el=document.getElementById('loginbar'); if(!el) return;
   if(ME){
