@@ -135,7 +135,7 @@ function cell(m){
 }
 
 function pick(d){ CUR=d; render(); }
-BTS.ready().then(load).catch(e=>{ document.getElementById('sub').textContent='Kunde inte ladda schemat.'; console.error(e); });
+load().catch(e=>{ document.getElementById('sub').textContent='Kunde inte ladda schemat.'; console.error(e); });
 </script>
 </body>
 </html>
