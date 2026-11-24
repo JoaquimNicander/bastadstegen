@@ -656,12 +656,39 @@ function openCant(matchId){
     </div>
     <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:9px">
       <button class="cyes" style="width:100%;padding:12px" onclick="closeCant()">Jag hör av mig först</button>
-      <button class="cantbtn" style="width:100%;padding:12px" onclick="doCant(${matchId||0})">Vi har pratat — avboka ändå</button>
+      <button class="cantbtn" style="width:100%;padding:12px" onclick="cantBanval(${matchId||0})">Vi har pratat →</button>
     </div>
   </div>`;
   document.getElementById('cantmodal').classList.add('open');
 }
-function doCant(matchId){
+function cantBanval(matchId){
+  const one = matchId ? MATCHES.filter(function(x){ return x.id===matchId; }) : null;
+  const mm = (one && one.length) ? one : myWeekMatches();
+  const oppNamn = mm.length ? (mm[0].a_id===ME.id ? mm[0].b_name : mm[0].a_name) : '';
+  const banTxt = (mm.length && mm[0].start_time && mm[0].court)
+    ? `${esc(mm[0].start_time)}, ${esc(mm[0].court)}` : 'er bokade tid';
+  document.getElementById('cantmodal').innerHTML=`<div class="pbox" style="max-width:440px">
+    <div class="ph" style="padding:22px">
+      <button class="pclose" onclick="closeCant()" aria-label="Stäng">×</button>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay-t);font-weight:700">Sista steget</div>
+      <h3 style="text-align:left;margin-top:4px;font-size:24px">Vad händer med banan?</h3>
+    </div>
+    <div style="padding:16px 18px;color:var(--cream);font-size:14.5px;line-height:1.6">
+      ${banTxt} är bokad. Vad vill ${esc(oppNamn)} göra?
+    </div>
+    <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:9px">
+      <button class="cantbtn" style="width:100%;padding:13px;text-align:left" onclick="doCant(${matchId||0},'behall')">
+        <b style="color:#fff">${esc(oppNamn)} behåller banan</b><br>
+        <span style="font-size:12.5px">Tränar eller spelar träningsmatch där. Ingen avbokning behövs.</span>
+      </button>
+      <button class="cantbtn" style="width:100%;padding:13px;text-align:left" onclick="doCant(${matchId||0},'slapp')">
+        <b style="color:#fff">Släpp banan</b><br>
+        <span style="font-size:12.5px">Mattias får besked och avbokar tiden hos klubben.</span>
+      </button>
+    </div>
+  </div>`;
+}
+function doCant(matchId, bana){
   const one = matchId ? MATCHES.filter(function(x){ return x.id===matchId; }) : null;
   const mm = (one && one.length) ? one : myWeekMatches();
   const opp=mm.length ? mm.map(m=>m.a_id===ME.id?m.b_name:m.a_name).join(', ') : '';
@@ -699,7 +726,7 @@ function doCant(matchId){
   // skicka aviseringen automatiskt
   const cantWeek = mm.length ? (mm[0].matchday||WEEK) : WEEK;
   const cantId = mm.length ? mm[0].id : 0;
-  BTS.hostCantNotify(ME.id, ME.pin, cantWeek, cantId).then(r=>{
+  BTS.hostCantNotify(ME.id, ME.pin, cantWeek, cantId, bana).then(r=>{
     MATCHES=[]; BTS.hostPoolMatches(ROUND).then(function(x){ MATCHES=x; render(); });
     const el=document.getElementById('cant-nmsg'); if(el) el.innerHTML='✓ Motståndaren och klubben är meddelade.';
   }).catch(e=>{ const el=document.getElementById('cant-nmsg'); if(el) el.textContent='Kunde inte skicka avisering: '+(e.message||e); });
