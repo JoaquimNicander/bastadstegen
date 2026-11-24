@@ -622,15 +622,56 @@ function myWeekMatches(){
   const onDay = dag ? mine.filter(m=>String(m.play_date||'')===dag) : [];
   return onDay.length ? onDay : (dag ? [] : mine.filter(m=>(m.matchday||0)===WEEK));
 }
+function first(n){ return String(n||'').trim().split(/\s+/)[0]||''; }
 function openCant(matchId){
+  // Steg 1: fråga om de pratat med varandra först. Avbokningen skickas
+  // inte förrän spelaren bekräftat — motståndaren vill kanske träna i stället.
+  const one0 = matchId ? MATCHES.filter(function(x){ return x.id===matchId; }) : null;
+  const mm0 = (one0 && one0.length) ? one0 : myWeekMatches();
+  if(!mm0.length){ doCant(matchId); return; }
+  const oppId = mm0[0].a_id===ME.id ? mm0[0].b_id : mm0[0].a_id;
+  const oppNamn = mm0[0].a_id===ME.id ? mm0[0].b_name : mm0[0].a_name;
+  const oppP = (PLAYERS||[]).find(function(x){ return x.id===oppId; }) || {};
+  const tel = String(oppP.phone||'').trim();
+  const telRad = tel
+    ? `<a href="tel:${esc(tel.replace(/\s|-/g,''))}" style="display:flex;align-items:center;justify-content:center;gap:9px;
+         margin-top:16px;padding:14px;background:var(--clayg);color:#fff;text-shadow:0 1px 2px rgba(74,18,0,.5);
+         font-weight:700;font-size:15.5px;text-decoration:none;border-radius:10px">
+         <span style="font-size:18px">📞</span> Ring ${esc(first(oppNamn))} · ${esc(tel)}</a>`
+    : '';
+  document.getElementById('cantmodal').innerHTML=`<div class="pbox" style="max-width:440px">
+    <div class="ph" style="padding:22px">
+      <button class="pclose" onclick="closeCant()" aria-label="Stäng">×</button>
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay-t);font-weight:700">Innan du avbokar</div>
+      <h3 style="text-align:left;margin-top:4px;font-size:24px">Har du pratat med ${esc(oppNamn)}?</h3>
+    </div>
+    <div style="padding:16px 18px;color:var(--cream);font-size:14.5px;line-height:1.6">
+      Ofta går det att hitta en annan tid i veckan i stället för att skjuta upp matchen.
+      <div style="margin:14px 0 0;padding:13px 15px;background:#0E2A45;border-left:3px solid var(--clay);border-radius:8px;font-size:13.5px;line-height:1.55">
+        <b style="color:#fff">Avbokar du är det ditt ansvar att</b>
+        <div style="margin-top:5px">· höra med ${esc(oppNamn)} om hen vill använda banan</div>
+        <div>· boka en ny tid tillsammans med ${esc(oppNamn)}</div>
+      </div>
+      ${telRad}
+    </div>
+    <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:9px">
+      <button class="cyes" style="width:100%;padding:12px" onclick="closeCant()">Jag hör av mig först</button>
+      <button class="cantbtn" style="width:100%;padding:12px" onclick="doCant(${matchId||0})">Vi har pratat — avboka ändå</button>
+    </div>
+  </div>`;
+  document.getElementById('cantmodal').classList.add('open');
+}
+function doCant(matchId){
   const one = matchId ? MATCHES.filter(function(x){ return x.id===matchId; }) : null;
   const mm = (one && one.length) ? one : myWeekMatches();
   const opp=mm.length ? mm.map(m=>m.a_id===ME.id?m.b_name:m.a_name).join(', ') : '';
   const mid=mm.length?mm[0].id:0;
+  const banTxt = (mm.length && mm[0].start_time && mm[0].court)
+    ? ` (${esc(mm[0].start_time)}, ${esc(mm[0].court)})` : '';
   const rescheduleBox = mm.length ? `
     <div style="border-top:1px solid var(--border);padding:16px">
-      <div style="font-weight:700;color:#fff;margin-bottom:4px">Kommit överens om ny tid?</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Skriv in den så meddelas ${esc(opp)} och klubben, och tiden syns på matchen.</div>
+      <div style="font-weight:700;color:#fff;margin-bottom:4px">Lägg in er nya tid</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">När ni kommit överens — skriv in den så meddelas ${esc(opp)} och klubben, och tiden syns på matchen.</div>
       <input id="cant-note" type="text" placeholder="T.ex. onsdag 18:00, bana 2" style="width:100%;font:inherit;padding:11px 13px;background:#071F36;border:1px solid var(--border2);border-radius:9px;color:#fff;box-sizing:border-box">
       <button class="repbtn" style="margin-top:10px" onclick="sendReschedule(${mid})">Meddela ny tid →</button>
       <div class="state" id="cant-rmsg" style="color:var(--muted);font-size:13px;margin-top:8px"></div>
@@ -642,12 +683,17 @@ function openCant(matchId){
       <h3 style="text-align:left;margin-top:4px;font-size:24px">Du kan inte spela</h3>
     </div>
     <div style="padding:16px 18px;color:var(--cream);font-size:14.5px;line-height:1.6">
-      ${opp ? `Vi meddelar <b>${esc(opp)}</b> och klubben automatiskt via SMS/mejl. Ta kontakt med varandra och kom överens om en ny tid att spela er match.`
+      ${opp ? `<b>${esc(opp)}</b> och klubben är meddelade.
+        <div style="margin:14px 0 0;padding:14px 16px;background:#0E2A45;border-left:3px solid var(--clay);border-radius:8px;font-size:13.5px;line-height:1.6">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clay-t);font-weight:700;margin-bottom:7px">Nu är det upp till dig</div>
+          <div><b style="color:#fff">1.</b> Fråga ${esc(opp)} om hen vill använda banan${banTxt}. Avbokar du sent står den tom annars.</div>
+          <div style="margin-top:6px"><b style="color:#fff">2.</b> Kom överens med ${esc(opp)} om en ny tid för matchen, och lägg in den här nedanför.</div>
+        </div>`
             : 'Klubben är meddelad. Du hade ingen inlagd match för den här spelomgången.'}
       <div class="state" id="cant-nmsg" style="color:var(--muted);font-size:13px;margin-top:10px">Skickar avisering…</div>
     </div>
     ${rescheduleBox}
-    <div style="padding:0 18px 18px"><button class="cyes" style="width:100%;padding:12px" onclick="closeCant()">Klart</button></div>
+    <div style="padding:0 18px 18px"><button class="cyes" style="width:100%;padding:12px" onclick="closeCant()">Jag tar det härifrån</button></div>
   </div>`;
   document.getElementById('cantmodal').classList.add('open');
   // skicka aviseringen automatiskt
